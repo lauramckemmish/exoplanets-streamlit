@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+import math
 from pathlib import Path
 
 import numpy as np
@@ -23,17 +24,191 @@ NUMERIC = [
     "disc_year", "ra", "dec", "pl_orbper", "pl_orbsmax", "pl_rade",
     "pl_bmasse", "pl_bmassj", "pl_eqt", "sy_dist", "sy_snum", "sy_pnum",
 ]
-PLOT_FIELDS = {
-    "Planet radius (Earth radii)": "pl_rade",
-    "Planet mass (Earth masses)": "pl_bmasse",
-    "Orbital period (days)": "pl_orbper",
-    "Orbital distance (AU)": "pl_orbsmax",
-    "Equilibrium temperature (K)": "pl_eqt",
-    "Distance from Earth (parsecs)": "sy_dist",
-    "Discovery year": "disc_year",
+
+VARIABLES = {
+    "pl_rade": {
+        "label": "Planet radius",
+        "unit": "Earth radii",
+        "description": "The size of the planet compared with Earth.",
+        "measurement": "Measured or modelled from observations, often from transit data.",
+        "log": "optional",
+        "log_reason": "Radius varies substantially, but usually across fewer orders of magnitude than mass or orbital period.",
+    },
+    "pl_bmasse": {
+        "label": "Planet mass",
+        "unit": "Earth masses",
+        "description": "The mass of the planet compared with Earth.",
+        "measurement": "Measured or estimated from methods such as radial velocity and transit timing.",
+        "log": "recommended",
+        "log_reason": "Planet masses span many orders of magnitude, so a logarithmic axis usually reveals the structure more clearly.",
+    },
+    "pl_orbper": {
+        "label": "Orbital period",
+        "unit": "days",
+        "description": "The time taken for the planet to complete one orbit around its host star.",
+        "measurement": "Measured from repeating signals such as transits or radial-velocity cycles.",
+        "log": "recommended",
+        "log_reason": "Orbital periods range from fractions of a day to many years.",
+    },
+    "pl_orbsmax": {
+        "label": "Orbital distance",
+        "unit": "astronomical units (AU)",
+        "description": "The semi-major axis of the planet's orbit, used as a measure of orbital distance.",
+        "measurement": "Calculated from orbital observations and system models.",
+        "log": "recommended",
+        "log_reason": "Orbital distances span very small to very large values.",
+    },
+    "pl_eqt": {
+        "label": "Equilibrium temperature",
+        "unit": "kelvin (K)",
+        "description": "An estimate of the planet's temperature based on absorbed and emitted radiation.",
+        "measurement": "Calculated estimate. It does not directly represent surface temperature or climate.",
+        "log": "usually unnecessary",
+        "log_reason": "Temperature values are positive but normally occupy a range that remains readable on a linear axis.",
+    },
+    "sy_dist": {
+        "label": "Distance from Earth",
+        "unit": "parsecs",
+        "description": "The distance from Earth to the planetary system.",
+        "measurement": "Measured astronomically, commonly using parallax and related methods.",
+        "log": "recommended",
+        "log_reason": "Distances span a broad range and may cluster near the lower end on a linear axis.",
+    },
+    "disc_year": {
+        "label": "Discovery year",
+        "unit": "year",
+        "description": "The year the planet was reported as discovered.",
+        "measurement": "A calendar year, not a physical measurement.",
+        "log": "usually unnecessary",
+        "log_reason": "Equal differences between years are meaningful, so a linear axis is clearer.",
+    },
+    "sy_snum": {
+        "label": "Stars in system",
+        "unit": "count",
+        "description": "The number of known stars in the planetary system.",
+        "measurement": "A small whole-number count.",
+        "log": "not suitable",
+        "log_reason": "Small category-like counts are clearer on a linear axis.",
+    },
+    "sy_pnum": {
+        "label": "Planets in system",
+        "unit": "count",
+        "description": "The number of known planets in the planetary system.",
+        "measurement": "A small whole-number count that may change as more planets are discovered.",
+        "log": "not suitable",
+        "log_reason": "Small whole-number counts are clearer on a linear axis.",
+    },
 }
 
-st.set_page_config(page_title="Find Tatooine", page_icon="🪐", layout="wide")
+FIELD_OPTIONS = {
+    f"{details['label']} ({details['unit']})": field
+    for field, details in VARIABLES.items()
+}
+FIELD_LABEL = {field: label for label, field in FIELD_OPTIONS.items()}
+
+COLOUR_OPTIONS = {
+    "Discovery method": "discoverymethod",
+    "Discovery year": "disc_year",
+    "Distance from Earth": "sy_dist",
+    "Stars in system": "sy_snum",
+    "Planets in system": "sy_pnum",
+}
+
+INVESTIGATIONS = {
+    "Does planet size relate to mass?": {
+        "x": "pl_rade", "y": "pl_bmasse", "colour": "discoverymethod",
+        "log_x": False, "log_y": True,
+        "question": "Do larger planets tend to have greater mass?",
+        "caution": "Planets with similar radii can have very different compositions and masses. Mass is also missing for many planets.",
+        "teacher": "Ask why two planets with similar radii might have different masses. Listen for composition, density and measurement uncertainty.",
+    },
+    "Does orbital distance relate to temperature?": {
+        "x": "pl_orbsmax", "y": "pl_eqt", "colour": "discoverymethod",
+        "log_x": True, "log_y": False,
+        "question": "Are planets farther from their stars generally cooler?",
+        "caution": "The host star's luminosity and the assumptions used in estimating equilibrium temperature also matter.",
+        "teacher": "Use this to distinguish a broad relationship from a complete causal model. Distance is important, but it is not the only factor.",
+    },
+    "Do discovery methods reveal different planet populations?": {
+        "x": "pl_orbper", "y": "pl_rade", "colour": "discoverymethod",
+        "log_x": True, "log_y": False,
+        "question": "Do discovery methods tend to identify planets with different sizes or orbital periods?",
+        "caution": "Visible clusters may reflect detection bias as much as the underlying population of planets.",
+        "teacher": "Prompt students to separate 'what exists' from 'what our instruments are good at finding'.",
+    },
+    "Has the reach of exoplanet discovery changed over time?": {
+        "x": "disc_year", "y": "sy_dist", "colour": "discoverymethod",
+        "log_x": False, "log_y": True,
+        "question": "Have discoveries extended to more distant systems over time?",
+        "caution": "Distance alone is not a simple measure of telescope capability or scientific progress.",
+        "teacher": "Ask students what other factors influence the visible pattern, including survey design, methods and target selection.",
+    },
+}
+
+MISSION_NOTES = {
+    0: {
+        "explain": "The narrative gives the investigation a clear purpose. The scientific task is to translate story evidence into variables and filters.",
+        "ask": "What facts about Tatooine could be represented in a dataset?",
+        "expected": "Two stars, a planetary system, approximately Earth-like size or gravity, temperature and a location.",
+        "idea": "Begin with a question before opening the data.",
+        "watch": "Avoid treating every visual detail from a film as a precise scientific measurement.",
+    },
+    1: {
+        "explain": "Before filtering, inspect what each row and column represent and how much information is missing.",
+        "ask": "What does a missing value tell us?",
+        "expected": "Only that this property is unknown or unavailable in this table.",
+        "idea": "Data quality affects which questions can be answered.",
+        "watch": "Students may interpret missing as zero or as evidence that a candidate qualifies.",
+    },
+    2: {
+        "explain": "Operationalising means converting an idea into a measurable rule.",
+        "ask": "How can 'two suns' become a filter?",
+        "expected": "Select records where the number of known stars equals two.",
+        "idea": "Evidence becomes useful when it is linked to a variable and a decision rule.",
+        "watch": "A dataset variable is a representation of reality, not reality itself.",
+    },
+    3: {
+        "explain": "The first filter removes systems that do not have exactly two known stars and separately counts records with missing star data.",
+        "ask": "Should unknown star counts be kept as possible matches?",
+        "expected": "They can be labelled unknown, but they cannot be counted as confirmed matches.",
+        "idea": "Filter failures and missing data are different reasons for exclusion.",
+        "watch": "Do not describe missing data as failing the physical criterion.",
+    },
+    4: {
+        "explain": "The original notebook assumes a three-planet system. This is a modelling choice rather than a fact established by the films.",
+        "ask": "What happens if we use 'at least three' instead of 'exactly three'?",
+        "expected": "More candidates remain because the criterion is broader.",
+        "idea": "Analytical choices shape the result.",
+        "watch": "Students may think a filter is objectively correct simply because it is coded into the app.",
+    },
+    5: {
+        "explain": "Radius is available more often than mass, but radius is not the same as mass or surface gravity.",
+        "ask": "What assumption are we making when we use Earth-like radius as a proxy?",
+        "expected": "That an Earth-sized planet may be more likely to support Earth-like conditions, while recognising the evidence is incomplete.",
+        "idea": "Proxies allow analysis but introduce limitations.",
+        "watch": "Avoid claiming that Earth-sized means habitable or Earth-like.",
+    },
+    6: {
+        "explain": "Candidates should be compared using known, conflicting and missing evidence.",
+        "ask": "Which candidate has the strongest evidence, and which has only insufficient information?",
+        "expected": "Students should justify a choice and explicitly mention uncertainty.",
+        "idea": "A conclusion should include evidence, assumptions and limitations.",
+        "watch": "Unknown temperature or mass is not positive evidence for a match.",
+    },
+    7: {
+        "explain": "The sky map communicates direction using right ascension and declination. It does not show the true physical spacing of systems.",
+        "ask": "What can this map show, and what can it not show?",
+        "expected": "It shows celestial direction, but not true three-dimensional distance unless distance is incorporated.",
+        "idea": "Visualisations are models with defined purposes and limitations.",
+        "watch": "The sphere can look like a physical map of nearby space even though distance is not represented.",
+    },
+}
+
+st.set_page_config(
+    page_title="Find Tatooine | Exoplanet Data Investigation",
+    page_icon="🪐",
+    layout="wide",
+)
 
 
 @st.cache_data(ttl=21_600, show_spinner=False)
@@ -59,14 +234,15 @@ def prepare(raw: pd.DataFrame) -> pd.DataFrame:
         if column not in data.columns:
             data[column] = np.nan
     data = data[COLUMNS]
+
     for column in NUMERIC:
         data[column] = pd.to_numeric(data[column], errors="coerce")
     for column in ["pl_name", "hostname", "discoverymethod", "disc_telescope"]:
         data[column] = data[column].astype("string").str.strip()
+
     data = data.dropna(subset=["pl_name"]).drop_duplicates("pl_name")
-    data["disc_year"] = data["disc_year"].astype("Int64")
-    data["sy_snum"] = data["sy_snum"].astype("Int64")
-    data["sy_pnum"] = data["sy_pnum"].astype("Int64")
+    for column in ["disc_year", "sy_snum", "sy_pnum"]:
+        data[column] = data[column].astype("Int64")
 
     valid = data["ra"].notna() & data["dec"].notna()
     ra = np.deg2rad(data.loc[valid, "ra"])
@@ -77,92 +253,249 @@ def prepare(raw: pd.DataFrame) -> pd.DataFrame:
     return data.reset_index(drop=True)
 
 
-def filter_step(frame: pd.DataFrame, column: str, keep: pd.Series, label: str):
+def load_data(source: str) -> tuple[pd.DataFrame, str]:
+    if source == "Live NASA data":
+        try:
+            return prepare(load_live()), "Live NASA Exoplanet Archive"
+        except Exception as exc:
+            st.warning(f"Live NASA data could not be loaded: {exc}")
+            st.info("The bundled notebook sample is being used instead.")
+    return prepare(load_sample()), "Bundled notebook sample"
+
+
+def apply_filter(frame: pd.DataFrame, column: str, mask: pd.Series, label: str) -> tuple[pd.DataFrame, dict[str, int | str]]:
     before = len(frame)
     missing = int(frame[column].isna().sum())
-    result = frame[frame[column].notna() & keep].copy()
+    result = frame[frame[column].notna() & mask].copy()
     return result, {
         "Criterion": label,
         "Before": before,
-        "Missing excluded": missing,
+        "Did not meet criterion": before - missing - len(result),
+        "Missing or unknown": missing,
         "Remaining": len(result),
     }
 
 
-def build_candidates(
+def mission_candidates(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, list[pd.DataFrame]]:
+    current = data.copy()
+    steps: list[dict[str, int | str]] = []
+    stages = [current.copy()]
+
+    current, row = apply_filter(current, "sy_snum", current["sy_snum"] == 2, "Exactly two known stars")
+    steps.append(row)
+    stages.append(current.copy())
+
+    current, row = apply_filter(current, "sy_pnum", current["sy_pnum"] == 3, "Exactly three known planets")
+    steps.append(row)
+    stages.append(current.copy())
+
+    current, row = apply_filter(
+        current,
+        "pl_rade",
+        current["pl_rade"].between(0.8, 1.5, inclusive="both"),
+        "Radius between 0.8 and 1.5 Earth radii",
+    )
+    steps.append(row)
+    stages.append(current.copy())
+    return current, pd.DataFrame(steps), stages
+
+
+def custom_candidates(
     data: pd.DataFrame,
     stars: int,
-    planet_mode: str,
+    planet_rule: str,
     planets: int,
     radius: tuple[float, float],
-    use_temp: bool,
-    temperature: tuple[int, int],
-    use_distance: bool,
-    distance: float,
-):
+    temperature: tuple[int, int] | None,
+    max_distance: float | None,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     current = data.copy()
-    steps = []
+    rows: list[dict[str, int | str]] = []
 
-    current, step = filter_step(
-        current, "sy_snum", current["sy_snum"] == stars,
-        f"Exactly {stars} known star{'s' if stars != 1 else ''}",
-    )
-    steps.append(step)
-
-    planet_keep = current["sy_pnum"] == planets if planet_mode == "Exactly" else current["sy_pnum"] >= planets
-    current, step = filter_step(
-        current, "sy_pnum", planet_keep,
-        f"{planet_mode} {planets} known planet{'s' if planets != 1 else ''}",
-    )
-    steps.append(step)
-
-    current, step = filter_step(
-        current, "pl_rade", current["pl_rade"].between(*radius, inclusive="both"),
+    current, row = apply_filter(current, "sy_snum", current["sy_snum"] == stars, f"Exactly {stars} known stars")
+    rows.append(row)
+    planet_mask = current["sy_pnum"] == planets if planet_rule == "Exactly" else current["sy_pnum"] >= planets
+    current, row = apply_filter(current, "sy_pnum", planet_mask, f"{planet_rule} {planets} known planets")
+    rows.append(row)
+    current, row = apply_filter(
+        current,
+        "pl_rade",
+        current["pl_rade"].between(*radius, inclusive="both"),
         f"Radius {radius[0]:.2f} to {radius[1]:.2f} Earth radii",
     )
-    steps.append(step)
-
-    if use_temp:
-        current, step = filter_step(
-            current, "pl_eqt", current["pl_eqt"].between(*temperature, inclusive="both"),
+    rows.append(row)
+    if temperature is not None:
+        current, row = apply_filter(
+            current,
+            "pl_eqt",
+            current["pl_eqt"].between(*temperature, inclusive="both"),
             f"Temperature {temperature[0]} to {temperature[1]} K",
         )
-        steps.append(step)
-
-    if use_distance:
-        current, step = filter_step(
-            current, "sy_dist", current["sy_dist"] <= distance,
-            f"Within {distance:.0f} parsecs",
-        )
-        steps.append(step)
-
-    return current, pd.DataFrame(steps)
+        rows.append(row)
+    if max_distance is not None:
+        current, row = apply_filter(current, "sy_dist", current["sy_dist"] <= max_distance, f"Within {max_distance:.0f} parsecs")
+        rows.append(row)
+    return current, pd.DataFrame(rows)
 
 
-def sky_map(data: pd.DataFrame, selected: str | None) -> go.Figure:
+def discovery_chart(data: pd.DataFrame, methods: list[str]) -> go.Figure:
+    subset = data[data["discoverymethod"].isin(methods)].dropna(subset=["disc_year"])
+    counts = subset.groupby(["disc_year", "discoverymethod"], observed=True).size().reset_index(name="Planets")
+    figure = px.bar(
+        counts,
+        x="disc_year",
+        y="Planets",
+        color="discoverymethod",
+        labels={"disc_year": "Discovery year", "discoverymethod": "Discovery method"},
+        title="Confirmed exoplanet discoveries by year and method",
+    )
+    figure.update_layout(height=560, legend_title_text="Discovery method")
+    return figure
+
+
+def scale_profile(data: pd.DataFrame, field: str) -> dict[str, float | int | str | None]:
+    series = pd.to_numeric(data[field], errors="coerce")
+    complete = series.dropna()
+    positive = complete[complete > 0]
+    min_value = float(complete.min()) if not complete.empty else None
+    max_value = float(complete.max()) if not complete.empty else None
+    positive_min = float(positive.min()) if not positive.empty else None
+    positive_max = float(positive.max()) if not positive.empty else None
+    orders = None
+    if positive_min and positive_max and positive_min > 0 and positive_max >= positive_min:
+        orders = math.log10(positive_max / positive_min) if positive_max > positive_min else 0.0
+    return {
+        "complete": int(complete.size),
+        "missing": int(series.isna().sum()),
+        "non_positive": int((complete <= 0).sum()),
+        "min": min_value,
+        "max": max_value,
+        "positive_min": positive_min,
+        "positive_max": positive_max,
+        "orders": orders,
+    }
+
+
+def format_number(value: float | None) -> str:
+    if value is None or not np.isfinite(value):
+        return "Unknown"
+    if abs(value) >= 10000 or (0 < abs(value) < 0.01):
+        return f"{value:.2e}"
+    return f"{value:,.2f}"
+
+
+def scale_guidance(data: pd.DataFrame, field: str) -> tuple[str, str, dict[str, float | int | str | None]]:
+    details = VARIABLES[field]
+    profile = scale_profile(data, field)
+    orders = profile["orders"]
+    suitability = details["log"]
+
+    if suitability == "not suitable":
+        status = "Linear scale recommended"
+    elif suitability == "usually unnecessary":
+        status = "Linear scale usually clearer"
+    elif suitability == "recommended" or (orders is not None and orders >= 3):
+        status = "Logarithmic scale recommended"
+    else:
+        status = "Logarithmic scale optional"
+
+    range_text = (
+        f"The positive values range from {format_number(profile['positive_min'])} to "
+        f"{format_number(profile['positive_max'])}."
+    )
+    if orders is not None:
+        range_text += f" This spans approximately {orders:.1f} orders of magnitude."
+    return status, f"{details['log_reason']} {range_text}", profile
+
+
+def scatter_chart(
+    data: pd.DataFrame,
+    x_field: str,
+    y_field: str,
+    colour_field: str,
+    log_x: bool,
+    log_y: bool,
+) -> tuple[go.Figure | None, dict[str, int]]:
+    total = len(data)
+    complete_mask = data[[x_field, y_field, colour_field]].notna().all(axis=1)
+    complete = data[complete_mask].copy()
+    log_excluded = pd.Series(False, index=complete.index)
+    if log_x:
+        log_excluded |= complete[x_field] <= 0
+    if log_y:
+        log_excluded |= complete[y_field] <= 0
+    plot_data = complete[~log_excluded].copy()
+
+    stats = {
+        "Total records": total,
+        "Missing selected values": total - len(complete),
+        "Excluded by log scale": int(log_excluded.sum()),
+        "Records shown": len(plot_data),
+    }
+    if plot_data.empty:
+        return None, stats
+
+    figure = px.scatter(
+        plot_data,
+        x=x_field,
+        y=y_field,
+        color=colour_field,
+        hover_name="pl_name",
+        hover_data={
+            "hostname": True,
+            "disc_year": True,
+            "discoverymethod": True,
+            "pl_rade": ":.2f",
+            "pl_bmasse": ":.2f",
+            "pl_eqt": ":.1f",
+            "sy_dist": ":.1f",
+        },
+        log_x=log_x,
+        log_y=log_y,
+        labels={
+            x_field: FIELD_LABEL[x_field],
+            y_field: FIELD_LABEL[y_field],
+            colour_field: next((label for label, value in COLOUR_OPTIONS.items() if value == colour_field), colour_field),
+        },
+        title=f"{VARIABLES[y_field]['label']} compared with {VARIABLES[x_field]['label']}",
+    )
+    figure.update_traces(marker={"size": 8, "opacity": 0.65})
+    figure.update_layout(height=610)
+    return figure, stats
+
+
+def sky_map(data: pd.DataFrame, selected_planet: str) -> go.Figure:
     mapped = data.dropna(subset=["x", "y", "z"]).copy()
-    chosen = mapped[mapped["pl_name"] == selected]
-    background = mapped[mapped["pl_name"] != selected]
+    selected = mapped[mapped["pl_name"] == selected_planet]
+    background = mapped[mapped["pl_name"] != selected_planet]
 
-    fig = go.Figure()
-    fig.add_trace(go.Scatter3d(
+    figure = go.Figure()
+    figure.add_trace(go.Scatter3d(
         x=background["x"], y=background["y"], z=background["z"],
         mode="markers", name="Known exoplanets",
-        marker={"size": 3, "opacity": 0.35},
+        marker={"size": 3, "opacity": 0.3},
         text=background["pl_name"],
-        hovertemplate="<b>%{text}</b><extra></extra>",
+        customdata=np.column_stack([
+            background["sy_dist"].fillna(np.nan),
+            background["discoverymethod"].fillna("Unknown"),
+        ]) if not background.empty else None,
+        hovertemplate=(
+            "<b>%{text}</b><br>Distance: %{customdata[0]:.1f} pc"
+            "<br>Method: %{customdata[1]}<extra></extra>"
+        ),
     ))
-    if not chosen.empty:
-        fig.add_trace(go.Scatter3d(
-            x=chosen["x"], y=chosen["y"], z=chosen["z"],
-            mode="markers+text", name=selected,
+    if not selected.empty:
+        figure.add_trace(go.Scatter3d(
+            x=selected["x"], y=selected["y"], z=selected["z"],
+            mode="markers+text", name=selected_planet,
             marker={"size": 9, "symbol": "diamond"},
-            text=chosen["pl_name"], textposition="top center",
+            text=selected["pl_name"], textposition="top center",
             hovertemplate="<b>%{text}</b><extra></extra>",
         ))
-    fig.update_layout(
-        height=620,
+    figure.update_layout(
+        height=650,
         margin={"l": 0, "r": 0, "t": 20, "b": 0},
+        legend={"orientation": "h", "y": 0.02},
         scene={
             "xaxis": {"title": "x", "showticklabels": False},
             "yaxis": {"title": "y", "showticklabels": False},
@@ -170,169 +503,520 @@ def sky_map(data: pd.DataFrame, selected: str | None) -> go.Figure:
             "aspectmode": "cube",
         },
     )
-    return fig
+    return figure
 
 
-st.title("🪐 Find Tatooine")
-st.subheader("A guided exoplanet data-science investigation")
-st.write(
-    "Explore real exoplanet records, examine missing data, visualise patterns, "
-    "and turn a fictional description into measurable selection criteria."
-)
+def presenter_notes(step: int) -> None:
+    notes = MISSION_NOTES[step]
+    with st.expander("Demonstrator notes", expanded=False):
+        st.markdown(f"**Explain**  \n{notes['explain']}")
+        st.markdown(f"**Ask the group**  \n{notes['ask']}")
+        st.markdown(f"**Expected response**  \n{notes['expected']}")
+        st.markdown(f"**Key data-science idea**  \n{notes['idea']}")
+        st.markdown(f"**Watch for**  \n{notes['watch']}")
 
-with st.sidebar:
-    st.header("Data source")
-    source = st.radio(
-        "Choose a dataset",
-        ["Live NASA Exoplanet Archive", "Bundled notebook sample"],
-    )
-    st.caption("The live dataset is cached for six hours.")
 
-try:
-    with st.spinner("Loading exoplanet data..."):
-        raw = load_live() if source.startswith("Live") else load_sample()
-    source_used = source
-except Exception as exc:
-    st.warning(f"The live NASA request failed, so the bundled sample is being used. Details: {exc}")
-    raw = load_sample()
-    source_used = "Bundled notebook sample"
+def variable_card(data: pd.DataFrame, field: str, guidance_mode: str) -> None:
+    details = VARIABLES[field]
+    status, reason, profile = scale_guidance(data, field)
+    st.markdown(f"#### {details['label']}")
+    st.write(f"**Field:** `{field}`  ")
+    st.write(f"**Unit:** {details['unit']}  ")
+    st.write(details["description"])
+    if guidance_mode != "Minimal":
+        st.caption(details["measurement"])
+        st.info(f"**Scale guidance: {status}.** {reason}")
+        st.caption(
+            f"Available for {profile['complete']:,} of {len(data):,} records; "
+            f"{profile['missing']:,} values are missing."
+        )
 
-data = prepare(raw)
 
-m1, m2, m3, m4 = st.columns(4)
-m1.metric("Planet records", f"{len(data):,}")
-m2.metric("Host systems", f"{data['hostname'].nunique():,}")
-m3.metric("Discovery methods", f"{data['discoverymethod'].nunique():,}")
-m4.metric("Data source", source_used)
+def guidance_box(mode: str, student_text: str, teacher_text: str | None = None) -> None:
+    if mode == "Student":
+        st.info(student_text)
+    elif mode == "Teacher" and teacher_text:
+        st.info(student_text)
+        with st.expander("Teacher guidance", expanded=False):
+            st.write(teacher_text)
 
-meet, discoveries, relationships, tatooine, mapping = st.tabs([
-    "1. Meet the data", "2. Discoveries", "3. Relationships",
-    "4. Find Tatooine", "5. Map the candidate",
-])
 
-with meet:
+def mission_navigation(step: int, total: int, position: str) -> None:
+    left, middle, right = st.columns([1, 4, 1])
+    with left:
+        if step > 0 and st.button("← Back", use_container_width=True, key=f"{position}_back_{step}"):
+            st.session_state["mission_step"] = step - 1
+            st.rerun()
+    with middle:
+        st.progress((step + 1) / total, text=f"Mission stage {step + 1} of {total}")
+    with right:
+        if step < total - 1 and st.button("Continue →", use_container_width=True, type="primary", key=f"{position}_continue_{step}"):
+            st.session_state["mission_step"] = step + 1
+            st.rerun()
+
+
+def render_guided_mission(data: pd.DataFrame, presenter_mode: bool) -> None:
+    total_steps = 8
+    if "mission_step" not in st.session_state:
+        st.session_state["mission_step"] = 0
+    step = int(st.session_state["mission_step"])
+    step = max(0, min(step, total_steps - 1))
+
+    st.title("Find Tatooine: Guided Mission")
+    st.caption("A demonstrator-led investigation using real exoplanet data")
+    mission_navigation(step, total_steps, "top")
+    candidates, steps, stages = mission_candidates(data)
+
+    if step == 0:
+        st.header("Mission briefing")
+        st.markdown(
+            "The Rebel Alliance has obtained an archive of known exoplanets. Your mission is to use the data "
+            "to identify the strongest candidate for **Tatooine**, a planet described as orbiting in a system "
+            "with two suns."
+        )
+        a, b = st.columns(2)
+        with a:
+            st.subheader("What the story gives us")
+            st.markdown(
+                "- Two visible suns\n"
+                "- A planet within a wider planetary system\n"
+                "- People appear able to stand and move normally\n"
+                "- A warm, dry environment\n"
+                "- A destination that must be located"
+            )
+        with b:
+            st.subheader("What the data can help us test")
+            st.markdown(
+                "- Number of known stars\n"
+                "- Number of known planets\n"
+                "- Planet radius and mass\n"
+                "- Estimated equilibrium temperature\n"
+                "- Celestial coordinates and distance"
+            )
+        st.warning("The story evidence is not a precise scientific specification. Every filter will involve an assumption.")
+
+    elif step == 1:
+        st.header("Inspect the Imperial exoplanet archive")
+        a, b, c, d = st.columns(4)
+        a.metric("Planet records", f"{len(data):,}")
+        b.metric("Host systems", f"{data['hostname'].nunique(dropna=True):,}")
+        c.metric("Discovery methods", f"{data['discoverymethod'].nunique(dropna=True):,}")
+        d.metric("Fields used", f"{len(COLUMNS):,}")
+        display = ["pl_name", "hostname", "disc_year", "discoverymethod", "pl_rade", "pl_bmasse", "pl_eqt", "sy_snum", "sy_pnum", "sy_dist"]
+        st.dataframe(data[display].head(30), use_container_width=True, hide_index=True)
+        missing = pd.DataFrame({
+            "Variable": display,
+            "Missing records": [int(data[col].isna().sum()) for col in display],
+            "Complete records (%)": [round(100 * data[col].notna().mean(), 1) for col in display],
+        }).sort_values("Complete records (%)")
+        st.subheader("Incomplete intelligence")
+        st.dataframe(missing, use_container_width=True, hide_index=True)
+        st.info("Missing means unknown. It does not mean zero, unsuitable, or a possible match.")
+
+    elif step == 2:
+        st.header("Decode the evidence")
+        st.write("Translate each story observation into a variable and a decision rule.")
+        operational = pd.DataFrame([
+            {"Story evidence": "Two suns", "Dataset variable": "Stars in system (`sy_snum`)", "Initial rule": "Exactly 2"},
+            {"Story evidence": "Part of a planetary system", "Dataset variable": "Planets in system (`sy_pnum`)", "Initial rule": "Exactly 3"},
+            {"Story evidence": "Approximately Earth-like scale", "Dataset variable": "Planet radius (`pl_rade`)", "Initial rule": "0.8 to 1.5 Earth radii"},
+            {"Story evidence": "Warm and dry", "Dataset variable": "Equilibrium temperature (`pl_eqt`)", "Initial rule": "Inspect, but do not treat as surface climate"},
+            {"Story evidence": "Find the destination", "Dataset variable": "Right ascension and declination", "Initial rule": "Map the final candidates"},
+        ])
+        st.dataframe(operational, use_container_width=True, hide_index=True)
+        st.warning("These are analytical choices. A different definition of Tatooine could produce a different result.")
+
+    elif step == 3:
+        st.header("Intelligence filter 1: two suns")
+        row = steps.iloc[0]
+        a, b, c = st.columns(3)
+        a.metric("Records before", f"{row['Before']:,}")
+        b.metric("Unknown star count", f"{row['Missing or unknown']:,}")
+        c.metric("Confirmed two-star records", f"{row['Remaining']:,}")
+        st.dataframe(stages[1][["pl_name", "hostname", "sy_snum", "sy_pnum", "pl_rade"]].head(50), use_container_width=True, hide_index=True)
+        st.info("Records with unknown star counts are not confirmed matches. They are incomplete evidence.")
+
+    elif step == 4:
+        st.header("Intelligence filter 2: a three-planet system")
+        st.dataframe(steps.iloc[:2], use_container_width=True, hide_index=True)
+        st.metric("Records remaining", f"{len(stages[2]):,}")
+        st.dataframe(stages[2][["pl_name", "hostname", "sy_snum", "sy_pnum", "pl_rade", "pl_eqt"]], use_container_width=True, hide_index=True)
+        st.warning("The rule 'exactly three' comes from the original activity. It is a modelling choice, not certain evidence from the story.")
+
+    elif step == 5:
+        st.header("Intelligence filter 3: approximately Earth-sized")
+        st.dataframe(steps, use_container_width=True, hide_index=True)
+        st.metric("Possible candidates", f"{len(candidates):,}")
+        candidate_columns = ["pl_name", "hostname", "pl_rade", "pl_bmasse", "pl_eqt", "sy_dist", "sy_snum", "sy_pnum"]
+        st.dataframe(candidates[candidate_columns].sort_values("pl_name"), use_container_width=True, hide_index=True)
+        st.info("Radius is a proxy. It does not directly tell us mass, composition, gravity, atmosphere or habitability.")
+
+    elif step == 6:
+        st.header("Compare candidate systems")
+        candidate_columns = ["pl_name", "hostname", "disc_year", "pl_rade", "pl_bmasse", "pl_eqt", "sy_dist", "sy_snum", "sy_pnum"]
+        if candidates.empty:
+            st.warning("The current live dataset has no candidates under the original rules.")
+        else:
+            candidates = candidates.sort_values("pl_name")
+            names = candidates["pl_name"].tolist()
+            default = names.index("K2-148 b") if "K2-148 b" in names else 0
+            selected = st.selectbox("Candidate to examine", names, index=default, key="mission_candidate")
+            st.session_state["selected_candidate"] = selected
+            st.dataframe(candidates[candidate_columns], use_container_width=True, hide_index=True)
+            row = candidates[candidates["pl_name"] == selected].iloc[0]
+            evidence = pd.DataFrame([
+                {"Evidence": "Two known stars", "Status": "Matches" if row["sy_snum"] == 2 else "Conflict", "Value": row["sy_snum"]},
+                {"Evidence": "Three known planets", "Status": "Matches" if row["sy_pnum"] == 3 else "Conflict", "Value": row["sy_pnum"]},
+                {"Evidence": "Earth-sized radius", "Status": "Matches" if 0.8 <= row["pl_rade"] <= 1.5 else "Conflict", "Value": f"{row['pl_rade']:.2f} Earth radii"},
+                {"Evidence": "Mass", "Status": "Unknown" if pd.isna(row["pl_bmasse"]) else "Known", "Value": "Unknown" if pd.isna(row["pl_bmasse"]) else f"{row['pl_bmasse']:.2f} Earth masses"},
+                {"Evidence": "Temperature", "Status": "Unknown" if pd.isna(row["pl_eqt"]) else "Known", "Value": "Unknown" if pd.isna(row["pl_eqt"]) else f"{row['pl_eqt']:.0f} K"},
+            ])
+            st.subheader(f"Evidence assessment: {selected}")
+            st.dataframe(evidence, use_container_width=True, hide_index=True)
+            st.markdown(
+                "**Mission report starter:**  \n"
+                f"Our selected candidate is **{selected}**. It meets the criteria for ______. "
+                "The evidence remains uncertain because ______. Our conclusion depends on the assumption that ______."
+            )
+
+    elif step == 7:
+        st.header("Navigation coordinates and mission report")
+        names = candidates.sort_values("pl_name")["pl_name"].tolist() if not candidates.empty else []
+        selected = st.session_state.get("selected_candidate")
+        if names:
+            if selected not in names:
+                selected = "K2-148 b" if "K2-148 b" in names else names[0]
+            selected = st.selectbox("Highlighted candidate", names, index=names.index(selected), key="mission_map_candidate")
+        elif "K2-148 b" in data["pl_name"].tolist():
+            selected = "K2-148 b"
+            st.info("No current candidates meet all original rules, so the notebook's original candidate is shown.")
+        else:
+            selected = data.iloc[0]["pl_name"] if not data.empty else None
+
+        if selected:
+            st.plotly_chart(sky_map(data, selected), use_container_width=True)
+            row = data[data["pl_name"] == selected].iloc[0]
+            a, b, c, d = st.columns(4)
+            a.metric("Right ascension", "Unknown" if pd.isna(row["ra"]) else f"{row['ra']:.2f}°")
+            b.metric("Declination", "Unknown" if pd.isna(row["dec"]) else f"{row['dec']:.2f}°")
+            c.metric("Distance", "Unknown" if pd.isna(row["sy_dist"]) else f"{row['sy_dist']:.1f} pc")
+            d.metric("Discovery year", "Unknown" if pd.isna(row["disc_year"]) else str(row["disc_year"]))
+            st.success(
+                f"Mission conclusion: {selected} is a candidate under the selected rules, not a confirmed identification. "
+                "The final report should state the evidence, assumptions and missing information."
+            )
+        if st.button("Restart mission", type="secondary"):
+            st.session_state["mission_step"] = 0
+            st.rerun()
+
+    if presenter_mode:
+        presenter_notes(step)
+
+    mission_navigation(step, total_steps, "bottom")
+
+
+def render_dataset_lab(data: pd.DataFrame, guidance_mode: str) -> None:
     st.header("Meet the dataset")
-    display_columns = [
-        "pl_name", "hostname", "disc_year", "discoverymethod", "pl_rade",
-        "pl_bmasse", "pl_orbper", "pl_eqt", "sy_dist", "sy_snum", "sy_pnum",
-    ]
-    st.dataframe(data[display_columns], use_container_width=True, hide_index=True)
-
-    st.subheader("Missing data")
-    missing = pd.DataFrame({
-        "Field": display_columns,
-        "Missing records": [int(data[c].isna().sum()) for c in display_columns],
-        "Missing percentage": [round(100 * data[c].isna().mean(), 1) for c in display_columns],
-    }).sort_values("Missing percentage", ascending=False)
-    st.dataframe(missing, use_container_width=True, hide_index=True)
-    st.info("A missing value means the property is unknown in this table. It is not evidence that the planet meets a criterion.")
-
-with discoveries:
-    st.header("How exoplanet discoveries changed over time")
-    discovery_data = data.dropna(subset=["disc_year", "discoverymethod"]).copy()
-    methods = sorted(discovery_data["discoverymethod"].dropna().unique())
-    selected_methods = st.multiselect("Discovery methods", methods, default=methods)
-    discovery_data = discovery_data[discovery_data["discoverymethod"].isin(selected_methods)]
-    counts = discovery_data.groupby(["disc_year", "discoverymethod"]).size().reset_index(name="Planets")
-    fig = px.bar(counts, x="disc_year", y="Planets", color="discoverymethod", labels={"disc_year": "Discovery year", "discoverymethod": "Method"})
-    st.plotly_chart(fig, use_container_width=True)
-
-with relationships:
-    st.header("Explore relationships between planet properties")
-    c1, c2, c3 = st.columns(3)
-    x_label = c1.selectbox("Horizontal axis", list(PLOT_FIELDS), index=2)
-    y_label = c2.selectbox("Vertical axis", list(PLOT_FIELDS), index=0)
-    colour = c3.selectbox("Colour", ["Discovery method", "Discovery year", "Distance from Earth"])
-    log_x = c1.checkbox("Logarithmic horizontal axis", value=True)
-    log_y = c2.checkbox("Logarithmic vertical axis", value=False)
-
-    x_col, y_col = PLOT_FIELDS[x_label], PLOT_FIELDS[y_label]
-    colour_col = {"Discovery method": "discoverymethod", "Discovery year": "disc_year", "Distance from Earth": "sy_dist"}[colour]
-    plot_data = data.dropna(subset=[x_col, y_col, colour_col]).copy()
-    if log_x:
-        plot_data = plot_data[plot_data[x_col] > 0]
-    if log_y:
-        plot_data = plot_data[plot_data[y_col] > 0]
-    fig = px.scatter(
-        plot_data, x=x_col, y=y_col, color=colour_col,
-        hover_name="pl_name", hover_data=["hostname", "discoverymethod", "disc_year"],
-        log_x=log_x, log_y=log_y,
-        labels={x_col: x_label, y_col: y_label, colour_col: colour},
+    guidance_box(
+        guidance_mode,
+        "Start by checking what each row and column represent, then inspect missing values before drawing conclusions.",
+        "Learning intention: students recognise that data structure and completeness determine which questions can be answered reliably.",
     )
-    st.plotly_chart(fig, use_container_width=True)
-    st.caption(f"{len(plot_data):,} records have usable values for this graph.")
+    display = ["pl_name", "hostname", "disc_year", "discoverymethod", "pl_rade", "pl_bmasse", "pl_orbper", "pl_eqt", "sy_dist", "sy_snum", "sy_pnum"]
+    st.dataframe(data[display], use_container_width=True, hide_index=True)
 
-with tatooine:
-    st.header("Translate Tatooine into data criteria")
-    st.write("The original notebook used two stars, exactly three known planets, and a radius between 0.8 and 1.5 Earth radii.")
+    st.subheader("Missing-data summary")
+    missing = pd.DataFrame({
+        "Variable": display,
+        "Missing records": [int(data[col].isna().sum()) for col in display],
+        "Complete records (%)": [round(100 * data[col].notna().mean(), 1) for col in display],
+    }).sort_values("Complete records (%)")
+    st.dataframe(missing, use_container_width=True, hide_index=True)
+    if guidance_mode != "Minimal":
+        st.info("Missing means unknown. It does not mean zero, unsuitable, or evidence that a planet meets a criterion.")
 
-    a, b, c = st.columns(3)
-    stars = a.number_input("Known stars in system", min_value=1, max_value=10, value=2, step=1)
-    planet_mode = b.selectbox("Planet count rule", ["Exactly", "At least"])
-    planets = c.number_input("Known planets in system", min_value=1, max_value=20, value=3, step=1)
-    radius = st.slider("Planet radius range (Earth radii)", 0.1, 10.0, (0.8, 1.5), 0.05)
+    st.subheader("Variable guide")
+    selected_label = st.selectbox("Choose a variable to understand", list(FIELD_OPTIONS), key="dictionary_variable")
+    variable_card(data, FIELD_OPTIONS[selected_label], guidance_mode)
+
+
+def render_discovery_lab(data: pd.DataFrame, guidance_mode: str) -> None:
+    st.header("How have exoplanets been discovered?")
+    guidance_box(
+        guidance_mode,
+        "Use this graph to compare categories over time. Look for changes in dominant discovery methods, sudden increases and periods with sparse data.",
+        "Ask whether the graph describes the true planet population or the history of available detection methods and surveys.",
+    )
+    methods = sorted(data["discoverymethod"].dropna().unique().tolist())
+    selected_methods = st.multiselect("Discovery methods", methods, default=methods)
+    if selected_methods:
+        st.plotly_chart(discovery_chart(data, selected_methods), use_container_width=True)
+    else:
+        st.warning("Select at least one discovery method.")
+    if guidance_mode != "Minimal":
+        st.markdown(
+            "**Look for:** changes over time, dominant categories and sudden shifts.  \n"
+            "**Consider:** whether detection methods favour certain types of planets.  \n"
+            "**Describe:** 'Discoveries using ______ increased after ______, which may reflect ______.'"
+        )
+
+
+def render_relationship_lab(data: pd.DataFrame, guidance_mode: str) -> None:
+    st.header("Relationship explorer")
+    entry = st.radio("How would you like to begin?", ["Start with a question", "Build your own graph"], horizontal=True)
+
+    preset = None
+    if entry == "Start with a question":
+        preset_name = st.selectbox("Choose an investigation", list(INVESTIGATIONS))
+        preset = INVESTIGATIONS[preset_name]
+        st.markdown(f"**Investigation question:** {preset['question']}")
+        if guidance_mode != "Minimal":
+            st.warning(f"**Caution:** {preset['caution']}")
+    else:
+        preset_name = "Custom graph"
+
+    labels = list(FIELD_OPTIONS)
+    if preset:
+        x_default = labels.index(FIELD_LABEL[preset["x"]])
+        y_default = labels.index(FIELD_LABEL[preset["y"]])
+        colour_default = list(COLOUR_OPTIONS).index(next(label for label, value in COLOUR_OPTIONS.items() if value == preset["colour"]))
+        log_x_default = preset["log_x"]
+        log_y_default = preset["log_y"]
+    else:
+        x_default = labels.index(FIELD_LABEL["pl_orbper"])
+        y_default = labels.index(FIELD_LABEL["pl_rade"])
+        colour_default = 0
+        log_x_default = True
+        log_y_default = False
+
+    key_suffix = preset_name.replace(" ", "_").replace("?", "")
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        x_label = st.selectbox("Horizontal axis", labels, index=x_default, key=f"x_{key_suffix}")
+        x_field = FIELD_OPTIONS[x_label]
+        x_status, x_reason, x_profile = scale_guidance(data, x_field)
+        log_x = st.checkbox("Use logarithmic horizontal axis", value=log_x_default, key=f"log_x_{key_suffix}")
+    with c2:
+        y_label = st.selectbox("Vertical axis", labels, index=y_default, key=f"y_{key_suffix}")
+        y_field = FIELD_OPTIONS[y_label]
+        y_status, y_reason, y_profile = scale_guidance(data, y_field)
+        log_y = st.checkbox("Use logarithmic vertical axis", value=log_y_default, key=f"log_y_{key_suffix}")
+    with c3:
+        colour_label = st.selectbox("Colour by", list(COLOUR_OPTIONS), index=colour_default, key=f"colour_{key_suffix}")
+        colour_field = COLOUR_OPTIONS[colour_label]
+
+    if guidance_mode != "Minimal":
+        gx, gy = st.columns(2)
+        with gx:
+            st.info(f"**Horizontal scale: {x_status}.** {x_reason}")
+        with gy:
+            st.info(f"**Vertical scale: {y_status}.** {y_reason}")
+        if colour_field in {x_field, y_field}:
+            st.warning("The colour variable repeats a variable already used on an axis, so it may add little new information.")
+        elif colour_field == "discoverymethod":
+            st.caption("Colour is being used to compare categories of discovery method.")
+        else:
+            st.caption("Colour is being used to add a third numerical or count-based variable to the graph.")
+
+        with st.expander("How logarithmic axes work", expanded=False):
+            st.write(
+                "On a linear axis, equal visual spacing represents equal additions. On a logarithmic axis, "
+                "equal visual spacing represents equal multiplication. For example, 1, 10, 100 and 1,000 are equally spaced."
+            )
+            st.write("Zero and negative values cannot be displayed on a logarithmic axis. Those records are excluded from the graph.")
+
+    figure, stats = scatter_chart(data, x_field, y_field, colour_field, log_x, log_y)
+    stat_frame = pd.DataFrame([{"Data check": key, "Records": value} for key, value in stats.items()])
+    st.dataframe(stat_frame, use_container_width=True, hide_index=True)
+    if figure is None:
+        st.warning("No records meet the current plotting requirements.")
+    else:
+        st.plotly_chart(figure, use_container_width=True)
+
+    if guidance_mode != "Minimal":
+        st.subheader("Interpret the graph")
+        st.markdown(
+            "**Look for:** overall direction, clusters, gaps, outliers and differences between colours.  \n"
+            "**Consider:** missing data, detection bias, measurement uncertainty and whether the graph shows association rather than causation.  \n"
+            "**Sentence starter:** As ______ increases, ______ generally appears to ______. However, this pattern may be affected by ______."
+        )
+        with st.expander("Variable details", expanded=False):
+            left, right = st.columns(2)
+            with left:
+                variable_card(data, x_field, guidance_mode)
+            with right:
+                variable_card(data, y_field, guidance_mode)
+        if guidance_mode == "Teacher":
+            teacher_text = preset["teacher"] if preset else (
+                "Ask students to justify why the selected pair is scientifically meaningful before interpreting the pattern. "
+                "Then ask what process, bias or missing variable could create the same visual result."
+            )
+            with st.expander("Teacher discussion prompts", expanded=True):
+                st.write(teacher_text)
+                st.markdown(
+                    "- What relationship did you expect before seeing the graph?\n"
+                    "- How many records were excluded, and could that change the conclusion?\n"
+                    "- Would a different scale change what appears visually prominent?\n"
+                    "- What additional variable would help test the explanation?"
+                )
+
+
+def render_filter_lab(data: pd.DataFrame, guidance_mode: str) -> None:
+    st.header("Build your own Tatooine definition")
+    guidance_box(
+        guidance_mode,
+        "Change one assumption at a time and observe which records fail the criterion, which are unknown and which remain.",
+        "Learning intention: students understand that operational definitions and thresholds shape the candidate set.",
+    )
+    c1, c2, c3 = st.columns(3)
+    stars = c1.number_input("Known stars", 1, 10, 2)
+    planet_rule = c2.selectbox("Planet-count rule", ["Exactly", "At least"])
+    planets = c3.number_input("Known planets", 1, 20, 3)
+    radius = st.slider("Planet radius (Earth radii)", 0.1, 5.0, (0.8, 1.5), 0.05)
 
     t1, t2 = st.columns(2)
-    use_temp = t1.checkbox("Add an equilibrium-temperature criterion")
-    temperature = t1.slider("Temperature range (K)", 50, 3000, (200, 350), 10, disabled=not use_temp)
-    use_distance = t2.checkbox("Add a maximum-distance criterion")
-    known_max = data["sy_dist"].max()
-    max_distance = max(10.0, float(np.ceil(known_max / 10) * 10)) if pd.notna(known_max) else 1000.0
-    distance = t2.slider("Maximum distance (parsecs)", 1.0, max_distance, min(500.0, max_distance), max(1.0, max_distance / 200), disabled=not use_distance)
-
-    candidates, steps = build_candidates(
-        data, int(stars), planet_mode, int(planets), radius,
-        use_temp, temperature, use_distance, distance,
+    use_temperature = t1.checkbox("Use equilibrium temperature")
+    temperature = t1.slider("Temperature (K)", 100, 1500, (250, 350), 10, disabled=not use_temperature)
+    use_distance = t2.checkbox("Limit distance from Earth")
+    known_distances = data["sy_dist"].dropna()
+    distance_ceiling = max(10.0, float(known_distances.max())) if not known_distances.empty else 1000.0
+    max_distance = t2.slider(
+        "Maximum distance (parsecs)",
+        1.0,
+        distance_ceiling,
+        min(500.0, distance_ceiling),
+        disabled=not use_distance,
     )
-    st.subheader("What each criterion did")
+
+    candidates, steps = custom_candidates(
+        data,
+        int(stars),
+        planet_rule,
+        int(planets),
+        radius,
+        temperature if use_temperature else None,
+        max_distance if use_distance else None,
+    )
+    st.subheader("Effect of each criterion")
     st.dataframe(steps, use_container_width=True, hide_index=True)
     st.metric("Remaining candidates", f"{len(candidates):,}")
 
-    candidate_columns = ["pl_name", "hostname", "disc_year", "pl_rade", "pl_bmasse", "pl_eqt", "sy_snum", "sy_pnum", "sy_dist"]
+    candidate_columns = ["pl_name", "hostname", "disc_year", "pl_rade", "pl_bmasse", "pl_eqt", "sy_dist", "sy_snum", "sy_pnum"]
     if candidates.empty:
-        st.warning("No records meet every active criterion. Broaden one of the criteria to see where candidates return.")
-        st.session_state["candidate_names"] = []
+        st.warning("No records meet every active criterion. Broaden one criterion to see where candidates reappear.")
+        st.session_state["lab_candidate_names"] = []
     else:
-        st.dataframe(candidates[candidate_columns].sort_values("pl_name"), use_container_width=True, hide_index=True)
-        names = sorted(candidates["pl_name"].tolist())
+        candidates = candidates.sort_values("pl_name")
+        st.dataframe(candidates[candidate_columns], use_container_width=True, hide_index=True)
+        names = candidates["pl_name"].tolist()
         default = names.index("K2-148 b") if "K2-148 b" in names else 0
-        selected = st.selectbox("Candidate to investigate", names, index=default)
-        st.session_state["selected_candidate"] = selected
-        st.session_state["candidate_names"] = names
+        selected = st.selectbox("Candidate to investigate", names, index=default, key="lab_candidate")
+        st.session_state["lab_candidate_names"] = names
+        st.session_state["lab_selected_candidate"] = selected
         row = candidates[candidates["pl_name"] == selected].iloc[0]
-        st.subheader(f"Evidence for {selected}")
         evidence = pd.DataFrame([
-            {"Property": "Known stars", "Value": row["sy_snum"]},
-            {"Property": "Known planets", "Value": row["sy_pnum"]},
-            {"Property": "Radius (Earth radii)", "Value": row["pl_rade"]},
-            {"Property": "Mass (Earth masses)", "Value": row["pl_bmasse"]},
-            {"Property": "Equilibrium temperature (K)", "Value": row["pl_eqt"]},
-            {"Property": "Distance (parsecs)", "Value": row["sy_dist"]},
+            {"Property": "Known stars", "Value": row["sy_snum"], "Evidence status": "Known"},
+            {"Property": "Known planets", "Value": row["sy_pnum"], "Evidence status": "Known"},
+            {"Property": "Radius", "Value": f"{row['pl_rade']:.2f} Earth radii", "Evidence status": "Known"},
+            {"Property": "Mass", "Value": "Unknown" if pd.isna(row["pl_bmasse"]) else f"{row['pl_bmasse']:.2f} Earth masses", "Evidence status": "Unknown" if pd.isna(row["pl_bmasse"]) else "Known"},
+            {"Property": "Temperature", "Value": "Unknown" if pd.isna(row["pl_eqt"]) else f"{row['pl_eqt']:.0f} K", "Evidence status": "Unknown" if pd.isna(row["pl_eqt"]) else "Known"},
         ])
+        st.subheader(f"Evidence for {selected}")
         st.dataframe(evidence, use_container_width=True, hide_index=True)
-        st.download_button("Download candidate table", candidates[candidate_columns].to_csv(index=False), "tatooine_candidates.csv", "text/csv")
+        st.download_button(
+            "Download candidate table",
+            candidates[candidate_columns].to_csv(index=False).encode("utf-8"),
+            "tatooine_candidates.csv",
+            "text/csv",
+        )
+    if guidance_mode != "Minimal":
+        st.info("Unknown evidence should remain labelled unknown. It should not be counted as support for the candidate.")
 
-with mapping:
-    st.header("Map the selected candidate")
-    names = st.session_state.get("candidate_names", [])
-    current = st.session_state.get("selected_candidate")
+
+def render_map_lab(data: pd.DataFrame, guidance_mode: str) -> None:
+    st.header("Celestial map")
+    names = st.session_state.get("lab_candidate_names", [])
+    selected = st.session_state.get("lab_selected_candidate")
     if names:
-        chosen = st.selectbox("Highlighted planet", names, index=names.index(current) if current in names else 0, key="map_choice")
+        selected = st.selectbox("Highlighted planet", names, index=names.index(selected) if selected in names else 0, key="lab_map_choice")
     elif "K2-148 b" in data["pl_name"].tolist():
-        chosen = "K2-148 b"
-        st.info("The current filter has no candidates, so the original notebook choice is shown.")
-    else:
-        chosen = data["pl_name"].iloc[0] if not data.empty else None
+        selected = "K2-148 b"
+        st.info("No custom candidate set is active, so the original notebook candidate is shown.")
+    elif not data.empty:
+        selected = data.iloc[0]["pl_name"]
 
-    st.write("This visualisation uses right ascension and declination. It shows direction on the celestial sphere, not physical distance between systems.")
-    if chosen:
-        st.plotly_chart(sky_map(data, chosen), use_container_width=True)
-        row = data[data["pl_name"] == chosen].iloc[0]
-        c1, c2, c3, c4 = st.columns(4)
-        c1.metric("Right ascension", f"{row['ra']:.2f}°" if pd.notna(row["ra"]) else "Unknown")
-        c2.metric("Declination", f"{row['dec']:.2f}°" if pd.notna(row["dec"]) else "Unknown")
-        c3.metric("Distance", f"{row['sy_dist']:.1f} pc" if pd.notna(row["sy_dist"]) else "Unknown")
-        c4.metric("Discovery year", str(row["disc_year"]) if pd.notna(row["disc_year"]) else "Unknown")
+    if selected:
+        mapped = data.dropna(subset=["ra", "dec"])
+        if guidance_mode != "Minimal":
+            st.info(
+                f"The map uses right ascension and declination for {len(mapped):,} records. "
+                "It shows direction on the celestial sphere, not physical separation between systems."
+            )
+        st.plotly_chart(sky_map(data, selected), use_container_width=True)
+        row = data[data["pl_name"] == selected].iloc[0]
+        a, b, c, d = st.columns(4)
+        a.metric("Right ascension", "Unknown" if pd.isna(row["ra"]) else f"{row['ra']:.2f}°")
+        b.metric("Declination", "Unknown" if pd.isna(row["dec"]) else f"{row['dec']:.2f}°")
+        c.metric("Distance", "Unknown" if pd.isna(row["sy_dist"]) else f"{row['sy_dist']:.1f} pc")
+        d.metric("Discovery year", "Unknown" if pd.isna(row["disc_year"]) else str(row["disc_year"]))
+        if guidance_mode == "Teacher":
+            with st.expander("Teacher guidance", expanded=False):
+                st.write("Ask students what dimension is missing from this visualisation and how distance could be incorporated into a different three-dimensional model.")
+
+
+def render_data_lab(data: pd.DataFrame, guidance_mode: str) -> None:
+    st.title("Exoplanet Data Laboratory")
+    st.caption("Open exploration with contextual guidance for analytical choices")
+    dataset_tab, discovery_tab, relationship_tab, filter_tab, map_tab = st.tabs([
+        "Dataset and variables",
+        "Discoveries",
+        "Relationship explorer",
+        "Custom Tatooine filters",
+        "Sky map",
+    ])
+    with dataset_tab:
+        render_dataset_lab(data, guidance_mode)
+    with discovery_tab:
+        render_discovery_lab(data, guidance_mode)
+    with relationship_tab:
+        render_relationship_lab(data, guidance_mode)
+    with filter_tab:
+        render_filter_lab(data, guidance_mode)
+    with map_tab:
+        render_map_lab(data, guidance_mode)
+
+
+with st.sidebar:
+    st.header("Experience")
+    experience = st.radio(
+        "Choose how to use the app",
+        ["Guided Tatooine Mission", "Exoplanet Data Laboratory"],
+    )
+    st.divider()
+    st.header("Data source")
+    source = st.radio("Choose a dataset", ["Live NASA data", "Bundled notebook sample"])
+    st.caption("Live data are cached for six hours. The bundled sample keeps the activity usable offline.")
+
+data, source_label = load_data(source)
+
+with st.sidebar:
+    st.success(source_label)
+    st.metric("Planet records", f"{len(data):,}")
+    if experience == "Guided Tatooine Mission":
+        presenter_mode = st.toggle("Show demonstrator notes", value=True)
+        if st.button("Reset guided mission", use_container_width=True):
+            st.session_state["mission_step"] = 0
+            st.rerun()
+    else:
+        guidance_mode = st.radio("Guidance mode", ["Student", "Teacher", "Minimal"])
+
+if experience == "Guided Tatooine Mission":
+    render_guided_mission(data, presenter_mode)
+else:
+    render_data_lab(data, guidance_mode)
 
 st.divider()
-st.caption("Data fields come from the NASA Exoplanet Archive Planetary Systems Composite Parameters table. Tatooine is used as a fictional framing for data-science reasoning.")
+st.caption(
+    "Data fields come from the NASA Exoplanet Archive Planetary Systems Composite Parameters table. "
+    "The Tatooine comparison is a fictional framing for practising data-science reasoning."
+)
