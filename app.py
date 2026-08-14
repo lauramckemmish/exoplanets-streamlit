@@ -464,6 +464,45 @@ def scatter_chart(
     return figure, stats
 
 
+def demographics_chart(data: pd.DataFrame) -> go.Figure | None:
+    plot_data = data.dropna(
+        subset=["pl_orbsmax", "pl_bmasse", "discoverymethod"]
+    ).copy()
+    plot_data = plot_data[
+        (plot_data["pl_orbsmax"] > 0) & (plot_data["pl_bmasse"] > 0)
+    ]
+    if plot_data.empty:
+        return None
+
+    figure = px.scatter(
+        plot_data,
+        x="pl_orbsmax",
+        y="pl_bmasse",
+        color="discoverymethod",
+        hover_name="pl_name",
+        hover_data={
+            "hostname": True,
+            "discoverymethod": True,
+            "disc_year": True,
+            "pl_orbsmax": ":.3g",
+            "pl_bmasse": ":.3g",
+        },
+        log_x=True,
+        log_y=True,
+        labels={
+            "pl_orbsmax": "Orbital distance / semi-major axis (AU)",
+            "pl_bmasse": "Planet mass (Earth masses)",
+            "discoverymethod": "Discovery method",
+            "hostname": "Host star",
+            "disc_year": "Discovery year",
+        },
+        title="Known exoplanets by orbital distance and planet mass",
+    )
+    figure.update_traces(marker={"size": 8, "opacity": 0.65})
+    figure.update_layout(height=650, legend_title_text="Discovery method")
+    return figure
+
+
 def sky_map(data: pd.DataFrame, selected_planet: str) -> go.Figure:
     mapped = data.dropna(subset=["x", "y", "z"]).copy()
     selected = mapped[mapped["pl_name"] == selected_planet]
@@ -986,11 +1025,32 @@ def render_data_lab(data: pd.DataFrame, guidance_mode: str) -> None:
         render_map_lab(data, guidance_mode)
 
 
+def render_demographics(data: pd.DataFrame) -> None:
+    st.title("Exoplanet Demographics")
+    figure = demographics_chart(data)
+    if figure is None:
+        st.warning("No planets have the orbital-distance and mass data needed for this graph.")
+    else:
+        st.plotly_chart(figure, use_container_width=True)
+
+    st.subheader("Investigate the graph")
+    st.markdown(
+        "- Where are most of the known planets?\n"
+        "- Do planets discovered using different methods occupy the same parts of the graph?\n"
+        "- What could explain the patterns you see?\n"
+        "- Does this graph necessarily show what planetary systems in the Universe are really like?"
+    )
+
+
 with st.sidebar:
     st.header("Experience")
     experience = st.radio(
         "Choose how to use the app",
-        ["Guided Tatooine Mission", "Exoplanet Data Laboratory"],
+        [
+            "Guided Tatooine Mission",
+            "Exoplanet Demographics",
+            "Exoplanet Data Laboratory",
+        ],
     )
     st.divider()
     st.header("Data source")
@@ -1007,11 +1067,13 @@ with st.sidebar:
         if st.button("Reset guided mission", use_container_width=True):
             st.session_state["mission_step"] = 0
             st.rerun()
-    else:
+    elif experience == "Exoplanet Data Laboratory":
         guidance_mode = st.radio("Guidance mode", ["Student", "Teacher", "Minimal"])
 
 if experience == "Guided Tatooine Mission":
     render_guided_mission(data, presenter_mode)
+elif experience == "Exoplanet Demographics":
+    render_demographics(data)
 else:
     render_data_lab(data, guidance_mode)
 
