@@ -1363,7 +1363,8 @@ def response_box(step: int, prompt: str = "Record your thinking") -> None:
 
 
 def render_demographics(data: pd.DataFrame) -> None:
-    st.title("Exoplanet Demographics")
+    st.title("Are We Normal? Exploring Alien Worlds with Data")
+    st.caption("Use real NASA data to compare our Solar System with planets around other stars.")
     if "demographics_part" not in st.session_state:
         st.session_state["demographics_part"] = 0
     part = max(0, min(int(st.session_state["demographics_part"]), 7))
@@ -1639,16 +1640,41 @@ def render_demographics(data: pd.DataFrame) -> None:
             st.rerun()
 
 
+def select_experience(name: str) -> None:
+    st.session_state["experience"] = name
+
+
+if "experience" not in st.session_state:
+    st.session_state["experience"] = "Exoplanet Demographics"
+
 with st.sidebar:
-    st.header("Experience")
-    experience = st.radio(
-        "Choose how to use the app",
-        [
-            "Guided Tatooine Mission",
-            "Exoplanet Demographics",
-            "Exoplanet Data Laboratory",
-        ],
+    st.header("Today's workshop")
+    st.markdown("### 🪐 Are We Normal?")
+    st.caption("Exploring alien worlds with real NASA data")
+    st.button(
+        "Open today's workshop",
+        type="primary",
+        use_container_width=True,
+        disabled=st.session_state["experience"] == "Exoplanet Demographics",
+        on_click=select_experience,
+        args=("Exoplanet Demographics",),
     )
+    with st.expander("Other activities — explore later", expanded=False):
+        st.button(
+            "🌅 Find Tatooine",
+            use_container_width=True,
+            on_click=select_experience,
+            args=("Guided Tatooine Mission",),
+        )
+        st.button(
+            "🔬 Exoplanet Data Laboratory",
+            use_container_width=True,
+            on_click=select_experience,
+            args=("Exoplanet Data Laboratory",),
+        )
+    experience = st.session_state["experience"]
+    if experience != "Exoplanet Demographics":
+        st.caption(f"Currently open: {experience}")
     st.divider()
     st.header("Data source")
     source = st.radio("Choose a dataset", ["Live NASA data", "Bundled notebook sample"])
