@@ -64,7 +64,7 @@ VARIABLES = {
     "pl_orbsmax": {
         "label": "Orbital distance",
         "unit": "astronomical units (AU)",
-        "description": "The semi-major axis of the planet's orbit, used as a measure of orbital distance.",
+        "description": "A measure of the planet's orbital distance from its host star.",
         "measurement": "Calculated from orbital observations and system models.",
         "log": "recommended",
         "log_reason": "Orbital distances span very small to very large values.",
@@ -493,8 +493,8 @@ def readable_log_ticks(values: list[float]) -> tuple[list[float], list[str]]:
     minimum, maximum = min(positive), max(positive)
     first_power = math.floor(math.log10(minimum))
     last_power = math.ceil(math.log10(maximum))
-    ticks = [
-        multiplier * (10 ** power)
+    tick_parts = [
+        (multiplier, multiplier * (10 ** power))
         for power in range(first_power, last_power + 1)
         for multiplier in range(1, 10)
         if minimum * 0.9 <= multiplier * (10 ** power) <= maximum * 1.1
@@ -505,7 +505,9 @@ def readable_log_ticks(values: list[float]) -> tuple[list[float], list[str]]:
             return f"{value:,.0f}"
         return f"{value:.10f}".rstrip("0").rstrip(".")
 
-    return ticks, [label(value) for value in ticks]
+    ticks = [value for _, value in tick_parts]
+    labels = [label(value) if multiplier in {1, 2, 5} else "" for multiplier, value in tick_parts]
+    return ticks, labels
 
 
 def apply_readable_log_axes(
@@ -562,6 +564,7 @@ def add_solar_system_trace(figure: go.Figure) -> None:
             "line": {"color": "#FFFFFF", "width": 1},
         },
         textfont={"color": "#D81B60", "size": 13},
+        cliponaxis=False,
         customdata=SOLAR_SYSTEM_PLANETS[["Planet"]].to_numpy(),
         hovertemplate=(
             "<b>%{customdata[0]}</b><br>Solar System planet"
@@ -583,7 +586,7 @@ def finish_demographics_chart(
         figure,
         x_values,
         y_values,
-        "Orbital distance / semi-major axis (AU)",
+        "Orbital distance (AU)",
         "Planet mass (Earth masses)",
     )
     figure.update_layout(
@@ -600,7 +603,6 @@ def demographics_over_time_chart(data: pd.DataFrame, year: int) -> go.Figure:
     plot_data = all_plot_data[all_plot_data["disc_year"] <= year]
 
     figure = go.Figure()
-    add_solar_system_trace(figure)
     if not plot_data.empty:
         figure.add_trace(go.Scatter(
             x=plot_data["pl_orbsmax"],
@@ -616,6 +618,7 @@ def demographics_over_time_chart(data: pd.DataFrame, year: int) -> go.Figure:
                 "<br>Mass: %{y:.3g} Earth masses<extra></extra>"
             ),
         ))
+    add_solar_system_trace(figure)
     return finish_demographics_chart(
         figure,
         f"Solar System and exoplanets discovered by {year}",
@@ -627,7 +630,6 @@ def demographics_over_time_chart(data: pd.DataFrame, year: int) -> go.Figure:
 def current_demographics_chart(data: pd.DataFrame) -> go.Figure:
     plot_data = demographics_plot_data(data)
     figure = go.Figure()
-    add_solar_system_trace(figure)
     if not plot_data.empty:
         figure.add_trace(go.Scatter(
             x=plot_data["pl_orbsmax"],
@@ -643,6 +645,7 @@ def current_demographics_chart(data: pd.DataFrame) -> go.Figure:
                 "<br>Mass: %{y:.3g} Earth masses<extra></extra>"
             ),
         ))
+    add_solar_system_trace(figure)
     return finish_demographics_chart(
         figure,
         "Known exoplanets and Solar System planets",
@@ -661,7 +664,6 @@ def demographics_methods_chart(data: pd.DataFrame, view: str) -> go.Figure:
         plot_data = plot_data[plot_data["discoverymethod"].isin(method_filters[view])]
 
     figure = go.Figure()
-    add_solar_system_trace(figure)
     for method in sorted(plot_data["discoverymethod"].unique()):
         method_data = plot_data[plot_data["discoverymethod"] == method]
         display_method = "Direct Imaging" if method == "Imaging" else method
@@ -680,6 +682,7 @@ def demographics_methods_chart(data: pd.DataFrame, view: str) -> go.Figure:
                 "<br>Mass: %{y:.3g} Earth masses<extra></extra>"
             ),
         ))
+    add_solar_system_trace(figure)
     return finish_demographics_chart(
         figure,
         "Known exoplanets and Solar System planets by discovery method",
@@ -797,10 +800,11 @@ def solar_system_demographics_chart(log_axes: bool) -> go.Figure:
         apply_readable_log_axes(
             figure,
             SOLAR_SYSTEM_PLANETS["Orbital distance (AU)"].tolist(),
-            SOLAR_SYSTEM_PLANETS["Planet mass (Earth masses)"].tolist(),
+            SOLAR_SYSTEM_PLANETS["Planet mass (Earth masses)"].tolist() + [500],
             "Orbital distance (AU)",
             "Planet mass (Earth masses)",
         )
+        figure.update_yaxes(range=[math.log10(0.04), math.log10(500)])
     figure.update_layout(height=650, showlegend=False)
     return figure
 
@@ -1384,28 +1388,18 @@ def render_demographics(data: pd.DataFrame) -> None:
             "The giant planets make the smaller planets bunch together. It is difficult to compare Mercury, Venus, "
             "Earth and Mars. What could we change about the representation?"
         )
-        show_log = st.toggle("Show the log–log version", value=False, key="show_solar_log")
-        if show_log:
-            st.markdown(
-                "### What is a log–log graph doing?\n"
-                "Both axes still show ordinary planet mass and orbital distance. The spacing changes: equal distances "
-                "along an axis represent multiplication rather than addition. For example, the gap from **0.1 to 1** "
-                "is the same size as the gap from **1 to 10**. This spreads out small values while keeping very large "
-                "values on the same graph. You do not need to calculate logarithms to read it."
-            )
-            st.plotly_chart(solar_system_demographics_chart(True), use_container_width=True)
-            log_answer = st.radio(
-                "Quick check: which pair should be equally spaced on a logarithmic axis?",
-                ["1 and 10", "1 and 2"],
-                index=None,
-                key="log_quick_check",
-            )
-            if log_answer == "1 and 10":
-                st.success("Correct. Each step of the same size represents multiplying by 10.")
-            elif log_answer == "1 and 2":
-                st.warning("Try again: look at the spacing between 0.1, 1, 10 and 100.")
+        st.markdown(
+            "### What is a log–log graph doing?\n"
+            "Both axes still show ordinary planet mass and orbital distance. The spacing changes: equal distances "
+            "along an axis represent multiplication rather than addition. For example, the gap from **0.1 to 1** "
+            "is the same size as the gap from **1 to 10**. This spreads out small values while keeping very large "
+            "values on the same graph. You do not need to calculate logarithms to read it."
+        )
+        st.plotly_chart(solar_system_demographics_chart(True), use_container_width=True)
         st.subheader("Questions to investigate")
         st.markdown(
+            "- Which graph makes it easier to compare all eight planets? What can you see in the log–log graph "
+            "that was difficult to see in the linear–linear graph?\n"
             "- Where would Pluto likely go?\n"
             "- Would the asteroid belt appear as one point or many points? Why?\n"
             "- Why is the Moon not included as a planet?\n"
@@ -1477,10 +1471,6 @@ def render_demographics(data: pd.DataFrame) -> None:
             "- What is your hypothesis about why?\n"
             "- Are there any patterns in the data?"
         )
-        st.info(
-            "Hmm, it seems like more planets were discovered over time, but I cannot quite get a good picture. "
-            "What if I used a different data representation?"
-        )
         response_box(3)
         key_idea("A cumulative graph shows the evidence available by each year, but missing measurements still affect which planets appear.")
     elif part == 3:
@@ -1504,7 +1494,6 @@ def render_demographics(data: pd.DataFrame) -> None:
             "- Does a tall bar mean astronomers became better at finding every kind of planet?\n"
             "- What could cause the discovery rate to change?"
         )
-        st.info("I notice the types of planets seem to be changing. Can I find out more?")
         response_box(4)
         key_idea("A count-by-year plot makes changes in discovery rate easier to see than a scatter plot.")
     elif part == 4:
@@ -1583,18 +1572,8 @@ def render_demographics(data: pd.DataFrame) -> None:
             use_container_width=True,
             hide_index=True,
         )
-        completeness = pd.DataFrame([
-            {"Variable": "Planet mass", "Records available": int(data["pl_bmasse"].notna().sum())},
-            {"Variable": "Orbital distance", "Records available": int(data["pl_orbsmax"].notna().sum())},
-            {"Variable": "Discovery year", "Records available": int(data["disc_year"].notna().sum())},
-            {
-                "Variable": "All three together",
-                "Records available": int(data[["pl_bmasse", "pl_orbsmax", "disc_year"]].notna().all(axis=1).sum()),
-            },
-        ])
-        st.subheader("How complete are these variables?")
-        st.dataframe(completeness, use_container_width=True, hide_index=True)
-        response_box(7, "What other information would you want about each planet or planetary system?")
+        st.subheader("What else would be interesting to know about an exoplanet?")
+        response_box(7, "Record your ideas before revealing the other variables")
         with st.expander("Reveal more available variables", expanded=False):
             st.write("The archive is much richer than the three variables used so far:")
             richer_variables = pd.DataFrame([
@@ -1613,8 +1592,6 @@ def render_demographics(data: pd.DataFrame) -> None:
                 f"In the current data, distance from Earth is reported for {known_distance:,} planets and host-star "
                 f"spectral type for {known_star_type:,}. Missing still means unknown."
             )
-        st.info("Next, we will add discovery method to the mass–orbital-distance plot.")
-        key_idea("Choosing additional variables can help explain a pattern, but only when those values have been recorded.")
     else:
         st.header("Step 8: Compare discovery methods")
         demographics_question(
