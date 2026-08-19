@@ -485,6 +485,61 @@ def demographics_plot_data(data: pd.DataFrame, require_method: bool = False) -> 
     ]
 
 
+def readable_log_ticks(values: list[float], max_labels: int = 12) -> tuple[list[float], list[str]]:
+    positive = [float(value) for value in values if np.isfinite(value) and value > 0]
+    if not positive:
+        return [], []
+
+    minimum, maximum = min(positive), max(positive)
+    first_power = math.floor(math.log10(minimum))
+    last_power = math.ceil(math.log10(maximum))
+    ticks = [
+        multiplier * (10 ** power)
+        for power in range(first_power, last_power + 1)
+        for multiplier in (1, 2, 5)
+        if minimum / 1.1 <= multiplier * (10 ** power) <= maximum * 1.1
+    ]
+    if len(ticks) > max_labels:
+        step = math.ceil(len(ticks) / max_labels)
+        ticks = ticks[::step]
+
+    def label(value: float) -> str:
+        if value >= 1:
+            return f"{value:,.0f}"
+        return f"{value:.10f}".rstrip("0").rstrip(".")
+
+    return ticks, [label(value) for value in ticks]
+
+
+def apply_readable_log_axes(
+    figure: go.Figure,
+    x_values: list[float],
+    y_values: list[float],
+    x_title: str,
+    y_title: str,
+) -> None:
+    x_ticks, x_labels = readable_log_ticks(x_values)
+    y_ticks, y_labels = readable_log_ticks(y_values)
+    figure.update_xaxes(
+        type="log",
+        title=x_title,
+        tickmode="array",
+        tickvals=x_ticks,
+        ticktext=x_labels,
+        showgrid=True,
+        gridcolor="rgba(128, 128, 128, 0.25)",
+    )
+    figure.update_yaxes(
+        type="log",
+        title=y_title,
+        tickmode="array",
+        tickvals=y_ticks,
+        ticktext=y_labels,
+        showgrid=True,
+        gridcolor="rgba(128, 128, 128, 0.25)",
+    )
+
+
 def add_solar_system_trace(figure: go.Figure) -> None:
     figure.add_trace(go.Scatter(
         x=SOLAR_SYSTEM_PLANETS["Orbital distance (AU)"],
@@ -493,7 +548,13 @@ def add_solar_system_trace(figure: go.Figure) -> None:
         name="Solar System",
         text=SOLAR_SYSTEM_PLANETS["Planet"],
         textposition="top center",
-        marker={"size": 12, "color": "#111111", "symbol": "diamond"},
+        marker={
+            "size": 13,
+            "color": "#D81B60",
+            "symbol": "diamond",
+            "line": {"color": "#FFFFFF", "width": 1},
+        },
+        textfont={"color": "#D81B60", "size": 13},
         customdata=SOLAR_SYSTEM_PLANETS[["Planet"]].to_numpy(),
         hovertemplate=(
             "<b>%{customdata[0]}</b><br>Solar System planet"
@@ -504,8 +565,15 @@ def add_solar_system_trace(figure: go.Figure) -> None:
 
 
 def finish_demographics_chart(figure: go.Figure, title: str) -> go.Figure:
-    figure.update_xaxes(type="log", title="Orbital distance / semi-major axis (AU)")
-    figure.update_yaxes(type="log", title="Planet mass (Earth masses)")
+    x_values = [float(value) for trace in figure.data for value in trace.x]
+    y_values = [float(value) for trace in figure.data for value in trace.y]
+    apply_readable_log_axes(
+        figure,
+        x_values,
+        y_values,
+        "Orbital distance / semi-major axis (AU)",
+        "Planet mass (Earth masses)",
+    )
     figure.update_layout(
         title=title,
         height=650,
@@ -538,6 +606,31 @@ def demographics_over_time_chart(data: pd.DataFrame, year: int) -> go.Figure:
     return finish_demographics_chart(
         figure,
         f"Solar System and exoplanets discovered by {year}",
+    )
+
+
+def current_demographics_chart(data: pd.DataFrame) -> go.Figure:
+    plot_data = demographics_plot_data(data)
+    figure = go.Figure()
+    add_solar_system_trace(figure)
+    if not plot_data.empty:
+        figure.add_trace(go.Scatter(
+            x=plot_data["pl_orbsmax"],
+            y=plot_data["pl_bmasse"],
+            mode="markers",
+            name="Known exoplanets",
+            marker={"size": 8, "color": "#4C78A8", "opacity": 0.65},
+            customdata=plot_data[["pl_name", "hostname", "disc_year"]].to_numpy(),
+            hovertemplate=(
+                "<b>%{customdata[0]}</b><br>Host star: %{customdata[1]}"
+                "<br>Discovery year: %{customdata[2]}"
+                "<br>Orbital distance: %{x:.3g} AU"
+                "<br>Mass: %{y:.3g} Earth masses<extra></extra>"
+            ),
+        ))
+    return finish_demographics_chart(
+        figure,
+        "Known exoplanets and Solar System planets",
     )
 
 
@@ -575,6 +668,38 @@ def demographics_methods_chart(data: pd.DataFrame, view: str) -> go.Figure:
         figure,
         "Known exoplanets and Solar System planets by discovery method",
     )
+
+
+def planet_mass_distribution_chart(data: pd.DataFrame) -> go.Figure | None:
+    masses = data["pl_bmasse"].dropna()
+    masses = masses[masses > 0]
+    if masses.empty:
+        return None
+
+    mass_labels = [
+        "Less than 1",
+        "1–10",
+        "10–100",
+        "100–1,000",
+        "More than 1,000",
+    ]
+    groups = pd.cut(
+        masses,
+        bins=[0, 1, 10, 100, 1000, np.inf],
+        labels=mass_labels,
+        right=False,
+    )
+    counts = groups.value_counts(sort=False).rename_axis("Planet mass (Earth masses)").reset_index(name="Planets")
+    figure = px.bar(
+        counts,
+        x="Planet mass (Earth masses)",
+        y="Planets",
+        title="Distribution of known exoplanet masses",
+        category_orders={"Planet mass (Earth masses)": mass_labels},
+    )
+    figure.update_traces(marker_color="#4C78A8")
+    figure.update_layout(height=600, showlegend=False)
+    return figure
 
 
 def discoveries_by_year_chart(data: pd.DataFrame) -> go.Figure | None:
@@ -650,6 +775,14 @@ def solar_system_demographics_chart(log_axes: bool) -> go.Figure:
         marker={"size": 12, "color": "#4C78A8"},
         textposition="top center",
     )
+    if log_axes:
+        apply_readable_log_axes(
+            figure,
+            SOLAR_SYSTEM_PLANETS["Orbital distance (AU)"].tolist(),
+            SOLAR_SYSTEM_PLANETS["Planet mass (Earth masses)"].tolist(),
+            "Orbital distance (AU)",
+            "Planet mass (Earth masses)",
+        )
     figure.update_layout(height=650, showlegend=False)
     return figure
 
@@ -1191,17 +1324,16 @@ def render_demographics(data: pd.DataFrame) -> None:
     st.title("Exoplanet Demographics")
     if "demographics_part" not in st.session_state:
         st.session_state["demographics_part"] = 0
-    part = max(0, min(int(st.session_state["demographics_part"]), 4))
-    part_names = ["Part 1", "Part 2", "Part 2b", "Part 2c", "Part 3"]
-    st.progress((part + 1) / 5, text=f"Stage {part + 1} of 5 · {part_names[part]}")
+    part = max(0, min(int(st.session_state["demographics_part"]), 7))
+    st.progress((part + 1) / 8, text=f"Step {part + 1} of 8")
 
     if part == 0:
-        st.header("Part 1: Our Solar System")
+        st.header("Step 1: Our Solar System")
         demographics_question(
             "How different are planets in our Solar System?",
             "How do planet mass and distance from the Sun vary across the Solar System?",
-            "Plot the distance from the Sun and mass of each planet.",
-            "A scatter plot of planet mass against orbital distance.",
+            "Use orbital distance as the horizontal variable and planet mass as the vertical variable.",
+            "A scatter plot of planet mass against orbital distance for the eight Solar System planets.",
         )
         scale = st.radio(
             "Axis scale",
@@ -1221,12 +1353,31 @@ def render_demographics(data: pd.DataFrame) -> None:
             "- Where is the Moon?"
         )
     elif part == 1:
-        st.header("Part 2: Exoplanet discoveries over time")
+        st.header("Step 2: The distribution of planet masses")
+        demographics_question(
+            "What kinds of planet masses have we detected?",
+            "How many known exoplanets fall into each planet-mass range?",
+            "Group the planet-mass variable into ranges and count the number of planets in each range.",
+            "A bar chart with planet-mass range on the horizontal axis and number of planets on the vertical axis.",
+        )
+        figure = planet_mass_distribution_chart(data)
+        if figure is None:
+            st.warning("No planets have the mass data needed for this graph.")
+        else:
+            st.plotly_chart(figure, use_container_width=True)
+        st.subheader("Questions to investigate")
+        st.markdown(
+            "- Which mass range contains the most detected planets?\n"
+            "- Which mass ranges contain the fewest?\n"
+            "- Does this show which planet masses are most common in the Universe, or only which masses are in our dataset?"
+        )
+    elif part == 2:
+        st.header("Step 3: Exoplanet discoveries over time")
         demographics_question(
             "Are there planets around other stars? If so, what do they look like? Is our Solar System normal?",
             "Where do detected exoplanets fall on the same mass–orbital-distance plot, and how has that changed over time?",
-            "Look at exoplanet detections over time and plot them on the same figure as the Solar System planets.",
-            "A cumulative scatter plot controlled by discovery year.",
+            "Plot orbital distance horizontally and planet mass vertically, then use discovery year to control which planets are included.",
+            "A cumulative scatter plot of planet mass against orbital distance, controlled by discovery year.",
         )
         plot_data = demographics_plot_data(data)
         years = plot_data["disc_year"].dropna().astype(int)
@@ -1254,13 +1405,13 @@ def render_demographics(data: pd.DataFrame) -> None:
             "Hmm, it seems like more planets were discovered over time, but I cannot quite get a good picture. "
             "What if I used a different data representation?"
         )
-    elif part == 2:
-        st.header("Part 2b: Discoveries each year")
+    elif part == 3:
+        st.header("Step 4: Discoveries each year")
         demographics_question(
             "How has the rate of exoplanet discovery changed over time?",
             "How many exoplanets were discovered in each year?",
-            "Count the planet discoveries in each year instead of plotting their individual properties.",
-            "A bar chart of the number of planets discovered each year.",
+            "Use discovery year as the horizontal variable and count the number of planets for the vertical variable.",
+            "A bar chart with discovery year on the horizontal axis and number of planets discovered on the vertical axis.",
         )
         figure = discoveries_by_year_chart(data)
         if figure is None:
@@ -1268,26 +1419,77 @@ def render_demographics(data: pd.DataFrame) -> None:
         else:
             st.plotly_chart(figure, use_container_width=True)
         st.info("I notice the types of planets seem to be changing. Can I find out more?")
-    elif part == 3:
-        st.header("Part 2c: Discoveries by planet mass")
+    elif part == 4:
+        st.header("Step 5: Discoveries by planet mass")
         demographics_question(
             "Have the types of planets being discovered changed over time?",
             "How many planets in different mass groups were discovered in each year?",
-            "Group planets into mass ranges, then count each group by discovery year.",
-            "A stacked bar chart of yearly discoveries grouped by planet mass.",
+            "Use discovery year horizontally, number of planets vertically, and planet-mass range for the stacked groups.",
+            "A stacked bar chart with discovery year on the horizontal axis, number discovered on the vertical axis, and colour representing planet-mass range.",
         )
         figure = discoveries_by_mass_chart(data)
         if figure is None:
             st.warning("No planets have the discovery-year and mass data needed for this graph.")
         else:
             st.plotly_chart(figure, use_container_width=True)
+    elif part == 5:
+        st.header("Step 6: Is our Solar System normal?")
+        demographics_question(
+            "Is our Solar System normal?",
+            "Where do the Solar System planets sit within the distribution of known exoplanet mass and orbital distance?",
+            "Plot orbital distance horizontally and planet mass vertically for all known exoplanets and the Solar System planets.",
+            "A log–log scatter plot of planet mass against orbital distance, with the Solar System planets highlighted.",
+        )
+        st.plotly_chart(current_demographics_chart(data), use_container_width=True)
+        st.subheader("Questions to investigate")
+        st.markdown(
+            "- Do we expect every planetary system to be the same? Why or why not?\n"
+            "- In what ways does our Solar System look similar to the detected exoplanets?\n"
+            "- In what ways does it look different?\n"
+            "- Do you think the evidence we have so far is convincing yet?"
+        )
+    elif part == 6:
+        st.header("Step 7: From astronomy to data science")
+        st.markdown(
+            "### So far, we have been using a dataset\n"
+            "The data come from the **NASA Exoplanet Archive Planetary Systems Composite Parameters table**. "
+            "Each row represents a planet. For the graphs so far, we have mainly used three variables:"
+        )
+        st.dataframe(
+            pd.DataFrame([
+                {
+                    "Variable": "Planet mass",
+                    "NASA field": "pl_bmasse",
+                    "Meaning": "Planet mass measured in Earth masses",
+                },
+                {
+                    "Variable": "Orbital distance",
+                    "NASA field": "pl_orbsmax",
+                    "Meaning": "Distance from the host star in astronomical units (AU)",
+                },
+                {
+                    "Variable": "Discovery year",
+                    "NASA field": "disc_year",
+                    "Meaning": "The year the planet was reported as discovered",
+                },
+            ]),
+            use_container_width=True,
+            hide_index=True,
+        )
+        st.markdown(
+            "### The dataset is much richer than three variables\n"
+            "It also contains the planet name, host star, discovery method, radius, orbital period, "
+            "temperature estimates, distance from Earth, and information about the planetary system. "
+            "These extra variables may help us understand the patterns we have seen so far."
+        )
+        st.info("Next, we will add discovery method to the mass–orbital-distance plot.")
     else:
-        st.header("Part 3: Compare discovery methods")
+        st.header("Step 8: Compare discovery methods")
         demographics_question(
             "Why were different types of exoplanets detected at different times?",
             "Where do planets found by different detection methods appear on the mass–orbital-distance plot?",
-            "Look at detection methods.",
-            "A scatter plot that can compare Transit, Direct Imaging, both methods together, or all methods.",
+            "Plot orbital distance horizontally, planet mass vertically, and use discovery method to select and colour the exoplanets.",
+            "A log–log scatter plot of planet mass against orbital distance, coloured by discovery method.",
         )
         method_view = st.radio(
             "Planets to show",
@@ -1313,7 +1515,7 @@ def render_demographics(data: pd.DataFrame) -> None:
             st.session_state["demographics_part"] = part - 1
             st.rerun()
     with next_step:
-        if part < 4 and st.button("Continue →", type="primary", use_container_width=True, key="demographics_continue"):
+        if part < 7 and st.button("Continue →", type="primary", use_container_width=True, key="demographics_continue"):
             st.session_state["demographics_part"] = part + 1
             st.rerun()
 
