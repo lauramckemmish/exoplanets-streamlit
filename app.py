@@ -577,6 +577,60 @@ def demographics_methods_chart(data: pd.DataFrame, view: str) -> go.Figure:
     )
 
 
+def discoveries_by_year_chart(data: pd.DataFrame) -> go.Figure | None:
+    years = data.dropna(subset=["disc_year"]).copy()
+    if years.empty:
+        return None
+    counts = years.groupby("disc_year").size().reset_index(name="Planets discovered")
+    figure = px.bar(
+        counts,
+        x="disc_year",
+        y="Planets discovered",
+        labels={"disc_year": "Discovery year"},
+        title="Exoplanets discovered each year",
+    )
+    figure.update_traces(marker_color="#4C78A8")
+    figure.update_layout(height=600, showlegend=False)
+    return figure
+
+
+def discoveries_by_mass_chart(data: pd.DataFrame) -> go.Figure | None:
+    plot_data = data.dropna(subset=["disc_year", "pl_bmasse"]).copy()
+    plot_data = plot_data[plot_data["pl_bmasse"] > 0]
+    if plot_data.empty:
+        return None
+
+    mass_labels = [
+        "Less than 1 Earth mass",
+        "1–10 Earth masses",
+        "10–100 Earth masses",
+        "100–1,000 Earth masses",
+        "More than 1,000 Earth masses",
+    ]
+    plot_data["Mass group"] = pd.cut(
+        plot_data["pl_bmasse"],
+        bins=[0, 1, 10, 100, 1000, np.inf],
+        labels=mass_labels,
+        right=False,
+    )
+    counts = (
+        plot_data.groupby(["disc_year", "Mass group"], observed=True)
+        .size()
+        .reset_index(name="Planets discovered")
+    )
+    figure = px.bar(
+        counts,
+        x="disc_year",
+        y="Planets discovered",
+        color="Mass group",
+        category_orders={"Mass group": mass_labels},
+        labels={"disc_year": "Discovery year"},
+        title="Exoplanets discovered each year, grouped by planet mass",
+    )
+    figure.update_layout(height=620, barmode="stack", legend_title_text="Planet mass")
+    return figure
+
+
 def solar_system_demographics_chart(log_axes: bool) -> go.Figure:
     figure = px.scatter(
         SOLAR_SYSTEM_PLANETS,
@@ -1122,15 +1176,33 @@ def render_data_lab(data: pd.DataFrame, guidance_mode: str) -> None:
         render_map_lab(data, guidance_mode)
 
 
+def demographics_question(
+    research_question: str,
+    data_question: str,
+    approach: str,
+    plot_description: str,
+) -> None:
+    st.markdown(f"### Research question\n{research_question}")
+    st.markdown(f"### Data science question\n{data_question}")
+    st.markdown(f"**Approach:** {approach}  \n**Plot:** {plot_description}")
+
+
 def render_demographics(data: pd.DataFrame) -> None:
     st.title("Exoplanet Demographics")
     if "demographics_part" not in st.session_state:
         st.session_state["demographics_part"] = 0
-    part = max(0, min(int(st.session_state["demographics_part"]), 2))
-    st.progress((part + 1) / 3, text=f"Part {part + 1} of 3")
+    part = max(0, min(int(st.session_state["demographics_part"]), 4))
+    part_names = ["Part 1", "Part 2", "Part 2b", "Part 2c", "Part 3"]
+    st.progress((part + 1) / 5, text=f"Stage {part + 1} of 5 · {part_names[part]}")
 
     if part == 0:
         st.header("Part 1: Our Solar System")
+        demographics_question(
+            "How different are planets in our Solar System?",
+            "How do planet mass and distance from the Sun vary across the Solar System?",
+            "Plot the distance from the Sun and mass of each planet.",
+            "A scatter plot of planet mass against orbital distance.",
+        )
         scale = st.radio(
             "Axis scale",
             ["Linear–linear", "Log–log"],
@@ -1141,8 +1213,21 @@ def render_demographics(data: pd.DataFrame) -> None:
             solar_system_demographics_chart(scale == "Log–log"),
             use_container_width=True,
         )
+        st.subheader("Questions to investigate")
+        st.markdown(
+            "- Where would Pluto likely go?\n"
+            "- What about the asteroid belts?\n"
+            "- Where would you like to live?\n"
+            "- Where is the Moon?"
+        )
     elif part == 1:
         st.header("Part 2: Exoplanet discoveries over time")
+        demographics_question(
+            "Are there planets around other stars? If so, what do they look like? Is our Solar System normal?",
+            "Where do detected exoplanets fall on the same mass–orbital-distance plot, and how has that changed over time?",
+            "Look at exoplanet detections over time and plot them on the same figure as the Solar System planets.",
+            "A cumulative scatter plot controlled by discovery year.",
+        )
         plot_data = demographics_plot_data(data)
         years = plot_data["disc_year"].dropna().astype(int)
         if years.empty:
@@ -1159,8 +1244,51 @@ def render_demographics(data: pd.DataFrame) -> None:
                 demographics_over_time_chart(data, discovery_year),
                 use_container_width=True,
             )
+        st.subheader("Questions to investigate")
+        st.markdown(
+            "- Which planets seem to be easiest to detect?\n"
+            "- What is your hypothesis about why?\n"
+            "- Are there any patterns in the data?"
+        )
+        st.info(
+            "Hmm, it seems like more planets were discovered over time, but I cannot quite get a good picture. "
+            "What if I used a different data representation?"
+        )
+    elif part == 2:
+        st.header("Part 2b: Discoveries each year")
+        demographics_question(
+            "How has the rate of exoplanet discovery changed over time?",
+            "How many exoplanets were discovered in each year?",
+            "Count the planet discoveries in each year instead of plotting their individual properties.",
+            "A bar chart of the number of planets discovered each year.",
+        )
+        figure = discoveries_by_year_chart(data)
+        if figure is None:
+            st.warning("No planets have the discovery-year data needed for this graph.")
+        else:
+            st.plotly_chart(figure, use_container_width=True)
+        st.info("I notice the types of planets seem to be changing. Can I find out more?")
+    elif part == 3:
+        st.header("Part 2c: Discoveries by planet mass")
+        demographics_question(
+            "Have the types of planets being discovered changed over time?",
+            "How many planets in different mass groups were discovered in each year?",
+            "Group planets into mass ranges, then count each group by discovery year.",
+            "A stacked bar chart of yearly discoveries grouped by planet mass.",
+        )
+        figure = discoveries_by_mass_chart(data)
+        if figure is None:
+            st.warning("No planets have the discovery-year and mass data needed for this graph.")
+        else:
+            st.plotly_chart(figure, use_container_width=True)
     else:
         st.header("Part 3: Compare discovery methods")
+        demographics_question(
+            "Why were different types of exoplanets detected at different times?",
+            "Where do planets found by different detection methods appear on the mass–orbital-distance plot?",
+            "Look at detection methods.",
+            "A scatter plot that can compare Transit, Direct Imaging, both methods together, or all methods.",
+        )
         method_view = st.radio(
             "Planets to show",
             ["Transit", "Direct Imaging", "Transit + Direct Imaging", "All methods"],
@@ -1172,12 +1300,11 @@ def render_demographics(data: pd.DataFrame) -> None:
             use_container_width=True,
         )
 
-        st.subheader("Investigate the graph")
+        st.subheader("Questions to investigate")
         st.markdown(
-            "- Where are most of the known planets?\n"
-            "- Do planets discovered using different methods occupy the same parts of the graph?\n"
-            "- What could explain the patterns you see?\n"
-            "- Does this graph necessarily show what planetary systems in the Universe are really like?"
+            "- What kinds of planets are easiest to see with Transit?\n"
+            "- What about Direct Imaging?\n"
+            "- Are Earth-like planets easy to find?"
         )
 
     back, spacer, next_step = st.columns([1, 4, 1])
@@ -1186,7 +1313,7 @@ def render_demographics(data: pd.DataFrame) -> None:
             st.session_state["demographics_part"] = part - 1
             st.rerun()
     with next_step:
-        if part < 2 and st.button("Continue →", type="primary", use_container_width=True, key="demographics_continue"):
+        if part < 4 and st.button("Continue →", type="primary", use_container_width=True, key="demographics_continue"):
             st.session_state["demographics_part"] = part + 1
             st.rerun()
 
