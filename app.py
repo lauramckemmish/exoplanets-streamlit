@@ -1589,6 +1589,21 @@ def render_demographics(data: pd.DataFrame) -> None:
             "An **exoplanet** is a planet that orbits a star other than the Sun. Astronomers have detected thousands "
             "of exoplanets, although we do not have every measurement for every planet."
         )
+        st.subheader("A new and fast-growing science")
+        st.markdown("**1992 — the first confirmed exoplanets were discovered.**")
+        discovery_years = pd.to_numeric(data["disc_year"], errors="coerce").dropna()
+        milestones = [
+            ("By 1995", int((discovery_years <= 1995).sum())),
+            ("By 2005", int((discovery_years <= 2005).sum())),
+            ("By 2015", int((discovery_years <= 2015).sum())),
+            ("By 2025", int((discovery_years <= 2025).sum())),
+            ("Today", int(discovery_years.size)),
+        ]
+        milestone_columns = st.columns(len(milestones))
+        for column, (label, total) in zip(milestone_columns, milestones):
+            with column:
+                st.metric(label, f"{total:,}")
+        st.caption("Running total of confirmed exoplanets in the NASA Exoplanet Archive.")
         demographics_question(
             "Are most detected planets small like Earth, large like Jupiter, or somewhere in between—and how does our Solar System compare?",
             "What percentage of detected exoplanets and Solar System planets falls into each planet-mass range?",
