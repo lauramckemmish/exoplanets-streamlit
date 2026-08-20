@@ -1426,6 +1426,22 @@ def key_idea(text: str) -> None:
     st.success(f"**Key idea:** {text}")
 
 
+def graph_guide(*instructions: str) -> None:
+    st.info(
+        "**How to read this graph**\n\n"
+        + "\n".join(f"- {instruction}" for instruction in instructions)
+    )
+
+
+def graph_questions(find: str, compare: str, explain: str) -> None:
+    st.markdown("### Read, compare, explain")
+    st.markdown(
+        f"1. **Find:** {find}\n"
+        f"2. **Compare:** {compare}\n"
+        f"3. **Explain:** {explain}"
+    )
+
+
 def response_box(step: int, prompt: str, sentence_starters: str) -> None:
     st.caption(f"**Sentence starters:** {sentence_starters}")
     st.text_area(prompt, key=f"demographics_response_{step}", height=100)
@@ -1516,6 +1532,10 @@ def render_demographics(data: pd.DataFrame) -> None:
         )
         st.caption("**1 astronomical unit (AU)** is approximately the average distance from Earth to the Sun.")
         st.subheader("First, try ordinary linear axes")
+        graph_guide(
+            "The bottom axis shows distance from the Sun in AU. The side axis shows mass in Earth masses.",
+            "Each labelled point is one planet. Farther right means farther from the Sun; higher means more massive.",
+        )
         st.plotly_chart(
             solar_system_demographics_chart(False),
             use_container_width=True,
@@ -1531,26 +1551,16 @@ def render_demographics(data: pd.DataFrame) -> None:
             "is the same size as the gap from **1 to 10**. This spreads out small values while keeping very large "
             "values on the same graph. You do not need to calculate logarithms to read it."
         )
-        st.info(
-            "**Try two known points:** Earth is at **1 AU** and **1 Earth mass**. Start at 1 on the bottom axis, "
-            "move upwards to Earth, then move across to 1 on the side axis. Jupiter is about **5.2 AU** from the "
-            "Sun and has about **318 Earth masses**. Use the same steps to find Jupiter."
+        graph_guide(
+            "The axes show the same variables as the first graph, but the spacing now represents multiplication.",
+            "Find Earth at 1 AU and 1 Earth mass. Then find Jupiter at about 5.2 AU and 318 Earth masses.",
         )
         st.plotly_chart(solar_system_demographics_chart(True), use_container_width=True)
-        st.subheader("Start here")
-        st.markdown(
-            "- Find Earth on both graphs: it is at **1 AU** and **1 Earth mass**. Which graph makes Earth easier to "
-            "compare with the other small planets?\n"
-            "- Find Mercury, Venus, Earth and Mars on both graphs. What can you see in the log–log graph that was "
-            "difficult to see in the linear–linear graph?"
+        graph_questions(
+            "Can you locate Earth and Jupiter on both graphs?",
+            "Which graph makes Mercury, Venus, Earth and Mars easier to compare?",
+            "Why is the log–log graph useful when planet masses and distances vary so much?",
         )
-        with st.expander("Go further (optional)"):
-            st.markdown(
-                "- Where would Pluto likely go?\n"
-                "- Would the asteroid belt appear as one point or many points? Why?\n"
-                "- Why is the Moon not included as a planet?\n"
-                "- Where would you like to live? Could these two variables tell you enough to decide?"
-            )
         response_box(
             3,
             "What does the log–log graph help you see more clearly?",
@@ -1574,11 +1584,14 @@ def render_demographics(data: pd.DataFrame) -> None:
             "(more than 1,000 Earth masses). For example, Earth is **Small**, Neptune is **Medium**, and Jupiter is "
             "**Large**."
         )
+        graph_guide(
+            "The whole bar represents all eight Solar System planets, from 0% to 100%.",
+            "Each coloured section is one planet-size group. A wider section contains a larger share of the planets.",
+        )
         solar_figure = planet_mass_distribution_chart(data, include_exoplanets=False)
         if solar_figure is not None:
             st.plotly_chart(solar_figure, use_container_width=True)
         st.caption(
-            "Each coloured section shows the share of our eight planets in that planet-size group. "
             "**Hover over a section—or tap it on a touchscreen—to see the planet names.**"
         )
         key_idea("The planets in our Solar System have very different masses.")
@@ -1609,10 +1622,9 @@ def render_demographics(data: pd.DataFrame) -> None:
             "What percentage of detected exoplanets and Solar System planets falls into each planet-mass range?",
             "Two aligned 100% bars showing how the planets in each group are divided among the five planet-size categories.",
         )
-        st.info(
-            "**How to read this graph:** Step 1 showed the top bar. We have now added detected exoplanets underneath. "
-            "Each bar is one whole group and stretches from 0% to 100%. The bottom bar represents detected exoplanets "
-            "that can be placed in these mass groups. Compare sections with the same colour."
+        graph_guide(
+            "The top bar is our Solar System. The bottom bar is the detected exoplanets that can be placed in these mass groups.",
+            "Each bar is one whole group, from 0% to 100%. Compare sections with the same colour.",
         )
         figure = planet_mass_distribution_chart(data)
         if figure is None:
@@ -1620,17 +1632,11 @@ def render_demographics(data: pd.DataFrame) -> None:
         else:
             st.plotly_chart(figure, use_container_width=True)
         st.caption("**Hover over a section—or tap it on a touchscreen—to see its percentage and planet count.**")
-        st.subheader("Start here")
-        st.markdown(
-            "- Start with the top bar. Which labelled section takes up the most space?\n"
-            "- Now look at the bottom bar. Does the same planet-size group take up the most space?"
+        graph_questions(
+            "Which planet-size group takes up the most space in each bar?",
+            "Which planet-size group looks most different between the two bars?",
+            "What does this tell us about how detected exoplanets compare with our Solar System?",
         )
-        with st.expander("Go further (optional)"):
-            st.markdown(
-                "- Compare the width of each colour in the two bars. Where does our Solar System look most different "
-                "from the detected exoplanets?\n"
-                "- Does this show which planet masses are most common in the Universe, or only which masses are in our dataset?"
-            )
         st.caption("For reference: Earth is 1 Earth mass, Neptune is about 17, and Jupiter is about 318.")
         response_box(
             2,
@@ -1651,23 +1657,17 @@ def render_demographics(data: pd.DataFrame) -> None:
             "A log–log scatter plot of planet mass against orbital distance, with the Solar System planets highlighted.",
         )
         sample_note(data, ["pl_orbsmax", "pl_bmasse"], "exoplanet records")
-        st.info(
-            "This is the same kind of log–log scale you used in Step 3. Some number labels have been removed so the "
-            "many planet points are easier to see."
+        graph_guide(
+            "The bottom axis is orbital distance. The side axis is planet mass. Both use the log scale from Step 3.",
+            "Blue circles are detected exoplanets. Pink labelled diamonds are our Solar System planets.",
+            "Some number labels have been removed so the many planet points are easier to see.",
         )
         st.plotly_chart(current_demographics_chart(data), use_container_width=True)
-        st.subheader("Start here")
-        st.markdown(
-            "- Find the pink diamonds that represent our Solar System planets. Which ones are surrounded by many "
-            "detected exoplanets?\n"
-            "- Which Solar System planets are in parts of the graph with fewer detected exoplanets?"
+        graph_questions(
+            "Which Solar System planets are surrounded by many detected exoplanets?",
+            "Where does our Solar System look similar to or different from the detected exoplanets?",
+            "What more would we need to know before deciding whether our planetary system is “normal”?",
         )
-        with st.expander("Go further (optional)"):
-            st.markdown(
-                "- Do we expect every planetary system to be the same? Why or why not?\n"
-                "- In what ways does our Solar System look similar to or different from the detected exoplanets?\n"
-                "- What new evidence would make us more confident and less uncertain about whether our system is typical?"
-            )
         response_box(
             4,
             "Is our planetary system “normal”? Explain what you mean by “normal” and use evidence from the graph.",
@@ -1712,21 +1712,20 @@ def render_demographics(data: pd.DataFrame) -> None:
             horizontal=True,
             key="demographics_method_view",
         )
+        graph_guide(
+            "The bottom axis is orbital distance and the side axis is planet mass. Both use a log scale.",
+            "Use the buttons above to change which detected exoplanets are shown. Pink diamonds are our Solar System planets.",
+        )
         st.plotly_chart(
             demographics_methods_chart(data, method_view),
             use_container_width=True,
         )
 
-        st.subheader("Start here")
-        st.markdown(
-            "- Select **Direct Imaging**. Are most of its planets close to their stars or far away? Small or massive?\n"
-            "- Select **Transit**. Are most of its planets close to their stars or far away? Small or massive?"
+        graph_questions(
+            "Where do Direct Imaging planets appear? Then switch to Transit and find where those planets appear.",
+            "How are the mass and orbital distance patterns different for the two methods?",
+            "Why might each method find different kinds of planets?",
         )
-        with st.expander("Go further (optional)"):
-            st.markdown(
-                "- Select **Transit + Direct Imaging**. What differences can you see between the two groups?\n"
-                "- Are planets similar to Earth easy to find?"
-            )
         response_box(
             5,
             "What kinds of planets does each discovery method tend to find?",
