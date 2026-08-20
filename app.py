@@ -13,6 +13,8 @@ import streamlit as st
 
 APP_DIR = Path(__file__).resolve().parent
 SAMPLE_PATH = APP_DIR / "data" / "notebook_sample.csv"
+SOLAR_SYSTEM_IMAGE_PATH = APP_DIR / "assets" / "solar-system-nasa.jpeg"
+EXOPLANET_IMAGE_PATH = APP_DIR / "assets" / "exoplanets-artists-concept-nasa.jpeg"
 NASA_TAP_URL = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync"
 
 COLUMNS = [
@@ -1488,6 +1490,11 @@ def render_demographics(data: pd.DataFrame) -> None:
     elif part == 0:
         st.header("Step 1: From our Solar System to exoplanets")
         st.subheader("Start with the planets in our Solar System")
+        st.image(
+            SOLAR_SYSTEM_IMAGE_PATH,
+            caption="An illustration of our Solar System. Credit: NASA",
+            use_container_width=True,
+        )
         st.write(
             "We know eight planets orbit the Sun. Grouping them by mass gives us a familiar population to compare "
             "with planets found farther away."
@@ -1498,6 +1505,11 @@ def render_demographics(data: pd.DataFrame) -> None:
         st.info(
             "**An exoplanet is a planet that orbits a star other than the Sun.** Astronomers have detected thousands "
             "of exoplanets, although we do not have every measurement for every planet."
+        )
+        st.image(
+            EXOPLANET_IMAGE_PATH,
+            caption="Artist's concepts imagining the variety of exoplanets. These are illustrations, not photographs. Credit: NASA/JPL-Caltech",
+            use_container_width=True,
         )
         demographics_question(
             "Are most detected planets small like Earth, large like Jupiter, or somewhere in between—and how does our Solar System compare?",
