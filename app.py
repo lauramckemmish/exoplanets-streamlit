@@ -1444,6 +1444,14 @@ def response_box(step: int, prompt: str = "Record your thinking") -> None:
 def render_demographics(data: pd.DataFrame) -> None:
     st.title("Are We Normal? Exploring Alien Worlds with Data")
     st.caption("Use real NASA data to compare our Solar System with planets around other stars.")
+    st.markdown(
+        "### Welcome to the workshop\n"
+        "People have wondered about worlds beyond Earth for thousands of years. Modern astronomers can investigate "
+        "these age-old questions using data—but the patterns we see are shaped by what our technology can detect "
+        "and which measurements are available.\n\n"
+        "Today, you will compare planet masses, explore our Solar System, ask whether it is typical, and investigate "
+        "how different discovery methods shape our view of exoplanets."
+    )
     if "demographics_part" not in st.session_state:
         st.session_state["demographics_part"] = 0
     part = max(0, min(int(st.session_state["demographics_part"]), 3))
@@ -1616,6 +1624,24 @@ def render_demographics(data: pd.DataFrame) -> None:
             "Our current picture is incomplete. New telescopes and observing methods should help scientists find "
             "smaller planets, planets farther from their stars, and more possible Earth analogues. Planetary systems "
             "may keep surprising us as our technology improves."
+        )
+        st.markdown(
+            "### What have we learned?\n"
+            "- Data lets astronomers investigate planets far beyond our Solar System.\n"
+            "- A graph's scale can change which patterns are easy to see.\n"
+            "- Our Solar System is one planetary system among many—and defining whether it is ‘normal’ requires evidence.\n"
+            "- Our picture of exoplanets is incomplete because different methods find different kinds of planets."
+        )
+        st.markdown("### Keep wondering")
+        st.write(
+            "Scientists do not finish with all the answers—they finish with new questions. What do you now wonder "
+            "about planets or planetary systems? Try turning your idea into a **why** question."
+        )
+        st.text_area(
+            "My next question is…",
+            key="demographics_conclusion_question",
+            height=100,
+            placeholder="Why…?",
         )
 
     back, spacer, next_step = st.columns([1, 4, 1])
