@@ -1367,11 +1367,11 @@ def render_demographics(data: pd.DataFrame) -> None:
     st.caption("Use real NASA data to compare our Solar System with planets around other stars.")
     if "demographics_part" not in st.session_state:
         st.session_state["demographics_part"] = 0
-    part = max(0, min(int(st.session_state["demographics_part"]), 7))
-    st.progress((part + 1) / 8, text=f"Step {part + 1} of 8")
+    part = max(0, min(int(st.session_state["demographics_part"]), 3))
+    st.progress((part + 1) / 4, text=f"Step {part + 1} of 4")
 
-    if part == 0:
-        st.header("Step 1: Our Solar System")
+    if part == 1:
+        st.header("Step 2: Our Solar System")
         demographics_question(
             "The planets all orbit the same star, but how similar are they?",
             "How different are planets in our Solar System?",
@@ -1406,10 +1406,10 @@ def render_demographics(data: pd.DataFrame) -> None:
             "- Why is the Moon not included as a planet?\n"
             "- Where would you like to live? Could these two variables tell you enough to decide?"
         )
-        response_box(1)
+        response_box(2)
         key_idea("Changing the scale can reveal patterns that were hidden without changing the underlying data.")
-    elif part == 1:
-        st.header("Step 2: The distribution of planet masses")
+    elif part == 0:
+        st.header("Step 1: The distribution of planet masses")
         demographics_question(
             "Are most detected planets small like Earth, large like Jupiter, or somewhere in between?",
             "What kinds of planet masses have we detected?",
@@ -1430,98 +1430,10 @@ def render_demographics(data: pd.DataFrame) -> None:
             "- Does this show which planet masses are most common in the Universe, or only which masses are in our dataset?"
         )
         st.caption("For reference: Earth is 1 Earth mass, Neptune is about 17, and Jupiter is about 318.")
-        response_box(2)
+        response_box(1)
         key_idea("A distribution describes the values represented in a dataset, which may not represent every planet that exists.")
     elif part == 2:
-        st.header("Step 3: Exoplanet discoveries over time")
-        demographics_question(
-            "When did planets around other stars begin appearing on our graph?",
-            "Are there planets around other stars, and what do the detected planets look like?",
-            "Where do detected exoplanets fall on the same mass–orbital-distance plot, and how has that changed over time?",
-            "Plot orbital distance horizontally and planet mass vertically, then use discovery year to control which planets are included.",
-            "A cumulative scatter plot of planet mass against orbital distance, controlled by discovery year.",
-        )
-        plot_data = demographics_plot_data(data)
-        years = plot_data["disc_year"].dropna().astype(int)
-        eligible = int(plot_data["disc_year"].notna().sum())
-        st.caption(
-            f"**Data used:** {eligible:,} of {len(data):,} planet records have planet mass, orbital distance and "
-            f"discovery year. {len(data) - eligible:,} incomplete records are not shown."
-        )
-        if years.empty:
-            st.warning("No planets have the discovery-year, orbital-distance and mass data needed for this graph.")
-        else:
-            last_year = max(1992, int(years.max()))
-            discovery_year = st.slider(
-                "Show exoplanets discovered up to",
-                1992,
-                last_year,
-                1992,
-                key="demographics_discovery_year",
-            )
-            shown = int((years <= discovery_year).sum())
-            st.metric("Exoplanets shown", f"{shown:,}", help=f"Of {eligible:,} records complete enough for this plot")
-            st.plotly_chart(
-                demographics_over_time_chart(data, discovery_year),
-                use_container_width=True,
-            )
-            st.caption("The axes stay fixed as the year changes, so movement on the screen comes from planets being added—not from the graph rescaling.")
-        st.subheader("Questions to investigate")
-        st.markdown(
-            "- Which planets seem to be easiest to detect?\n"
-            "- What is your hypothesis about why?\n"
-            "- Are there any patterns in the data?"
-        )
-        response_box(3)
-        key_idea("A cumulative graph shows the evidence available by each year, but missing measurements still affect which planets appear.")
-    elif part == 3:
-        st.header("Step 4: Discoveries each year")
-        demographics_question(
-            "Were exoplanets discovered at a steady rate?",
-            "How has the rate of exoplanet discovery changed over time?",
-            "How many exoplanets were discovered in each year?",
-            "Use discovery year as the horizontal variable and count the number of planets for the vertical variable.",
-            "A bar chart with discovery year on the horizontal axis and number of planets discovered on the vertical axis.",
-        )
-        sample_note(data, ["disc_year"], "planet records")
-        figure = discoveries_by_year_chart(data)
-        if figure is None:
-            st.warning("No planets have the discovery-year data needed for this graph.")
-        else:
-            st.plotly_chart(figure, use_container_width=True)
-        st.subheader("Questions to investigate")
-        st.markdown(
-            "- Which years show sudden increases in discoveries?\n"
-            "- Does a tall bar mean astronomers became better at finding every kind of planet?\n"
-            "- What could cause the discovery rate to change?"
-        )
-        response_box(4)
-        key_idea("A count-by-year plot makes changes in discovery rate easier to see than a scatter plot.")
-    elif part == 4:
-        st.header("Step 5: Discoveries by planet mass")
-        demographics_question(
-            "Did the kinds of planets being added to the dataset change over time?",
-            "Have the types of planets being discovered changed over time?",
-            "How many planets in different mass groups were discovered in each year?",
-            "Use discovery year horizontally, number of planets vertically, and planet-mass range for the stacked groups.",
-            "A stacked bar chart with discovery year on the horizontal axis, number discovered on the vertical axis, and colour representing planet-mass range.",
-        )
-        sample_note(data, ["disc_year", "pl_bmasse"], "planet records")
-        figure = discoveries_by_mass_chart(data)
-        if figure is None:
-            st.warning("No planets have the discovery-year and mass data needed for this graph.")
-        else:
-            st.plotly_chart(figure, use_container_width=True)
-        st.subheader("Questions to investigate")
-        st.markdown(
-            "- Which planet-mass group changes most over time?\n"
-            "- Are the same mass groups dominant in every year?\n"
-            "- How might missing planet-mass measurements affect this graph?"
-        )
-        response_box(5)
-        key_idea("Adding a grouping variable can reveal changes that are hidden in the total number of discoveries.")
-    elif part == 5:
-        st.header("Step 6: Is our Solar System normal?")
+        st.header("Step 3: Is our Solar System normal?")
         st.text_area(
             "Before looking at the graph, what could “normal” mean for a planetary system?",
             key="define_normal",
@@ -1543,58 +1455,10 @@ def render_demographics(data: pd.DataFrame) -> None:
             "- In what ways does it look different?\n"
             "- What new evidence would make us more confident and less uncertain about whether our system is typical?"
         )
-        response_box(6, "Write your current answer. Include what “normal” means in your answer")
+        response_box(3, "Write your current answer. Include what “normal” means in your answer")
         key_idea("Everyday questions become testable when we define words such as “normal” using measurable variables.")
-    elif part == 6:
-        st.header("Step 7: From astronomy to data science")
-        st.markdown(
-            "### So far, we have been using a dataset\n"
-            "The data come from the **NASA Exoplanet Archive Planetary Systems Composite Parameters table**. "
-            "Each row represents a planet. For the graphs so far, we have mainly used three variables:"
-        )
-        st.dataframe(
-            pd.DataFrame([
-                {
-                    "Variable": "Planet mass",
-                    "NASA field": "pl_bmasse",
-                    "Meaning": "Planet mass measured in Earth masses",
-                },
-                {
-                    "Variable": "Orbital distance",
-                    "NASA field": "pl_orbsmax",
-                    "Meaning": "Distance from the host star in astronomical units (AU)",
-                },
-                {
-                    "Variable": "Discovery year",
-                    "NASA field": "disc_year",
-                    "Meaning": "The year the planet was reported as discovered",
-                },
-            ]),
-            use_container_width=True,
-            hide_index=True,
-        )
-        st.subheader("What else would be interesting to know about an exoplanet?")
-        response_box(7, "Record your ideas before revealing the other variables")
-        with st.expander("Reveal more available variables", expanded=False):
-            st.write("The archive is much richer than the three variables used so far:")
-            richer_variables = pd.DataFrame([
-                {"Available information": "Planet and host-star names", "Field": "pl_name, hostname"},
-                {"Available information": "How the planet was discovered", "Field": "discoverymethod"},
-                {"Available information": "Planet radius", "Field": "pl_rade"},
-                {"Available information": "Orbital period", "Field": "pl_orbper"},
-                {"Available information": "Estimated planet temperature", "Field": "pl_eqt"},
-                {"Available information": "Distance from Earth (convertible from parsecs to light-years)", "Field": "sy_dist"},
-                {"Available information": "Host-star spectral type, where reported", "Field": "st_spectype"},
-            ])
-            st.dataframe(richer_variables, use_container_width=True, hide_index=True)
-            known_distance = int(data["sy_dist"].notna().sum())
-            known_star_type = int(data["st_spectype"].notna().sum())
-            st.caption(
-                f"In the current data, distance from Earth is reported for {known_distance:,} planets and host-star "
-                f"spectral type for {known_star_type:,}. Missing still means unknown."
-            )
     else:
-        st.header("Step 8: Compare discovery methods")
+        st.header("Step 4: Compare discovery methods")
         demographics_question(
             "Maybe the way we search affects the kinds of planets we find.",
             "Do different detection methods find different kinds of planets?",
@@ -1620,7 +1484,7 @@ def render_demographics(data: pd.DataFrame) -> None:
             "- What about Direct Imaging?\n"
             "- Are Earth-like planets easy to find?"
         )
-        response_box(8)
+        response_box(4)
         key_idea("The planets in a dataset reflect both what exists and what our detection methods are able to find.")
         st.markdown("### Looking forward: finding another Earth")
         st.info(
@@ -1635,7 +1499,7 @@ def render_demographics(data: pd.DataFrame) -> None:
             st.session_state["demographics_part"] = part - 1
             st.rerun()
     with next_step:
-        if part < 7 and st.button("Continue →", type="primary", use_container_width=True, key="demographics_continue"):
+        if part < 3 and st.button("Continue →", type="primary", use_container_width=True, key="demographics_continue"):
             st.session_state["demographics_part"] = part + 1
             st.rerun()
 
