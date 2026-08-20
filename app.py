@@ -10,6 +10,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import requests
 import streamlit as st
+import streamlit.components.v1 as components
 
 APP_DIR = Path(__file__).resolve().parent
 SAMPLE_PATH = APP_DIR / "data" / "notebook_sample.csv"
@@ -1436,6 +1437,44 @@ def render_demographics(data: pd.DataFrame) -> None:
     if "demographics_part" not in st.session_state:
         st.session_state["demographics_part"] = 0
     part = max(0, min(int(st.session_state["demographics_part"]), 5))
+    step_labels = [
+        "Welcome",
+        "1 · Our Solar System",
+        "2 · Meet exoplanets",
+        "3 · Mass and distance",
+        "4 · Are we normal?",
+        "5 · Discovery methods",
+    ]
+    if st.session_state.get("demographics_selector_part") != part:
+        st.session_state["demographics_step_selector"] = step_labels[part]
+        st.session_state["demographics_selector_part"] = part
+    selected_step = st.selectbox(
+        "Jump to a section",
+        step_labels,
+        key="demographics_step_selector",
+    )
+    selected_part = step_labels.index(selected_step)
+    if selected_part != part:
+        st.session_state["demographics_part"] = selected_part
+        st.session_state["demographics_selector_part"] = selected_part
+        st.session_state["demographics_scroll_to_top"] = True
+        st.rerun()
+    if st.session_state.pop("demographics_scroll_to_top", False):
+        components.html(
+            """
+            <script>
+                const parentDocument = window.parent.document;
+                const scrollContainer =
+                    parentDocument.querySelector('[data-testid="stAppViewContainer"]') ||
+                    parentDocument.querySelector('section.main');
+                if (scrollContainer) {
+                    scrollContainer.scrollTo({top: 0, left: 0, behavior: 'instant'});
+                }
+                window.parent.scrollTo({top: 0, left: 0, behavior: 'instant'});
+            </script>
+            """,
+            height=0,
+        )
     if part == 0:
         st.header("Welcome to the workshop")
         st.image(
@@ -1466,6 +1505,10 @@ def render_demographics(data: pd.DataFrame) -> None:
 
     if part == 3:
         st.header("Step 3: Explore our Solar System")
+        st.write(
+            "Mass is not the only thing we might want to know about a planet. We might also ask how far it is from "
+            "the star it orbits. In our Solar System, that means measuring each planet's distance from the Sun."
+        )
         demographics_question(
             "The planets all orbit the same star, but how similar are they?",
             "How do planet mass and distance from the Sun vary across the Solar System?",
@@ -1704,11 +1747,17 @@ def render_demographics(data: pd.DataFrame) -> None:
     back, spacer, next_step = st.columns([1, 4, 1])
     with back:
         if part > 0 and st.button("← Back", use_container_width=True, key="demographics_back"):
-            st.session_state["demographics_part"] = part - 1
+            new_part = part - 1
+            st.session_state["demographics_part"] = new_part
+            st.session_state["demographics_selector_part"] = None
+            st.session_state["demographics_scroll_to_top"] = True
             st.rerun()
     with next_step:
         if part < 5 and st.button("Continue →", type="primary", use_container_width=True, key="demographics_continue"):
-            st.session_state["demographics_part"] = part + 1
+            new_part = part + 1
+            st.session_state["demographics_part"] = new_part
+            st.session_state["demographics_selector_part"] = None
+            st.session_state["demographics_scroll_to_top"] = True
             st.rerun()
 
 
