@@ -15,6 +15,7 @@ APP_DIR = Path(__file__).resolve().parent
 SAMPLE_PATH = APP_DIR / "data" / "notebook_sample.csv"
 SOLAR_SYSTEM_IMAGE_PATH = APP_DIR / "assets" / "solar-system-nasa.jpeg"
 EXOPLANET_IMAGE_PATH = APP_DIR / "assets" / "exoplanets-artists-concept-nasa.jpeg"
+DETECTION_METHODS_IMAGE_PATH = APP_DIR / "assets" / "exoplanet-detection-methods.svg"
 NASA_TAP_URL = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync"
 
 COLUMNS = [
@@ -487,7 +488,7 @@ def demographics_plot_data(data: pd.DataFrame, require_method: bool = False) -> 
     ]
 
 
-def readable_log_ticks(values: list[float]) -> tuple[list[float], list[str]]:
+def readable_log_ticks(values: list[float], label_every_tick: bool = False) -> tuple[list[float], list[str]]:
     positive = [float(value) for value in values if np.isfinite(value) and value > 0]
     if not positive:
         return [], []
@@ -508,7 +509,10 @@ def readable_log_ticks(values: list[float]) -> tuple[list[float], list[str]]:
         return f"{value:.10f}".rstrip("0").rstrip(".")
 
     ticks = [value for _, value in tick_parts]
-    labels = [label(value) if multiplier in {1, 2, 5} else "" for multiplier, value in tick_parts]
+    labels = [
+        label(value) if label_every_tick or multiplier in {1, 2, 5} else ""
+        for multiplier, value in tick_parts
+    ]
     return ticks, labels
 
 
@@ -518,9 +522,10 @@ def apply_readable_log_axes(
     y_values: list[float],
     x_title: str,
     y_title: str,
+    label_every_tick: bool = False,
 ) -> None:
-    x_ticks, x_labels = readable_log_ticks(x_values)
-    y_ticks, y_labels = readable_log_ticks(y_values)
+    x_ticks, x_labels = readable_log_ticks(x_values, label_every_tick)
+    y_ticks, y_labels = readable_log_ticks(y_values, label_every_tick)
     positive_x = [value for value in x_values if np.isfinite(value) and value > 0]
     positive_y = [value for value in y_values if np.isfinite(value) and value > 0]
     x_range = [math.log10(min(positive_x) * 0.8), math.log10(max(positive_x) * 1.2)]
@@ -700,13 +705,9 @@ def planet_mass_distribution_chart(data: pd.DataFrame) -> go.Figure | None:
     if masses.empty:
         return None
 
-    mass_labels = [
-        "Less than 1",
-        "1–10",
-        "10–100",
-        "100–1,000",
-        "More than 1,000",
-    ]
+    mass_labels = ["Very small", "Small", "Medium", "Large", "Very large"]
+    mass_ranges = ["Less than 1", "1–10", "10–100", "100–1,000", "More than 1,000"]
+    mass_colours = ["#4C78A8", "#72B7B2", "#F2CF5B", "#F58518", "#B279A2"]
     bins = [0, 1, 10, 100, 1000, np.inf]
     exoplanet_groups = pd.cut(
         masses,
@@ -725,76 +726,64 @@ def planet_mass_distribution_chart(data: pd.DataFrame) -> go.Figure | None:
     exoplanet_percentages = exoplanet_counts / exoplanet_counts.sum() * 100
     solar_percentages = solar_counts / solar_counts.sum() * 100
 
+    group_names = ["Our Solar System", "Detected exoplanets"]
     figure = go.Figure()
-    figure.add_trace(go.Bar(
-        x=mass_labels,
-        y=solar_percentages.tolist(),
-        name="Solar System planets",
-        marker={"color": "#D81B60"},
-        offsetgroup="solar-system",
-        hovertemplate="%{x} Earth masses<br>Solar System planets: %{y:.1f}%<extra></extra>",
-    ))
-    figure.add_trace(go.Bar(
-        x=mass_labels,
-        y=exoplanet_percentages.tolist(),
-        name="Detected exoplanets",
-        marker={"color": "#4C78A8"},
-        offsetgroup="exoplanets",
-        hovertemplate="%{x} Earth masses<br>Detected exoplanets: %{y:.1f}%<extra></extra>",
-    ))
+    for index, (label, mass_range, colour) in enumerate(zip(mass_labels, mass_ranges, mass_colours)):
+        percentages = [solar_percentages.iloc[index], exoplanet_percentages.iloc[index]]
+        counts = [solar_counts.iloc[index], exoplanet_counts.iloc[index]]
+        totals = [int(solar_counts.sum()), int(exoplanet_counts.sum())]
+        figure.add_trace(go.Bar(
+            x=percentages,
+            y=group_names,
+            name=f"{label} ({mass_range} Earth masses)",
+            orientation="h",
+            marker={"color": colour},
+            customdata=np.column_stack([counts, totals]),
+            text=[f"{value:.1f}%" if value >= 6 else "" for value in percentages],
+            textposition="inside",
+            hovertemplate=(
+                f"<b>{label}</b> ({mass_range} Earth masses)<br>"
+                "%{y}: %{x:.1f}% (%{customdata[0]} of %{customdata[1]} planets)<extra></extra>"
+            ),
+        ))
     figure.update_layout(
-        title="Percentage of planets in each mass range",
-        height=600,
-        barmode="group",
+        title="Planet-size groups: our Solar System and detected exoplanets",
+        height=500,
+        barmode="stack",
         xaxis={
-            "title": "Planet mass range (Earth masses)",
-            "categoryorder": "array",
-            "categoryarray": mass_labels,
-        },
-        yaxis={
-            "title": "Planets in each group (%)",
+            "title": "Percentage of each group",
             "ticksuffix": "%",
             "range": [0, 100],
-            "rangemode": "tozero",
         },
-        legend={"orientation": "h", "y": 1.08},
+        yaxis={
+            "title": "",
+            "categoryorder": "array",
+            "categoryarray": group_names,
+            "autorange": "reversed",
+        },
+        legend={"title": "Planet-size group", "orientation": "h", "y": 1.18},
     )
     return figure
 
 
-def solar_system_mass_distribution_chart() -> go.Figure:
-    mass_labels = [
-        "Less than 1",
-        "1–10",
-        "10–100",
-        "100–1,000",
-        "More than 1,000",
-    ]
-    groups = pd.cut(
+def solar_system_mass_categories() -> pd.DataFrame:
+    categories = pd.cut(
         SOLAR_SYSTEM_PLANETS["Planet mass (Earth masses)"],
         bins=[0, 1, 10, 100, 1000, np.inf],
-        labels=mass_labels,
+        labels=["Very small", "Small", "Medium", "Large", "Very large"],
         right=False,
     )
-    counts = groups.value_counts(sort=False).reindex(mass_labels, fill_value=0)
-    figure = go.Figure(go.Bar(
-        x=mass_labels,
-        y=counts.tolist(),
-        marker={"color": "#D81B60"},
-        hovertemplate="%{x} Earth masses<br>Solar System planets: %{y}<extra></extra>",
-    ))
-    figure.update_layout(
-        title="Planet masses in our Solar System",
-        height=480,
-        showlegend=False,
-        xaxis={
-            "title": "Planet mass range (Earth masses)",
-            "categoryorder": "array",
-            "categoryarray": mass_labels,
-        },
-        yaxis={"title": "Number of Solar System planets", "dtick": 1, "rangemode": "tozero"},
-    )
-    return figure
+    category_ranges = {
+        "Very small": "Less than 1",
+        "Small": "1–10",
+        "Medium": "10–100",
+        "Large": "100–1,000",
+        "Very large": "More than 1,000",
+    }
+    table = SOLAR_SYSTEM_PLANETS[["Planet", "Planet mass (Earth masses)"]].copy()
+    table["Planet-size group"] = categories.astype(str)
+    table["Mass range (Earth masses)"] = table["Planet-size group"].map(category_ranges)
+    return table[["Planet", "Planet mass (Earth masses)", "Planet-size group", "Mass range (Earth masses)"]]
 
 
 def discoveries_by_year_chart(data: pd.DataFrame) -> go.Figure | None:
@@ -877,8 +866,13 @@ def solar_system_demographics_chart(log_axes: bool) -> go.Figure:
             SOLAR_SYSTEM_PLANETS["Planet mass (Earth masses)"].tolist() + [500],
             "Orbital distance (AU)",
             "Planet mass (Earth masses)",
+            label_every_tick=True,
         )
         figure.update_yaxes(range=[math.log10(0.04), math.log10(500)])
+        for x_value in [1, 10]:
+            figure.add_vline(x=x_value, line_width=1.5, line_color="rgba(80, 80, 80, 0.5)")
+        for y_value in [0.1, 1, 10, 100]:
+            figure.add_hline(y=y_value, line_width=1.5, line_color="rgba(80, 80, 80, 0.5)")
     figure.update_layout(height=650, showlegend=False)
     return figure
 
@@ -1407,15 +1401,12 @@ def render_data_lab(data: pd.DataFrame, guidance_mode: str) -> None:
 
 def demographics_question(
     wonder: str,
-    research_question: str,
     data_question: str,
-    approach: str,
     plot_description: str,
 ) -> None:
     st.markdown(f"### I wonder…\n{wonder}")
-    st.markdown(f"### Research question\n{research_question}")
-    st.markdown(f"### Data science question\n{data_question}")
-    st.markdown(f"**Approach:** {approach}  \n**Plot:** {plot_description}")
+    st.markdown(f"### Question we can answer with data\n{data_question}")
+    st.markdown(f"### What we will plot\n{plot_description}")
 
 
 def sample_note(data: pd.DataFrame, required: list[str], label: str = "records") -> int:
@@ -1432,7 +1423,8 @@ def key_idea(text: str) -> None:
     st.success(f"**Key idea:** {text}")
 
 
-def response_box(step: int, prompt: str = "Record your thinking") -> None:
+def response_box(step: int, prompt: str, sentence_starters: str) -> None:
+    st.caption(f"**Sentence starters:** {sentence_starters}")
     st.text_area(prompt, key=f"demographics_response_{step}", height=100)
 
 
@@ -1474,9 +1466,7 @@ def render_demographics(data: pd.DataFrame) -> None:
         st.header("Step 3: Explore our Solar System")
         demographics_question(
             "The planets all orbit the same star, but how similar are they?",
-            "How different are planets in our Solar System?",
             "How do planet mass and distance from the Sun vary across the Solar System?",
-            "Use orbital distance as the horizontal variable and planet mass as the vertical variable.",
             "A scatter plot of planet mass against orbital distance for the eight Solar System planets.",
         )
         st.caption("**1 astronomical unit (AU)** is approximately the average distance from Earth to the Sun.")
@@ -1496,17 +1486,31 @@ def render_demographics(data: pd.DataFrame) -> None:
             "is the same size as the gap from **1 to 10**. This spreads out small values while keeping very large "
             "values on the same graph. You do not need to calculate logarithms to read it."
         )
-        st.plotly_chart(solar_system_demographics_chart(True), use_container_width=True)
-        st.subheader("Questions to investigate")
-        st.markdown(
-            "- Which graph makes it easier to compare all eight planets? What can you see in the log–log graph "
-            "that was difficult to see in the linear–linear graph?\n"
-            "- Where would Pluto likely go?\n"
-            "- Would the asteroid belt appear as one point or many points? Why?\n"
-            "- Why is the Moon not included as a planet?\n"
-            "- Where would you like to live? Could these two variables tell you enough to decide?"
+        st.info(
+            "**Try two known points:** Earth is at **1 AU** and **1 Earth mass**. Start at 1 on the bottom axis, "
+            "move upwards to Earth, then move across to 1 on the side axis. Jupiter is about **5.2 AU** from the "
+            "Sun and has about **318 Earth masses**. Use the same steps to find Jupiter."
         )
-        response_box(3)
+        st.plotly_chart(solar_system_demographics_chart(True), use_container_width=True)
+        st.subheader("Start here")
+        st.markdown(
+            "- Find Earth on both graphs: it is at **1 AU** and **1 Earth mass**. Which graph makes Earth easier to "
+            "compare with the other small planets?\n"
+            "- Find Mercury, Venus, Earth and Mars on both graphs. What can you see in the log–log graph that was "
+            "difficult to see in the linear–linear graph?"
+        )
+        with st.expander("Go further (optional)"):
+            st.markdown(
+                "- Where would Pluto likely go?\n"
+                "- Would the asteroid belt appear as one point or many points? Why?\n"
+                "- Why is the Moon not included as a planet?\n"
+                "- Where would you like to live? Could these two variables tell you enough to decide?"
+            )
+        response_box(
+            3,
+            "What does the log–log graph help you see more clearly?",
+            "“The log–log graph makes it easier to see…” or “On the linear graph…, but on the log–log graph…”",
+        )
         key_idea("Changing the scale can reveal patterns that were hidden without changing the underlying data.")
     elif part == 1:
         st.header("Step 1: Meet our Solar System")
@@ -1519,14 +1523,33 @@ def render_demographics(data: pd.DataFrame) -> None:
             "Our Solar System contains the Sun and everything held in orbit around it. Eight planets orbit the Sun, "
             "from small rocky worlds such as Earth to giant planets such as Jupiter."
         )
-        st.plotly_chart(solar_system_mass_distribution_chart(), use_container_width=True)
-        st.subheader("Questions to investigate")
         st.markdown(
-            "- Which mass range contains the most Solar System planets?\n"
-            "- Which planets do you think are in the smallest and largest mass ranges?\n"
-            "- What else would you like to know before comparing these planets?"
+            "### Sort the planets by mass\n"
+            "We will use five simple planet-size groups. A planet's group is based on its mass compared with Earth."
         )
-        response_box(1)
+        st.dataframe(
+            solar_system_mass_categories(),
+            hide_index=True,
+            use_container_width=True,
+            column_config={
+                "Planet mass (Earth masses)": st.column_config.NumberColumn(format="%.3g"),
+            },
+        )
+        st.subheader("Start here")
+        st.markdown(
+            "- Find Earth in the table. What is its mass and planet-size group?\n"
+            "- Which planets are in the same planet-size group?"
+        )
+        with st.expander("Go further (optional)"):
+            st.markdown(
+                "- Which planet-size groups contain no Solar System planets?\n"
+                "- What else would you like to know before comparing these planets?"
+            )
+        response_box(
+            1,
+            "What do you notice about the planet-size groups in our Solar System?",
+            "“I notice that…” or “___ and ___ are in the same group because…”",
+        )
         key_idea("The eight planets in our Solar System have a wide range of masses.")
     elif part == 2:
         st.header("Step 2: Meet exoplanets")
@@ -1537,28 +1560,39 @@ def render_demographics(data: pd.DataFrame) -> None:
         )
         demographics_question(
             "Are most detected planets small like Earth, large like Jupiter, or somewhere in between—and how does our Solar System compare?",
-            "What kinds of planet masses have we detected, and what kinds are present in our Solar System?",
             "What percentage of detected exoplanets and Solar System planets falls into each planet-mass range?",
-            "Group planet mass into ranges, then calculate the percentage of each population in every range.",
-            "A grouped bar chart with planet-mass range horizontally and the percentage of each population vertically.",
+            "Two aligned 100% bars showing how the planets in each group are divided among the five planet-size categories.",
         )
-        sample_note(data, ["pl_bmasse"], "planet records")
+        exoplanets_with_mass = sample_note(data, ["pl_bmasse"], "planet records")
         st.caption("All eight Solar System planets are included in the comparison.")
+        st.info(
+            "**How to read this graph:** Each horizontal bar is one whole group and stretches from 0% to 100%. "
+            "The top bar represents the 8 Solar System planets. The bottom bar represents the "
+            f"{exoplanets_with_mass:,} detected exoplanets with mass data. The coloured sections show what percentage "
+            "of each group belongs to each planet-size category."
+        )
         figure = planet_mass_distribution_chart(data)
         if figure is None:
             st.warning("No planets have the mass data needed for this graph.")
         else:
             st.plotly_chart(figure, use_container_width=True)
-        st.subheader("Questions to investigate")
+        st.subheader("Start here")
         st.markdown(
-            "- Each colour adds to 100%. Compare the heights of the pink and blue bars within each mass range.\n"
-            "- Which mass range contains the largest percentage of detected exoplanets?\n"
-            "- Which mass ranges contain the largest percentage of Solar System planets?\n"
-            "- Where does our Solar System look different from the detected exoplanets?\n"
-            "- Does this show which planet masses are most common in the Universe, or only which masses are in our dataset?"
+            "- Start with the top bar. Which colour takes up the most space? Use the legend to name that planet-size group.\n"
+            "- Now look at the bottom bar. Does the same planet-size group take up the most space?"
         )
+        with st.expander("Go further (optional)"):
+            st.markdown(
+                "- Compare the width of each colour in the two bars. Where does our Solar System look most different "
+                "from the detected exoplanets?\n"
+                "- Does this show which planet masses are most common in the Universe, or only which masses are in our dataset?"
+            )
         st.caption("For reference: Earth is 1 Earth mass, Neptune is about 17, and Jupiter is about 318.")
-        response_box(2)
+        response_box(
+            2,
+            "How are the two planet groups similar or different?",
+            "“The two bars are similar because…” or “They are different because…”",
+        )
         key_idea(
             "Percentages let us compare groups of different sizes, but the detected exoplanets may still not represent "
             "every planet that exists."
@@ -1572,31 +1606,45 @@ def render_demographics(data: pd.DataFrame) -> None:
         )
         demographics_question(
             "Is our Solar System normal?",
-            "Is our Solar System normal?",
             "How similar is our Solar System to the planetary systems represented by detected exoplanets?",
-            "Plot orbital distance horizontally and planet mass vertically for all known exoplanets and the Solar System planets.",
             "A log–log scatter plot of planet mass against orbital distance, with the Solar System planets highlighted.",
         )
         sample_note(data, ["pl_orbsmax", "pl_bmasse"], "exoplanet records")
-        st.plotly_chart(current_demographics_chart(data), use_container_width=True)
-        st.subheader("Questions to investigate")
-        st.markdown(
-            "- Do we expect every planetary system to be the same? Why or why not?\n"
-            "- In what ways does our Solar System look similar to the detected exoplanets?\n"
-            "- In what ways does it look different?\n"
-            "- What new evidence would make us more confident and less uncertain about whether our system is typical?"
+        st.info(
+            "This is the same kind of log–log scale you used in Step 3. Some number labels have been removed so the "
+            "many planet points are easier to see."
         )
-        response_box(4, "Write your current answer. Include what “normal” means in your answer")
+        st.plotly_chart(current_demographics_chart(data), use_container_width=True)
+        st.subheader("Start here")
+        st.markdown(
+            "- Find the pink diamonds that represent our Solar System planets. Which ones are surrounded by many "
+            "detected exoplanets?\n"
+            "- Which Solar System planets are in parts of the graph with fewer detected exoplanets?"
+        )
+        with st.expander("Go further (optional)"):
+            st.markdown(
+                "- Do we expect every planetary system to be the same? Why or why not?\n"
+                "- In what ways does our Solar System look similar to or different from the detected exoplanets?\n"
+                "- What new evidence would make us more confident and less uncertain about whether our system is typical?"
+            )
+        response_box(
+            4,
+            "Is our planetary system “normal”? Explain what you mean by “normal” and use evidence from the graph.",
+            "“By normal, I mean…” or “Our planetary system looks… because…” or “To be more confident, we would need…”",
+        )
         key_idea("Everyday questions become testable when we define words such as “normal” using measurable variables.")
     elif part == 5:
         st.header("Step 5: Compare discovery methods")
-        st.subheader("How can we find something beside a bright star?")
-        st.markdown(
-            "To our eyes, **Alpha Centauri** looks like one bright point of light, but it is a three-star system. "
-            "With a suitable telescope, Alpha Centauri A and B can be seen separately. The third star, Proxima "
-            "Centauri, is much fainter and lies farther from the pair in the sky.\n\n"
-            "A planet is harder to separate from its host star: it is much fainter and appears extremely close to "
-            "the star. Astronomers therefore need special ways to detect it."
+        st.subheader("How can we find a planet beside a bright star?")
+        st.write(
+            "Stars are extremely bright. Planets are much smaller and fainter, and they appear very close to their "
+            "stars in our sky. This makes exoplanets difficult to see. Astronomers therefore use special ways to "
+            "detect them. A planet's **host star** is the star it orbits."
+        )
+        st.image(
+            DETECTION_METHODS_IMAGE_PATH,
+            caption="Two ways to detect exoplanets: record the planet's light or measure a dip in its star's light.",
+            use_container_width=True,
         )
         method_intro_left, method_intro_right = st.columns(2)
         with method_intro_left:
@@ -1613,9 +1661,7 @@ def render_demographics(data: pd.DataFrame) -> None:
             )
         demographics_question(
             "Maybe the way we search affects the kinds of planets we find.",
-            "Do different detection methods find different kinds of planets?",
             "Where do planets found by different detection methods appear on a planet-mass and orbital-distance plot?",
-            "Plot orbital distance horizontally, planet mass vertically, and use discovery method to select and colour the exoplanets.",
             "A log–log scatter plot of planet mass against orbital distance, coloured by discovery method.",
         )
         sample_note(data, ["pl_orbsmax", "pl_bmasse", "discoverymethod"], "exoplanet records")
@@ -1630,18 +1676,26 @@ def render_demographics(data: pd.DataFrame) -> None:
             use_container_width=True,
         )
 
-        st.subheader("Questions to investigate")
+        st.subheader("Start here")
         st.markdown(
-            "- What kinds of planets are easiest to see with Transit?\n"
-            "- What about Direct Imaging?\n"
-            "- Are Earth-like planets easy to find?"
+            "- Select **Direct Imaging**. Are most of its planets close to their stars or far away? Small or massive?\n"
+            "- Select **Transit**. Are most of its planets close to their stars or far away? Small or massive?"
         )
-        response_box(5)
+        with st.expander("Go further (optional)"):
+            st.markdown(
+                "- Select **Transit + Direct Imaging**. What differences can you see between the two groups?\n"
+                "- Are planets similar to Earth easy to find?"
+            )
+        response_box(
+            5,
+            "What kinds of planets does each discovery method tend to find?",
+            "“Transit tends to find…” or “Direct imaging tends to find…” or “The methods are different because…”",
+        )
         key_idea("The planets in a dataset reflect both what exists and what our detection methods are able to find.")
         st.markdown("### Looking forward: finding another Earth")
         st.info(
             "Our current picture is incomplete. New telescopes and observing methods should help scientists find "
-            "smaller planets, planets farther from their stars, and more possible Earth analogues. Planetary systems "
+            "smaller planets, planets farther from their stars, and more planets similar to Earth. Planetary systems "
             "may keep surprising us as our technology improves."
         )
         st.markdown(
@@ -1656,6 +1710,7 @@ def render_demographics(data: pd.DataFrame) -> None:
             "Scientists do not finish with all the answers—they finish with new questions. What do you now wonder "
             "about planets or planetary systems? Try turning your idea into a **why** question."
         )
+        st.caption("**Question starters:** “Why does…?”, “Why are…?”, or “Why do scientists…?”")
         st.text_area(
             "My next question is…",
             key="demographics_conclusion_question",
