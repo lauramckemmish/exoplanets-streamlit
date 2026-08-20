@@ -726,6 +726,10 @@ def planet_mass_distribution_chart(
     )
     exoplanet_counts = exoplanet_groups.value_counts(sort=False).reindex(mass_labels, fill_value=0)
     solar_counts = solar_groups.value_counts(sort=False).reindex(mass_labels, fill_value=0)
+    solar_planet_names = [
+        ", ".join(SOLAR_SYSTEM_PLANETS.loc[solar_groups == label, "Planet"].tolist())
+        for label in mass_labels
+    ]
     exoplanet_percentages = exoplanet_counts / exoplanet_counts.sum() * 100
     solar_percentages = solar_counts / solar_counts.sum() * 100
 
@@ -737,17 +741,19 @@ def planet_mass_distribution_chart(
         percentages = [solar_percentages.iloc[index]]
         counts = [solar_counts.iloc[index]]
         totals = [int(solar_counts.sum())]
+        details = [solar_planet_names[index]]
         if include_exoplanets:
             percentages.append(exoplanet_percentages.iloc[index])
             counts.append(exoplanet_counts.iloc[index])
             totals.append(int(exoplanet_counts.sum()))
+            details.append("Detected exoplanet names are not listed for this large group")
         figure.add_trace(go.Bar(
             x=percentages,
             y=group_names,
             name=f"{label} ({mass_range} Earth masses)",
             orientation="h",
             marker={"color": colour},
-            customdata=np.column_stack([counts, totals]),
+            customdata=np.column_stack([counts, totals, details]),
             text=[
                 f"{label}<br>{value:.1f}%" if value >= 8 else (f"{value:.1f}%" if value > 0 else "")
                 for value in percentages
@@ -756,7 +762,8 @@ def planet_mass_distribution_chart(
             insidetextanchor="middle",
             hovertemplate=(
                 f"<b>{label}</b> ({mass_range} Earth masses)<br>"
-                "%{y}: %{x:.1f}% (%{customdata[0]} of %{customdata[1]} planets)<extra></extra>"
+                "%{y}: %{x:.1f}% (%{customdata[0]} of %{customdata[1]} planets)"
+                "<br>%{customdata[2]}<extra></extra>"
             ),
         ))
     figure.update_layout(
@@ -1506,7 +1513,7 @@ def render_demographics(data: pd.DataFrame) -> None:
             "What does the log–log graph help you see more clearly?",
             "“The log–log graph makes it easier to see…” or “On the linear graph…, but on the log–log graph…”",
         )
-        key_idea("Changing the scale can reveal patterns that were hidden without changing the underlying data.")
+        key_idea("A log scale helps us see small and large planets on the same graph.")
     elif part == 1:
         st.header("Step 1: Meet our Solar System")
         st.image(
@@ -1519,13 +1526,19 @@ def render_demographics(data: pd.DataFrame) -> None:
             "from small rocky worlds such as Earth to giant planets such as Jupiter."
         )
         st.markdown(
-            "We will group planets by mass: **Very small** (less than 1 Earth mass), **Small** (1–10), "
-            "**Medium** (10–100), **Large** (100–1,000), and **Very large** (more than 1,000)."
+            "We will group planets by mass: **Very small** (less than 1 Earth mass), **Small** (1–10 Earth masses), "
+            "**Medium** (10–100 Earth masses), **Large** (100–1,000 Earth masses), and **Very large** "
+            "(more than 1,000 Earth masses). For example, Earth is **Small**, Neptune is **Medium**, and Jupiter is "
+            "**Large**."
         )
         solar_figure = planet_mass_distribution_chart(data, include_exoplanets=False)
         if solar_figure is not None:
             st.plotly_chart(solar_figure, use_container_width=True)
-        st.caption("Each coloured section shows the share of our eight planets in that planet-size group.")
+        st.caption(
+            "Each coloured section shows the share of our eight planets in that planet-size group. "
+            "**Hover over a section—or tap it on a touchscreen—to see the planet names.**"
+        )
+        key_idea("The planets in our Solar System have very different masses.")
     elif part == 2:
         st.header("Step 2: Meet exoplanets")
         st.info(
@@ -1538,18 +1551,17 @@ def render_demographics(data: pd.DataFrame) -> None:
             "What percentage of detected exoplanets and Solar System planets falls into each planet-mass range?",
             "Two aligned 100% bars showing how the planets in each group are divided among the five planet-size categories.",
         )
-        exoplanets_with_mass = sample_note(data, ["pl_bmasse"], "planet records")
-        st.caption("All eight Solar System planets are included in the comparison.")
         st.info(
             "**How to read this graph:** Step 1 showed the top bar. We have now added detected exoplanets underneath. "
-            "Each bar is one whole group and stretches from 0% to 100%. The bottom bar represents the "
-            f"{exoplanets_with_mass:,} detected exoplanets with mass data. Compare sections with the same colour."
+            "Each bar is one whole group and stretches from 0% to 100%. The bottom bar represents detected exoplanets "
+            "that can be placed in these mass groups. Compare sections with the same colour."
         )
         figure = planet_mass_distribution_chart(data)
         if figure is None:
             st.warning("No planets have the mass data needed for this graph.")
         else:
             st.plotly_chart(figure, use_container_width=True)
+        st.caption("**Hover over a section—or tap it on a touchscreen—to see its percentage and planet count.**")
         st.subheader("Start here")
         st.markdown(
             "- Start with the top bar. Which labelled section takes up the most space?\n"
@@ -1567,10 +1579,7 @@ def render_demographics(data: pd.DataFrame) -> None:
             "How are the two planet groups similar or different?",
             "“The two bars are similar because…” or “They are different because…”",
         )
-        key_idea(
-            "Percentages let us compare groups of different sizes, but the detected exoplanets may still not represent "
-            "every planet that exists."
-        )
+        key_idea("Detected exoplanets have a different mix of sizes from the planets in our Solar System.")
     elif part == 4:
         st.header("Step 4: Is our Solar System normal?")
         st.text_area(
@@ -1606,7 +1615,7 @@ def render_demographics(data: pd.DataFrame) -> None:
             "Is our planetary system “normal”? Explain what you mean by “normal” and use evidence from the graph.",
             "“By normal, I mean…” or “Our planetary system looks… because…” or “To be more confident, we would need…”",
         )
-        key_idea("Everyday questions become testable when we define words such as “normal” using measurable variables.")
+        key_idea("We need more evidence before deciding whether our planetary system is “normal”.")
     elif part == 5:
         st.header("Step 5: Compare discovery methods")
         st.subheader("How can we find a planet beside a bright star?")
@@ -1665,7 +1674,7 @@ def render_demographics(data: pd.DataFrame) -> None:
             "What kinds of planets does each discovery method tend to find?",
             "“Transit tends to find…” or “Direct imaging tends to find…” or “The methods are different because…”",
         )
-        key_idea("The planets in a dataset reflect both what exists and what our detection methods are able to find.")
+        key_idea("Different discovery methods find different kinds of planets.")
         st.markdown("### Looking forward: finding another Earth")
         st.info(
             "Our current picture is incomplete. New telescopes and observing methods should help scientists find "
