@@ -1444,6 +1444,14 @@ def render_demographics(data: pd.DataFrame) -> None:
     part = max(0, min(int(st.session_state["demographics_part"]), 5))
     if part == 0:
         st.header("Welcome to the workshop")
+        st.image(
+            EXOPLANET_IMAGE_PATH,
+            caption=(
+                "Artist's concepts imagining the variety of exoplanets. These are illustrations, not photographs. "
+                "Credit: NASA/JPL-Caltech"
+            ),
+            use_container_width=True,
+        )
         st.markdown(
             "People have wondered about worlds beyond Earth for thousands of years. Modern astronomers can investigate "
             "these age-old questions using data—but the patterns we see are shaped by what our technology can detect "
@@ -1523,13 +1531,9 @@ def render_demographics(data: pd.DataFrame) -> None:
     elif part == 2:
         st.header("Step 2: Meet exoplanets")
         st.info(
-            "**An exoplanet is a planet that orbits a star other than the Sun.** Astronomers have detected thousands "
+            "### What is an exoplanet?\n"
+            "An **exoplanet** is a planet that orbits a star other than the Sun. Astronomers have detected thousands "
             "of exoplanets, although we do not have every measurement for every planet."
-        )
-        st.image(
-            EXOPLANET_IMAGE_PATH,
-            caption="Artist's concepts imagining the variety of exoplanets. These are illustrations, not photographs. Credit: NASA/JPL-Caltech",
-            use_container_width=True,
         )
         demographics_question(
             "Are most detected planets small like Earth, large like Jupiter, or somewhere in between—and how does our Solar System compare?",
