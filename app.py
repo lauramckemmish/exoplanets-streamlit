@@ -17,6 +17,7 @@ SAMPLE_PATH = APP_DIR / "data" / "notebook_sample.csv"
 SOLAR_SYSTEM_IMAGE_PATH = APP_DIR / "assets" / "solar-system-nasa.jpeg"
 EXOPLANET_IMAGE_PATH = APP_DIR / "assets" / "exoplanets-artists-concept-nasa.jpeg"
 DETECTION_METHODS_IMAGE_PATH = APP_DIR / "assets" / "exoplanet-detection-methods.svg"
+DIRECT_IMAGING_IMAGE_PATH = APP_DIR / "assets" / "direct-imaging.svg"
 NASA_TAP_URL = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync"
 
 COLUMNS = [
@@ -1433,33 +1434,39 @@ def graph_guide(*instructions: str) -> None:
     )
 
 
-def graph_questions(find: str, compare: str, explain: str) -> None:
-    st.markdown("### Read, compare, explain")
+def graph_questions(find: str, compare: str) -> None:
+    st.markdown("### Read and compare")
     st.markdown(
         f"1. **Find:** {find}\n"
-        f"2. **Compare:** {compare}\n"
-        f"3. **Explain:** {explain}"
+        f"2. **Compare:** {compare}"
     )
 
 
 def response_box(step: int, prompt: str, sentence_starters: str) -> None:
+    st.markdown(f"### Explain\n{prompt}")
     st.caption(f"**Sentence starters:** {sentence_starters}")
-    st.text_area(prompt, key=f"demographics_response_{step}", height=100)
+    st.text_area(
+        "Write your explanation",
+        key=f"demographics_response_{step}",
+        height=100,
+        label_visibility="collapsed",
+    )
 
 
-def render_demographics(data: pd.DataFrame) -> None:
-    st.title("Are We Normal? Exploring Alien Worlds with Data")
-    st.caption("Use real NASA data to compare our Solar System with planets around other stars.")
+def render_demographics_classroom(data: pd.DataFrame) -> None:
     if "demographics_part" not in st.session_state:
         st.session_state["demographics_part"] = 0
-    part = max(0, min(int(st.session_state["demographics_part"]), 5))
+    part = max(0, min(int(st.session_state["demographics_part"]), 8))
     step_labels = [
         "Welcome",
         "1 · Our Solar System",
         "2 · Meet exoplanets",
         "3 · Mass and distance",
         "4 · Are we normal?",
-        "5 · Discovery methods",
+        "5 · Direct imaging",
+        "6 · Transit detection",
+        "7 · Compare methods",
+        "Conclusion",
     ]
     if st.session_state.get("demographics_selector_part") != part:
         st.session_state["demographics_step_selector"] = step_labels[part]
@@ -1514,10 +1521,15 @@ def render_demographics(data: pd.DataFrame) -> None:
             "2. Meet exoplanets and compare planet masses.\n"
             "3. Explore planet mass and orbital distance.\n"
             "4. Ask whether our planetary system is ‘normal’.\n"
-            "5. Investigate how discovery methods shape the data."
+            "5. Investigate direct imaging.\n"
+            "6. Investigate transit detection.\n"
+            "7. Compare discovery methods."
         )
     else:
-        st.progress(part / 5, text=f"Step {part} of 5")
+        if part <= 7:
+            st.progress(part / 7, text=f"Step {part} of 7")
+        else:
+            st.progress(1.0, text="Conclusion")
 
     if part == 3:
         st.header("Step 3: Explore our Solar System")
@@ -1559,7 +1571,6 @@ def render_demographics(data: pd.DataFrame) -> None:
         graph_questions(
             "Can you locate Earth and Jupiter on both graphs?",
             "Which graph makes Mercury, Venus, Earth and Mars easier to compare?",
-            "Why is the log–log graph useful when planet masses and distances vary so much?",
         )
         response_box(
             3,
@@ -1617,10 +1628,9 @@ def render_demographics(data: pd.DataFrame) -> None:
             with column:
                 st.metric(label, f"{total:,}")
         st.caption("Running total of confirmed exoplanets in the NASA Exoplanet Archive.")
-        demographics_question(
-            "Are most detected planets small like Earth, large like Jupiter, or somewhere in between—and how does our Solar System compare?",
-            "What percentage of detected exoplanets and Solar System planets falls into each planet-mass range?",
-            "Two aligned 100% bars showing how the planets in each group are divided among the five planet-size categories.",
+        st.markdown(
+            "### Our question\n"
+            "How do the sizes of detected exoplanets compare with planets in our Solar System?"
         )
         graph_guide(
             "The top bar is our Solar System. The bottom bar is the detected exoplanets that can be placed in these mass groups.",
@@ -1635,12 +1645,10 @@ def render_demographics(data: pd.DataFrame) -> None:
         graph_questions(
             "Which planet-size group takes up the most space in each bar?",
             "Which planet-size group looks most different between the two bars?",
-            "What does this tell us about how detected exoplanets compare with our Solar System?",
         )
-        st.caption("For reference: Earth is 1 Earth mass, Neptune is about 17, and Jupiter is about 318.")
         response_box(
             2,
-            "How are the two planet groups similar or different?",
+            "What do the bars tell us about how the two planet groups are similar or different?",
             "“The two bars are similar because…” or “They are different because…”",
         )
         key_idea("Detected exoplanets have a different mix of sizes from the planets in our Solar System.")
@@ -1656,7 +1664,6 @@ def render_demographics(data: pd.DataFrame) -> None:
             "How similar is our Solar System to the planetary systems represented by detected exoplanets?",
             "A log–log scatter plot of planet mass against orbital distance, with the Solar System planets highlighted.",
         )
-        sample_note(data, ["pl_orbsmax", "pl_bmasse"], "exoplanet records")
         graph_guide(
             "The bottom axis is orbital distance. The side axis is planet mass. Both use the log scale from Step 3.",
             "Blue circles are detected exoplanets. Pink labelled diamonds are our Solar System planets.",
@@ -1666,7 +1673,6 @@ def render_demographics(data: pd.DataFrame) -> None:
         graph_questions(
             "Which Solar System planets are surrounded by many detected exoplanets?",
             "Where does our Solar System look similar to or different from the detected exoplanets?",
-            "What more would we need to know before deciding whether our planetary system is “normal”?",
         )
         response_box(
             4,
@@ -1674,38 +1680,75 @@ def render_demographics(data: pd.DataFrame) -> None:
             "“By normal, I mean…” or “Our planetary system looks… because…” or “To be more confident, we would need…”",
         )
         key_idea("We need more evidence before deciding whether our planetary system is “normal”.")
+        st.info(
+            "### Suggested end of Lesson 1\n"
+            "Lesson 2 begins by investigating how the way astronomers search affects the planets they find."
+        )
     elif part == 5:
-        st.header("Step 5: Compare discovery methods")
-        st.subheader("How can we find a planet beside a bright star?")
+        st.header("Step 5: Direct imaging")
+        st.caption("Lesson 2 starts here")
         st.write(
-            "Stars are extremely bright. Planets are much smaller and fainter, and they appear very close to their "
-            "stars in our sky. This makes exoplanets difficult to see. Astronomers therefore use special ways to "
-            "detect them. A planet's **host star** is the star it orbits."
+            "Stars are extremely bright, while planets are much smaller and fainter. **Direct imaging** records "
+            "light from a planet itself. Astronomers use special instruments to block or reduce the glare from its "
+            "host star—the star the planet orbits."
         )
         st.image(
-            DETECTION_METHODS_IMAGE_PATH,
-            caption="Two ways to detect exoplanets: record the planet's light or measure a dip in its star's light.",
+            DIRECT_IMAGING_IMAGE_PATH,
+            caption="Direct imaging reduces a star's glare so that light from a nearby planet can be recorded.",
             use_container_width=True,
         )
-        method_intro_left, method_intro_right = st.columns(2)
-        with method_intro_left:
-            st.markdown(
-                "#### Direct imaging\n"
-                "Direct imaging records light from the planet itself. Astronomers use special instruments to reduce "
-                "or block the much brighter light from the host star."
-            )
-        with method_intro_right:
-            st.markdown(
-                "#### Transit detection\n"
-                "A transit occurs when a planet passes in front of its star from our viewpoint. The planet blocks a "
-                "tiny amount of starlight, producing a small repeating dip in the star's measured brightness."
-            )
-        demographics_question(
-            "Maybe the way we search affects the kinds of planets we find.",
-            "Where do planets found by different detection methods appear on a planet-mass and orbital-distance plot?",
-            "A log–log scatter plot of planet mass against orbital distance, coloured by discovery method.",
+        st.markdown("### Our question\nWhich kinds of planets are easiest to find using direct imaging?")
+        graph_guide(
+            "The bottom axis shows orbital distance and the side axis shows planet mass. Both use a log scale.",
+            "Blue circles are planets found using direct imaging. Pink labelled diamonds are Solar System planets.",
         )
-        sample_note(data, ["pl_orbsmax", "pl_bmasse", "discoverymethod"], "exoplanet records")
+        st.plotly_chart(
+            demographics_methods_chart(data, "Direct Imaging"),
+            use_container_width=True,
+        )
+        graph_questions(
+            "Where are most direct-imaging planets: near or far from their stars, and low or high on the mass axis?",
+            "How do the direct-imaging planets compare with the Solar System planets?",
+        )
+        response_box(
+            5,
+            "What kinds of planets does direct imaging tend to find? Use evidence from the graph.",
+            "“Direct imaging tends to find planets that are…” or “Most of the blue points are…”",
+        )
+        key_idea("Direct imaging tends to find massive planets that are far from their stars.")
+    elif part == 6:
+        st.header("Step 6: Transit detection")
+        st.write(
+            "A **transit** happens when a planet passes in front of its star from our viewpoint. The planet blocks a "
+            "tiny amount of starlight. If the dip repeats, astronomers can use it as evidence of an orbiting planet."
+        )
+        st.video("https://www.youtube.com/watch?v=BFi4HBUdWkk")
+        st.caption("NASA animation of an exoplanet transiting its star. Credit: NASA/JPL-Caltech")
+        st.markdown("### Our question\nWhich kinds of planets are easiest to find using transit detection?")
+        graph_guide(
+            "The bottom axis shows orbital distance and the side axis shows planet mass. Both use a log scale.",
+            "Blue circles are planets found using transits. Pink labelled diamonds are Solar System planets.",
+        )
+        st.plotly_chart(
+            demographics_methods_chart(data, "Transit"),
+            use_container_width=True,
+        )
+        graph_questions(
+            "Where are most transit planets: near or far from their stars, and low or high on the mass axis?",
+            "How do the transit planets compare with the direct-imaging planets from Step 5?",
+        )
+        response_box(
+            6,
+            "What kinds of planets does transit detection tend to find? Use evidence from the graph.",
+            "“Transit detection tends to find planets that are…” or “Most of the blue points are…”",
+        )
+        key_idea("Most planets found using transits orbit close to their stars.")
+    elif part == 7:
+        st.header("Step 7: Compare discovery methods")
+        st.write(
+            "Now compare the two methods and then reveal the other methods in the NASA data. The same planet can be "
+            "easier or harder to detect depending on how astronomers search for it."
+        )
         method_view = st.radio(
             "Planets to show",
             ["Direct Imaging", "Transit", "Transit + Direct Imaging", "All methods"],
@@ -1713,25 +1756,33 @@ def render_demographics(data: pd.DataFrame) -> None:
             key="demographics_method_view",
         )
         graph_guide(
-            "The bottom axis is orbital distance and the side axis is planet mass. Both use a log scale.",
-            "Use the buttons above to change which detected exoplanets are shown. Pink diamonds are our Solar System planets.",
+            "The bottom axis shows orbital distance and the side axis shows planet mass. Both use a log scale.",
+            "Use the buttons above to change the view. Colours show discovery methods; pink diamonds are Solar System planets.",
         )
         st.plotly_chart(
             demographics_methods_chart(data, method_view),
             use_container_width=True,
         )
-
         graph_questions(
-            "Where do Direct Imaging planets appear? Then switch to Transit and find where those planets appear.",
-            "How are the mass and orbital distance patterns different for the two methods?",
-            "Why might each method find different kinds of planets?",
+            "Switch between the four views. Where does each method place most of its points?",
+            "How are the mass and orbital-distance patterns different for direct imaging and transit detection?",
         )
         response_box(
-            5,
-            "What kinds of planets does each discovery method tend to find?",
-            "“Transit tends to find…” or “Direct imaging tends to find…” or “The methods are different because…”",
+            7,
+            "Why do different discovery methods find different kinds of planets?",
+            "“The methods find different planets because…” or “A planet is easier to find when…”",
         )
         key_idea("Different discovery methods find different kinds of planets.")
+        with st.expander("Other ways astronomers find exoplanets"):
+            st.markdown(
+                "- **Radial velocity (the Doppler method):** A planet's gravity makes its star wobble. The star's "
+                "spectral lines shift towards blue as it moves towards us and towards red as it moves away.\n"
+                "- **Gravitational microlensing:** A star and planet can bend and magnify light from a more distant star.\n"
+                "- **Astrometry:** Astronomers measure tiny changes in a star's position caused by an orbiting planet.\n"
+                "- **Timing methods:** A planet can cause small changes in the timing of regular signals or events."
+            )
+    elif part == 8:
+        st.header("Conclusion")
         st.markdown("### Looking forward: finding another Earth")
         st.info(
             "Our current picture is incomplete. New telescopes and observing methods should help scientists find "
@@ -1767,12 +1818,214 @@ def render_demographics(data: pd.DataFrame) -> None:
             st.session_state["demographics_scroll_to_top"] = True
             st.rerun()
     with next_step:
-        if part < 5 and st.button("Continue →", type="primary", use_container_width=True, key="demographics_continue"):
+        if part < 8 and st.button("Continue →", type="primary", use_container_width=True, key="demographics_continue"):
             new_part = part + 1
             st.session_state["demographics_part"] = new_part
             st.session_state["demographics_selector_part"] = None
             st.session_state["demographics_scroll_to_top"] = True
             st.rerun()
+
+
+def render_demographics_curious(data: pd.DataFrame) -> None:
+    """A presenter-led route designed to fit a 50–60 minute outreach session."""
+    if "curious_part" not in st.session_state:
+        st.session_state["curious_part"] = 0
+    part = max(0, min(int(st.session_state["curious_part"]), 6))
+    step_labels = [
+        "Welcome",
+        "1 · Our Solar System",
+        "2 · Meet exoplanets",
+        "3 · Mass and distance",
+        "4 · Are we normal?",
+        "5 · How we find planets",
+        "Conclusion",
+    ]
+    if st.session_state.get("curious_selector_part") != part:
+        st.session_state["curious_step_selector"] = step_labels[part]
+        st.session_state["curious_selector_part"] = part
+    selected_step = st.selectbox(
+        "Jump to a section",
+        step_labels,
+        key="curious_step_selector",
+    )
+    selected_part = step_labels.index(selected_step)
+    if selected_part != part:
+        st.session_state["curious_part"] = selected_part
+        st.session_state["curious_selector_part"] = selected_part
+        st.session_state["curious_scroll_to_top"] = True
+        st.rerun()
+    if st.session_state.pop("curious_scroll_to_top", False):
+        components.html(
+            """
+            <script>
+                const parentDocument = window.parent.document;
+                const scrollContainer =
+                    parentDocument.querySelector('[data-testid="stAppViewContainer"]') ||
+                    parentDocument.querySelector('section.main');
+                if (scrollContainer) scrollContainer.scrollTo({top: 0, left: 0, behavior: 'instant'});
+                window.parent.scrollTo({top: 0, left: 0, behavior: 'instant'});
+            </script>
+            """,
+            height=0,
+        )
+    if part == 0:
+        st.header("Welcome to the Curious workshop")
+        st.image(
+            EXOPLANET_IMAGE_PATH,
+            caption="Artist's concepts of exoplanets. Credit: NASA/JPL-Caltech",
+            use_container_width=True,
+        )
+        st.write(
+            "Modern astronomy uses data to investigate an age-old question: are there other worlds like ours? "
+            "We will look for patterns—but also ask how our technology shapes the planets we have found."
+        )
+        st.info("**Today's challenge:** Use NASA data to decide whether our planetary system looks typical.")
+    else:
+        st.progress(part / 6, text="50–60 minute Curious route")
+
+    if part == 1:
+        st.header("Step 1: Meet our Solar System")
+        st.image(
+            SOLAR_SYSTEM_IMAGE_PATH,
+            caption="An illustration of our Solar System. Credit: NASA",
+            use_container_width=True,
+        )
+        st.write(
+            "The eight planets have very different masses. We will group them as **Very small**, **Small**, "
+            "**Medium**, **Large**, or **Very large**."
+        )
+        graph_guide(
+            "The whole bar represents all eight planets.",
+            "A wider labelled section contains a larger share of the planets.",
+        )
+        figure = planet_mass_distribution_chart(data, include_exoplanets=False)
+        if figure is not None:
+            st.plotly_chart(figure, use_container_width=True)
+        st.markdown("### Discuss\nWhich size groups contain the Solar System planets?")
+        key_idea("The planets in our Solar System have very different masses.")
+    elif part == 2:
+        st.header("Step 2: Meet exoplanets")
+        st.info(
+            "An **exoplanet** is a planet that orbits a star other than the Sun. The first confirmed exoplanets "
+            "were discovered in 1992; astronomers have now detected thousands."
+        )
+        discovery_years = pd.to_numeric(data["disc_year"], errors="coerce").dropna()
+        milestone_columns = st.columns(3)
+        for column, (label, total) in zip(
+            milestone_columns,
+            [("By 2005", int((discovery_years <= 2005).sum())),
+             ("By 2015", int((discovery_years <= 2015).sum())),
+             ("Today", int(discovery_years.size))],
+        ):
+            with column:
+                st.metric(label, f"{total:,}")
+        graph_guide(
+            "The top bar is our Solar System; the bottom bar is detected exoplanets.",
+            "Compare sections with the same label. Each complete bar represents 100% of its group.",
+        )
+        figure = planet_mass_distribution_chart(data)
+        if figure is not None:
+            st.plotly_chart(figure, use_container_width=True)
+        st.markdown("### Discuss\nWhich planet-size group looks most different between the two bars?")
+        key_idea("Detected exoplanets have a different mix of sizes from our Solar System planets.")
+    elif part == 3:
+        st.header("Step 3: Mass and orbital distance")
+        st.write(
+            "Mass is only one way to describe a planet. We can also plot its **orbital distance**—how far it is "
+            "from its star. One astronomical unit (AU) is the average distance from Earth to the Sun."
+        )
+        graph_guide(
+            "The bottom axis shows orbital distance; the side axis shows mass.",
+            "On a log scale, equal spaces represent multiplication. This spreads out small and large values.",
+        )
+        st.plotly_chart(solar_system_demographics_chart(True), use_container_width=True)
+        st.markdown("### Discuss\nWhere are the small rocky planets? Where are the giant planets?")
+        key_idea("A log scale helps us see small and large planets on the same graph.")
+    elif part == 4:
+        st.header("Step 4: Is our planetary system normal?")
+        graph_guide(
+            "The bottom axis shows orbital distance and the side axis shows planet mass. Both use a log scale.",
+            "Blue circles are detected exoplanets; pink labelled diamonds are Solar System planets.",
+        )
+        st.plotly_chart(current_demographics_chart(data), use_container_width=True)
+        st.markdown(
+            "### Discuss\nWhat could **normal** mean here? Does this evidence convince you that our planetary "
+            "system is typical—or unusual?"
+        )
+        key_idea("We need to understand how the data were collected before drawing a conclusion.")
+    elif part == 5:
+        st.header("Step 5: How do we find exoplanets?")
+        st.image(
+            DETECTION_METHODS_IMAGE_PATH,
+            caption="Direct imaging records planet light; transit detection measures a dip in starlight.",
+            use_container_width=True,
+        )
+        st.write(
+            "**Direct imaging** reduces a star's glare to record light from a planet. During a **transit**, a planet "
+            "passes in front of its star and blocks a tiny amount of starlight."
+        )
+        method_view = st.radio(
+            "Reveal the data",
+            ["Direct Imaging", "Transit", "Transit + Direct Imaging", "All methods"],
+            horizontal=True,
+            key="curious_method_view",
+        )
+        graph_guide(
+            "Use the buttons to reveal how the pattern changes.",
+            "Compare where each method's points appear on the mass and orbital-distance axes.",
+        )
+        st.plotly_chart(demographics_methods_chart(data, method_view), use_container_width=True)
+        st.markdown("### Discuss\nWhat changed when we changed the way we searched?")
+        key_idea("Different discovery methods find different kinds of planets.")
+    elif part == 6:
+        st.header("Conclusion: Our view is still changing")
+        st.info(
+            "The exoplanets we know are not necessarily a perfect picture of all the planets that exist. New "
+            "technology should help us find smaller and more distant planets—including more worlds like Earth."
+        )
+        st.markdown(
+            "### Three ideas to take away\n"
+            "- Planetary systems contain planets with very different masses and orbital distances.\n"
+            "- Graph choices help us see different patterns in data.\n"
+            "- The way we search affects the planets we find."
+        )
+        st.text_area(
+            "What do you now wonder about planets or planetary systems?",
+            key="curious_conclusion_question",
+            height=100,
+            placeholder="Why…?",
+        )
+
+    back, spacer, next_step = st.columns([1, 4, 1])
+    with back:
+        if part > 0 and st.button("← Back", use_container_width=True, key="curious_back"):
+            st.session_state["curious_part"] = part - 1
+            st.session_state["curious_selector_part"] = None
+            st.session_state["curious_scroll_to_top"] = True
+            st.rerun()
+    with next_step:
+        if part < 6 and st.button("Continue →", type="primary", use_container_width=True, key="curious_continue"):
+            st.session_state["curious_part"] = part + 1
+            st.session_state["curious_selector_part"] = None
+            st.session_state["curious_scroll_to_top"] = True
+            st.rerun()
+
+
+def render_demographics(data: pd.DataFrame) -> None:
+    st.title("Are We Normal? Exploring Alien Worlds with Data")
+    st.caption("Use real NASA data to compare our Solar System with planets around other stars.")
+    version = st.radio(
+        "Choose a workshop version",
+        ["Curious workshop · 50–60 minutes", "Classroom investigation · two lessons"],
+        horizontal=True,
+        key="demographics_version",
+    )
+    if version.startswith("Curious"):
+        st.caption("A fast, presenter-led journey with discussion prompts and one central story.")
+        render_demographics_curious(data)
+    else:
+        st.caption("A slower, student-led investigation with written explanations and separate method activities.")
+        render_demographics_classroom(data)
 
 
 def select_experience(name: str) -> None:
