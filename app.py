@@ -557,6 +557,7 @@ def add_solar_system_trace(figure: go.Figure) -> None:
         y=SOLAR_SYSTEM_PLANETS["Planet mass (Earth masses)"],
         mode="markers+text",
         name="Solar System",
+        legendrank=1,
         text=SOLAR_SYSTEM_PLANETS["Planet"],
         textposition="top center",
         marker={
@@ -725,20 +726,20 @@ def planet_mass_distribution_chart(data: pd.DataFrame) -> go.Figure | None:
     figure = go.Figure()
     figure.add_trace(go.Bar(
         x=mass_labels,
-        y=exoplanet_counts.tolist(),
-        name="Detected exoplanets",
-        marker={"color": "#4C78A8"},
-        offsetgroup="exoplanets",
-        hovertemplate="%{x} Earth masses<br>Detected exoplanets: %{y}<extra></extra>",
-    ))
-    figure.add_trace(go.Bar(
-        x=mass_labels,
         y=solar_counts.tolist(),
         name="Solar System planets",
         marker={"color": "#D81B60"},
         yaxis="y2",
         offsetgroup="solar-system",
         hovertemplate="%{x} Earth masses<br>Solar System planets: %{y}<extra></extra>",
+    ))
+    figure.add_trace(go.Bar(
+        x=mass_labels,
+        y=exoplanet_counts.tolist(),
+        name="Detected exoplanets",
+        marker={"color": "#4C78A8"},
+        offsetgroup="exoplanets",
+        hovertemplate="%{x} Earth masses<br>Detected exoplanets: %{y}<extra></extra>",
     ))
     figure.update_layout(
         title="Planet masses: detected exoplanets and our Solar System",
