@@ -699,7 +699,10 @@ def demographics_methods_chart(data: pd.DataFrame, view: str) -> go.Figure:
     )
 
 
-def planet_mass_distribution_chart(data: pd.DataFrame) -> go.Figure | None:
+def planet_mass_distribution_chart(
+    data: pd.DataFrame,
+    include_exoplanets: bool = True,
+) -> go.Figure | None:
     masses = data["pl_bmasse"].dropna()
     masses = masses[masses > 0]
     if masses.empty:
@@ -726,12 +729,18 @@ def planet_mass_distribution_chart(data: pd.DataFrame) -> go.Figure | None:
     exoplanet_percentages = exoplanet_counts / exoplanet_counts.sum() * 100
     solar_percentages = solar_counts / solar_counts.sum() * 100
 
-    group_names = ["Our Solar System", "Detected exoplanets"]
+    group_names = ["Our Solar System"]
+    if include_exoplanets:
+        group_names.append("Detected exoplanets")
     figure = go.Figure()
     for index, (label, mass_range, colour) in enumerate(zip(mass_labels, mass_ranges, mass_colours)):
-        percentages = [solar_percentages.iloc[index], exoplanet_percentages.iloc[index]]
-        counts = [solar_counts.iloc[index], exoplanet_counts.iloc[index]]
-        totals = [int(solar_counts.sum()), int(exoplanet_counts.sum())]
+        percentages = [solar_percentages.iloc[index]]
+        counts = [solar_counts.iloc[index]]
+        totals = [int(solar_counts.sum())]
+        if include_exoplanets:
+            percentages.append(exoplanet_percentages.iloc[index])
+            counts.append(exoplanet_counts.iloc[index])
+            totals.append(int(exoplanet_counts.sum()))
         figure.add_trace(go.Bar(
             x=percentages,
             y=group_names,
@@ -739,21 +748,26 @@ def planet_mass_distribution_chart(data: pd.DataFrame) -> go.Figure | None:
             orientation="h",
             marker={"color": colour},
             customdata=np.column_stack([counts, totals]),
-            text=[f"{value:.1f}%" if value >= 6 else "" for value in percentages],
+            text=[
+                f"{label}<br>{value:.1f}%" if value >= 8 else (f"{value:.1f}%" if value > 0 else "")
+                for value in percentages
+            ],
             textposition="inside",
+            insidetextanchor="middle",
             hovertemplate=(
                 f"<b>{label}</b> ({mass_range} Earth masses)<br>"
                 "%{y}: %{x:.1f}% (%{customdata[0]} of %{customdata[1]} planets)<extra></extra>"
             ),
         ))
     figure.update_layout(
-        title="Planet-size groups: our Solar System and detected exoplanets",
-        height=500,
+        height=390 if include_exoplanets else 260,
         barmode="stack",
         xaxis={
-            "title": "Percentage of each group",
+            "title": "",
             "ticksuffix": "%",
             "range": [0, 100],
+            "tickmode": "array",
+            "tickvals": [0, 25, 50, 75, 100],
         },
         yaxis={
             "title": "",
@@ -761,29 +775,10 @@ def planet_mass_distribution_chart(data: pd.DataFrame) -> go.Figure | None:
             "categoryarray": group_names,
             "autorange": "reversed",
         },
-        legend={"title": "Planet-size group", "orientation": "h", "y": 1.18},
+        showlegend=False,
+        margin={"l": 150, "r": 20, "t": 20, "b": 45},
     )
     return figure
-
-
-def solar_system_mass_categories() -> pd.DataFrame:
-    categories = pd.cut(
-        SOLAR_SYSTEM_PLANETS["Planet mass (Earth masses)"],
-        bins=[0, 1, 10, 100, 1000, np.inf],
-        labels=["Very small", "Small", "Medium", "Large", "Very large"],
-        right=False,
-    )
-    category_ranges = {
-        "Very small": "Less than 1",
-        "Small": "1–10",
-        "Medium": "10–100",
-        "Large": "100–1,000",
-        "Very large": "More than 1,000",
-    }
-    table = SOLAR_SYSTEM_PLANETS[["Planet", "Planet mass (Earth masses)"]].copy()
-    table["Planet-size group"] = categories.astype(str)
-    table["Mass range (Earth masses)"] = table["Planet-size group"].map(category_ranges)
-    return table[["Planet", "Planet mass (Earth masses)", "Planet-size group", "Mass range (Earth masses)"]]
 
 
 def discoveries_by_year_chart(data: pd.DataFrame) -> go.Figure | None:
@@ -1524,33 +1519,13 @@ def render_demographics(data: pd.DataFrame) -> None:
             "from small rocky worlds such as Earth to giant planets such as Jupiter."
         )
         st.markdown(
-            "### Sort the planets by mass\n"
-            "We will use five simple planet-size groups. A planet's group is based on its mass compared with Earth."
+            "We will group planets by mass: **Very small** (less than 1 Earth mass), **Small** (1–10), "
+            "**Medium** (10–100), **Large** (100–1,000), and **Very large** (more than 1,000)."
         )
-        st.dataframe(
-            solar_system_mass_categories(),
-            hide_index=True,
-            use_container_width=True,
-            column_config={
-                "Planet mass (Earth masses)": st.column_config.NumberColumn(format="%.3g"),
-            },
-        )
-        st.subheader("Start here")
-        st.markdown(
-            "- Find Earth in the table. What is its mass and planet-size group?\n"
-            "- Which planets are in the same planet-size group?"
-        )
-        with st.expander("Go further (optional)"):
-            st.markdown(
-                "- Which planet-size groups contain no Solar System planets?\n"
-                "- What else would you like to know before comparing these planets?"
-            )
-        response_box(
-            1,
-            "What do you notice about the planet-size groups in our Solar System?",
-            "“I notice that…” or “___ and ___ are in the same group because…”",
-        )
-        key_idea("The eight planets in our Solar System have a wide range of masses.")
+        solar_figure = planet_mass_distribution_chart(data, include_exoplanets=False)
+        if solar_figure is not None:
+            st.plotly_chart(solar_figure, use_container_width=True)
+        st.caption("Each coloured section shows the share of our eight planets in that planet-size group.")
     elif part == 2:
         st.header("Step 2: Meet exoplanets")
         st.info(
@@ -1566,10 +1541,9 @@ def render_demographics(data: pd.DataFrame) -> None:
         exoplanets_with_mass = sample_note(data, ["pl_bmasse"], "planet records")
         st.caption("All eight Solar System planets are included in the comparison.")
         st.info(
-            "**How to read this graph:** Each horizontal bar is one whole group and stretches from 0% to 100%. "
-            "The top bar represents the 8 Solar System planets. The bottom bar represents the "
-            f"{exoplanets_with_mass:,} detected exoplanets with mass data. The coloured sections show what percentage "
-            "of each group belongs to each planet-size category."
+            "**How to read this graph:** Step 1 showed the top bar. We have now added detected exoplanets underneath. "
+            "Each bar is one whole group and stretches from 0% to 100%. The bottom bar represents the "
+            f"{exoplanets_with_mass:,} detected exoplanets with mass data. Compare sections with the same colour."
         )
         figure = planet_mass_distribution_chart(data)
         if figure is None:
@@ -1578,7 +1552,7 @@ def render_demographics(data: pd.DataFrame) -> None:
             st.plotly_chart(figure, use_container_width=True)
         st.subheader("Start here")
         st.markdown(
-            "- Start with the top bar. Which colour takes up the most space? Use the legend to name that planet-size group.\n"
+            "- Start with the top bar. Which labelled section takes up the most space?\n"
             "- Now look at the bottom bar. Does the same planet-size group take up the most space?"
         )
         with st.expander("Go further (optional)"):
