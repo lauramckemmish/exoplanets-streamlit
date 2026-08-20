@@ -722,27 +722,28 @@ def planet_mass_distribution_chart(data: pd.DataFrame) -> go.Figure | None:
     )
     exoplanet_counts = exoplanet_groups.value_counts(sort=False).reindex(mass_labels, fill_value=0)
     solar_counts = solar_groups.value_counts(sort=False).reindex(mass_labels, fill_value=0)
+    exoplanet_percentages = exoplanet_counts / exoplanet_counts.sum() * 100
+    solar_percentages = solar_counts / solar_counts.sum() * 100
 
     figure = go.Figure()
     figure.add_trace(go.Bar(
         x=mass_labels,
-        y=solar_counts.tolist(),
+        y=solar_percentages.tolist(),
         name="Solar System planets",
         marker={"color": "#D81B60"},
-        yaxis="y2",
         offsetgroup="solar-system",
-        hovertemplate="%{x} Earth masses<br>Solar System planets: %{y}<extra></extra>",
+        hovertemplate="%{x} Earth masses<br>Solar System planets: %{y:.1f}%<extra></extra>",
     ))
     figure.add_trace(go.Bar(
         x=mass_labels,
-        y=exoplanet_counts.tolist(),
+        y=exoplanet_percentages.tolist(),
         name="Detected exoplanets",
         marker={"color": "#4C78A8"},
         offsetgroup="exoplanets",
-        hovertemplate="%{x} Earth masses<br>Detected exoplanets: %{y}<extra></extra>",
+        hovertemplate="%{x} Earth masses<br>Detected exoplanets: %{y:.1f}%<extra></extra>",
     ))
     figure.update_layout(
-        title="Planet masses: detected exoplanets and our Solar System",
+        title="Percentage of planets in each mass range",
         height=600,
         barmode="group",
         xaxis={
@@ -751,17 +752,10 @@ def planet_mass_distribution_chart(data: pd.DataFrame) -> go.Figure | None:
             "categoryarray": mass_labels,
         },
         yaxis={
-            "title": {"text": "Number of detected exoplanets", "font": {"color": "#4C78A8"}},
-            "tickfont": {"color": "#4C78A8"},
+            "title": "Planets in each group (%)",
+            "ticksuffix": "%",
+            "range": [0, 100],
             "rangemode": "tozero",
-        },
-        yaxis2={
-            "title": {"text": "Number of Solar System planets", "font": {"color": "#D81B60"}},
-            "tickfont": {"color": "#D81B60"},
-            "overlaying": "y",
-            "side": "right",
-            "rangemode": "tozero",
-            "dtick": 1,
         },
         legend={"orientation": "h", "y": 1.08},
     )
@@ -1540,9 +1534,9 @@ def render_demographics(data: pd.DataFrame) -> None:
         demographics_question(
             "Are most detected planets small like Earth, large like Jupiter, or somewhere in between—and how does our Solar System compare?",
             "What kinds of planet masses have we detected, and what kinds are present in our Solar System?",
-            "How many detected exoplanets and Solar System planets fall into each planet-mass range?",
-            "Group planet mass into ranges, then count detected exoplanets and Solar System planets separately in each range.",
-            "A grouped bar chart with planet-mass range horizontally, detected-exoplanet count on the left axis, and Solar System planet count on the right axis.",
+            "What percentage of detected exoplanets and Solar System planets falls into each planet-mass range?",
+            "Group planet mass into ranges, then calculate the percentage of each population in every range.",
+            "A grouped bar chart with planet-mass range horizontally and the percentage of each population vertically.",
         )
         sample_note(data, ["pl_bmasse"], "planet records")
         st.caption("All eight Solar System planets are included in the comparison.")
@@ -1553,15 +1547,18 @@ def render_demographics(data: pd.DataFrame) -> None:
             st.plotly_chart(figure, use_container_width=True)
         st.subheader("Questions to investigate")
         st.markdown(
-            "- Use the blue left axis to read detected-exoplanet counts. Use the pink right axis to read Solar System counts.\n"
-            "- Which mass range contains the most detected exoplanets?\n"
-            "- Which mass ranges contain most of the Solar System planets?\n"
+            "- Each colour adds to 100%. Compare the heights of the pink and blue bars within each mass range.\n"
+            "- Which mass range contains the largest percentage of detected exoplanets?\n"
+            "- Which mass ranges contain the largest percentage of Solar System planets?\n"
             "- Where does our Solar System look different from the detected exoplanets?\n"
             "- Does this show which planet masses are most common in the Universe, or only which masses are in our dataset?"
         )
         st.caption("For reference: Earth is 1 Earth mass, Neptune is about 17, and Jupiter is about 318.")
         response_box(2)
-        key_idea("A distribution describes the values represented in a dataset, which may not represent every planet that exists.")
+        key_idea(
+            "Percentages let us compare groups of different sizes, but the detected exoplanets may still not represent "
+            "every planet that exists."
+        )
     elif part == 4:
         st.header("Step 4: Is our Solar System normal?")
         st.text_area(
