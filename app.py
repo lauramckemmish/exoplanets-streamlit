@@ -1444,21 +1444,31 @@ def response_box(step: int, prompt: str = "Record your thinking") -> None:
 def render_demographics(data: pd.DataFrame) -> None:
     st.title("Are We Normal? Exploring Alien Worlds with Data")
     st.caption("Use real NASA data to compare our Solar System with planets around other stars.")
-    st.markdown(
-        "### Welcome to the workshop\n"
-        "People have wondered about worlds beyond Earth for thousands of years. Modern astronomers can investigate "
-        "these age-old questions using data—but the patterns we see are shaped by what our technology can detect "
-        "and which measurements are available.\n\n"
-        "Today, you will compare planet masses, explore our Solar System, ask whether it is typical, and investigate "
-        "how different discovery methods shape our view of exoplanets."
-    )
     if "demographics_part" not in st.session_state:
         st.session_state["demographics_part"] = 0
-    part = max(0, min(int(st.session_state["demographics_part"]), 3))
-    st.progress((part + 1) / 4, text=f"Step {part + 1} of 4")
+    part = max(0, min(int(st.session_state["demographics_part"]), 5))
+    if part == 0:
+        st.header("Welcome to the workshop")
+        st.markdown(
+            "People have wondered about worlds beyond Earth for thousands of years. Modern astronomers can investigate "
+            "these age-old questions using data—but the patterns we see are shaped by what our technology can detect "
+            "and which measurements are available.\n\n"
+            "Today, you will compare planet masses, explore our Solar System, ask whether it is typical, and investigate "
+            "how different discovery methods shape our view of exoplanets."
+        )
+        st.markdown(
+            "#### Our journey\n"
+            "1. Meet the planets in our Solar System.\n"
+            "2. Meet exoplanets and compare planet masses.\n"
+            "3. Explore planet mass and orbital distance.\n"
+            "4. Ask whether our planetary system is ‘normal’.\n"
+            "5. Investigate how discovery methods shape the data."
+        )
+    else:
+        st.progress(part / 5, text=f"Step {part} of 5")
 
-    if part == 1:
-        st.header("Step 2: Our Solar System")
+    if part == 3:
+        st.header("Step 3: Explore our Solar System")
         demographics_question(
             "The planets all orbit the same star, but how similar are they?",
             "How different are planets in our Solar System?",
@@ -1493,23 +1503,30 @@ def render_demographics(data: pd.DataFrame) -> None:
             "- Why is the Moon not included as a planet?\n"
             "- Where would you like to live? Could these two variables tell you enough to decide?"
         )
-        response_box(2)
+        response_box(3)
         key_idea("Changing the scale can reveal patterns that were hidden without changing the underlying data.")
-    elif part == 0:
-        st.header("Step 1: From our Solar System to exoplanets")
-        st.subheader("Start with the planets in our Solar System")
+    elif part == 1:
+        st.header("Step 1: Meet our Solar System")
         st.image(
             SOLAR_SYSTEM_IMAGE_PATH,
             caption="An illustration of our Solar System. Credit: NASA",
             use_container_width=True,
         )
         st.write(
-            "We know eight planets orbit the Sun. Grouping them by mass gives us a familiar population to compare "
-            "with planets found farther away."
+            "Our Solar System contains the Sun and everything held in orbit around it. Eight planets orbit the Sun, "
+            "from small rocky worlds such as Earth to giant planets such as Jupiter."
         )
         st.plotly_chart(solar_system_mass_distribution_chart(), use_container_width=True)
-
-        st.subheader("Now look beyond our Solar System")
+        st.subheader("Questions to investigate")
+        st.markdown(
+            "- Which mass range contains the most Solar System planets?\n"
+            "- Which planets do you think are in the smallest and largest mass ranges?\n"
+            "- What else would you like to know before comparing these planets?"
+        )
+        response_box(1)
+        key_idea("The eight planets in our Solar System have a wide range of masses.")
+    elif part == 2:
+        st.header("Step 2: Meet exoplanets")
         st.info(
             "**An exoplanet is a planet that orbits a star other than the Sun.** Astronomers have detected thousands "
             "of exoplanets, although we do not have every measurement for every planet."
@@ -1542,10 +1559,10 @@ def render_demographics(data: pd.DataFrame) -> None:
             "- Does this show which planet masses are most common in the Universe, or only which masses are in our dataset?"
         )
         st.caption("For reference: Earth is 1 Earth mass, Neptune is about 17, and Jupiter is about 318.")
-        response_box(1)
+        response_box(2)
         key_idea("A distribution describes the values represented in a dataset, which may not represent every planet that exists.")
-    elif part == 2:
-        st.header("Step 3: Is our Solar System normal?")
+    elif part == 4:
+        st.header("Step 4: Is our Solar System normal?")
         st.text_area(
             "Before looking at the graph, what could “normal” mean for a planetary system?",
             key="define_normal",
@@ -1567,10 +1584,10 @@ def render_demographics(data: pd.DataFrame) -> None:
             "- In what ways does it look different?\n"
             "- What new evidence would make us more confident and less uncertain about whether our system is typical?"
         )
-        response_box(3, "Write your current answer. Include what “normal” means in your answer")
+        response_box(4, "Write your current answer. Include what “normal” means in your answer")
         key_idea("Everyday questions become testable when we define words such as “normal” using measurable variables.")
-    else:
-        st.header("Step 4: Compare discovery methods")
+    elif part == 5:
+        st.header("Step 5: Compare discovery methods")
         st.subheader("How can we find something beside a bright star?")
         st.markdown(
             "To our eyes, **Alpha Centauri** looks like one bright point of light, but it is a three-star system. "
@@ -1617,7 +1634,7 @@ def render_demographics(data: pd.DataFrame) -> None:
             "- What about Direct Imaging?\n"
             "- Are Earth-like planets easy to find?"
         )
-        response_box(4)
+        response_box(5)
         key_idea("The planets in a dataset reflect both what exists and what our detection methods are able to find.")
         st.markdown("### Looking forward: finding another Earth")
         st.info(
@@ -1650,7 +1667,7 @@ def render_demographics(data: pd.DataFrame) -> None:
             st.session_state["demographics_part"] = part - 1
             st.rerun()
     with next_step:
-        if part < 3 and st.button("Continue →", type="primary", use_container_width=True, key="demographics_continue"):
+        if part < 5 and st.button("Continue →", type="primary", use_container_width=True, key="demographics_continue"):
             st.session_state["demographics_part"] = part + 1
             st.rerun()
 
