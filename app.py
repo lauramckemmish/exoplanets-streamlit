@@ -26,6 +26,7 @@ from charts import (
     discoveries_by_year_chart,
     finish_demographics_chart,
     format_number,
+    planet_mass_distribution_chart as shared_planet_mass_distribution_chart,
     readable_log_ticks,
     scale_profile,
     scale_guidance as shared_scale_guidance,
@@ -1805,7 +1806,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "The whole bar represents all eight Solar System planets, from 0% to 100%.",
             "Each coloured section is one planet-size group. A wider section contains a larger share of the planets.",
         )
-        solar_figure = planet_mass_distribution_chart(data, include_exoplanets=False)
+        solar_figure = shared_planet_mass_distribution_chart(data, include_exoplanets=False)
         if solar_figure is not None:
             st.plotly_chart(solar_figure, use_container_width=True)
         st.caption(
@@ -1862,7 +1863,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "The top bar is our Solar System. The bottom bar is the detected exoplanets that can be placed in these mass groups.",
             "Each bar is one whole group, from 0% to 100%. Compare sections with the same colour.",
         )
-        figure = planet_mass_distribution_chart(data)
+        figure = shared_planet_mass_distribution_chart(data)
         if figure is None:
             st.warning("No planets have the mass data needed for this graph.")
         else:
@@ -2026,7 +2027,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "The top bar is our Solar System. The bottom bar is the detected exoplanets that can be placed in these mass groups.",
             "Each bar represents 100% of its group. Compare sections carrying the same label.",
         )
-        figure = planet_mass_distribution_chart(data)
+        figure = shared_planet_mass_distribution_chart(data)
         if figure is None:
             st.warning("No planets have the mass data needed for this graph.")
         else:
@@ -2382,7 +2383,7 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
             "The whole bar represents all eight planets.",
             "A wider labelled section contains a larger share of the planets.",
         )
-        figure = planet_mass_distribution_chart(data, include_exoplanets=False)
+        figure = shared_planet_mass_distribution_chart(data, include_exoplanets=False)
         if figure is not None:
             st.plotly_chart(figure, use_container_width=True)
         st.markdown("### Discuss\nWhich size groups contain the Solar System planets?")
@@ -2420,7 +2421,7 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
             "The top bar is our Solar System; the bottom bar is detected exoplanets.",
             "Compare sections with the same label. Each complete bar represents 100% of its group.",
         )
-        figure = planet_mass_distribution_chart(data)
+        figure = shared_planet_mass_distribution_chart(data)
         if figure is not None:
             st.plotly_chart(figure, use_container_width=True)
         st.markdown("### Discuss\nWhich planet-size group looks most different between the two bars?")
