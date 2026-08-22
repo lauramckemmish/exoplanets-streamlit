@@ -8,9 +8,25 @@ import math
 
 import numpy as np
 import pandas as pd
+import plotly.express as px
 import plotly.graph_objects as go
 
 from data import SOLAR_SYSTEM_PLANETS
+
+
+def discovery_chart(data: pd.DataFrame, methods: list[str]) -> go.Figure:
+    subset = data[data["discoverymethod"].isin(methods)].dropna(subset=["disc_year"])
+    counts = subset.groupby(["disc_year", "discoverymethod"], observed=True).size().reset_index(name="Planets")
+    figure = px.bar(
+        counts,
+        x="disc_year",
+        y="Planets",
+        color="discoverymethod",
+        labels={"disc_year": "Discovery year", "discoverymethod": "Discovery method"},
+        title="Confirmed exoplanet discoveries by year and method",
+    )
+    figure.update_layout(height=560, legend_title_text="Discovery method")
+    return figure
 
 
 def demographics_plot_data(data: pd.DataFrame, require_method: bool = False) -> pd.DataFrame:
