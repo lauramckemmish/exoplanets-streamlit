@@ -2247,9 +2247,14 @@ def render_demographics_landing() -> None:
         "### Explore real exoplanet data and discover what it can tell us about planets beyond our Solar System."
     )
     st.info(
-        "**Teacher pilot**\n\n"
-        "The classroom pathways are currently being developed with teacher feedback. Please try the resource and "
-        "share it with colleagues. Your classroom experience will help shape the next version."
+        "**Designed for UNSW CURIOUS — currently in development**\n\n"
+        "This resource is being designed for the UNSW CURIOUS program and is being actively developed, likely "
+        "until early September 2026. Please expect some content and features to change during this period. A stable "
+        "version will be created in due course.\n\n"
+        "Feedback is very welcome—especially detailed suggestions from teachers and facilitators. The resource is "
+        "easy to update, so content can readily be added, removed or revised. Please email "
+        "[l.mckemmish@unsw.edu.au](mailto:l.mckemmish@unsw.edu.au), and feel free to share the resource with "
+        "colleagues and through your local networks."
     )
     if TEACHER_FEEDBACK_URL:
         st.link_button("Give teacher feedback", TEACHER_FEEDBACK_URL, type="primary")
