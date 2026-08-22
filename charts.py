@@ -79,6 +79,28 @@ def sky_map(data: pd.DataFrame, selected_planet: str) -> go.Figure:
     return figure
 
 
+def scale_profile(data: pd.DataFrame, field: str) -> dict[str, float | int | str | None]:
+    series = pd.to_numeric(data[field], errors="coerce")
+    complete = series.dropna()
+    positive = complete[complete > 0]
+    min_value = float(complete.min()) if not complete.empty else None
+    max_value = float(complete.max()) if not complete.empty else None
+    positive_min = float(positive.min()) if not positive.empty else None
+    positive_max = float(positive.max()) if not positive.empty else None
+    orders = None
+    if positive_min and positive_max and positive_min > 0 and positive_max >= positive_min:
+        orders = math.log10(positive_max / positive_min) if positive_max > positive_min else 0.0
+    return {"complete": int(complete.size), "missing": int(series.isna().sum()), "non_positive": int((complete <= 0).sum()), "min": min_value, "max": max_value, "positive_min": positive_min, "positive_max": positive_max, "orders": orders}
+
+
+def format_number(value: float | None) -> str:
+    if value is None or not np.isfinite(value):
+        return "Unknown"
+    if abs(value) >= 10000 or (0 < abs(value) < 0.01):
+        return f"{value:.2e}"
+    return f"{value:,.2f}"
+
+
 def demographics_plot_data(data: pd.DataFrame, require_method: bool = False) -> pd.DataFrame:
     required = ["pl_orbsmax", "pl_bmasse"]
     if require_method:
