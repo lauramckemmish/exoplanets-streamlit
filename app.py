@@ -18,7 +18,12 @@ SOLAR_SYSTEM_IMAGE_PATH = APP_DIR / "assets" / "solar-system-nasa.jpeg"
 EXOPLANET_IMAGE_PATH = APP_DIR / "assets" / "exoplanets-artists-concept-nasa.jpeg"
 DETECTION_METHODS_IMAGE_PATH = APP_DIR / "assets" / "exoplanet-detection-methods.svg"
 DIRECT_IMAGING_IMAGE_PATH = APP_DIR / "assets" / "direct-imaging.svg"
+PLANETARY_SYSTEMS_IMAGE_PATH = APP_DIR / "assets" / "planetary-systems.svg"
+INNER_OUTER_PLANETS_IMAGE_PATH = APP_DIR / "assets" / "inner-outer-planets.svg"
 NASA_TAP_URL = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync"
+NSW_SCIENCE_SYLLABUS_URL = "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/outcomes"
+# Add the public teacher-feedback form URL here when it is ready.
+TEACHER_FEEDBACK_URL = ""
 
 COLUMNS = [
     "pl_name", "hostname", "disc_year", "discoverymethod", "disc_telescope",
@@ -1613,6 +1618,19 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "An **exoplanet** is a planet that orbits a star other than the Sun. Astronomers have detected thousands "
             "of exoplanets, although we do not have every measurement for every planet."
         )
+        st.image(
+            PLANETARY_SYSTEMS_IMAGE_PATH,
+            caption=(
+                "The Sun is a star, and our Solar System is one planetary system. Exoplanets belong to other "
+                "planetary systems."
+            ),
+            use_container_width=True,
+        )
+        st.markdown(
+            "### Imagine another planetary system\n"
+            "Could it have more planets, fewer planets, two stars, or planets arranged very differently? Describe "
+            "or sketch one possibility before looking at the data."
+        )
         st.subheader("A new and fast-growing science")
         st.markdown("**1992 — the first confirmed exoplanets were discovered.**")
         discovery_years = pd.to_numeric(data["disc_year"], errors="coerce").dropna()
@@ -1909,6 +1927,18 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
             "An **exoplanet** is a planet that orbits a star other than the Sun. The first confirmed exoplanets "
             "were discovered in 1992; astronomers have now detected thousands."
         )
+        st.image(
+            PLANETARY_SYSTEMS_IMAGE_PATH,
+            caption=(
+                "The Sun is a star, and our Solar System is one planetary system. Exoplanets belong to other "
+                "planetary systems."
+            ),
+            use_container_width=True,
+        )
+        st.markdown(
+            "### Imagine\n"
+            "What might another planetary system look like? Could it have more planets, fewer planets, or even two stars?"
+        )
         discovery_years = pd.to_numeric(data["disc_year"], errors="coerce").dropna()
         milestone_columns = st.columns(3)
         for column, (label, total) in zip(
@@ -1934,12 +1964,36 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
             "Mass is only one way to describe a planet. We can also plot its **orbital distance**—how far it is "
             "from its star. One astronomical unit (AU) is the average distance from Earth to the Sun."
         )
+        st.image(
+            INNER_OUTER_PLANETS_IMAGE_PATH,
+            caption="A simplified pattern to look for before reading the graphs.",
+            use_container_width=True,
+        )
+        st.subheader("First: ordinary linear axes")
         graph_guide(
             "The bottom axis shows orbital distance; the side axis shows mass.",
-            "On a log scale, equal spaces represent multiplication. This spreads out small and large values.",
+            "Farther right means farther from the Sun. Higher means more massive.",
+        )
+        st.plotly_chart(solar_system_demographics_chart(False), use_container_width=True)
+        st.info(
+            "Jupiter and the distant outer planets set the scale, so the small inner planets bunch together near "
+            "the bottom-left corner. How could we spread them out without losing the giant planets?"
+        )
+        st.subheader("Next: change both axes to a log scale")
+        st.write(
+            "The variables do not change: the graph still shows orbital distance and mass. Only the spacing changes. "
+            "On a log scale, equal spaces represent multiplication—for example, **0.1 to 1** takes the same space as "
+            "**1 to 10**. You do not need to calculate logarithms to read the graph."
+        )
+        graph_guide(
+            "The axes show the same values, but the new spacing spreads out the small planets.",
+            "Find Earth at 1 AU and 1 Earth mass, then compare the positions of the four inner planets.",
         )
         st.plotly_chart(solar_system_demographics_chart(True), use_container_width=True)
-        st.markdown("### Discuss\nWhere are the small rocky planets? Where are the giant planets?")
+        st.markdown(
+            "### Discuss\n"
+            "What became easier to see on the log–log graph? Where are the small inner planets and the giant outer planets?"
+        )
         key_idea("A log scale helps us see small and large planets on the same graph.")
     elif part == 4:
         st.header("Step 4: Is our planetary system normal?")
@@ -2011,20 +2065,128 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
             st.rerun()
 
 
-def render_demographics(data: pd.DataFrame) -> None:
-    st.title("Are We Normal? Exploring Alien Worlds with Data")
-    st.caption("Use real NASA data to compare our Solar System with planets around other stars.")
-    version = st.radio(
-        "Choose a workshop version",
-        ["Curious workshop · 50–60 minutes", "Classroom investigation · two lessons"],
-        horizontal=True,
-        key="demographics_version",
+def render_syllabus_alignment(year_level: str) -> None:
+    st.markdown(f"### NSW Science 7–10 Syllabus (2023): {year_level}")
+    st.caption(
+        "These are direct connections to the current syllabus, implemented from 2026. Teachers should select and "
+        "emphasise outcomes to suit their program and students."
     )
-    if version.startswith("Curious"):
-        st.caption("A fast, presenter-led journey with discussion prompts and one central story.")
+    if year_level == "Year 8":
+        st.markdown(
+            "**Strong content connections**\n\n"
+            "- **SC4-OTU-01:** explains how observations are used by scientists to increase knowledge and "
+            "understanding of the Universe\n"
+            "- **SC4-DA1-01:** explains how data is used by scientists to model and predict scientific phenomena\n\n"
+            "**Working Scientifically**\n\n"
+            "- **SC4-WS-05:** uses a variety of ways to process and represent data\n"
+            "- **SC4-WS-06:** uses data to identify trends, patterns and relationships, and draw conclusions\n"
+            "- **SC4-WS-08:** communicates scientific concepts and ideas using a range of communication forms"
+        )
+    else:
+        st.markdown(
+            "**Strong content connection**\n\n"
+            "- **SC5-DA2-01:** assesses the use of scientific knowledge and data in evidence-based decisions and "
+            "when verifying the legitimacy of claims\n\n"
+            "**Working Scientifically**\n\n"
+            "- **SC5-WS-05:** selects and uses a range of tools to process and represent data\n"
+            "- **SC5-WS-06:** analyses data from investigations to identify trends, patterns and relationships, and "
+            "draws conclusions\n"
+            "- **SC5-WS-08:** communicates scientific arguments with evidence, using scientific language and "
+            "terminology in a range of communication forms"
+        )
+        st.info(
+            "**Supporting connection — SC5-WAM-01:** describes the features and applications of different forms of "
+            "waves. Transit detection uses measured changes in light, and radial velocity provides an optional "
+            "Doppler-effect connection. This activity supports that learning but does not cover the whole outcome."
+        )
+    st.markdown(f"[View the official NESA outcomes]({NSW_SCIENCE_SYLLABUS_URL})")
+
+
+def render_classroom_overview(year_level: str) -> None:
+    st.header(f"{year_level} classroom learning experience")
+    st.markdown(
+        "**For:** NSW Science students and their teachers  \n"
+        "**Time:** Two lessons of approximately 50–60 minutes  \n"
+        "**Students:** Interpret real NASA data, compare graphs, discuss detection bias and write evidence-based "
+        "explanations."
+    )
+    overview_tab, syllabus_tab, preparation_tab = st.tabs(
+        ["Lesson outline", "Syllabus alignment", "Teacher preparation"]
+    )
+    with overview_tab:
+        st.markdown(
+            "**Lesson 1 — What do planets look like?**\n\n"
+            "Meet Solar System planets and exoplanets, compare their masses, interpret linear and logarithmic "
+            "graphs, and consider whether our planetary system is typical.\n\n"
+            "**Lesson 2 — How does the way we search shape the data?**\n\n"
+            "Investigate direct imaging and transit detection, compare discovery methods, and explain why the known "
+            "exoplanets may not represent all planets that exist."
+        )
+    with syllabus_tab:
+        render_syllabus_alignment(year_level)
+    with preparation_tab:
+        st.markdown(
+            "- Allow one internet-connected device per student or pair.\n"
+            "- A projector is useful for modelling how to read the first graph.\n"
+            "- No specialist software or student login is required.\n"
+            "- The default live NASA dataset is cached; a bundled sample is available if the archive is unavailable.\n"
+            "- Student responses remain in the current browser session and are not submitted to the teacher.\n"
+            "- Lesson 1 has a clearly marked stopping point after Step 4."
+        )
+
+
+def render_demographics_landing() -> None:
+    st.title("Exoplanet Demographics")
+    st.markdown(
+        "### Explore real exoplanet data and discover what it can tell us about planets beyond our Solar System."
+    )
+    st.info(
+        "**Teacher pilot**\n\n"
+        "The classroom pathways are currently being developed with teacher feedback. Please try the resource and "
+        "share it with colleagues. Your classroom experience will help shape the next version."
+    )
+    if TEACHER_FEEDBACK_URL:
+        st.link_button("Give teacher feedback", TEACHER_FEEDBACK_URL, type="primary")
+    else:
+        st.caption("The teacher-feedback link will be added before the pilot is shared.")
+    st.markdown("## Choose a pathway")
+    pathway = st.radio(
+        "Pathway",
+        ["CURIOUS workshop", "Year 8 classroom", "Year 10 classroom"],
+        key="demographics_pathway",
+        label_visibility="collapsed",
+    )
+    if pathway == "CURIOUS workshop":
+        st.markdown(
+            "### CURIOUS workshop\n"
+            "**Audience:** Outreach participants  \n"
+            "**Time:** One 50–60 minute session  \n"
+            "**Delivery:** Fast-paced and facilitator-led, with discussion prompts and a single scientific story."
+        )
+    else:
+        render_classroom_overview(pathway.split(" classroom")[0])
+    if st.button("Launch this pathway →", type="primary", use_container_width=True):
+        st.session_state["demographics_started"] = True
+        st.rerun()
+
+
+def render_demographics(data: pd.DataFrame) -> None:
+    if not st.session_state.get("demographics_started", False):
+        render_demographics_landing()
+        return
+
+    pathway = st.session_state.get("demographics_pathway", "CURIOUS workshop")
+    heading, change_pathway = st.columns([5, 1])
+    with heading:
+        st.title("Exoplanet Demographics")
+        st.caption(f"Current pathway: {pathway}")
+    with change_pathway:
+        if st.button("Change pathway", use_container_width=True):
+            st.session_state["demographics_started"] = False
+            st.rerun()
+    if pathway == "CURIOUS workshop":
         render_demographics_curious(data)
     else:
-        st.caption("A slower, student-led investigation with written explanations and separate method activities.")
         render_demographics_classroom(data)
 
 
@@ -2036,18 +2198,17 @@ if "experience" not in st.session_state:
     st.session_state["experience"] = "Exoplanet Demographics"
 
 with st.sidebar:
-    st.header("Today's workshop")
-    st.markdown("### 🪐 Are We Normal?")
-    st.caption("Exploring alien worlds with real NASA data")
+    st.header("Explore exoplanets")
+    st.caption("Activities using real NASA data")
     st.button(
-        "Open today's workshop",
+        "🪐 Exoplanet Demographics",
         type="primary",
         use_container_width=True,
         disabled=st.session_state["experience"] == "Exoplanet Demographics",
         on_click=select_experience,
         args=("Exoplanet Demographics",),
     )
-    with st.expander("Other activities — explore later", expanded=False):
+    with st.expander("More activities", expanded=False):
         st.button(
             "🌅 Find Tatooine",
             use_container_width=True,
@@ -2061,12 +2222,17 @@ with st.sidebar:
             args=("Exoplanet Data Laboratory",),
         )
     experience = st.session_state["experience"]
-    if experience != "Exoplanet Demographics":
-        st.caption(f"Currently open: {experience}")
+    st.caption(f"**Open:** {experience}")
+    if experience == "Exoplanet Demographics" and st.session_state.get("demographics_started", False):
+        st.caption(f"**Pathway:** {st.session_state.get('demographics_pathway', 'CURIOUS workshop')}")
     st.divider()
     st.header("Data source")
     source = st.radio("Choose a dataset", ["Live NASA data", "Bundled notebook sample"])
     st.caption("Live data are cached for six hours. The bundled sample keeps the activity usable offline.")
+
+if experience == "Exoplanet Demographics" and not st.session_state.get("demographics_started", False):
+    render_demographics_landing()
+    st.stop()
 
 data, source_label = load_data(source)
 
