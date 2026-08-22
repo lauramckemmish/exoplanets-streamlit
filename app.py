@@ -2569,11 +2569,13 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
         st.markdown("### What we found earlier")
         direct_imaging_column, transit_column = st.columns(2)
         with direct_imaging_column:
-            st.image(DIRECT_IMAGING_IMAGE_PATH, width=250)
-            st.markdown("**Direct imaging**  \n\n**Often finds:** bright, massive planets far from their stars.")
+            with st.container(border=True):
+                st.image(DIRECT_IMAGING_IMAGE_PATH, use_container_width=True)
+                st.markdown("**Direct imaging**  \n\n**Often finds:** bright, massive planets far from their stars.")
         with transit_column:
-            st.image(TRANSIT_DETECTION_IMAGE_PATH, width=250)
-            st.markdown("**Transit detection**  \n\n**Often finds:** planets close to their stars—especially larger planets.")
+            with st.container(border=True):
+                st.image(TRANSIT_DETECTION_IMAGE_PATH, use_container_width=True)
+                st.markdown("**Transit detection**  \n\n**Often finds:** planets close to their stars—especially larger planets.")
         st.caption("These are patterns in the planets we have detected, not a list of every planet that exists.")
         with st.expander("Explore other ways astronomers find exoplanets"):
             st.markdown(
@@ -2865,13 +2867,27 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
         key_idea("We need to understand how the data were collected before drawing a conclusion.", "Earth and your chosen planet give clues, but the graph alone cannot show every kind of planet that exists.")
     elif part == 5:
         st.header("Step 5: How do we find exoplanets?")
-        st.write(
-            "**Direct imaging** means taking a picture of light from a planet. It works best when a planet is bright "
-            "and appears far from its star. During a **transit**, a planet passes in front of its star and blocks a "
-            "tiny amount of starlight."
-        )
-        st.video("https://www.youtube.com/watch?v=BFi4HBUdWkk")
-        st.caption("NASA animation: a transit produces a small, repeating dip in a star's light. Credit: NASA/JPL-Caltech")
+        st.write("Astronomers use different ways to find exoplanets. Here are two important examples.")
+        direct_imaging_column, transit_column = st.columns(2)
+        with direct_imaging_column:
+            with st.container(border=True):
+                st.image(DIRECT_IMAGING_IMAGE_PATH, use_container_width=True)
+                st.markdown(
+                    "### Direct imaging\n"
+                    "Astronomers take a picture of light from a planet.\n\n"
+                    "**Often finds:** bright, massive planets far from their stars."
+                )
+        with transit_column:
+            with st.container(border=True):
+                st.image(TRANSIT_DETECTION_IMAGE_PATH, use_container_width=True)
+                st.markdown(
+                    "### Transit detection\n"
+                    "A planet passes in front of its star, causing a tiny dip in starlight.\n\n"
+                    "**Often finds:** planets close to their stars—especially larger planets."
+                )
+        with st.expander("Watch transit detection in motion"):
+            st.video("https://www.youtube.com/watch?v=BFi4HBUdWkk")
+            st.caption("NASA animation: a transit produces a small, repeating dip in a star's light. Credit: NASA/JPL-Caltech")
         method_view = st.radio(
             "Reveal the data",
             ["Direct Imaging", "Transit", "Transit + Direct Imaging", "All methods"],
