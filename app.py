@@ -13,6 +13,12 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 APP_DIR = Path(__file__).resolve().parent
+
+# ---------------------------------------------------------------------------
+# SHARED DATA AND ASSET CONFIGURATION
+# Edit the lesson wording much further down; these constants keep data paths
+# and reusable images in one easy-to-find place.
+# ---------------------------------------------------------------------------
 SAMPLE_PATH = APP_DIR / "data" / "notebook_sample.csv"
 SOLAR_SYSTEM_IMAGE_PATH = APP_DIR / "assets" / "solar-system-nasa.jpeg"
 EXOPLANET_IMAGE_PATH = APP_DIR / "assets" / "exoplanets-artists-concept-nasa.jpeg"
@@ -991,6 +997,10 @@ def mission_navigation(step: int, total: int, position: str) -> None:
             st.rerun()
 
 
+# ============================================================================
+# EXPERIENCE 1 — FIND TATOOINE
+# ============================================================================
+
 def render_guided_mission(data: pd.DataFrame, presenter_mode: bool) -> None:
     total_steps = 8
     if "mission_step" not in st.session_state:
@@ -1171,6 +1181,10 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool) -> None:
         "mission",
     )
 
+
+# ============================================================================
+# EXPERIENCE 2 — EXOPLANET DATA LABORATORY
+# ============================================================================
 
 def render_dataset_lab(data: pd.DataFrame, guidance_mode: str) -> None:
     st.header("Meet the dataset")
@@ -1470,6 +1484,11 @@ def render_data_lab(data: pd.DataFrame, guidance_mode: str) -> None:
     )
 
 
+# ============================================================================
+# EXPERIENCE 3 — EXOPLANET DEMOGRAPHICS: SHARED CONTENT HELPERS
+# The pathway renderers below contain the editable student-facing lesson text.
+# ============================================================================
+
 def demographics_question(
     wonder: str,
     data_question: str,
@@ -1752,6 +1771,12 @@ def teacher_note(
                     "they are not additional required activities."
                 )
 
+
+# ============================================================================
+# EXPERIENCE 3A — CLASSROOM PATHWAYS
+# Stage 4 / Strange New Worlds and Stage 5 / The Planets We Haven't Found use
+# this shared renderer. The `part` branches below are the individual steps.
+# ============================================================================
 
 def classroom_teacher_note(part: int, year_level: str) -> None:
     stage = "Stage 4" if year_level == "Year 8" else "Stage 5"
@@ -2055,6 +2080,7 @@ def curious_teacher_note(part: int) -> None:
 
 
 def render_demographics_classroom(data: pd.DataFrame) -> None:
+    """Render the Year 8 and Year 10 lessons, one selected step at a time."""
     pathway = st.session_state.get("demographics_pathway")
     year_level = {STAGE4_PATHWAY: "Year 8", STAGE5_PATHWAY: "Year 10"}.get(pathway)
     if year_level is None:
@@ -2108,6 +2134,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             height=0,
         )
     classroom_teacher_note(part, year_level)
+    # CLASSROOM STEP 0 — Welcome
     if part == 0:
         st.header(pathway)
         st.image(
@@ -2149,6 +2176,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
                 "6. Compare the observational windows.\n"
                 "7. Reconsider what the evidence supports."
             )
+    # YEAR 10 STEP 3 — Mass and distance
     if part == 3 and year_level != "Year 8":
         st.header("Step 3: Explore our Solar System")
         st.write(
@@ -2191,6 +2219,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
                 "“The log–log graph makes it easier to see…” or “On the linear graph…, but on the log–log graph…”",
             )
             key_idea("A log scale helps us see small and large planets on the same graph.", "The inner planets separate from one another while Jupiter and the other giant planets remain visible.")
+    # CLASSROOM STEP 1 — Meet our Solar System / Our Solar System
     elif part == 1:
         st.header("Step 1: Meet our Solar System")
         st.image(
@@ -2219,6 +2248,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "**Hover over a section—or tap it on a touchscreen—to see the planet names.**"
         )
         key_idea("The planets in our Solar System have very different masses.", "Which labelled mass group contains the greatest share of our eight planets?")
+    # YEAR 10 STEP 2 — Meet exoplanets
     elif part == 2 and year_level != "Year 8":
         st.header("Step 2: Meet exoplanets")
         st.info(
@@ -2284,6 +2314,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "“The two bars are similar because…” or “They are different because…”",
         )
         key_idea("Detected exoplanets have a different mix of sizes from the planets in our Solar System.", "Compare the same labelled section in the two bars, especially the widest section in each.")
+    # YEAR 8 STEP 2 — Planets around other stars
     elif part == 2:
         st.header("Step 2: There are planets around other stars")
         st.info(
@@ -2332,6 +2363,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "“This system is different because…” or “It is similar to ours because…”",
         )
         key_idea("Individual discoveries show that other planetary systems can be very different from ours.", "Choose one case study and identify its unusual star, planet size or arrangement.")
+    # YEAR 8 STEP 3 — Discoveries over time
     elif part == 3:
         st.header("Step 3: Exoplanet discoveries over time")
         st.write(
@@ -2362,6 +2394,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "“I notice that…” or “One possible reason is…”",
         )
         key_idea("Astronomy is a rapidly growing science, and new analyses can add many confirmed planets to the record.", "Look for years with unusually tall bars and consider why a large group of discoveries might appear together.")
+    # YEAR 10 STEP 4 — Are our planets typical?
     elif part == 4 and year_level != "Year 8":
         st.header("Step 4: Are planets in other systems like ours?")
         st.markdown("### Question we can answer with data\nHow similar are detected exoplanets to Solar System planets in mass and orbital distance?")
@@ -2418,6 +2451,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
                 "### Suggested end of Lesson 1\n"
                 "Lesson 2 begins by investigating how the way astronomers search affects the planets they find."
             )
+    # YEAR 8 STEP 4 — Compare planet masses
     elif part == 4:
         st.header("Step 4: Compare planet masses")
         st.write(
@@ -2447,6 +2481,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "### Suggested end of Lesson 1\n"
             "Lesson 2 adds orbital distance and asks how strange planetary systems can be."
         )
+    # YEAR 10 STEP 5 — Direct imaging
     elif part == 5 and year_level != "Year 8":
         st.header("Step 5: Direct imaging")
         st.caption("Lesson 2 starts here")
@@ -2478,6 +2513,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "“Direct imaging tends to find planets that are…” or “Most of the blue points are…”",
         )
         key_idea("Direct imaging tends to find massive planets that are far from their stars.", "Most blue points sit high and to the right: high mass and far from their host stars.")
+    # YEAR 8 STEP 5 — Strange new worlds (start of Lesson 2)
     elif part == 5:
         st.header("Step 5: Strange new worlds")
         st.caption("Lesson 2 starts here")
@@ -2516,6 +2552,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "Where would your planet be? Would it orbit very close to its star, or much farther away?\n\n"
             "**How can we describe how far a planet is from its star?**"
         )
+    # YEAR 10 STEP 6 — Transit detection
     elif part == 6 and year_level != "Year 8":
         st.header("Step 6: Transit detection")
         st.write(
@@ -2543,6 +2580,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "“Transit detection tends to find planets that are…” or “Most of the blue points are…”",
         )
         key_idea("Most planets found using transits orbit close to their stars.", "Most transit points are on the left of the graph, showing short distances from their host stars.")
+    # YEAR 8 STEP 6 — Add orbital distance
     elif part == 6:
         st.header("Step 6: Add orbital distance")
         st.write(
@@ -2578,6 +2616,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
                 "“The linear graph shows…, but the log–log graph shows…” or “I can now see…”",
             )
             key_idea("Changing the graph scale can make patterns easier to see.", "Compare the inner planets before and after the scale changes: which view separates them most clearly?")
+    # YEAR 10 STEP 7 — Compare discovery methods
     elif part == 7 and year_level != "Year 8":
         st.header("Step 7: Compare discovery methods")
         st.write(
@@ -2628,6 +2667,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "“The methods find different planets because…” or “A planet is easier to find when…”",
         )
         key_idea("Different discovery methods find different kinds of planets.", "Switch between methods and watch how the occupied parts of the graph change.")
+    # YEAR 8 STEP 7 — Compare planetary systems
     elif part == 7:
         st.header("Step 7: Compare planetary systems")
         st.write(
@@ -2647,6 +2687,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "“My first claim was…, but the graph shows…” or “Near ___, I found…”",
         )
         key_idea("A larger dataset helps us test an idea that began with a few memorable examples.", "Return to Earth and your chosen Solar System planet: where are nearby blue points, and where are there few?")
+    # CLASSROOM STEP 8 — Conclusion
     elif part == 8:
         st.header("Conclusion")
         if year_level == "Year 8":
@@ -2706,6 +2747,12 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
     )
 
 
+# ============================================================================
+# EXPERIENCE 3B — CURIOUS FACILITATOR PATHWAY
+# This is the shorter, discussion-led version. Search for `CURIOUS STEP` in
+# the renderer below to review it independently from the classroom lessons.
+# ============================================================================
+
 def render_demographics_curious(data: pd.DataFrame) -> None:
     """A presenter-led route designed to fit an approximately 50-minute outreach session."""
     if st.session_state.get("demographics_pathway") != FACILITATED_PATHWAY:
@@ -2742,6 +2789,7 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
             height=0,
         )
     curious_teacher_note(part)
+    # CURIOUS STEP 0 — Welcome
     if part == 0:
         st.header("Welcome")
         st.image(
@@ -2754,6 +2802,7 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
             "We will look for patterns—but also ask how our technology shapes the planets we have found."
         )
         st.info("**Today's challenge:** Use NASA data to decide whether our planetary system looks typical.")
+    # CURIOUS STEP 1 — Meet our Solar System
     if part == 1:
         st.header("Step 1: Meet our Solar System")
         st.image(
@@ -2774,6 +2823,7 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
             st.plotly_chart(figure, use_container_width=True)
         st.markdown("### Discuss\nWhich size groups contain the Solar System planets?")
         key_idea("The planets in our Solar System have very different masses.", "Which labelled mass groups contain our eight planets, and which group contains the most?")
+    # CURIOUS STEP 2 — Planets around other stars
     elif part == 2:
         st.header("Step 2: Meet exoplanets")
         st.info(
@@ -2811,6 +2861,7 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
             st.plotly_chart(figure, use_container_width=True)
         st.markdown("### Discuss\nWhich planet-size group looks most different between the two bars?")
         key_idea("Detected exoplanets have a different mix of sizes from our Solar System planets.", "Compare the widest labelled section in the top bar with the widest section in the bottom bar.")
+    # CURIOUS STEP 3 — Discoveries over time
     elif part == 3:
         st.header("Step 3: Mass and orbital distance")
         st.write(
@@ -2844,6 +2895,7 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
                 "What became easier to see on the log–log graph? Where are the small inner planets and the giant outer planets?"
             )
             key_idea("A log scale helps us see small and large planets on the same graph.", "The four inner planets are easier to separate without losing Jupiter and the outer planets.")
+    # CURIOUS STEP 4 — Compare planet masses and orbital distance
     elif part == 4:
         st.header("Step 4: Is our planetary system normal?")
         st.write(
@@ -2869,6 +2921,7 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
             "evidence make our planetary system seem typical—or unusual?"
         )
         key_idea("We need to understand how the data were collected before drawing a conclusion.", "Earth and your chosen planet give clues, but the graph alone cannot show every kind of planet that exists.")
+    # CURIOUS STEP 5 — Detection methods
     elif part == 5:
         st.header("Step 5: How do we find exoplanets?")
         st.write("Astronomers use different ways to find exoplanets. Here are two important examples.")
@@ -2905,6 +2958,7 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
         st.plotly_chart(demographics_methods_chart(data, method_view), use_container_width=True)
         st.markdown("### Discuss\nWhat changed when we changed the way we searched?")
         key_idea("Different discovery methods find different kinds of planets.", "Toggle the method views and compare where their points appear on the graph.")
+    # CURIOUS STEP 6 — Conclusion
     elif part == 6:
         st.header("Conclusion: Our view is still changing")
         st.info(
