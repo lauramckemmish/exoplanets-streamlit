@@ -2271,16 +2271,15 @@ def render_demographics(data: pd.DataFrame) -> None:
         return
 
     pathway = st.session_state.get("demographics_pathway")
-    pathway_migrations = {
-        "CURIOUS workshop": FACILITATED_PATHWAY,
-        "50-minute facilitated experience": FACILITATED_PATHWAY,
-        "Year 8 classroom": STAGE4_PATHWAY,
-        "Year 10 classroom": STAGE5_PATHWAY,
-    }
-    if pathway in pathway_migrations:
-        pathway = pathway_migrations[pathway]
+    pathway = router.normalise_pathway(
+        pathway,
+        FACILITATED_PATHWAY,
+        STAGE4_PATHWAY,
+        STAGE5_PATHWAY,
+    )
+    if pathway is not None:
         st.session_state["demographics_pathway"] = pathway
-    if pathway not in {FACILITATED_PATHWAY, STAGE4_PATHWAY, STAGE5_PATHWAY}:
+    else:
         st.session_state["experience"] = "Introduction"
         st.rerun()
     heading, activity_controls = st.columns([4, 2])
