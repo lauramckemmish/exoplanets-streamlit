@@ -58,6 +58,7 @@ from ui_helpers import (
     step_tabs,
     variable_card,
 )
+from experiences import data_laboratory, tatooine
 
 APP_DIR = Path(__file__).resolve().parent
 
@@ -2369,11 +2370,11 @@ with st.sidebar:
         guidance_mode = "Teacher" if st.session_state.get("lab_teacher_view", False) else "Student"
 
 if experience == "Guided Tatooine Mission":
-    render_guided_mission(data, presenter_mode)
+    tatooine.render(data, presenter_mode, render_guided_mission)
 elif experience == "Exoplanet Demographics":
     render_demographics(data)
 else:
-    render_data_lab(data, guidance_mode)
+    data_laboratory.render(data, guidance_mode, render_data_lab)
 
 st.divider()
 st.caption(
