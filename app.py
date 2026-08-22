@@ -2479,7 +2479,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
         ]
         for column, (poster_path, caption) in zip(poster_columns, posters):
             with column:
-                st.image(poster_path, width=125)
+                st.image(poster_path, width=250)
                 st.caption(caption)
         st.write(
             "Our Solar System is not the only possible arrangement. Some giant planets orbit extremely close to "
