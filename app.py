@@ -1437,8 +1437,15 @@ def sample_note(data: pd.DataFrame, required: list[str], label: str = "records")
     return complete
 
 
-def key_idea(text: str) -> None:
-    st.success(f"**Key idea:** {text}")
+def key_idea(text: str, evidence: str | None = None) -> None:
+    """Close a step with the scientific idea and the evidence students used."""
+    evidence = evidence or (
+        "I used the evidence on this page—such as the graph, examples or comparisons—to work this out."
+    )
+    st.success(
+        f"**What I learned**\n\n{text}\n\n"
+        f"**How I know**\n\n{evidence}"
+    )
 
 
 def graph_guide(*instructions: str) -> None:
@@ -1449,7 +1456,7 @@ def graph_guide(*instructions: str) -> None:
 
 
 def graph_questions(find: str, compare: str) -> None:
-    st.markdown("### Read and compare")
+    st.markdown("### Find and explore")
     st.markdown(
         f"1. **Find:** {find}\n"
         f"2. **Compare:** {compare}"
@@ -1457,11 +1464,12 @@ def graph_questions(find: str, compare: str) -> None:
 
 
 def response_box(step: int, prompt: str, sentence_starters: str) -> None:
-    st.markdown(f"### Explain\n{prompt}")
+    pathway = st.session_state.get("demographics_pathway", "classroom")
+    st.markdown(f"### Discuss your conclusion\n{prompt}")
     st.caption(f"**Sentence starters:** {sentence_starters}")
     st.text_area(
         "Write your explanation",
-        key=f"demographics_response_{step}",
+        key=f"demographics_response_{pathway}_{step}",
         height=100,
         label_visibility="collapsed",
     )
@@ -1969,6 +1977,9 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "Earth and Mars. What could we change about the representation?"
         )
         st.markdown(
+            "### Why change the graph?\n"
+            "The linear graph shows the full range, but it hides the differences between the small inner planets. "
+            "The data have not changed; we are changing the representation so we can see more of the data clearly.\n\n"
             "### What is a log–log graph doing?\n"
             "Both axes still show ordinary planet mass and orbital distance. The spacing changes: equal distances "
             "along an axis represent multiplication rather than addition. For example, the gap from **0.1 to 1** "
@@ -2033,6 +2044,12 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             ),
             use_container_width=True,
         )
+        st.info(
+            "### How far away are they?\n"
+            "The nearest known exoplanet is about **4 light-years** away. Many of the stars searched by space "
+            "telescopes are **hundreds to thousands of light-years** away—still inside our Milky Way galaxy. A "
+            "light-year is a distance: how far light travels in one year."
+        )
         st.markdown(
             "### Imagine another planetary system\n"
             "Could it have more planets, fewer planets, two stars, or planets arranged very differently? Describe "
@@ -2088,6 +2105,12 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             caption="Our Solar System is one planetary system; other stars can have their own planetary systems.",
             use_container_width=True,
         )
+        st.info(
+            "### A sense of scale\n"
+            "The nearest known exoplanet is about **4 light-years** away. Many of the stars searched by telescopes "
+            "are **hundreds to thousands of light-years** away, but they are still in our Milky Way. A light-year "
+            "measures distance: it is how far light travels in one year."
+        )
         st.subheader("Three discoveries to meet")
         case_studies = st.columns(3)
         with case_studies[0]:
@@ -2113,6 +2136,11 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "Planetary systems can be arranged in ways that are familiar, surprising or completely different from "
             "our own. We will now look at the larger collection of discoveries."
         )
+        response_box(
+            2,
+            "Choose one system. What makes it similar to or different from our Solar System?",
+            "“This system is different because…” or “It is similar to ours because…”",
+        )
         key_idea("Individual discoveries show that other planetary systems can be very different from ours.")
     elif part == 3:
         st.header("Step 3: Exoplanet discoveries over time")
@@ -2137,6 +2165,11 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
         graph_questions(
             "What pattern do you notice in the number of discoveries over time?",
             "What might a large group of results released in one year tell us about how science works?",
+        )
+        response_box(
+            3,
+            "Describe one pattern in the annual discovery graph and give a possible explanation.",
+            "“I notice that…” or “One possible reason is…”",
         )
         key_idea("Astronomy is a rapidly growing science, and new analyses can add many confirmed planets to the record.")
     elif part == 4 and year_level != "Year 8":
@@ -2267,6 +2300,15 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "Compare the positions of the inner planets and the outer giants.",
         )
         st.plotly_chart(solar_system_demographics_chart(True), use_container_width=True)
+        graph_questions(
+            "Which planets are easiest to compare on the log–log graph?",
+            "What can you see on the log–log graph that was difficult to see on the linear graph?",
+        )
+        response_box(
+            5,
+            "What does the log–log graph help you say about the planets?",
+            "“The linear graph shows…, but the log–log graph shows…” or “I can now see…”",
+        )
         key_idea("Changing the graph scale can make patterns easier to see.")
     elif part == 6 and year_level != "Year 8":
         st.header("Step 6: Transit detection")
@@ -2313,6 +2355,11 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "### Discuss\n"
             "What makes these systems different from ours? What might a planetary system look like if it formed in "
             "a different way?"
+        )
+        response_box(
+            6,
+            "Choose one strange world or system. What makes it surprising compared with our Solar System?",
+            "“I chose… It is surprising because…” or “Compared with our Solar System…”",
         )
         key_idea("Other planetary systems can be very different from ours—and that is what makes them exciting to study.")
     elif part == 7 and year_level != "Year 8":
@@ -2570,7 +2617,13 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
             "Jupiter and the distant outer planets set the scale, so the small inner planets bunch together near "
             "the bottom-left corner. How could we spread them out without losing the giant planets?"
         )
-        st.subheader("Next: change both axes to a log scale")
+        st.markdown(
+            "### Why change the graph?\n"
+            "The first graph is useful for seeing the overall range, but it hides the differences between the small "
+            "inner planets. This is a representation problem: the data are still there, but the linear spacing does "
+            "not show them clearly. We will keep the same two variables and change only the axis spacing."
+        )
+        st.subheader("Now: change both axes to a log scale")
         st.write(
             "The variables do not change: the graph still shows orbital distance and mass. Only the spacing changes. "
             "On a log scale, equal spaces represent multiplication—for example, **0.1 to 1** takes the same space as "
@@ -2646,11 +2699,9 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
             "- Graph choices help us see different patterns in data.\n"
             "- The way we search affects the planets we find."
         )
-        st.text_area(
-            "What do you now wonder about planets or planetary systems?",
-            key="curious_conclusion_question",
-            height=100,
-            placeholder="Why…?",
+        st.markdown(
+            "### Discuss\n"
+            "What do you now wonder about planets or planetary systems? Try turning your idea into a **why** question."
         )
         learn_more_prompt("facilitated")
 
@@ -2825,8 +2876,11 @@ def render_demographics_landing() -> None:
         st.markdown(
             "### Is Our Solar System Normal?\n"
             "**Audience:** Outreach participants  \n"
-            "**Time:** One approximately 50-minute session  \n"
-            "**Delivery:** Fast-paced and facilitator-led, with discussion prompts and a single scientific story."
+            "**Delivery:** Fast-paced and facilitator-led, with discussion prompts and a single scientific story.\n\n"
+            "**What students do:** Begin with the planets they know, then explore real NASA exoplanet data. "
+            "Students compare planet mass and orbital distance, switch between linear and log–log views, and "
+            "investigate how the way we find planets shapes the patterns we see. They finish by using evidence to "
+            "ask whether our Solar System is a fair guide to planetary systems elsewhere."
         )
     else:
         year_level = "Year 8" if pathway == STAGE4_PATHWAY else "Year 10"
@@ -2866,8 +2920,8 @@ def render_demographics(data: pd.DataFrame) -> None:
         st.session_state["demographics_pathway"] = pathway
     heading, activity_controls = st.columns([4, 2])
     with heading:
-        st.title(DEMOGRAPHICS_TITLE)
-        st.caption(f"Current pathway: {pathway}")
+        st.title(pathway)
+        st.markdown(f"*{DEMOGRAPHICS_TITLE}*")
     with activity_controls:
         st.toggle(
             "Teacher view",
