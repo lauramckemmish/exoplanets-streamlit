@@ -22,6 +22,8 @@ from charts import (
     apply_readable_log_axes,
     demographics_plot_data,
     discovery_chart,
+    discoveries_by_mass_chart,
+    discoveries_by_year_chart,
     finish_demographics_chart,
     readable_log_ticks,
 )
@@ -557,60 +559,6 @@ def planet_mass_distribution_chart(
         showlegend=False,
         margin={"l": 150, "r": 20, "t": 20, "b": 45},
     )
-    return figure
-
-
-def discoveries_by_year_chart(data: pd.DataFrame) -> go.Figure | None:
-    years = data.dropna(subset=["disc_year"]).copy()
-    if years.empty:
-        return None
-    counts = years.groupby("disc_year").size().reset_index(name="Confirmed planets")
-    figure = px.bar(
-        counts,
-        x="disc_year",
-        y="Confirmed planets",
-        labels={"disc_year": "Discovery year"},
-        title="Confirmed exoplanets recorded in each discovery year",
-    )
-    figure.update_traces(marker_color="#4C78A8")
-    figure.update_layout(height=600, showlegend=False)
-    return figure
-
-
-def discoveries_by_mass_chart(data: pd.DataFrame) -> go.Figure | None:
-    plot_data = data.dropna(subset=["disc_year", "pl_bmasse"]).copy()
-    plot_data = plot_data[plot_data["pl_bmasse"] > 0]
-    if plot_data.empty:
-        return None
-
-    mass_labels = [
-        "Less than 1 Earth mass",
-        "1–10 Earth masses",
-        "10–100 Earth masses",
-        "100–1,000 Earth masses",
-        "More than 1,000 Earth masses",
-    ]
-    plot_data["Mass group"] = pd.cut(
-        plot_data["pl_bmasse"],
-        bins=[0, 1, 10, 100, 1000, np.inf],
-        labels=mass_labels,
-        right=False,
-    )
-    counts = (
-        plot_data.groupby(["disc_year", "Mass group"], observed=True)
-        .size()
-        .reset_index(name="Planets discovered")
-    )
-    figure = px.bar(
-        counts,
-        x="disc_year",
-        y="Planets discovered",
-        color="Mass group",
-        category_orders={"Mass group": mass_labels},
-        labels={"disc_year": "Discovery year"},
-        title="Exoplanets discovered each year, grouped by planet mass",
-    )
-    figure.update_layout(height=620, barmode="stack", legend_title_text="Planet mass")
     return figure
 
 
