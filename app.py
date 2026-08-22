@@ -577,12 +577,12 @@ def render_relationship_lab(data: pd.DataFrame, guidance_mode: str) -> None:
     with c1:
         x_label = st.selectbox("Horizontal axis", labels, index=x_default, key=f"x_{key_suffix}")
         x_field = FIELD_OPTIONS[x_label]
-        x_status, x_reason, x_profile = scale_guidance(data, x_field)
+        x_status, x_reason, x_profile = shared_scale_guidance(data, x_field, VARIABLES)
         log_x = st.checkbox("Use logarithmic horizontal axis", value=log_x_default, key=f"log_x_{key_suffix}")
     with c2:
         y_label = st.selectbox("Vertical axis", labels, index=y_default, key=f"y_{key_suffix}")
         y_field = FIELD_OPTIONS[y_label]
-        y_status, y_reason, y_profile = scale_guidance(data, y_field)
+        y_status, y_reason, y_profile = shared_scale_guidance(data, y_field, VARIABLES)
         log_y = st.checkbox("Use logarithmic vertical axis", value=log_y_default, key=f"log_y_{key_suffix}")
     with c3:
         colour_label = st.selectbox("Colour by", list(COLOUR_OPTIONS), index=colour_default, key=f"colour_{key_suffix}")
