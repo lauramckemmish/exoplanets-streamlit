@@ -58,7 +58,13 @@ from ui_helpers import (
     step_tabs,
     variable_card,
 )
-from experiences import data_laboratory, tatooine
+from experiences import (
+    curious,
+    data_laboratory,
+    planets_we_have_not_found,
+    strange_new_worlds,
+    tatooine,
+)
 
 APP_DIR = Path(__file__).resolve().parent
 
@@ -2287,9 +2293,11 @@ def render_demographics(data: pd.DataFrame) -> None:
             help="Show learning purpose, facilitation guidance and syllabus connections within each step.",
         )
     if pathway == FACILITATED_PATHWAY:
-        render_demographics_curious(data)
+        curious.render(data, render_demographics_curious)
+    elif pathway == STAGE4_PATHWAY:
+        strange_new_worlds.render(data, render_demographics_classroom)
     else:
-        render_demographics_classroom(data)
+        planets_we_have_not_found.render(data, render_demographics_classroom)
 
 
 def select_experience(name: str) -> None:
