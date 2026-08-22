@@ -1616,19 +1616,31 @@ def scroll_to_top_if_requested(key: str) -> None:
     )
 
 
-def log_scale_reveal(prompt: str) -> None:
-    """Scaffold the conceptual move from a linear to a log–log representation."""
+def log_scale_reveal(prompt: str, key: str) -> bool:
+    """Create a deliberate, persistent reveal before showing a log–log graph."""
     st.markdown(f"### Pause and predict\n{prompt}")
-    with st.expander("Reveal: How can we make the small planets easier to see?"):
-        st.success(
-            "**Keep the same data; change the spacing on the axes.** A log scale spreads out the small values "
-            "while keeping the giant planets on the same graph."
+    if key not in st.session_state:
+        st.session_state[key] = False
+
+    if not st.session_state[key]:
+        st.button(
+            "Reveal a new way to view the same data →",
+            type="primary",
+            key=f"{key}_button",
+            on_click=lambda: st.session_state.__setitem__(key, True),
         )
-        st.write(
-            "The variables do not change: the graph still shows planet mass and orbital distance. On a log scale, "
-            "equal spaces represent multiplication. For example, the gap from **0.1 to 1** is the same size as "
-            "the gap from **1 to 10**. You do not need to calculate logarithms to read the graph."
-        )
+        return False
+
+    st.success(
+        "**Same planets. Same variables. Different spacing.** A log scale spreads out the small values "
+        "while keeping the giant planets on the same graph."
+    )
+    st.write(
+        "The variables do not change: the graph still shows planet mass and orbital distance. On a log scale, "
+        "equal spaces represent multiplication. For example, the gap from **0.1 to 1** is the same size as "
+        "the gap from **1 to 10**. You do not need to calculate logarithms to read the graph."
+    )
+    return True
 
 
 def response_box(step: int, prompt: str, sentence_starters: str) -> None:
@@ -2131,26 +2143,27 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             solar_system_demographics_chart(False),
             use_container_width=True,
         )
-        log_scale_reveal(
+        if log_scale_reveal(
             "Jupiter and the distant outer planets set the scale, so Mercury, Venus, Earth and Mars bunch together "
-            "near the bottom-left corner. How could we spread them out without losing the giant planets?"
-        )
-        st.subheader("Now compare the log–log view")
-        graph_guide(
-            "The axes show the same variables as the first graph, but the spacing now represents multiplication.",
-            "Find Earth at 1 AU and 1 Earth mass. Then find Jupiter at about 5.2 AU and 318 Earth masses.",
-        )
-        st.plotly_chart(solar_system_demographics_chart(True), use_container_width=True)
-        graph_questions(
-            "Can you locate Earth and Jupiter on both graphs?",
-            "Which graph makes Mercury, Venus, Earth and Mars easier to compare?",
-        )
-        response_box(
-            3,
-            "What does the log–log graph help you see more clearly?",
-            "“The log–log graph makes it easier to see…” or “On the linear graph…, but on the log–log graph…”",
-        )
-        key_idea("A log scale helps us see small and large planets on the same graph.")
+            "near the bottom-left corner. How could we spread them out without losing the giant planets?",
+            "year10_log_scale_revealed",
+        ):
+            st.subheader("Now compare the log–log view")
+            graph_guide(
+                "The axes show the same variables as the first graph, but the spacing now represents multiplication.",
+                "Find Earth at 1 AU and 1 Earth mass. Then find Jupiter at about 5.2 AU and 318 Earth masses.",
+            )
+            st.plotly_chart(solar_system_demographics_chart(True), use_container_width=True)
+            graph_questions(
+                "Can you locate Earth and Jupiter on both graphs?",
+                "Which graph makes Mercury, Venus, Earth and Mars easier to compare?",
+            )
+            response_box(
+                3,
+                "What does the log–log graph help you see more clearly?",
+                "“The log–log graph makes it easier to see…” or “On the linear graph…, but on the log–log graph…”",
+            )
+            key_idea("A log scale helps us see small and large planets on the same graph.")
     elif part == 1:
         st.header("Step 1: Meet our Solar System")
         st.image(
@@ -2440,26 +2453,27 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "Each labelled point is one Solar System planet. Farther right means farther from the Sun; higher means more massive.",
         )
         st.plotly_chart(solar_system_demographics_chart(False), use_container_width=True)
-        log_scale_reveal(
+        if log_scale_reveal(
             "Jupiter and the distant outer planets set the scale, so the small inner planets bunch together near "
-            "the bottom-left corner. How could we spread them out without losing the giant planets?"
-        )
-        st.subheader("Now compare the log–log view")
-        graph_guide(
-            "The variables are the same, but equal spaces now represent multiplication rather than addition.",
-            "Compare the positions of the inner planets and the outer giants.",
-        )
-        st.plotly_chart(solar_system_demographics_chart(True), use_container_width=True)
-        graph_questions(
-            "Which planets are easiest to compare on the log–log graph?",
-            "What can you see on the log–log graph that was difficult to see on the linear graph?",
-        )
-        response_box(
-            5,
-            "What does the log–log graph help you say about the planets?",
-            "“The linear graph shows…, but the log–log graph shows…” or “I can now see…”",
-        )
-        key_idea("Changing the graph scale can make patterns easier to see.")
+            "the bottom-left corner. How could we spread them out without losing the giant planets?",
+            "year8_log_scale_revealed",
+        ):
+            st.subheader("Now compare the log–log view")
+            graph_guide(
+                "The variables are the same, but equal spaces now represent multiplication rather than addition.",
+                "Compare the positions of the inner planets and the outer giants.",
+            )
+            st.plotly_chart(solar_system_demographics_chart(True), use_container_width=True)
+            graph_questions(
+                "Which planets are easiest to compare on the log–log graph?",
+                "What can you see on the log–log graph that was difficult to see on the linear graph?",
+            )
+            response_box(
+                5,
+                "What does the log–log graph help you say about the planets?",
+                "“The linear graph shows…, but the log–log graph shows…” or “I can now see…”",
+            )
+            key_idea("Changing the graph scale can make patterns easier to see.")
     elif part == 6 and year_level != "Year 8":
         st.header("Step 6: Transit detection")
         st.write(
@@ -2747,21 +2761,22 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
             "Farther right means farther from the Sun. Higher means more massive.",
         )
         st.plotly_chart(solar_system_demographics_chart(False), use_container_width=True)
-        log_scale_reveal(
+        if log_scale_reveal(
             "Jupiter and the distant outer planets set the scale, so the small inner planets bunch together near "
-            "the bottom-left corner. How could we spread them out without losing the giant planets?"
-        )
-        st.subheader("Now compare the log–log view")
-        graph_guide(
-            "The axes show the same values, but the new spacing spreads out the small planets.",
-            "Find Earth at 1 AU and 1 Earth mass, then compare the positions of the four inner planets.",
-        )
-        st.plotly_chart(solar_system_demographics_chart(True), use_container_width=True)
-        st.markdown(
-            "### Discuss\n"
-            "What became easier to see on the log–log graph? Where are the small inner planets and the giant outer planets?"
-        )
-        key_idea("A log scale helps us see small and large planets on the same graph.")
+            "the bottom-left corner. How could we spread them out without losing the giant planets?",
+            "curious_log_scale_revealed",
+        ):
+            st.subheader("Now compare the log–log view")
+            graph_guide(
+                "The axes show the same values, but the new spacing spreads out the small planets.",
+                "Find Earth at 1 AU and 1 Earth mass, then compare the positions of the four inner planets.",
+            )
+            st.plotly_chart(solar_system_demographics_chart(True), use_container_width=True)
+            st.markdown(
+                "### Discuss\n"
+                "What became easier to see on the log–log graph? Where are the small inner planets and the giant outer planets?"
+            )
+            key_idea("A log scale helps us see small and large planets on the same graph.")
     elif part == 4:
         st.header("Step 4: Is our planetary system normal?")
         st.write(
@@ -2961,8 +2976,7 @@ def reset_demographics_navigation() -> None:
 
 def render_demographics_landing(data: pd.DataFrame) -> None:
     st.title("Explore exoplanets using real NASA data")
-    st.markdown("**Developed for UNSW CURIOUS**")
-    count_column, description_column = st.columns([1, 3])
+    count_column, description_column, image_column = st.columns([1, 2, 2])
     with count_column:
         st.metric("Confirmed exoplanets", f"{len(data):,}")
     with description_column:
@@ -2970,6 +2984,13 @@ def render_demographics_landing(data: pd.DataFrame) -> None:
             "Astronomers have confirmed thousands of planets orbiting stars beyond our Sun. "
             "This number comes from the NASA Exoplanet Archive and grows as new observations are analysed."
         )
+    with image_column:
+        st.image(
+            EXOPLANET_IMAGE_PATH,
+            caption="Artist's concept of the variety of known exoplanets. Credit: NASA/JPL-Caltech",
+            use_container_width=True,
+        )
+    st.markdown("**Developed for UNSW CURIOUS**")
     st.info(
         "**Currently in development**\n\n"
         "This resource is being actively developed. Please expect some content and features to change during this "
@@ -3019,10 +3040,24 @@ def render_demographics_landing(data: pd.DataFrame) -> None:
                 with st.container(border=True):
                     st.markdown(f"### {name}")
                     st.write(summary)
+                    st.button(
+                        "Open experience →",
+                        key=f"open_experience_{name}",
+                        use_container_width=True,
+                        on_click=open_experience,
+                        args=(name,),
+                    )
     if len(experiences) % 2:
         with st.container(border=True):
             st.markdown(f"### {experiences[-1][0]}")
             st.write(experiences[-1][1])
+            st.button(
+                "Open experience →",
+                key=f"open_experience_{experiences[-1][0]}",
+                use_container_width=True,
+                on_click=open_experience,
+                args=(experiences[-1][0],),
+            )
     with st.expander("About and acknowledgements"):
         st.markdown(
             "**Developed for UNSW CURIOUS**\n\n"
@@ -3079,6 +3114,16 @@ def select_demographics_pathway(pathway: str) -> None:
     reset_demographics_navigation()
     st.session_state["demographics_started"] = True
     st.session_state["experience"] = "Exoplanet Demographics"
+
+
+def open_experience(name: str) -> None:
+    """Launch an experience from the Introduction overview card."""
+    if name in {FACILITATED_PATHWAY, STAGE4_PATHWAY, STAGE5_PATHWAY}:
+        select_demographics_pathway(name)
+    elif name == "Find Tatooine":
+        select_experience("Guided Tatooine Mission")
+    else:
+        select_experience(name)
 
 
 if "experience" not in st.session_state:
