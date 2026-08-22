@@ -25,8 +25,10 @@ NASA_TAP_URL = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync"
 NSW_SCIENCE_SYLLABUS_URL = "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/outcomes"
 # Add the public teacher-feedback form URL here when it is ready.
 TEACHER_FEEDBACK_URL = ""
-DEMOGRAPHICS_TITLE = "Is Our Solar System Normal?"
-FACILITATED_PATHWAY = "50-minute facilitated experience"
+DEMOGRAPHICS_TITLE = "Exoplanet Discovery with NASA Data"
+FACILITATED_PATHWAY = "Is Our Solar System Normal?"
+STAGE4_PATHWAY = "Strange New Worlds"
+STAGE5_PATHWAY = "The Planets We Haven't Found"
 GRANT_RECIPIENTS_URL = (
     "https://business.gov.au/grants-and-programs/"
     "maker-projects-community-stem-engagement-grants-2024/grant-recipients"
@@ -806,13 +808,13 @@ def discoveries_by_year_chart(data: pd.DataFrame) -> go.Figure | None:
     years = data.dropna(subset=["disc_year"]).copy()
     if years.empty:
         return None
-    counts = years.groupby("disc_year").size().reset_index(name="Planets discovered")
+    counts = years.groupby("disc_year").size().reset_index(name="Confirmed planets")
     figure = px.bar(
         counts,
         x="disc_year",
-        y="Planets discovered",
+        y="Confirmed planets",
         labels={"disc_year": "Discovery year"},
-        title="Exoplanets discovered each year",
+        title="Confirmed exoplanets recorded in each discovery year",
     )
     figure.update_traces(marker_color="#4C78A8")
     figure.update_layout(height=600, showlegend=False)
@@ -1465,6 +1467,39 @@ def response_box(step: int, prompt: str, sentence_starters: str) -> None:
     )
 
 
+def learn_more_prompt(key_prefix: str) -> None:
+    st.markdown("### What would you most like to find out next?")
+    st.write(
+        "Exoplanets connect to many different questions. Choose something that interested you, then turn it into a "
+        "question you could investigate."
+    )
+    st.markdown(
+        "- **Worlds and space:** planetary formation, unusual systems, telescopes and future missions\n"
+        "- **Life beyond Earth:** astrobiology, atmospheres, molecules, spectra and possible signs of life\n"
+        "- **People and ideas:** aliens, philosophy, culture, media, politics and how humanity might respond to a discovery"
+    )
+    st.text_area(
+        "My learn-more question",
+        key=f"{key_prefix}_learn_more",
+        height=90,
+        placeholder="I would like to find out…",
+    )
+    if st.session_state.get("demographics_teacher_view", False):
+        with st.expander("Teacher guide: helping students follow their interest"):
+            st.markdown(
+                "These are optional engagement routes, not additional required curriculum. Invite students to choose "
+                "one question and identify useful search terms or an appropriate source. Possible prompts include:\n\n"
+                "- How do planets and planetary systems form?\n"
+                "- How can a spectrum reveal molecules in an exoplanet atmosphere?\n"
+                "- What might count as evidence of life?\n"
+                "- Which future telescope or mission could answer this question?\n"
+                "- How might scientists communicate a possible discovery of life?\n"
+                "- How have different cultures imagined other worlds?\n\n"
+                "Atmospheric molecules, spectra and biosignatures belong here as learn-more possibilities. They are "
+                "not assumed knowledge or required content in either classroom pathway."
+            )
+
+
 def teacher_note(
     title: str,
     purpose: str,
@@ -1484,9 +1519,9 @@ def teacher_note(
         st.markdown(f"### 👩‍🏫 Teacher view: {title}")
         if timing:
             st.caption(f"Suggested time: {timing} · Use this as guidance, not a required pace.")
-        st.markdown(f"**Learning objective:** {purpose}")
+        st.markdown(f"**Learning intention:** {purpose}")
         if alignment:
-            st.markdown(f"**NSW syllabus connection:** {alignment}")
+            st.markdown(f"**Relevant NSW syllabus outcomes:** {alignment}")
         if evidence:
             st.markdown(f"**Evidence of learning:** {evidence}")
         with st.expander("Teaching this step"):
@@ -1675,6 +1710,100 @@ def classroom_teacher_note(part: int, year_level: str) -> None:
             "and likely to change as technology improves**."
         ),
     }
+    if year_level == "Year 8":
+        notes.update(
+            {
+                0: dict(
+                    title="Pathway overview",
+                    purpose="Use authentic astronomy examples and data to move from individual discoveries to patterns and an evidence-based conclusion.",
+                    timing="3 minutes (Lesson 1)",
+                    facilitation="Preview the two-lesson journey as an exploration of strange planetary systems. Students do not need prior astronomy knowledge or detailed detection methods.",
+                    alignment="Stage 4 Observing the Universe, Data Science 1 and Working Scientifically.",
+                    evidence="Students can state that they will use examples and graphs to learn what planetary systems can be like.",
+                    listen_for="Curiosity about other worlds and questions that can later be connected to evidence.",
+                ),
+                2: dict(
+                    title="Move from our Solar System to memorable examples",
+                    purpose="Use individual exoplanet examples to recognise that other stars host varied planetary systems.",
+                    timing="10 minutes (Lesson 1)",
+                    facilitation="Define star, planetary system and exoplanet before introducing the three cases. Students do not need to memorise the names; use each story as evidence that systems can be arranged differently.",
+                    alignment="SC4-OTU-01 and SC4-WS-08: use observations and examples to build and communicate understanding of the Universe.",
+                    evidence="Students explain that the Sun is one star and identify one way another planetary system differs from ours.",
+                    listen_for="Comparisons involving number, type or arrangement of planets rather than recall of proper names.",
+                    misconceptions="‘Solar System’ names our own system; ‘planetary system’ is the general term.",
+                ),
+                3: dict(
+                    title="Move from examples to an annual dataset",
+                    purpose="Interpret an annual bar chart and describe how the recorded exoplanet population has changed over time.",
+                    timing="15 minutes (Lesson 1)",
+                    facilitation="Model the axes and one bar, then ask students to describe the overall pattern before discussing the 2014 and 2016 Kepler releases.",
+                    alignment="SC4-OTU-01, SC4-DA1-01, SC4-WS-05 and SC4-WS-06: represent and interpret changing scientific knowledge.",
+                    evidence="Students use the annual bars to describe growth and explain that a spike can reflect a large scientific release.",
+                    listen_for="The graph counts confirmations recorded in each year, not planets physically forming or all being noticed on one night.",
+                    misconceptions="The vertical axis is an annual count, not a running cumulative total.",
+                ),
+                4: dict(
+                    title="Compare planet-mass distributions",
+                    purpose="Compare two 100% bar representations and communicate a similarity or difference supported by the graph.",
+                    timing="15 minutes (Lesson 1)",
+                    facilitation="Remind students that each complete bar represents a different-sized group. Model comparing the same labelled section across the two bars.",
+                    alignment="SC4-WS-05, SC4-WS-06 and SC4-WS-08: represent data, identify patterns and communicate conclusions.",
+                    evidence="Students make a comparison and refer to a labelled mass group as evidence.",
+                    listen_for="A comparison of proportions rather than raw totals, because one group has eight planets and the other has thousands.",
+                    misconceptions="A wider section represents a larger proportion of that group, not a physically wider planet.",
+                ),
+                5: dict(
+                    title="Add orbital distance and change representation",
+                    purpose="Interpret a two-variable scatter plot and explain why a log–log representation makes a wide range easier to see.",
+                    timing="12 minutes (Lesson 2)",
+                    facilitation="Use the linear graph to create a genuine visibility problem, then reveal the log–log graph as a representation choice. No logarithm calculations are required.",
+                    alignment="SC4-DA1-01, SC4-WS-05 and SC4-WS-06: use representations to identify relationships in data.",
+                    evidence="Students identify what becomes easier to distinguish after the scale changes.",
+                    listen_for="The variables and values stay the same; only the spacing changes.",
+                    misconceptions="The graph has not changed the planets or their real locations.",
+                ),
+                6: dict(
+                    title="Connect patterns with strange systems",
+                    purpose="Use memorable cases to explain that planetary systems can contain different planet types and arrangements.",
+                    timing="12 minutes (Lesson 2)",
+                    facilitation="Treat hot Jupiters and compact systems as evidence, not vocabulary to memorise. Invite comparisons with Jupiter and the layout of our Solar System.",
+                    alignment="SC4-OTU-01 and SC4-WS-06: use observations and relationships to increase understanding of planetary diversity.",
+                    evidence="Students identify a feature that makes one system different from ours.",
+                    listen_for="Specific comparisons such as massive-and-close or many planets packed close to a star.",
+                    misconceptions="A hot Jupiter is not necessarily hotter than every object; the name describes a gas giant strongly heated by orbiting close to its star.",
+                ),
+                7: dict(
+                    title="Construct an evidence-based claim",
+                    purpose="Combine an example or data pattern with a claim about planetary systems.",
+                    timing="18 minutes (Lesson 2)",
+                    facilitation="Ask students to choose one defensible claim and one relevant piece of evidence. Keep the final structure simple: claim plus evidence.",
+                    alignment="SC4-WS-06 and SC4-WS-08: draw and communicate conclusions from data.",
+                    evidence="Students state a reasonable claim and connect it explicitly to an example or pattern.",
+                    listen_for="The evidence actually supports the claim rather than merely repeating it.",
+                    misconceptions="Students do not need to decide whether our Solar System is statistically normal.",
+                ),
+                8: dict(
+                    title="Consolidate diversity and generate questions",
+                    purpose="Communicate what the evidence shows about planetary diversity and identify a productive next question.",
+                    timing="8 minutes (Lesson 2)",
+                    facilitation="Invite several claims before summarising. Use the learn-more prompt to value astronomy, astrobiology and broader human questions without adding required content.",
+                    alignment="SC4-WS-06 and SC4-WS-08: draw conclusions and communicate scientific ideas.",
+                    evidence="Students support one claim about planetary systems with an example or pattern from the activity.",
+                    listen_for="A clear connection between evidence and the conclusion that planetary systems can be diverse.",
+                ),
+            }
+        )
+        classroom_backgrounds.update(
+            {
+                0: "**The pathway's purpose**\n\nThe curriculum learning is in processing and representing data, identifying patterns and communicating a conclusion. Exoplanets provide the motivating scientific context. Students move from familiar Solar System planets, to memorable examples, to annual counts and comparative graphs. Detailed detection bias belongs in the separate Stage 5 pathway and is not required here.",
+                3: "**Reading the annual chart**\n\nEach bar counts confirmed exoplanets assigned to one discovery year; the chart is not cumulative. Large releases can create spikes because teams may validate many candidates together after years of observation and analysis. Kepler contributed 715 newly validated planets in 2014 and a further large validated collection in 2016. Keep the student explanation focused on how scientific knowledge can grow through coordinated observation, analysis and publication.",
+                4: "**Why use 100% bars?**\n\nOur Solar System has only eight planets, while the detected sample contains thousands. Raw counts would make direct comparison difficult. Converting each group to percentages asks a fairer question: what proportion of each group falls into each mass category? The categories are instructional bins rather than official planet classes, and planets without the required mass estimate cannot be placed in them.",
+                5: "**Two variables and two scales**\n\nOrbital distance describes the typical size of a planet's orbit; one AU is the average Earth–Sun distance. A scatter plot locates one planet using mass and orbital distance. Linear axes use equal additions, while logarithmic axes use equal multiplications. The log–log version spreads out small values while retaining the giant planets. Students read ordinary labels and do not calculate logarithms.",
+                6: "**Planetary diversity**\n\nA hot Jupiter is a gas giant orbiting close enough to its star to be strongly heated, often completing an orbit in days. Compact systems place several planets inside a region much smaller than our Solar System. These examples challenge the assumption that every system resembles ours. Detailed detection methods and planet-formation mechanisms are not required learning in this pathway.",
+                7: "**Claim plus evidence**\n\nThe final task assesses data reasoning rather than recall of exoplanet names. A claim might concern diversity, compact systems, planet masses or discoveries over time. Evidence may be one case study or a pattern from a graph. A strong response explains how the selected evidence supports the claim.",
+                8: "**A deliberately open ending**\n\nStudents should leave with an evidence-based understanding that planetary systems can be diverse and with a question worth pursuing. Optional interests may lead towards astronomy, planetary formation, atmospheres, spectra, astrobiology, philosophy, culture or science communication. These are engagement routes rather than additional Stage 4 requirements.",
+            }
+        )
     for step, background in classroom_backgrounds.items():
         notes[step]["background"] = background
     teacher_note(**notes[part])
@@ -1705,24 +1834,37 @@ def curious_teacher_note(part: int) -> None:
 
 
 def render_demographics_classroom(data: pd.DataFrame) -> None:
-    pathway = st.session_state.get("demographics_pathway", "Year 8 classroom")
-    if not pathway.endswith(" classroom"):
+    pathway = st.session_state.get("demographics_pathway", STAGE4_PATHWAY)
+    year_level = {STAGE4_PATHWAY: "Year 8", STAGE5_PATHWAY: "Year 10"}.get(pathway)
+    if year_level is None:
         return
-    year_level = pathway.split(" classroom")[0]
     if "demographics_part" not in st.session_state:
         st.session_state["demographics_part"] = 0
     part = max(0, min(int(st.session_state["demographics_part"]), 8))
-    step_labels = [
-        "Welcome",
-        "1 · Our Solar System",
-        "2 · Meet exoplanets",
-        "3 · Mass and distance",
-        "4 · Are we normal?",
-        "5 · Direct imaging",
-        "6 · Transit detection",
-        "7 · Compare methods",
-        "Conclusion",
-    ]
+    if year_level == "Year 8":
+        step_labels = [
+            "Welcome",
+            "1 · Meet our Solar System",
+            "2 · Planets around other stars",
+            "3 · Discoveries over time",
+            "4 · Compare planet masses",
+            "5 · Add orbital distance",
+            "6 · Strange planets and systems",
+            "7 · Make a claim",
+            "Conclusion",
+        ]
+    else:
+        step_labels = [
+            "Welcome",
+            "1 · Our Solar System",
+            "2 · Meet exoplanets",
+            "3 · Mass and distance",
+            "4 · Make an initial claim",
+            "5 · Direct imaging",
+            "6 · Transit detection",
+            "7 · Compare methods",
+            "Conclusion",
+        ]
     if st.session_state.get("demographics_selector_part") != part:
         st.session_state["demographics_step_selector"] = step_labels[part]
         st.session_state["demographics_selector_part"] = part
@@ -1755,7 +1897,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
         )
     classroom_teacher_note(part, year_level)
     if part == 0:
-        st.header("Welcome to the workshop")
+        st.header(pathway)
         st.image(
             EXOPLANET_IMAGE_PATH,
             caption=(
@@ -1764,23 +1906,37 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             ),
             use_container_width=True,
         )
-        st.markdown(
-            "People have wondered about worlds beyond Earth for thousands of years. Modern astronomers can investigate "
-            "these age-old questions using data—but the patterns we see are shaped by what our technology can detect "
-            "and which measurements are available.\n\n"
-            "Today, you will compare planet masses, explore our Solar System, ask whether it is typical, and investigate "
-            "how different discovery methods shape our view of exoplanets."
-        )
-        st.markdown(
-            "#### Our journey\n"
-            "1. Meet the planets in our Solar System.\n"
-            "2. Meet exoplanets and compare planet masses.\n"
-            "3. Explore planet mass and orbital distance.\n"
-            "4. Ask whether our planetary system is ‘normal’.\n"
-            "5. Investigate direct imaging.\n"
-            "6. Investigate transit detection.\n"
-            "7. Compare discovery methods."
-        )
+        if year_level == "Year 8":
+            st.markdown(
+                "Other stars have planets too—and some planetary systems are very different from ours. You will "
+                "start with individual discoveries, then use real NASA data to find larger patterns."
+            )
+            st.markdown(
+                "#### Our journey\n"
+                "1. Start with our Solar System.\n"
+                "2. Meet memorable planets and planetary systems.\n"
+                "3. Watch exoplanet discoveries grow over time.\n"
+                "4. Compare planet masses.\n"
+                "5. Add orbital distance and change the graph scale.\n"
+                "6. Explore strange new worlds.\n"
+                "7. Make a claim supported by evidence."
+            )
+        else:
+            st.markdown(
+                "The planets we have detected form a scientific dataset—but does that dataset show every kind of "
+                "planet that exists? You will make an initial claim, investigate how the evidence was collected, and "
+                "then decide whether your claim needs to change."
+            )
+            st.markdown(
+                "#### Our journey\n"
+                "1. Establish our Solar System as a reference.\n"
+                "2. Compare it with detected exoplanets.\n"
+                "3. Use mass and orbital distance to identify patterns.\n"
+                "4. Make an initial claim.\n"
+                "5. Investigate direct imaging and transit detection.\n"
+                "6. Compare the observational windows.\n"
+                "7. Reconsider what the evidence supports."
+            )
     else:
         if part <= 7:
             st.progress(part / 7, text=f"Step {part} of 7")
@@ -1969,7 +2125,11 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "The horizontal axis shows the year a planet was recorded as discovered or confirmed.",
             "The vertical axis shows how many confirmed planets were recorded in that year.",
         )
-        st.plotly_chart(discovery_count_chart(data), use_container_width=True)
+        discovery_figure = discoveries_by_year_chart(data)
+        if discovery_figure is None:
+            st.warning("No discovery-year data are available for this graph.")
+        else:
+            st.plotly_chart(discovery_figure, use_container_width=True)
         st.info(
             "NASA's Kepler mission contributed a particularly large group of results in 2014. Another large release "
             "followed in 2016 as scientists analysed more of the mission's data."
@@ -1979,7 +2139,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "What might a large group of results released in one year tell us about how science works?",
         )
         key_idea("Astronomy is a rapidly growing science, and new analyses can add many confirmed planets to the record.")
-    elif part == 4:
+    elif part == 4 and year_level != "Year 8":
         st.header("Step 4: Is our Solar System normal?")
         st.text_area(
             "Before looking at the graph, what could “normal” mean for a planetary system?",
@@ -2022,6 +2182,35 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
         st.info(
             "### Suggested end of Lesson 1\n"
             "Lesson 2 begins by investigating how the way astronomers search affects the planets they find."
+        )
+    elif part == 4:
+        st.header("Step 4: Compare planet masses")
+        st.write(
+            "We have met a few individual planetary systems. Now we can use the larger NASA dataset to ask whether "
+            "the detected exoplanets have the same mix of planet masses as our Solar System."
+        )
+        graph_guide(
+            "The top bar is our Solar System. The bottom bar is the detected exoplanets that can be placed in these mass groups.",
+            "Each bar represents 100% of its group. Compare sections carrying the same label.",
+        )
+        figure = planet_mass_distribution_chart(data)
+        if figure is None:
+            st.warning("No planets have the mass data needed for this graph.")
+        else:
+            st.plotly_chart(figure, use_container_width=True)
+        graph_questions(
+            "Which planet-mass group takes up the most space in each bar?",
+            "Which group looks most different between our Solar System and the detected exoplanets?",
+        )
+        response_box(
+            4,
+            "What is one similarity or difference between the two groups?",
+            "“The groups are similar because…” or “They are different because…”",
+        )
+        key_idea("A larger dataset helps us move from individual examples to patterns across many planets.")
+        st.info(
+            "### Suggested end of Lesson 1\n"
+            "Lesson 2 adds orbital distance and asks how strange planetary systems can be."
         )
     elif part == 5 and year_level != "Year 8":
         st.header("Step 5: Direct imaging")
@@ -2207,6 +2396,11 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
                 "- Our Solar System is one planetary system among many—and defining whether it is ‘normal’ requires evidence.\n"
                 "- Our picture of exoplanets is incomplete because different methods find different kinds of planets."
             )
+            response_box(
+                8,
+                "What can the known exoplanets tell us about whether our Solar System is typical—and what prevents us from being completely certain?",
+                "“My claim is…” + “The evidence is…” + “A limitation is…”",
+            )
         st.markdown("### Keep wondering")
         st.write(
             "Scientists do not finish with all the answers—they finish with new questions. What do you now wonder "
@@ -2219,6 +2413,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             height=100,
             placeholder="Why…?",
         )
+        learn_more_prompt("classroom")
 
     back, spacer, next_step = st.columns([1, 4, 1])
     with back:
@@ -2457,6 +2652,7 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
             height=100,
             placeholder="Why…?",
         )
+        learn_more_prompt("facilitated")
 
     back, spacer, next_step = st.columns([1, 4, 1])
     with back:
@@ -2510,16 +2706,17 @@ def render_syllabus_alignment(year_level: str) -> None:
     st.markdown(f"[View the official NESA outcomes]({NSW_SCIENCE_SYLLABUS_URL})")
 
 
-def render_classroom_overview(year_level: str) -> None:
-    st.header(f"{year_level} classroom learning experience")
+def render_classroom_overview(year_level: str, pathway_title: str) -> None:
+    st.header(pathway_title)
     st.markdown(
-        "**For:** NSW Science students and their teachers  \n"
+        f"**Teacher positioning:** designed around {('Stage 4 / approximately Year 8' if year_level == 'Year 8' else 'Stage 5 / approximately Year 10')}; adaptable for other cohorts  \n"
         "**Time:** Two lessons of approximately 50 minutes each  \n"
-        "**Students:** Interpret real NASA data, compare graphs, discuss detection bias and write evidence-based "
-        "explanations."
+        f"**Learning intention:** {('represent data, identify patterns and communicate a conclusion' if year_level == 'Year 8' else 'analyse data, evaluate how evidence was collected and qualify a claim')}  \n"
+        f"**Scientific context:** {('planetary diversity and the growth of exoplanet discoveries' if year_level == 'Year 8' else 'exoplanet detection and the limits of an observed sample')}  \n"
+        f"**Evidence of learning:** {('one claim supported by an example or data pattern' if year_level == 'Year 8' else 'a claim supported by evidence and qualified by a limitation')}."
     )
-    overview_tab, syllabus_tab, preparation_tab = st.tabs(
-        ["Lesson outline", "Syllabus alignment", "Teacher preparation"]
+    overview_tab, mapping_tab, syllabus_tab, preparation_tab = st.tabs(
+        ["Lesson outline", "Lesson-to-outcome map", "Syllabus outcomes", "Teacher preparation"]
     )
     with overview_tab:
         if year_level == "Year 8":
@@ -2542,8 +2739,33 @@ def render_classroom_overview(year_level: str) -> None:
                 "Meet Solar System planets and exoplanets, compare their masses, interpret linear and logarithmic "
                 "graphs, and consider whether our planetary system is typical.\n\n"
                 "**Lesson 2 — How does the way we search shape the data?**\n\n"
-                "Investigate direct imaging, transit detection and radial velocity, compare discovery methods, and "
-                "explain why the known exoplanets may not represent all planets that exist."
+                "Investigate direct imaging and transit detection, compare discovery methods, and explain why the "
+                "known exoplanets may not represent all planets that exist. Radial velocity/Doppler is available as "
+                "an optional supporting connection for teachers using the waves content."
+            )
+    with mapping_tab:
+        if year_level == "Year 8":
+            st.markdown(
+                "**Lesson 1 — Discovering other worlds**\n\n"
+                "- Meet our Solar System: **SC4-WS-05, SC4-WS-08**\n"
+                "- Planets around other stars and memorable systems: **SC4-OTU-01**\n"
+                "- Annual discoveries: **SC4-OTU-01, SC4-DA1-01, SC4-WS-05, SC4-WS-06**\n"
+                "- Compare planet masses: **SC4-WS-05, SC4-WS-06**\n\n"
+                "**Lesson 2 — How strange can planetary systems be?**\n\n"
+                "- Add orbital distance and compare representations: **SC4-DA1-01, SC4-WS-05, SC4-WS-06**\n"
+                "- Strange planets and systems: **SC4-OTU-01, SC4-WS-06**\n"
+                "- Final claim plus evidence: **SC4-WS-06, SC4-WS-08**"
+            )
+        else:
+            st.markdown(
+                "**Lesson 1 — What does the evidence seem to show?**\n\n"
+                "- Meet and compare planets: **SC5-WS-05, SC5-WS-06**\n"
+                "- Mass, orbital distance and log–log representation: **SC5-WS-05, SC5-WS-06**\n"
+                "- Initial claim about our Solar System: **SC5-DA2-01, SC5-WS-06, SC5-WS-08**\n\n"
+                "**Lesson 2 — Can we trust the pattern?**\n\n"
+                "- Direct imaging and transit: **SC5-DA2-01, SC5-WS-06**; transit supports **SC5-WAM-01**\n"
+                "- Compare methods and revise the claim: **SC5-DA2-01, SC5-WS-06, SC5-WS-08**\n"
+                "- Optional radial velocity/Doppler connection: supports **SC5-WAM-01**"
             )
     with syllabus_tab:
         render_syllabus_alignment(year_level)
@@ -2584,23 +2806,31 @@ def render_demographics_landing() -> None:
     if TEACHER_FEEDBACK_URL:
         st.link_button("Give teacher feedback", TEACHER_FEEDBACK_URL, type="primary")
     st.markdown("## Choose a pathway")
-    if st.session_state.get("demographics_pathway") == "CURIOUS workshop":
-        st.session_state["demographics_pathway"] = FACILITATED_PATHWAY
+    old_pathways = {
+        "CURIOUS workshop": FACILITATED_PATHWAY,
+        "50-minute facilitated experience": FACILITATED_PATHWAY,
+        "Year 8 classroom": STAGE4_PATHWAY,
+        "Year 10 classroom": STAGE5_PATHWAY,
+    }
+    current_pathway = st.session_state.get("demographics_pathway")
+    if current_pathway in old_pathways:
+        st.session_state["demographics_pathway"] = old_pathways[current_pathway]
     pathway = st.radio(
         "Pathway",
-        [FACILITATED_PATHWAY, "Year 8 classroom", "Year 10 classroom"],
+        [FACILITATED_PATHWAY, STAGE4_PATHWAY, STAGE5_PATHWAY],
         key="demographics_pathway",
         label_visibility="collapsed",
     )
     if pathway == FACILITATED_PATHWAY:
         st.markdown(
-            "### 50-minute facilitated experience\n"
+            "### Is Our Solar System Normal?\n"
             "**Audience:** Outreach participants  \n"
             "**Time:** One approximately 50-minute session  \n"
             "**Delivery:** Fast-paced and facilitator-led, with discussion prompts and a single scientific story."
         )
     else:
-        render_classroom_overview(pathway.split(" classroom")[0])
+        year_level = "Year 8" if pathway == STAGE4_PATHWAY else "Year 10"
+        render_classroom_overview(year_level, pathway)
     with st.expander("About and acknowledgements"):
         st.markdown(
             "**Developed for UNSW CURIOUS**\n\n"
@@ -2625,8 +2855,14 @@ def render_demographics(data: pd.DataFrame) -> None:
         return
 
     pathway = st.session_state.get("demographics_pathway", FACILITATED_PATHWAY)
-    if pathway == "CURIOUS workshop":
-        pathway = FACILITATED_PATHWAY
+    pathway_migrations = {
+        "CURIOUS workshop": FACILITATED_PATHWAY,
+        "50-minute facilitated experience": FACILITATED_PATHWAY,
+        "Year 8 classroom": STAGE4_PATHWAY,
+        "Year 10 classroom": STAGE5_PATHWAY,
+    }
+    if pathway in pathway_migrations:
+        pathway = pathway_migrations[pathway]
         st.session_state["demographics_pathway"] = pathway
     heading, activity_controls = st.columns([4, 2])
     with heading:
