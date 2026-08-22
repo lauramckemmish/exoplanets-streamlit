@@ -2612,20 +2612,6 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
         key_idea("Different discovery methods find different kinds of planets.", "Switch between methods and watch how the occupied parts of the graph change.")
     elif part == 7:
         st.header("Step 7: Compare planetary systems")
-        prior_claim = st.session_state.get(f"demographics_response_{STAGE4_PATHWAY}_5", "").strip()
-        if prior_claim:
-            st.info(
-                "### Return to your Step 5 claim\n"
-                "You made an early claim after meeting a few strange worlds. Keep it in mind while you examine a much "
-                "larger set of planets.\n\n"
-                f"**Your claim:** {prior_claim}"
-            )
-        else:
-            st.info(
-                "### Return to your Step 5 claim\n"
-                "In Step 5, you met a few strange worlds and made an early claim about whether other planetary systems "
-                "need to look like ours. Now you will test that idea using many detected planets."
-            )
         st.write(
             "This graph adds detected exoplanets to the same mass-and-orbital-distance view as the Solar System planets. "
             "Use this larger dataset to support, challenge or change your Step 5 claim."
