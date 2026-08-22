@@ -92,3 +92,40 @@ def scroll_to_top_if_requested(key: str) -> None:
         """,
         height=0,
     )
+
+
+def log_scale_reveal(prompt: str, key: str) -> bool:
+    """Create a deliberate, persistent reveal before showing a log–log graph."""
+    st.markdown(f"### Pause and predict\n{prompt}")
+    if key not in st.session_state:
+        st.session_state[key] = False
+    if not st.session_state[key]:
+        st.button(
+            "Reveal a new way to view the same data →",
+            type="primary",
+            key=f"{key}_button",
+            on_click=lambda: st.session_state.__setitem__(key, True),
+        )
+        return False
+    st.success(
+        "**Same planets. Same variables. Different spacing.** A log scale spreads out the small values "
+        "while keeping the giant planets on the same graph."
+    )
+    st.write(
+        "The variables do not change: the graph still shows planet mass and orbital distance. On a log scale, "
+        "equal spaces represent multiplication. For example, the gap from **0.1 to 1** is the same size as "
+        "the gap from **1 to 10**. You do not need to calculate logarithms to read the graph."
+    )
+    return True
+
+
+def response_box(step: int, prompt: str, sentence_starters: str) -> None:
+    pathway = st.session_state.get("demographics_pathway", "classroom")
+    st.markdown(f"### Discuss your conclusion\n{prompt}")
+    st.caption(f"**Sentence starters:** {sentence_starters}")
+    st.text_area(
+        "Write your explanation",
+        key=f"demographics_response_{pathway}_{step}",
+        height=100,
+        label_visibility="collapsed",
+    )
