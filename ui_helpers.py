@@ -166,3 +166,13 @@ def guidance_box(mode: str, student_text: str, teacher_text: str | None = None) 
         st.info(student_text)
         with st.expander("Teacher guidance", expanded=False):
             st.write(teacher_text)
+
+
+def sample_note(data, required: list[str], label: str = "records") -> int:
+    complete = int(data[required].notna().all(axis=1).sum())
+    excluded = len(data) - complete
+    st.caption(
+        f"**Data used:** {complete:,} of {len(data):,} {label}. "
+        f"{excluded:,} are not shown because at least one required value is missing."
+    )
+    return complete

@@ -46,6 +46,7 @@ from ui_helpers import (
     learn_more_prompt,
     log_scale_reveal,
     response_box,
+    sample_note,
     scroll_to_top_if_requested,
     select_tab_step,
     step_buttons,
@@ -843,16 +844,6 @@ def demographics_question(
     st.markdown(f"### I wonder…\n{wonder}")
     st.markdown(f"### Question we can answer with data\n{data_question}")
     st.markdown(f"### What we will plot\n{plot_description}")
-
-
-def sample_note(data: pd.DataFrame, required: list[str], label: str = "records") -> int:
-    complete = int(data[required].notna().all(axis=1).sum())
-    excluded = len(data) - complete
-    st.caption(
-        f"**Data used:** {complete:,} of {len(data):,} {label}. "
-        f"{excluded:,} are not shown because at least one required value is missing."
-    )
-    return complete
 
 
 def teacher_note(
