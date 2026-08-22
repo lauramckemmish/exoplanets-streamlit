@@ -39,9 +39,11 @@ from charts import (
 )
 from ui_helpers import (
     data_detective_challenge,
+    guidance_box,
     graph_guide,
     graph_questions,
     key_idea,
+    learn_more_prompt,
     log_scale_reveal,
     response_box,
     scroll_to_top_if_requested,
@@ -325,15 +327,6 @@ def variable_card(data: pd.DataFrame, field: str, guidance_mode: str) -> None:
             f"Available for {profile['complete']:,} of {len(data):,} records; "
             f"{profile['missing']:,} values are missing."
         )
-
-
-def guidance_box(mode: str, student_text: str, teacher_text: str | None = None) -> None:
-    if mode == "Student":
-        st.info(student_text)
-    elif mode == "Teacher" and teacher_text:
-        st.info(student_text)
-        with st.expander("Teacher guidance", expanded=False):
-            st.write(teacher_text)
 
 
 def mission_navigation(step: int, total: int, position: str) -> None:
@@ -860,39 +853,6 @@ def sample_note(data: pd.DataFrame, required: list[str], label: str = "records")
         f"{excluded:,} are not shown because at least one required value is missing."
     )
     return complete
-
-
-def learn_more_prompt(key_prefix: str) -> None:
-    st.markdown("### What would you most like to find out next?")
-    st.write(
-        "Exoplanets connect to many different questions. Choose something that interested you, then turn it into a "
-        "question you could investigate."
-    )
-    st.markdown(
-        "- **Worlds and space:** planetary formation, unusual systems, telescopes and future missions\n"
-        "- **Life beyond Earth:** astrobiology, atmospheres, molecules, spectra and possible signs of life\n"
-        "- **People and ideas:** aliens, philosophy, culture, media, politics and how humanity might respond to a discovery"
-    )
-    st.text_area(
-        "My learn-more question",
-        key=f"{key_prefix}_learn_more",
-        height=90,
-        placeholder="I would like to find out…",
-    )
-    if st.session_state.get("demographics_teacher_view", False):
-        with st.expander("Teacher guide: helping students follow their interest"):
-            st.markdown(
-                "These are optional engagement routes, not additional required curriculum. Invite students to choose "
-                "one question and identify useful search terms or an appropriate source. Possible prompts include:\n\n"
-                "- How do planets and planetary systems form?\n"
-                "- How can a spectrum reveal molecules in an exoplanet atmosphere?\n"
-                "- What might count as evidence of life?\n"
-                "- Which future telescope or mission could answer this question?\n"
-                "- How might scientists communicate a possible discovery of life?\n"
-                "- How have different cultures imagined other worlds?\n\n"
-                "Atmospheric molecules, spectra and biosignatures belong here as learn-more possibilities. They are "
-                "not assumed knowledge or required content in either classroom pathway."
-            )
 
 
 def teacher_note(
