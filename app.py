@@ -1771,6 +1771,18 @@ def classroom_teacher_note(part: int, year_level: str) -> None:
         7: dict(title="Compare discovery methods", purpose="Explain how measurement methods shape the detected dataset and the conclusions that can be drawn from it.", timing="18 minutes (Lesson 2)", facilitation="Toggle one method at a time, ask students to describe each pattern, and only then reveal all methods. Ask what may be hard for current methods to find. Let students infer the incompleteness of the dataset before consolidating it in the conclusion.", alignment=("SC4-DA1-01 and SC4-WS-06: use and interpret scientific datasets." if year_level == "Year 8" else "SC5-DA2-01 and SC5-WS-06: assess claims using the strengths and limitations of data."), evidence="Students use differences between method views to explain why detected planets may not represent every planet that exists.", listen_for="‘A gap could mean difficult to detect, not impossible’ and ‘future technology may reveal planets in currently sparse regions’. Keep ‘may’ rather than promising that every gap will be filled.", background="**Radial velocity (Doppler method):** an orbiting planet makes its star move slightly towards and away from us, shifting its spectrum towards blue and red. This offers a useful Year 10 waves connection.\n\n**Microlensing:** gravity from a foreground star-system bends and magnifies light from a more distant star. A planet can add a brief feature to that one-off brightening event. It can find distant systems but events usually cannot be repeated.\n\nOther methods can remain optional student research rather than required teacher exposition.", misconceptions="Different methods do not create different planets; they make different existing planets easier to detect.", resources=(("NASA: Doppler and transit overview", "https://science.nasa.gov/astrobiology/learning-resources/alp/discover-worlds-around-other-stars/"), ("NASA: microlensing explainer", "https://science.nasa.gov/resource/exoplanet-detection-microlensing-method/"))),
         8: dict(title="Consolidate and generate new questions", purpose="Connect planet diversity, graph representation and detection limitations in an evidence-based explanation.", timing="8 minutes (Lesson 2)", facilitation="Ask students for their own conclusion first. Then consolidate the shared idea that scientists have not found every planet and that future technology may change the visible pattern. Finish with a question students genuinely want investigated.", alignment=f"{working_scientifically}: communicate scientific concepts or arguments using evidence.", evidence="Students distinguish the detected sample from all planets that may exist and pose a relevant scientific question.", listen_for="Questions that could be investigated using observations, models or new technology. Preserve uncertainty: some gaps may reflect detection limits and some may reflect how planetary systems form."),
     }
+    if year_level == "Year 8":
+        notes[5] = dict(
+            title="Reconnect mass and ask what else matters",
+            purpose="Reactivate students' understanding of planet mass, use memorable exoplanets to restore context, and create a reason to introduce orbital distance as a second variable.",
+            timing="10 minutes (start of Lesson 2)",
+            facilitation="Keep this conversational and imaginative. Ask students what kind of planet they would visit and what its mass might be. Then ask what else they would want to know about where that planet sits in its planetary system. End by asking how scientists describe a planet's distance from its star; the following section answers that question.",
+            alignment="SC4-OTU-01 and SC4-WS-06: use observations and scientific questions to build understanding of the Universe.",
+            evidence="Students retrieve mass as a meaningful description of a planet and begin to suggest location or distance from the star as another important characteristic.",
+            listen_for="Students using mass meaningfully, such as choosing a small rocky or much more massive world, and beginning to suggest that a planet's position or distance from its star matters too.",
+            background="These are NASA/JPL artist's impressions based on real exoplanet systems, not photographs. Kepler-16 b orbits two stars; 51 Pegasi b is a hot Jupiter; Kepler-186 f is approximately Earth-sized. TRAPPIST-1 has seven known, roughly Earth-sized planets packed close to one small star. The purpose here is wonder and retrieval, not a complete astronomy lesson. Orbital distance is introduced formally on the next page.",
+            misconceptions="The posters do not show the planets' true sizes or distances to scale. A planet's mass tells us how much matter it has, but not where it orbits or what its surface is like.",
+        )
     classroom_backgrounds = {
         0: (
             "**What teachers need to know**\n\n"
@@ -2470,34 +2482,40 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
         st.header("Step 5: Strange new worlds")
         st.caption("Lesson 2 starts here")
         st.caption("NASA/JPL Exoplanet Travel Bureau posters: artists' illustrations based on real exoplanet systems.")
-        poster_columns = st.columns(4)
+        poster_columns = st.columns(3)
         posters = [
             (NASA_KEPLER_16B_POSTER_PATH, "Kepler-16 b: two suns"),
             (NASA_51_PEGASI_B_POSTER_PATH, "51 Pegasi b: hot Jupiter"),
             (NASA_KEPLER_186F_POSTER_PATH, "Kepler-186 f: Earth-size world"),
-            (NASA_TRAPPIST_1E_POSTER_PATH, "TRAPPIST-1 e: compact system"),
         ]
         for column, (poster_path, caption) in zip(poster_columns, posters):
             with column:
-                st.image(poster_path, width=125)
+                st.image(poster_path, use_container_width=True)
                 st.caption(caption)
+        st.info(
+            "### Seven worlds around one tiny star\n"
+            "TRAPPIST-1 has seven known planets, all roughly the size of Earth. They are packed incredibly close "
+            "together: all seven orbit closer to their star than Mercury orbits the Sun. The planets are so close "
+            "together that, from one world, neighbouring planets could sometimes appear larger in the sky than our "
+            "Moon does from Earth."
+        )
+        st.markdown("## Pick your holiday planet")
         st.write(
-            "Our Solar System is not the only possible arrangement. Some giant planets orbit extremely close to "
-            "their stars. Other systems contain several planets packed into a much smaller space than ours."
+            "If you could visit an exoplanet, what kind of world would you choose? Would you choose a small rocky "
+            "world like Earth or a much more massive planet? Would you visit a planet with two suns? Would you choose "
+            "a system where other planets loom large in the sky?"
+        )
+        st.text_area(
+            "How massive would your planet be?",
+            key="demographics_response_Strange New Worlds_5",
+            height=90,
+            placeholder="Describe your holiday planet and its mass…",
         )
         st.markdown(
-            "### A few strange worlds\n"
-            "- **Kepler-16 b:** a planet orbiting two stars, like the fictional world Tatooine.\n"
-            "- **51 Pegasi b:** a giant planet with a very short orbit.\n"
-            "- **Kepler-90:** eight known planets arranged much more compactly than our Solar System.\n"
-            "- **TRAPPIST-1:** seven roughly Earth-sized planets around one small star."
+            "### But mass isn't the whole story\n"
+            "Where would your planet be? Would it orbit very close to its star, or much farther away?\n\n"
+            "**How can we describe how far a planet is from its star?**"
         )
-        response_box(
-            5,
-            "Make an initial claim: do other planetary systems need to look like our Solar System? Why do you think so?",
-            "“I think other planetary systems…” or “The Kepler-16 b poster makes me think…”",
-        )
-        key_idea("Planetary systems can have very different arrangements of planets and stars.", "Kepler-16 b has two stars; compare that arrangement with our one-star Solar System.")
     elif part == 6 and year_level != "Year 8":
         st.header("Step 6: Transit detection")
         st.write(
