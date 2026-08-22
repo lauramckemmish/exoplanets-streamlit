@@ -2393,7 +2393,7 @@ with st.sidebar:
         guidance_mode = "Teacher" if st.session_state.get("lab_teacher_view", False) else "Student"
 
 if experience == "Guided Tatooine Mission":
-    tatooine.render(data, presenter_mode, render_guided_mission)
+    tatooine.render(data, None, render_guided_mission)
 elif experience == "Exoplanet Demographics":
     render_demographics(data)
 else:
