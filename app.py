@@ -2301,6 +2301,8 @@ def render_demographics(data: pd.DataFrame) -> None:
         curious.render,
         strange_new_worlds.render,
         planets_we_have_not_found.render,
+        render_demographics_curious,
+        render_demographics_classroom,
     )
 
 
