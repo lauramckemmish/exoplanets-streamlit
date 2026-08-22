@@ -176,3 +176,52 @@ def sample_note(data, required: list[str], label: str = "records") -> int:
         f"{excluded:,} are not shown because at least one required value is missing."
     )
     return complete
+
+
+def teacher_note(title: str, purpose: str, facilitation: str, alignment: str = "", *, timing: str = "", evidence: str = "", listen_for: str = "", background: str = "", misconceptions: str = "", resources: tuple[tuple[str, str], ...] = ()) -> None:
+    if not st.session_state.get("demographics_teacher_view", False):
+        return
+    with st.container(border=True):
+        st.markdown(f"### 👩‍🏫 Teacher view: {title}")
+        if timing:
+            st.caption(f"Suggested time: {timing} · Use this as guidance, not a required pace.")
+        st.markdown(f"**Learning intention:** {purpose}")
+        if alignment:
+            st.markdown(f"**Relevant NSW syllabus outcomes:** {alignment}")
+        if evidence:
+            st.markdown(f"**Evidence of learning:** {evidence}")
+        with st.expander("Teaching this step"):
+            st.markdown(f"**Suggested approach:** {facilitation}")
+            if listen_for:
+                st.markdown(f"**Listen for:** {listen_for}")
+        if background or misconceptions:
+            with st.expander("Teacher background and possible misconceptions"):
+                if background:
+                    st.markdown(background)
+                if misconceptions:
+                    st.markdown(f"**Possible misconceptions:** {misconceptions}")
+        if resources:
+            with st.expander("Resources and optional extension"):
+                for label, url in resources:
+                    st.markdown(f"- [{label}]({url})")
+                st.caption("These are optional teacher background or no-equipment research resources; they are not additional required activities.")
+
+
+def demographics_question(wonder: str, data_question: str, plot_description: str) -> None:
+    st.markdown(f"### I wonder…\n{wonder}")
+    st.markdown(f"### Question we can answer with data\n{data_question}")
+    st.markdown(f"### What we will plot\n{plot_description}")
+
+
+def mission_navigation(step: int, total: int, position: str) -> None:
+    left, middle, right = st.columns([1, 4, 1])
+    with left:
+        if step > 0 and st.button("← Back", use_container_width=True, key=f"{position}_back_{step}"):
+            st.session_state["mission_step"] = step - 1
+            st.rerun()
+    with middle:
+        st.progress((step + 1) / total, text=f"Mission stage {step + 1} of {total}")
+    with right:
+        if step < total - 1 and st.button("Continue →", use_container_width=True, type="primary", key=f"{position}_continue_{step}"):
+            st.session_state["mission_step"] = step + 1
+            st.rerun()

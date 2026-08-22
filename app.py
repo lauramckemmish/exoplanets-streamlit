@@ -39,15 +39,18 @@ from charts import (
 )
 from ui_helpers import (
     data_detective_challenge,
+    demographics_question,
     guidance_box,
     graph_guide,
     graph_questions,
     key_idea,
     learn_more_prompt,
     log_scale_reveal,
+    mission_navigation,
     response_box,
     sample_note,
     scroll_to_top_if_requested,
+    teacher_note,
     select_tab_step,
     step_buttons,
     step_navigation_bar,
@@ -330,7 +333,7 @@ def variable_card(data: pd.DataFrame, field: str, guidance_mode: str) -> None:
         )
 
 
-def mission_navigation(step: int, total: int, position: str) -> None:
+def _legacy_mission_navigation(step: int, total: int, position: str) -> None:
     left, middle, right = st.columns([1, 4, 1])
     with left:
         if step > 0 and st.button("← Back", use_container_width=True, key=f"{position}_back_{step}"):
@@ -836,7 +839,7 @@ def render_data_lab(data: pd.DataFrame, guidance_mode: str) -> None:
 # The pathway renderers below contain the editable student-facing lesson text.
 # ============================================================================
 
-def demographics_question(
+def _legacy_demographics_question(
     wonder: str,
     data_question: str,
     plot_description: str,
@@ -844,50 +847,6 @@ def demographics_question(
     st.markdown(f"### I wonder…\n{wonder}")
     st.markdown(f"### Question we can answer with data\n{data_question}")
     st.markdown(f"### What we will plot\n{plot_description}")
-
-
-def teacher_note(
-    title: str,
-    purpose: str,
-    facilitation: str,
-    alignment: str = "",
-    *,
-    timing: str = "",
-    evidence: str = "",
-    listen_for: str = "",
-    background: str = "",
-    misconceptions: str = "",
-    resources: tuple[tuple[str, str], ...] = (),
-) -> None:
-    if not st.session_state.get("demographics_teacher_view", False):
-        return
-    with st.container(border=True):
-        st.markdown(f"### 👩‍🏫 Teacher view: {title}")
-        if timing:
-            st.caption(f"Suggested time: {timing} · Use this as guidance, not a required pace.")
-        st.markdown(f"**Learning intention:** {purpose}")
-        if alignment:
-            st.markdown(f"**Relevant NSW syllabus outcomes:** {alignment}")
-        if evidence:
-            st.markdown(f"**Evidence of learning:** {evidence}")
-        with st.expander("Teaching this step"):
-            st.markdown(f"**Suggested approach:** {facilitation}")
-            if listen_for:
-                st.markdown(f"**Listen for:** {listen_for}")
-        if background or misconceptions:
-            with st.expander("Teacher background and possible misconceptions"):
-                if background:
-                    st.markdown(background)
-                if misconceptions:
-                    st.markdown(f"**Possible misconceptions:** {misconceptions}")
-        if resources:
-            with st.expander("Resources and optional extension"):
-                for label, url in resources:
-                    st.markdown(f"- [{label}]({url})")
-                st.caption(
-                    "These are optional teacher background or no-equipment research resources; "
-                    "they are not additional required activities."
-                )
 
 
 # ============================================================================
