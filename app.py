@@ -26,6 +26,8 @@ from charts import (
     discoveries_by_year_chart,
     finish_demographics_chart,
     readable_log_ticks,
+    sky_map,
+    solar_system_demographics_chart,
 )
 
 APP_DIR = Path(__file__).resolve().parent
@@ -558,85 +560,6 @@ def planet_mass_distribution_chart(
         },
         showlegend=False,
         margin={"l": 150, "r": 20, "t": 20, "b": 45},
-    )
-    return figure
-
-
-def solar_system_demographics_chart(log_axes: bool) -> go.Figure:
-    figure = px.scatter(
-        SOLAR_SYSTEM_PLANETS,
-        x="Orbital distance (AU)",
-        y="Planet mass (Earth masses)",
-        text="Planet",
-        hover_name="Planet",
-        hover_data={
-            "Orbital distance (AU)": ":.3f",
-            "Planet mass (Earth masses)": ":.3g",
-        },
-        log_x=log_axes,
-        log_y=log_axes,
-        title="The planets in our Solar System",
-    )
-    figure.update_traces(
-        marker={"size": 12, "color": "#4C78A8"},
-        textposition="top center",
-    )
-    if log_axes:
-        apply_readable_log_axes(
-            figure,
-            SOLAR_SYSTEM_PLANETS["Orbital distance (AU)"].tolist(),
-            SOLAR_SYSTEM_PLANETS["Planet mass (Earth masses)"].tolist() + [500],
-            "Orbital distance (AU)",
-            "Planet mass (Earth masses)",
-            label_every_tick=True,
-        )
-        figure.update_yaxes(range=[math.log10(0.04), math.log10(500)])
-        for x_value in [1, 10]:
-            figure.add_vline(x=x_value, line_width=1.5, line_color="rgba(80, 80, 80, 0.5)")
-        for y_value in [0.1, 1, 10, 100]:
-            figure.add_hline(y=y_value, line_width=1.5, line_color="rgba(80, 80, 80, 0.5)")
-    figure.update_layout(height=650, showlegend=False)
-    return figure
-
-
-def sky_map(data: pd.DataFrame, selected_planet: str) -> go.Figure:
-    mapped = data.dropna(subset=["x", "y", "z"]).copy()
-    selected = mapped[mapped["pl_name"] == selected_planet]
-    background = mapped[mapped["pl_name"] != selected_planet]
-
-    figure = go.Figure()
-    figure.add_trace(go.Scatter3d(
-        x=background["x"], y=background["y"], z=background["z"],
-        mode="markers", name="Known exoplanets",
-        marker={"size": 3, "opacity": 0.3},
-        text=background["pl_name"],
-        customdata=np.column_stack([
-            background["sy_dist"].fillna(np.nan),
-            background["discoverymethod"].fillna("Unknown"),
-        ]) if not background.empty else None,
-        hovertemplate=(
-            "<b>%{text}</b><br>Distance: %{customdata[0]:.1f} pc"
-            "<br>Method: %{customdata[1]}<extra></extra>"
-        ),
-    ))
-    if not selected.empty:
-        figure.add_trace(go.Scatter3d(
-            x=selected["x"], y=selected["y"], z=selected["z"],
-            mode="markers+text", name=selected_planet,
-            marker={"size": 9, "symbol": "diamond"},
-            text=selected["pl_name"], textposition="top center",
-            hovertemplate="<b>%{text}</b><extra></extra>",
-        ))
-    figure.update_layout(
-        height=650,
-        margin={"l": 0, "r": 0, "t": 20, "b": 0},
-        legend={"orientation": "h", "y": 0.02},
-        scene={
-            "xaxis": {"title": "x", "showticklabels": False},
-            "yaxis": {"title": "y", "showticklabels": False},
-            "zaxis": {"title": "z", "showticklabels": False},
-            "aspectmode": "cube",
-        },
     )
     return figure
 
