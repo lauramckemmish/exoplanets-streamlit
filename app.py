@@ -62,6 +62,7 @@ from experiences import (
     curious,
     data_laboratory,
     planets_we_have_not_found,
+    catalog,
     router,
     strange_new_worlds,
     tatooine,
@@ -2191,33 +2192,7 @@ def render_demographics_landing(data: pd.DataFrame) -> None:
         "## Choose an experience\n"
         "Use the sidebar to open the experience that suits your group."
     )
-    experiences = [
-        (
-            FACILITATED_PATHWAY,
-            "A fast-paced, facilitator-led CURIOUS experience. Compare planets, change graph scales and discuss "
-            "why the planets we detect may not tell the whole story.",
-        ),
-        (
-            STAGE4_PATHWAY,
-            "A two-lesson classroom experience for exploring individual discoveries, growing datasets and the "
-            "wonderfully varied planetary systems beyond our own.",
-        ),
-        (
-            STAGE5_PATHWAY,
-            "A two-lesson classroom experience that investigates how different ways of finding planets shape the "
-            "evidence we have—and the planets we have not yet found.",
-        ),
-        (
-            "Exoplanet Data Laboratory",
-            "An open exploration space for inspecting the NASA dataset, choosing variables, building graphs and "
-            "testing your own questions.",
-        ),
-        (
-            "Find Tatooine",
-            "A guided data-science mission: turn clues from Star Wars into testable criteria, inspect candidate "
-            "worlds and communicate uncertainty in your conclusion.",
-        ),
-    ]
+    experiences = catalog.experience_catalog(FACILITATED_PATHWAY, STAGE4_PATHWAY, STAGE5_PATHWAY)
     for left, right in zip(experiences[::2], experiences[1::2]):
         first, second = st.columns(2)
         for column, (name, summary) in zip((first, second), (left, right)):
