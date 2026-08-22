@@ -21,6 +21,7 @@ from charts import (
     add_solar_system_trace,
     apply_readable_log_axes,
     demographics_plot_data,
+    discovery_chart,
     finish_demographics_chart,
     readable_log_ticks,
 )
@@ -263,21 +264,6 @@ st.set_page_config(
     page_icon="🪐",
     layout="wide",
 )
-
-
-def discovery_chart(data: pd.DataFrame, methods: list[str]) -> go.Figure:
-    subset = data[data["discoverymethod"].isin(methods)].dropna(subset=["disc_year"])
-    counts = subset.groupby(["disc_year", "discoverymethod"], observed=True).size().reset_index(name="Planets")
-    figure = px.bar(
-        counts,
-        x="disc_year",
-        y="Planets",
-        color="discoverymethod",
-        labels={"disc_year": "Discovery year", "discoverymethod": "Discovery method"},
-        title="Confirmed exoplanet discoveries by year and method",
-    )
-    figure.update_layout(height=560, legend_title_text="Discovery method")
-    return figure
 
 
 def scale_profile(data: pd.DataFrame, field: str) -> dict[str, float | int | str | None]:
