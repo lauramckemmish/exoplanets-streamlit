@@ -28,6 +28,7 @@ from charts import (
     format_number,
     readable_log_ticks,
     scale_profile,
+    scale_guidance as shared_scale_guidance,
     sky_map,
     solar_system_demographics_chart,
 )
@@ -270,30 +271,6 @@ st.set_page_config(
     page_icon="🪐",
     layout="wide",
 )
-
-
-def scale_guidance(data: pd.DataFrame, field: str) -> tuple[str, str, dict[str, float | int | str | None]]:
-    details = VARIABLES[field]
-    profile = scale_profile(data, field)
-    orders = profile["orders"]
-    suitability = details["log"]
-
-    if suitability == "not suitable":
-        status = "Linear scale recommended"
-    elif suitability == "usually unnecessary":
-        status = "Linear scale usually clearer"
-    elif suitability == "recommended" or (orders is not None and orders >= 3):
-        status = "Logarithmic scale recommended"
-    else:
-        status = "Logarithmic scale optional"
-
-    range_text = (
-        f"The positive values range from {format_number(profile['positive_min'])} to "
-        f"{format_number(profile['positive_max'])}."
-    )
-    if orders is not None:
-        range_text += f" This spans approximately {orders:.1f} orders of magnitude."
-    return status, f"{details['log_reason']} {range_text}", profile
 
 
 def scatter_chart(
@@ -547,7 +524,7 @@ def presenter_notes(step: int) -> None:
 
 def variable_card(data: pd.DataFrame, field: str, guidance_mode: str) -> None:
     details = VARIABLES[field]
-    status, reason, profile = scale_guidance(data, field)
+    status, reason, profile = shared_scale_guidance(data, field, VARIABLES)
     st.markdown(f"#### {details['label']}")
     st.write(f"**Field:** `{field}`  ")
     st.write(f"**Unit:** {details['unit']}  ")

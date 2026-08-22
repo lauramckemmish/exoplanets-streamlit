@@ -101,6 +101,25 @@ def format_number(value: float | None) -> str:
     return f"{value:,.2f}"
 
 
+def scale_guidance(data: pd.DataFrame, field: str, variables: dict) -> tuple[str, str, dict[str, float | int | str | None]]:
+    details = variables[field]
+    profile = scale_profile(data, field)
+    orders = profile["orders"]
+    suitability = details["log"]
+    if suitability == "not suitable":
+        status = "Linear scale recommended"
+    elif suitability == "usually unnecessary":
+        status = "Linear scale usually clearer"
+    elif suitability == "recommended" or (orders is not None and orders >= 3):
+        status = "Logarithmic scale recommended"
+    else:
+        status = "Logarithmic scale optional"
+    range_text = f"The positive values range from {format_number(profile['positive_min'])} to {format_number(profile['positive_max'])}."
+    if orders is not None:
+        range_text += f" This spans approximately {orders:.1f} orders of magnitude."
+    return status, f"{details['log_reason']} {range_text}", profile
+
+
 def demographics_plot_data(data: pd.DataFrame, require_method: bool = False) -> pd.DataFrame:
     required = ["pl_orbsmax", "pl_bmasse"]
     if require_method:
