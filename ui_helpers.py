@@ -219,6 +219,12 @@ def mission_navigation(step: int, total: int, position: str) -> None:
         if step > 0 and st.button("← Back", use_container_width=True, key=f"{position}_back_{step}"):
             st.session_state["mission_step"] = step - 1
             st.rerun()
+    with middle:
+        st.progress((step + 1) / total, text=f"Mission stage {step + 1} of {total}")
+    with right:
+        if step < total - 1 and st.button("Continue →", use_container_width=True, type="primary", key=f"{position}_continue_{step}"):
+            st.session_state["mission_step"] = step + 1
+            st.rerun()
 
 
 def presenter_notes(step: int, notes_by_step: dict) -> None:
@@ -242,9 +248,3 @@ def variable_card(data, field: str, guidance_mode: str, variables: dict, scale_g
         st.caption(details["measurement"])
         st.info(f"**Scale guidance: {status}.** {reason}")
         st.caption(f"Available for {profile['complete']:,} of {len(data):,} records; {profile['missing']:,} values are missing.")
-    with middle:
-        st.progress((step + 1) / total, text=f"Mission stage {step + 1} of {total}")
-    with right:
-        if step < total - 1 and st.button("Continue →", use_container_width=True, type="primary", key=f"{position}_continue_{step}"):
-            st.session_state["mission_step"] = step + 1
-            st.rerun()
