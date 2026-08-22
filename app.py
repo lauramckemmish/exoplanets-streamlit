@@ -2159,16 +2159,6 @@ def render_classroom_overview(year_level: str, pathway_title: str) -> None:
         )
 
 
-def reset_demographics_navigation() -> None:
-    """Start the selected pathway with clean, independent navigation state."""
-    st.session_state["demographics_part"] = 0
-    st.session_state["curious_part"] = 0
-    st.session_state.pop("demographics_step_selector", None)
-    st.session_state.pop("curious_step_selector", None)
-    st.session_state["demographics_scroll_to_top"] = True
-    st.session_state["curious_scroll_to_top"] = True
-
-
 def render_demographics_landing(data: pd.DataFrame) -> None:
     st.title("Explore exoplanets using real NASA data")
     count_column, description_column, image_column = st.columns([1, 2, 2])
@@ -2290,7 +2280,7 @@ def select_experience(name: str) -> None:
 def select_demographics_pathway(pathway: str) -> None:
     """Open one named pathway with independent step navigation."""
     st.session_state["demographics_pathway"] = pathway
-    reset_demographics_navigation()
+    router.reset_navigation()
     st.session_state["demographics_started"] = True
     st.session_state["experience"] = "Exoplanet Demographics"
 
