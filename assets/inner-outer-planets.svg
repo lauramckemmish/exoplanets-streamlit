@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="430" viewBox="0 0 1200 430" role="img" aria-labelledby="title description">
+  <title id="title">Inner and outer Solar System planets</title>
+  <description id="description">Mercury, Venus, Earth and Mars are small planets close to the Sun. Jupiter, Saturn, Uranus and Neptune are much farther from the Sun and generally much more massive.</description>
+  <rect width="1200" height="430" rx="28" fill="#F7F9FC"/>
+  <text x="600" y="48" text-anchor="middle" font-family="Arial, sans-serif" font-size="31" font-weight="700" fill="#172033">Before we plot: look for the broad pattern</text>
+  <rect x="35" y="80" width="540" height="300" rx="20" fill="#FFFFFF" stroke="#4C78A8" stroke-width="4"/>
+  <rect x="625" y="80" width="540" height="300" rx="20" fill="#FFFFFF" stroke="#D97706" stroke-width="4"/>
+  <text x="305" y="122" text-anchor="middle" font-family="Arial, sans-serif" font-size="27" font-weight="700" fill="#172033">Inner planets</text>
+  <text x="895" y="122" text-anchor="middle" font-family="Arial, sans-serif" font-size="27" font-weight="700" fill="#172033">Outer planets</text>
+  <circle cx="100" cy="220" r="35" fill="#FFD54F"/>
+  <text x="100" y="280" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#172033">Sun</text>
+  <g font-family="Arial, sans-serif" text-anchor="middle" fill="#172033">
+    <circle cx="205" cy="220" r="7" fill="#9CA3AF"/><text x="205" y="255" font-size="16">Mercury</text>
+    <circle cx="292" cy="220" r="13" fill="#D6A85F"/><text x="292" y="255" font-size="16">Venus</text>
+    <circle cx="390" cy="220" r="14" fill="#4C78A8"/><text x="390" y="255" font-size="16">Earth</text>
+    <circle cx="492" cy="220" r="10" fill="#C2410C"/><text x="492" y="255" font-size="16">Mars</text>
+    <text x="305" y="330" font-size="23" font-weight="700" fill="#4C78A8">close to the Sun + small</text>
+
+    <circle cx="700" cy="210" r="47" fill="#D97706"/><text x="700" y="280" font-size="16">Jupiter</text>
+    <ellipse cx="830" cy="215" rx="65" ry="14" fill="none" stroke="#A16207" stroke-width="7"/><circle cx="830" cy="215" r="38" fill="#EABF83"/><text x="830" y="280" font-size="16">Saturn</text>
+    <circle cx="970" cy="215" r="25" fill="#67C5D1"/><text x="970" y="280" font-size="16">Uranus</text>
+    <circle cx="1080" cy="215" r="24" fill="#315EAF"/><text x="1080" y="280" font-size="16">Neptune</text>
+    <text x="895" y="330" font-size="23" font-weight="700" fill="#D97706">far from the Sun + generally large</text>
+  </g>
+  <text x="600" y="410" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#475569">Planet sizes and distances are simplified and are not to scale.</text>
+</svg>

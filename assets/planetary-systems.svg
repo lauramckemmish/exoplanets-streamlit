@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="title description">
+  <title id="title">Our Solar System and other possible planetary systems</title>
+  <description id="description">The Sun is one star. Planets orbit the Sun in our Solar System. Exoplanets orbit other stars in other planetary systems, which may have different numbers and arrangements of planets.</description>
+  <rect width="1200" height="620" rx="28" fill="#F7F9FC"/>
+  <text x="600" y="48" text-anchor="middle" font-family="Arial, sans-serif" font-size="31" font-weight="700" fill="#172033">One star can be the centre of a planetary system</text>
+  <rect x="35" y="78" width="1130" height="215" rx="20" fill="#FFFFFF" stroke="#4C78A8" stroke-width="4"/>
+  <text x="285" y="116" text-anchor="middle" font-family="Arial, sans-serif" font-size="26" font-weight="700" fill="#172033">Our Solar System</text>
+  <circle cx="285" cy="200" r="38" fill="#FFD54F"/>
+  <text x="285" y="207" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#172033">Sun</text>
+  <text x="285" y="285" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#475569">our star</text>
+  <g stroke="#94A3B8" stroke-width="2" fill="none">
+    <ellipse cx="285" cy="200" rx="72" ry="42"/><ellipse cx="285" cy="200" rx="116" ry="60"/><ellipse cx="285" cy="200" rx="162" ry="76"/>
+  </g>
+  <circle cx="357" cy="200" r="8" fill="#9CA3AF"/><circle cx="207" cy="170" r="13" fill="#4C78A8"/><circle cx="430" cy="232" r="21" fill="#D97706"/>
+  <path d="M500 235 H650" stroke="#64748B" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="575" y="170" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" fill="#334155">travel far beyond</text>
+  <text x="575" y="195" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" fill="#334155">our Solar System</text>
+  <circle cx="800" cy="190" r="19" fill="#E2E8F0"/><circle cx="875" cy="142" r="13" fill="#E2E8F0"/><circle cx="940" cy="228" r="16" fill="#E2E8F0"/><circle cx="1030" cy="164" r="11" fill="#E2E8F0"/>
+  <text x="915" y="270" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#172033">other stars</text>
+
+  <text x="600" y="340" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#172033">Other planetary systems could look very different</text>
+  <g font-family="Arial, sans-serif" fill="#172033" text-anchor="middle">
+    <g transform="translate(205 450)">
+      <circle r="34" fill="#FB923C"/><ellipse rx="82" ry="54" fill="none" stroke="#94A3B8" stroke-width="2"/><circle cx="82" cy="0" r="12" fill="#4C78A8"/>
+      <text y="105" font-size="20" font-weight="700">one close exoplanet</text>
+    </g>
+    <g transform="translate(600 450)">
+      <circle r="31" fill="#FDE047"/><ellipse rx="70" ry="48" fill="none" stroke="#94A3B8" stroke-width="2"/><ellipse rx="115" ry="72" fill="none" stroke="#94A3B8" stroke-width="2"/><ellipse rx="160" ry="92" fill="none" stroke="#94A3B8" stroke-width="2"/>
+      <circle cx="70" cy="0" r="8" fill="#A78BFA"/><circle cx="-105" cy="31" r="15" fill="#4C78A8"/><circle cx="72" cy="-82" r="20" fill="#D97706"/>
+      <text y="125" font-size="20" font-weight="700">several different exoplanets</text>
+    </g>
+    <g transform="translate(995 450)">
+      <circle cx="-20" r="28" fill="#FBBF24"/><circle cx="25" r="23" fill="#F97316"/><ellipse rx="115" ry="70" fill="none" stroke="#94A3B8" stroke-width="2"/><circle cx="-104" cy="30" r="14" fill="#4C78A8"/>
+      <text y="105" font-size="20" font-weight="700">a planet orbiting two stars</text>
+    </g>
+  </g>
+  <text x="600" y="600" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#475569">Simple diagrams — sizes and distances are not to scale.</text>
+  <defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="4" orient="auto"><path d="M0,0 L0,8 L11,4 z" fill="#64748B"/></marker></defs>
+</svg>
