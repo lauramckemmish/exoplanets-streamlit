@@ -120,6 +120,36 @@ def scale_guidance(data: pd.DataFrame, field: str, variables: dict) -> tuple[str
     return status, f"{details['log_reason']} {range_text}", profile
 
 
+def planet_mass_distribution_chart(data: pd.DataFrame, include_exoplanets: bool = True) -> go.Figure | None:
+    masses = data["pl_bmasse"].dropna()
+    masses = masses[masses > 0]
+    if masses.empty:
+        return None
+    mass_labels = ["Very small", "Small", "Medium", "Large", "Very large"]
+    mass_ranges = ["Less than 1", "1–10", "10–100", "100–1,000", "More than 1,000"]
+    mass_colours = ["#4C78A8", "#72B7B2", "#F2CF5B", "#F58518", "#B279A2"]
+    bins = [0, 1, 10, 100, 1000, np.inf]
+    exoplanet_groups = pd.cut(masses, bins=bins, labels=mass_labels, right=False)
+    solar_groups = pd.cut(SOLAR_SYSTEM_PLANETS["Planet mass (Earth masses)"], bins=bins, labels=mass_labels, right=False)
+    exoplanet_counts = exoplanet_groups.value_counts(sort=False).reindex(mass_labels, fill_value=0)
+    solar_counts = solar_groups.value_counts(sort=False).reindex(mass_labels, fill_value=0)
+    solar_planet_names = [", ".join(SOLAR_SYSTEM_PLANETS.loc[solar_groups == label, "Planet"].tolist()) for label in mass_labels]
+    exoplanet_percentages = exoplanet_counts / exoplanet_counts.sum() * 100
+    solar_percentages = solar_counts / solar_counts.sum() * 100
+    group_names = ["Our Solar System"] + (["Detected exoplanets"] if include_exoplanets else [])
+    figure = go.Figure()
+    for index, (label, mass_range, colour) in enumerate(zip(mass_labels, mass_ranges, mass_colours)):
+        percentages = [solar_percentages.iloc[index]]
+        counts = [solar_counts.iloc[index]]
+        totals = [int(solar_counts.sum())]
+        details = [solar_planet_names[index]]
+        if include_exoplanets:
+            percentages.append(exoplanet_percentages.iloc[index]); counts.append(exoplanet_counts.iloc[index]); totals.append(int(exoplanet_counts.sum())); details.append("Detected exoplanet names are not listed for this large group")
+        figure.add_trace(go.Bar(x=percentages, y=group_names, name=f"{label} ({mass_range} Earth masses)", orientation="h", marker={"color": colour}, customdata=np.column_stack([counts, totals, details]), text=[f"{label}<br>{value:.1f}%" if value >= 8 else (f"{value:.1f}%" if value > 0 else "") for value in percentages], textposition="inside", insidetextanchor="middle", hovertemplate=f"<b>{label}</b> ({mass_range} Earth masses)<br>%{{y}}: %{{x:.1f}}% (%{{customdata[0]}} of %{{customdata[1]}} planets)<br>%{{customdata[2]}}<extra></extra>"))
+    figure.update_layout(height=390 if include_exoplanets else 260, barmode="stack", xaxis={"title": "", "ticksuffix": "%", "range": [0, 100], "tickmode": "array", "tickvals": [0, 25, 50, 75, 100]}, yaxis={"title": "", "categoryorder": "array", "categoryarray": group_names, "autorange": "reversed"}, showlegend=False, margin={"l": 150, "r": 20, "t": 20, "b": 45})
+    return figure
+
+
 def demographics_plot_data(data: pd.DataFrame, require_method: bool = False) -> pd.DataFrame:
     required = ["pl_orbsmax", "pl_bmasse"]
     if require_method:
