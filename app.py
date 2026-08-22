@@ -333,6 +333,16 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool) -> None:
 
     st.title("Find Tatooine: Guided Mission")
     st.caption("A demonstrator-led investigation using real exoplanet data")
+    if presenter_mode:
+        teacher_note(
+            "Find Tatooine: facilitator guidance",
+            "Use a fictional mission to practise turning story clues into data variables, applying filters and judging evidence.",
+            "Keep the story playful, but pause at each filter to ask what the rule assumes and what missing values mean. The final candidate is not a confirmed identification.",
+            alignment="Working Scientifically: plan questions, process data and communicate a conclusion.",
+            timing="20–30 minutes",
+            listen_for="Students distinguishing a rule chosen for the investigation from direct evidence about a planet.",
+            misconceptions="An unknown value is not a match or a failed match; it is incomplete evidence.",
+        )
     _, selected_step = step_tabs(step_labels, "mission_tab", step)
     if selected_step != step:
         step = selected_step
@@ -481,9 +491,6 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool) -> None:
         if st.button("Restart mission", type="secondary"):
             st.session_state["mission_step"] = 0
             st.rerun()
-
-    if presenter_mode:
-        presenter_notes(step, MISSION_NOTES)
 
     step_buttons(
         step_labels,
@@ -758,6 +765,15 @@ def render_data_lab(data: pd.DataFrame, guidance_mode: str) -> None:
             "Teacher view",
             key="lab_teacher_view",
             help="Show additional guidance for teaching and facilitating the investigation.",
+        )
+    if guidance_mode == "Teacher":
+        teacher_note(
+            "Exoplanet Data Laboratory",
+            "Support open-ended exploration while making analytical choices visible and discussable.",
+            "Invite students to state a question before changing variables. Ask what each axis, colour and scale contributes, and whether missing data or detection methods could affect the pattern.",
+            alignment="Working Scientifically: analyse data, identify patterns and evaluate evidence.",
+            timing="Flexible investigation",
+            listen_for="Students explaining why a graph answers a particular question rather than treating graph settings as decoration.",
         )
     tab_labels = [
         "Dataset and variables",
@@ -2361,7 +2377,7 @@ with st.sidebar:
     st.success(source_label)
     st.metric("Confirmed exoplanets", f"{len(data):,}")
     if experience == "Guided Tatooine Mission":
-        presenter_mode = st.toggle("Show demonstrator notes", value=True)
+        presenter_mode = st.toggle("Teacher view", value=True, help="Show facilitation guidance at the top of the experience.")
         if st.button("Reset guided mission", use_container_width=True):
             st.session_state["mission_step"] = 0
             st.session_state.pop("mission_tab", None)
