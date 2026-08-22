@@ -47,6 +47,7 @@ from ui_helpers import (
     learn_more_prompt,
     log_scale_reveal,
     mission_navigation,
+    presenter_notes,
     response_box,
     sample_note,
     scroll_to_top_if_requested,
@@ -55,6 +56,7 @@ from ui_helpers import (
     step_buttons,
     step_navigation_bar,
     step_tabs,
+    variable_card,
 )
 
 APP_DIR = Path(__file__).resolve().parent
@@ -307,46 +309,6 @@ st.set_page_config(
 
 
 
-def presenter_notes(step: int) -> None:
-    notes = MISSION_NOTES[step]
-    with st.expander("Demonstrator notes", expanded=False):
-        st.markdown(f"**Explain**  \n{notes['explain']}")
-        st.markdown(f"**Ask the group**  \n{notes['ask']}")
-        st.markdown(f"**Expected response**  \n{notes['expected']}")
-        st.markdown(f"**Key data-science idea**  \n{notes['idea']}")
-        st.markdown(f"**Watch for**  \n{notes['watch']}")
-
-
-def variable_card(data: pd.DataFrame, field: str, guidance_mode: str) -> None:
-    details = VARIABLES[field]
-    status, reason, profile = shared_scale_guidance(data, field, VARIABLES)
-    st.markdown(f"#### {details['label']}")
-    st.write(f"**Field:** `{field}`  ")
-    st.write(f"**Unit:** {details['unit']}  ")
-    st.write(details["description"])
-    if guidance_mode != "Minimal":
-        st.caption(details["measurement"])
-        st.info(f"**Scale guidance: {status}.** {reason}")
-        st.caption(
-            f"Available for {profile['complete']:,} of {len(data):,} records; "
-            f"{profile['missing']:,} values are missing."
-        )
-
-
-def _legacy_mission_navigation(step: int, total: int, position: str) -> None:
-    left, middle, right = st.columns([1, 4, 1])
-    with left:
-        if step > 0 and st.button("← Back", use_container_width=True, key=f"{position}_back_{step}"):
-            st.session_state["mission_step"] = step - 1
-            st.rerun()
-    with middle:
-        st.progress((step + 1) / total, text=f"Mission stage {step + 1} of {total}")
-    with right:
-        if step < total - 1 and st.button("Continue →", use_container_width=True, type="primary", key=f"{position}_continue_{step}"):
-            st.session_state["mission_step"] = step + 1
-            st.rerun()
-
-
 # ============================================================================
 # EXPERIENCE 1 — FIND TATOOINE
 # ============================================================================
@@ -520,7 +482,7 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool) -> None:
             st.rerun()
 
     if presenter_mode:
-        presenter_notes(step)
+        presenter_notes(step, MISSION_NOTES)
 
     step_buttons(
         step_labels,
@@ -558,7 +520,7 @@ def render_dataset_lab(data: pd.DataFrame, guidance_mode: str) -> None:
 
     st.subheader("Variable guide")
     selected_label = st.selectbox("Choose a variable to understand", list(FIELD_OPTIONS), key="dictionary_variable")
-    variable_card(data, FIELD_OPTIONS[selected_label], guidance_mode)
+    variable_card(data, FIELD_OPTIONS[selected_label], guidance_mode, VARIABLES, shared_scale_guidance)
 
 
 def render_discovery_lab(data: pd.DataFrame, guidance_mode: str) -> None:
@@ -664,9 +626,9 @@ def render_relationship_lab(data: pd.DataFrame, guidance_mode: str) -> None:
         with st.expander("Variable details", expanded=False):
             left, right = st.columns(2)
             with left:
-                variable_card(data, x_field, guidance_mode)
+                variable_card(data, x_field, guidance_mode, VARIABLES, shared_scale_guidance)
             with right:
-                variable_card(data, y_field, guidance_mode)
+                variable_card(data, y_field, guidance_mode, VARIABLES, shared_scale_guidance)
         if guidance_mode == "Teacher":
             teacher_text = preset["teacher"] if preset else (
                 "Ask students to justify why the selected pair is scientifically meaningful before interpreting the pattern. "
@@ -838,16 +800,6 @@ def render_data_lab(data: pd.DataFrame, guidance_mode: str) -> None:
 # EXPERIENCE 3 — EXOPLANET DEMOGRAPHICS: SHARED CONTENT HELPERS
 # The pathway renderers below contain the editable student-facing lesson text.
 # ============================================================================
-
-def _legacy_demographics_question(
-    wonder: str,
-    data_question: str,
-    plot_description: str,
-) -> None:
-    st.markdown(f"### I wonder…\n{wonder}")
-    st.markdown(f"### Question we can answer with data\n{data_question}")
-    st.markdown(f"### What we will plot\n{plot_description}")
-
 
 # ============================================================================
 # EXPERIENCE 3A — CLASSROOM PATHWAYS

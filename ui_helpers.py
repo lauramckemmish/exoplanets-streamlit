@@ -219,6 +219,29 @@ def mission_navigation(step: int, total: int, position: str) -> None:
         if step > 0 and st.button("← Back", use_container_width=True, key=f"{position}_back_{step}"):
             st.session_state["mission_step"] = step - 1
             st.rerun()
+
+
+def presenter_notes(step: int, notes_by_step: dict) -> None:
+    notes = notes_by_step[step]
+    with st.expander("Demonstrator notes", expanded=False):
+        st.markdown(f"**Explain**  \n{notes['explain']}")
+        st.markdown(f"**Ask the group**  \n{notes['ask']}")
+        st.markdown(f"**Expected response**  \n{notes['expected']}")
+        st.markdown(f"**Key data-science idea**  \n{notes['idea']}")
+        st.markdown(f"**Watch for**  \n{notes['watch']}")
+
+
+def variable_card(data, field: str, guidance_mode: str, variables: dict, scale_guidance) -> None:
+    details = variables[field]
+    status, reason, profile = scale_guidance(data, field, variables)
+    st.markdown(f"#### {details['label']}")
+    st.write(f"**Field:** `{field}`  ")
+    st.write(f"**Unit:** {details['unit']}  ")
+    st.write(details["description"])
+    if guidance_mode != "Minimal":
+        st.caption(details["measurement"])
+        st.info(f"**Scale guidance: {status}.** {reason}")
+        st.caption(f"Available for {profile['complete']:,} of {len(data):,} records; {profile['missing']:,} values are missing.")
     with middle:
         st.progress((step + 1) / total, text=f"Mission stage {step + 1} of {total}")
     with right:
