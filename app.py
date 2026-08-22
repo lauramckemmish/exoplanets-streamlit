@@ -1876,10 +1876,13 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
     if st.session_state.get("demographics_selector_part") != part:
         st.session_state["demographics_step_selector"] = step_labels[part]
         st.session_state["demographics_selector_part"] = part
-    selected_step = st.selectbox(
-        "Jump to a section",
+    st.caption("Go to a step")
+    selected_step = st.radio(
+        "Go to a step",
         step_labels,
         key="demographics_step_selector",
+        horizontal=True,
+        label_visibility="collapsed",
     )
     selected_part = step_labels.index(selected_step)
     if selected_part != part:
@@ -2498,10 +2501,13 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
     if st.session_state.get("curious_selector_part") != part:
         st.session_state["curious_step_selector"] = step_labels[part]
         st.session_state["curious_selector_part"] = part
-    selected_step = st.selectbox(
-        "Jump to a section",
+    st.caption("Go to a step")
+    selected_step = st.radio(
+        "Go to a step",
         step_labels,
         key="curious_step_selector",
+        horizontal=True,
+        label_visibility="collapsed",
     )
     selected_part = step_labels.index(selected_step)
     if selected_part != part:
@@ -2842,13 +2848,12 @@ def reset_demographics_navigation() -> None:
 
 
 def render_demographics_landing() -> None:
-    st.title(DEMOGRAPHICS_TITLE)
-    st.markdown("### *Explore exoplanets using real NASA data*")
+    st.title("Explore exoplanets using real NASA data")
     st.markdown("**Developed for UNSW CURIOUS**")
     st.info(
         "**Currently in development**\n\n"
-        "This resource is being actively developed, likely until early September 2026. Please expect some content "
-        "and features to change during this period. A stable version will be created in due course.\n\n"
+        "This resource is being actively developed. Please expect some content and features to change during this "
+        "period; a stable version will be created in due course.\n\n"
         "Feedback is very welcome—especially detailed suggestions from teachers and facilitators. The resource is "
         "easy to update, so content can readily be added, removed or revised. Please email "
         "[l.mckemmish@unsw.edu.au](mailto:l.mckemmish@unsw.edu.au), and feel free to share the resource with "
@@ -2856,35 +2861,11 @@ def render_demographics_landing() -> None:
     )
     if TEACHER_FEEDBACK_URL:
         st.link_button("Give teacher feedback", TEACHER_FEEDBACK_URL, type="primary")
-    st.markdown("## Choose a pathway")
-    old_pathways = {
-        "CURIOUS workshop": FACILITATED_PATHWAY,
-        "50-minute facilitated experience": FACILITATED_PATHWAY,
-        "Year 8 classroom": STAGE4_PATHWAY,
-        "Year 10 classroom": STAGE5_PATHWAY,
-    }
-    current_pathway = st.session_state.get("demographics_pathway")
-    if current_pathway in old_pathways:
-        st.session_state["demographics_pathway"] = old_pathways[current_pathway]
-    pathway = st.radio(
-        "Pathway",
-        [FACILITATED_PATHWAY, STAGE4_PATHWAY, STAGE5_PATHWAY],
-        key="demographics_pathway",
-        label_visibility="collapsed",
+    st.markdown(
+        "## Choose an experience\n"
+        "Use the sidebar to open a facilitator-led workshop, one of the classroom learning experiences, or an "
+        "open investigation activity."
     )
-    if pathway == FACILITATED_PATHWAY:
-        st.markdown(
-            "### Is Our Solar System Normal?\n"
-            "**Audience:** Outreach participants  \n"
-            "**Delivery:** Fast-paced and facilitator-led, with discussion prompts and a single scientific story.\n\n"
-            "**What students do:** Begin with the planets they know, then explore real NASA exoplanet data. "
-            "Students compare planet mass and orbital distance, switch between linear and log–log views, and "
-            "investigate how the way we find planets shapes the patterns we see. They finish by using evidence to "
-            "ask whether our Solar System is a fair guide to planetary systems elsewhere."
-        )
-    else:
-        year_level = "Year 8" if pathway == STAGE4_PATHWAY else "Year 10"
-        render_classroom_overview(year_level, pathway)
     with st.expander("About and acknowledgements"):
         st.markdown(
             "**Developed for UNSW CURIOUS**\n\n"
@@ -2897,12 +2878,6 @@ def render_demographics_landing() -> None:
             "**Contact:** Dr Laura McKemmish — "
             "[l.mckemmish@unsw.edu.au](mailto:l.mckemmish@unsw.edu.au)"
         )
-    if st.button("Launch this pathway →", type="primary", use_container_width=True):
-        reset_demographics_navigation()
-        st.session_state["demographics_started"] = True
-        st.rerun()
-
-
 def render_demographics(data: pd.DataFrame) -> None:
     if not st.session_state.get("demographics_started", False):
         render_demographics_landing()
@@ -2928,9 +2903,8 @@ def render_demographics(data: pd.DataFrame) -> None:
             key="demographics_teacher_view",
             help="Show learning purpose, facilitation guidance and syllabus connections within each step.",
         )
-        if st.button("Change pathway", use_container_width=True):
-            reset_demographics_navigation()
-            st.session_state["demographics_started"] = False
+        if st.button("Back to introduction", use_container_width=True):
+            st.session_state["experience"] = "Introduction"
             st.rerun()
     if pathway == FACILITATED_PATHWAY:
         render_demographics_curious(data)
@@ -2942,33 +2916,69 @@ def select_experience(name: str) -> None:
     st.session_state["experience"] = name
 
 
-if "experience" not in st.session_state:
+def select_demographics_pathway(pathway: str) -> None:
+    """Open one named pathway with independent step navigation."""
+    st.session_state["demographics_pathway"] = pathway
+    reset_demographics_navigation()
+    st.session_state["demographics_started"] = True
     st.session_state["experience"] = "Exoplanet Demographics"
+
+
+if "experience" not in st.session_state:
+    st.session_state["experience"] = "Introduction"
 
 with st.sidebar:
     st.header("Explore exoplanets")
     st.caption("Activities using real NASA data")
     st.button(
-        f"🪐 {DEMOGRAPHICS_TITLE}",
-        type="primary",
+        "🏠 Introduction",
+        type="primary" if st.session_state["experience"] == "Introduction" else "secondary",
         use_container_width=True,
-        disabled=st.session_state["experience"] == "Exoplanet Demographics",
+        disabled=st.session_state["experience"] == "Introduction",
         on_click=select_experience,
-        args=("Exoplanet Demographics",),
+        args=("Introduction",),
     )
-    with st.expander("More activities", expanded=False):
-        st.button(
-            "🌅 Find Tatooine",
-            use_container_width=True,
-            on_click=select_experience,
-            args=("Guided Tatooine Mission",),
-        )
-        st.button(
-            "🔬 Exoplanet Data Laboratory",
-            use_container_width=True,
-            on_click=select_experience,
-            args=("Exoplanet Data Laboratory",),
-        )
+    st.markdown("#### Learning experiences")
+    st.button(
+        f"🪐 {FACILITATED_PATHWAY}",
+        type="primary" if st.session_state.get("demographics_pathway") == FACILITATED_PATHWAY and st.session_state["experience"] == "Exoplanet Demographics" else "secondary",
+        use_container_width=True,
+        disabled=st.session_state.get("demographics_pathway") == FACILITATED_PATHWAY and st.session_state["experience"] == "Exoplanet Demographics",
+        on_click=select_demographics_pathway,
+        args=(FACILITATED_PATHWAY,),
+    )
+    st.button(
+        f"✨ {STAGE4_PATHWAY}",
+        type="primary" if st.session_state.get("demographics_pathway") == STAGE4_PATHWAY and st.session_state["experience"] == "Exoplanet Demographics" else "secondary",
+        use_container_width=True,
+        disabled=st.session_state.get("demographics_pathway") == STAGE4_PATHWAY and st.session_state["experience"] == "Exoplanet Demographics",
+        on_click=select_demographics_pathway,
+        args=(STAGE4_PATHWAY,),
+    )
+    st.button(
+        f"🔭 {STAGE5_PATHWAY}",
+        type="primary" if st.session_state.get("demographics_pathway") == STAGE5_PATHWAY and st.session_state["experience"] == "Exoplanet Demographics" else "secondary",
+        use_container_width=True,
+        disabled=st.session_state.get("demographics_pathway") == STAGE5_PATHWAY and st.session_state["experience"] == "Exoplanet Demographics",
+        on_click=select_demographics_pathway,
+        args=(STAGE5_PATHWAY,),
+    )
+    st.button(
+        "🔬 Exoplanet Data Laboratory",
+        type="primary" if st.session_state["experience"] == "Exoplanet Data Laboratory" else "secondary",
+        use_container_width=True,
+        disabled=st.session_state["experience"] == "Exoplanet Data Laboratory",
+        on_click=select_experience,
+        args=("Exoplanet Data Laboratory",),
+    )
+    st.button(
+        "🌅 Find Tatooine",
+        type="primary" if st.session_state["experience"] == "Guided Tatooine Mission" else "secondary",
+        use_container_width=True,
+        disabled=st.session_state["experience"] == "Guided Tatooine Mission",
+        on_click=select_experience,
+        args=("Guided Tatooine Mission",),
+    )
     experience = st.session_state["experience"]
     st.caption(f"**Open:** {experience}")
     if experience == "Exoplanet Demographics" and st.session_state.get("demographics_started", False):
@@ -2978,7 +2988,7 @@ with st.sidebar:
     source = st.radio("Choose a dataset", ["Live NASA data", "Bundled notebook sample"])
     st.caption("Live data are cached for six hours. The bundled sample keeps the activity usable offline.")
 
-if experience == "Exoplanet Demographics" and not st.session_state.get("demographics_started", False):
+if experience == "Introduction":
     render_demographics_landing()
     st.stop()
 
