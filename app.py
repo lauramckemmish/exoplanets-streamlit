@@ -33,6 +33,7 @@ from charts import (
     readable_log_ticks,
     scale_profile,
     scale_guidance as shared_scale_guidance,
+    scatter_chart as shared_scatter_chart,
     sky_map,
     solar_system_demographics_chart,
 )
@@ -277,243 +278,14 @@ st.set_page_config(
 )
 
 
-def scatter_chart(
-    data: pd.DataFrame,
-    x_field: str,
-    y_field: str,
-    colour_field: str,
-    log_x: bool,
-    log_y: bool,
-) -> tuple[go.Figure | None, dict[str, int]]:
-    total = len(data)
-    complete_mask = data[[x_field, y_field, colour_field]].notna().all(axis=1)
-    complete = data[complete_mask].copy()
-    log_excluded = pd.Series(False, index=complete.index)
-    if log_x:
-        log_excluded |= complete[x_field] <= 0
-    if log_y:
-        log_excluded |= complete[y_field] <= 0
-    plot_data = complete[~log_excluded].copy()
-
-    stats = {
-        "Total records": total,
-        "Missing selected values": total - len(complete),
-        "Excluded by log scale": int(log_excluded.sum()),
-        "Records shown": len(plot_data),
-    }
-    if plot_data.empty:
-        return None, stats
-
-    figure = px.scatter(
-        plot_data,
-        x=x_field,
-        y=y_field,
-        color=colour_field,
-        hover_name="pl_name",
-        hover_data={
-            "hostname": True,
-            "disc_year": True,
-            "discoverymethod": True,
-            "pl_rade": ":.2f",
-            "pl_bmasse": ":.2f",
-            "pl_eqt": ":.1f",
-            "sy_dist": ":.1f",
-        },
-        log_x=log_x,
-        log_y=log_y,
-        labels={
-            x_field: FIELD_LABEL[x_field],
-            y_field: FIELD_LABEL[y_field],
-            colour_field: next((label for label, value in COLOUR_OPTIONS.items() if value == colour_field), colour_field),
-        },
-        title=f"{VARIABLES[y_field]['label']} compared with {VARIABLES[x_field]['label']}",
-    )
-    figure.update_traces(marker={"size": 8, "opacity": 0.65})
-    figure.update_layout(height=610)
-    return figure, stats
 
 
-def demographics_over_time_chart(data: pd.DataFrame, year: int) -> go.Figure:
-    all_plot_data = demographics_plot_data(data)
-    all_plot_data = all_plot_data[all_plot_data["disc_year"].notna()]
-    plot_data = all_plot_data[all_plot_data["disc_year"] <= year]
-
-    figure = go.Figure()
-    if not plot_data.empty:
-        figure.add_trace(go.Scatter(
-            x=plot_data["pl_orbsmax"],
-            y=plot_data["pl_bmasse"],
-            mode="markers",
-            name=f"Exoplanets discovered by {year}",
-            marker={"size": 8, "color": "#4C78A8", "opacity": 0.65},
-            customdata=plot_data[["pl_name", "hostname", "disc_year"]].to_numpy(),
-            hovertemplate=(
-                "<b>%{customdata[0]}</b><br>Host star: %{customdata[1]}"
-                "<br>Discovery year: %{customdata[2]}"
-                "<br>Orbital distance: %{x:.3g} AU"
-                "<br>Mass: %{y:.3g} Earth masses<extra></extra>"
-            ),
-        ))
-    add_solar_system_trace(figure)
-    return finish_demographics_chart(
-        figure,
-        f"Solar System and exoplanets discovered by {year}",
-        SOLAR_SYSTEM_PLANETS["Orbital distance (AU)"].tolist() + all_plot_data["pl_orbsmax"].tolist(),
-        SOLAR_SYSTEM_PLANETS["Planet mass (Earth masses)"].tolist() + all_plot_data["pl_bmasse"].tolist(),
-    )
 
 
-def current_demographics_chart(data: pd.DataFrame) -> go.Figure:
-    plot_data = demographics_plot_data(data)
-    figure = go.Figure()
-    if not plot_data.empty:
-        figure.add_trace(go.Scatter(
-            x=plot_data["pl_orbsmax"],
-            y=plot_data["pl_bmasse"],
-            mode="markers",
-            name="Known exoplanets",
-            marker={"size": 8, "color": "#4C78A8", "opacity": 0.65},
-            customdata=plot_data[["pl_name", "hostname", "disc_year"]].to_numpy(),
-            hovertemplate=(
-                "<b>%{customdata[0]}</b><br>Host star: %{customdata[1]}"
-                "<br>Discovery year: %{customdata[2]}"
-                "<br>Orbital distance: %{x:.3g} AU"
-                "<br>Mass: %{y:.3g} Earth masses<extra></extra>"
-            ),
-        ))
-    add_solar_system_trace(figure)
-    return finish_demographics_chart(
-        figure,
-        "Known exoplanets and Solar System planets",
-    )
 
 
-def demographics_methods_chart(data: pd.DataFrame, view: str) -> go.Figure:
-    all_plot_data = demographics_plot_data(data, require_method=True)
-    plot_data = all_plot_data.copy()
-    method_filters = {
-        "Transit": ["Transit"],
-        "Direct Imaging": ["Imaging"],
-        "Transit + Direct Imaging": ["Transit", "Imaging"],
-    }
-    if view in method_filters:
-        plot_data = plot_data[plot_data["discoverymethod"].isin(method_filters[view])]
-
-    figure = go.Figure()
-    for method in sorted(plot_data["discoverymethod"].unique()):
-        method_data = plot_data[plot_data["discoverymethod"] == method]
-        display_method = "Direct Imaging" if method == "Imaging" else method
-        figure.add_trace(go.Scatter(
-            x=method_data["pl_orbsmax"],
-            y=method_data["pl_bmasse"],
-            mode="markers",
-            name=display_method,
-            marker={"size": 8, "opacity": 0.65},
-            customdata=method_data[["pl_name", "hostname", "disc_year"]].to_numpy(),
-            hovertemplate=(
-                "<b>%{customdata[0]}</b><br>Host star: %{customdata[1]}"
-                f"<br>Discovery method: {display_method}"
-                "<br>Discovery year: %{customdata[2]}"
-                "<br>Orbital distance: %{x:.3g} AU"
-                "<br>Mass: %{y:.3g} Earth masses<extra></extra>"
-            ),
-        ))
-    add_solar_system_trace(figure)
-    return finish_demographics_chart(
-        figure,
-        "Known exoplanets and Solar System planets by discovery method",
-        SOLAR_SYSTEM_PLANETS["Orbital distance (AU)"].tolist() + all_plot_data["pl_orbsmax"].tolist(),
-        SOLAR_SYSTEM_PLANETS["Planet mass (Earth masses)"].tolist() + all_plot_data["pl_bmasse"].tolist(),
-    )
 
 
-def planet_mass_distribution_chart(
-    data: pd.DataFrame,
-    include_exoplanets: bool = True,
-) -> go.Figure | None:
-    masses = data["pl_bmasse"].dropna()
-    masses = masses[masses > 0]
-    if masses.empty:
-        return None
-
-    mass_labels = ["Very small", "Small", "Medium", "Large", "Very large"]
-    mass_ranges = ["Less than 1", "1–10", "10–100", "100–1,000", "More than 1,000"]
-    mass_colours = ["#4C78A8", "#72B7B2", "#F2CF5B", "#F58518", "#B279A2"]
-    bins = [0, 1, 10, 100, 1000, np.inf]
-    exoplanet_groups = pd.cut(
-        masses,
-        bins=bins,
-        labels=mass_labels,
-        right=False,
-    )
-    solar_groups = pd.cut(
-        SOLAR_SYSTEM_PLANETS["Planet mass (Earth masses)"],
-        bins=bins,
-        labels=mass_labels,
-        right=False,
-    )
-    exoplanet_counts = exoplanet_groups.value_counts(sort=False).reindex(mass_labels, fill_value=0)
-    solar_counts = solar_groups.value_counts(sort=False).reindex(mass_labels, fill_value=0)
-    solar_planet_names = [
-        ", ".join(SOLAR_SYSTEM_PLANETS.loc[solar_groups == label, "Planet"].tolist())
-        for label in mass_labels
-    ]
-    exoplanet_percentages = exoplanet_counts / exoplanet_counts.sum() * 100
-    solar_percentages = solar_counts / solar_counts.sum() * 100
-
-    group_names = ["Our Solar System"]
-    if include_exoplanets:
-        group_names.append("Detected exoplanets")
-    figure = go.Figure()
-    for index, (label, mass_range, colour) in enumerate(zip(mass_labels, mass_ranges, mass_colours)):
-        percentages = [solar_percentages.iloc[index]]
-        counts = [solar_counts.iloc[index]]
-        totals = [int(solar_counts.sum())]
-        details = [solar_planet_names[index]]
-        if include_exoplanets:
-            percentages.append(exoplanet_percentages.iloc[index])
-            counts.append(exoplanet_counts.iloc[index])
-            totals.append(int(exoplanet_counts.sum()))
-            details.append("Detected exoplanet names are not listed for this large group")
-        figure.add_trace(go.Bar(
-            x=percentages,
-            y=group_names,
-            name=f"{label} ({mass_range} Earth masses)",
-            orientation="h",
-            marker={"color": colour},
-            customdata=np.column_stack([counts, totals, details]),
-            text=[
-                f"{label}<br>{value:.1f}%" if value >= 8 else (f"{value:.1f}%" if value > 0 else "")
-                for value in percentages
-            ],
-            textposition="inside",
-            insidetextanchor="middle",
-            hovertemplate=(
-                f"<b>{label}</b> ({mass_range} Earth masses)<br>"
-                "%{y}: %{x:.1f}% (%{customdata[0]} of %{customdata[1]} planets)"
-                "<br>%{customdata[2]}<extra></extra>"
-            ),
-        ))
-    figure.update_layout(
-        height=390 if include_exoplanets else 260,
-        barmode="stack",
-        xaxis={
-            "title": "",
-            "ticksuffix": "%",
-            "range": [0, 100],
-            "tickmode": "array",
-            "tickvals": [0, 25, 50, 75, 100],
-        },
-        yaxis={
-            "title": "",
-            "categoryorder": "array",
-            "categoryarray": group_names,
-            "autorange": "reversed",
-        },
-        showlegend=False,
-        margin={"l": 150, "r": 20, "t": 20, "b": 45},
-    )
-    return figure
 
 
 def presenter_notes(step: int) -> None:
@@ -864,7 +636,7 @@ def render_relationship_lab(data: pd.DataFrame, guidance_mode: str) -> None:
             )
             st.write("Zero and negative values cannot be displayed on a logarithmic axis. Those records are excluded from the graph.")
 
-    figure, stats = scatter_chart(data, x_field, y_field, colour_field, log_x, log_y)
+    figure, stats = shared_scatter_chart(data, x_field, y_field, colour_field, log_x, log_y, VARIABLES, FIELD_LABEL, COLOUR_OPTIONS)
     stat_frame = pd.DataFrame([{"Data check": key, "Records": value} for key, value in stats.items()])
     st.dataframe(stat_frame, use_container_width=True, hide_index=True)
     if figure is None:
