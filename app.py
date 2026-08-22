@@ -992,10 +992,24 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool) -> None:
         st.session_state["mission_step"] = 0
     step = int(st.session_state["mission_step"])
     step = max(0, min(step, total_steps - 1))
+    step_labels = [
+        "Briefing",
+        "Archive",
+        "Evidence",
+        "Two suns",
+        "Three planets",
+        "Earth-sized",
+        "Compare",
+        "Report",
+    ]
 
     st.title("Find Tatooine: Guided Mission")
     st.caption("A demonstrator-led investigation using real exoplanet data")
-    mission_navigation(step, total_steps, "top")
+    _, selected_step = step_tabs(step_labels, "mission_tab", step)
+    if selected_step != step:
+        step = selected_step
+        st.session_state["mission_step"] = step
+    scroll_to_top_if_requested("mission_scroll_to_top")
     candidates, steps, stages = mission_candidates(data)
 
     if step == 0:
@@ -1143,7 +1157,14 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool) -> None:
     if presenter_mode:
         presenter_notes(step)
 
-    mission_navigation(step, total_steps, "bottom")
+    step_buttons(
+        step_labels,
+        "mission_tab",
+        "mission_step",
+        "mission_scroll_to_top",
+        step,
+        "mission",
+    )
 
 
 def render_dataset_lab(data: pd.DataFrame, guidance_mode: str) -> None:
@@ -1406,23 +1427,42 @@ def render_data_lab(data: pd.DataFrame, guidance_mode: str) -> None:
             key="lab_teacher_view",
             help="Show additional guidance for teaching and facilitating the investigation.",
         )
-    dataset_tab, discovery_tab, relationship_tab, filter_tab, map_tab = st.tabs([
+    tab_labels = [
         "Dataset and variables",
         "Discoveries",
         "Relationship explorer",
         "Custom Tatooine filters",
         "Sky map",
-    ])
-    with dataset_tab:
-        render_dataset_lab(data, guidance_mode)
-    with discovery_tab:
-        render_discovery_lab(data, guidance_mode)
-    with relationship_tab:
-        render_relationship_lab(data, guidance_mode)
-    with filter_tab:
-        render_filter_lab(data, guidance_mode)
-    with map_tab:
-        render_map_lab(data, guidance_mode)
+    ]
+    current_tab = int(st.session_state.get("lab_tab_step", 0))
+    tabs, selected_tab = step_tabs(tab_labels, "lab_tab", current_tab)
+    if selected_tab != current_tab:
+        current_tab = selected_tab
+        st.session_state["lab_tab_step"] = current_tab
+    scroll_to_top_if_requested("lab_scroll_to_top")
+    if current_tab == 0:
+        with tabs[0]:
+            render_dataset_lab(data, guidance_mode)
+    elif current_tab == 1:
+        with tabs[1]:
+            render_discovery_lab(data, guidance_mode)
+    elif current_tab == 2:
+        with tabs[2]:
+            render_relationship_lab(data, guidance_mode)
+    elif current_tab == 3:
+        with tabs[3]:
+            render_filter_lab(data, guidance_mode)
+    else:
+        with tabs[4]:
+            render_map_lab(data, guidance_mode)
+    step_buttons(
+        tab_labels,
+        "lab_tab",
+        "lab_tab_step",
+        "lab_scroll_to_top",
+        current_tab,
+        "lab",
+    )
 
 
 def demographics_question(
@@ -1446,24 +1486,9 @@ def sample_note(data: pd.DataFrame, required: list[str], label: str = "records")
 
 
 def key_idea(text: str, evidence: str | None = None) -> None:
-    """Close a step with the scientific idea and the evidence students used."""
-    if st.session_state.get("demographics_pathway") == FACILITATED_PATHWAY:
-        look_for = evidence or (
-            "Use the graph, examples or comparisons on this page. What do you notice?"
-        )
-        st.success(
-            f"**Big idea**\n\n{text}\n\n"
-            f"**Look for**\n\n{look_for}"
-        )
-        return
-
-    evidence = evidence or (
-        "I used the evidence on this page—such as the graph, examples or comparisons—to work this out."
-    )
-    st.success(
-        f"**What I learned**\n\n{text}\n\n"
-        f"**How I know**\n\n{evidence}"
-    )
+    """Close a step with a student-friendly science idea and observation prompt."""
+    look_for = evidence or "Use the graph, examples or comparisons on this page. What do you notice?"
+    st.success(f"**Big idea:** {text}\n\n**Look for:** {look_for}")
 
 
 def graph_guide(*instructions: str) -> None:
@@ -1515,6 +1540,79 @@ def step_navigation_bar(labels: list[str], key: str) -> str:
         key=key,
         horizontal=True,
         label_visibility="collapsed",
+    )
+
+
+def select_tab_step(
+    tab_key: str,
+    labels: list[str],
+    step_key: str,
+    scroll_key: str,
+    step: int,
+) -> None:
+    """Select a state-tracking tab before Streamlit renders the next page."""
+    st.session_state[tab_key] = labels[step]
+    st.session_state[step_key] = step
+    st.session_state[scroll_key] = True
+
+
+def step_tabs(labels: list[str], key: str, current_step: int):
+    """Render real Streamlit tabs while only the current step is rendered below."""
+    current_step = max(0, min(current_step, len(labels) - 1))
+    if st.session_state.get(key) not in labels:
+        st.session_state[key] = labels[current_step]
+    tabs = st.tabs(labels, default=st.session_state[key], key=key, on_change="rerun")
+    return tabs, labels.index(st.session_state.get(key, labels[current_step]))
+
+
+def step_buttons(
+    labels: list[str],
+    tab_key: str,
+    step_key: str,
+    scroll_key: str,
+    step: int,
+    button_prefix: str,
+) -> None:
+    """Add bottom navigation that selects the adjacent real tab."""
+    back, spacer, next_step = st.columns([1, 4, 1])
+    with back:
+        if step > 0:
+            st.button(
+                "← Back",
+                use_container_width=True,
+                key=f"{button_prefix}_back",
+                on_click=select_tab_step,
+                args=(tab_key, labels, step_key, scroll_key, step - 1),
+            )
+    with next_step:
+        if step < len(labels) - 1:
+            st.button(
+                "Continue →",
+                type="primary",
+                use_container_width=True,
+                key=f"{button_prefix}_continue",
+                on_click=select_tab_step,
+                args=(tab_key, labels, step_key, scroll_key, step + 1),
+            )
+
+
+def scroll_to_top_if_requested(key: str) -> None:
+    if not st.session_state.pop(key, False):
+        return
+    components.html(
+        """
+        <script>
+            const parentDocument = window.parent.document;
+            const scrollContainer =
+                parentDocument.querySelector('[data-testid="stAppViewContainer"]') ||
+                parentDocument.querySelector('section.main');
+            if (scrollContainer) {
+                scrollContainer.scrollTo({top: 0, left: 0, behavior: 'instant'});
+            }
+            window.parent.scrollTo({top: 0, left: 0, behavior: 'instant'});
+        </script>
+        """,
+        height=0,
     )
 
 
@@ -1943,17 +2041,11 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "7 · Compare methods",
             "Conclusion",
         ]
-    if st.session_state.get("demographics_selector_part") != part:
-        st.session_state["demographics_step_selector"] = step_labels[part]
-        st.session_state["demographics_selector_part"] = part
-    st.caption("Go to a step")
-    selected_step = step_navigation_bar(step_labels, "demographics_step_selector")
-    selected_part = step_labels.index(selected_step)
+    _, selected_part = step_tabs(step_labels, "demographics_step_selector", part)
     if selected_part != part:
-        st.session_state["demographics_part"] = selected_part
-        st.session_state["demographics_selector_part"] = selected_part
+        part = selected_part
+        st.session_state["demographics_part"] = part
         st.session_state["demographics_scroll_to_top"] = True
-        st.rerun()
     if st.session_state.pop("demographics_scroll_to_top", False):
         components.html(
             """
@@ -2520,21 +2612,14 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
         )
         learn_more_prompt("classroom")
 
-    back, spacer, next_step = st.columns([1, 4, 1])
-    with back:
-        if part > 0 and st.button("← Back", use_container_width=True, key="demographics_back"):
-            new_part = part - 1
-            st.session_state["demographics_part"] = new_part
-            st.session_state["demographics_selector_part"] = None
-            st.session_state["demographics_scroll_to_top"] = True
-            st.rerun()
-    with next_step:
-        if part < 8 and st.button("Continue →", type="primary", use_container_width=True, key="demographics_continue"):
-            new_part = part + 1
-            st.session_state["demographics_part"] = new_part
-            st.session_state["demographics_selector_part"] = None
-            st.session_state["demographics_scroll_to_top"] = True
-            st.rerun()
+    step_buttons(
+        step_labels,
+        "demographics_step_selector",
+        "demographics_part",
+        "demographics_scroll_to_top",
+        part,
+        "demographics",
+    )
 
 
 def render_demographics_curious(data: pd.DataFrame) -> None:
@@ -2553,17 +2638,11 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
         "5 · How we find planets",
         "Conclusion",
     ]
-    if st.session_state.get("curious_selector_part") != part:
-        st.session_state["curious_step_selector"] = step_labels[part]
-        st.session_state["curious_selector_part"] = part
-    st.caption("Go to a step")
-    selected_step = step_navigation_bar(step_labels, "curious_step_selector")
-    selected_part = step_labels.index(selected_step)
+    _, selected_part = step_tabs(step_labels, "curious_step_selector", part)
     if selected_part != part:
-        st.session_state["curious_part"] = selected_part
-        st.session_state["curious_selector_part"] = selected_part
+        part = selected_part
+        st.session_state["curious_part"] = part
         st.session_state["curious_scroll_to_top"] = True
-        st.rerun()
     if st.session_state.pop("curious_scroll_to_top", False):
         components.html(
             """
@@ -2749,19 +2828,14 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
         )
         learn_more_prompt("facilitated")
 
-    back, spacer, next_step = st.columns([1, 4, 1])
-    with back:
-        if part > 0 and st.button("← Back", use_container_width=True, key="curious_back"):
-            st.session_state["curious_part"] = part - 1
-            st.session_state["curious_selector_part"] = None
-            st.session_state["curious_scroll_to_top"] = True
-            st.rerun()
-    with next_step:
-        if part < 6 and st.button("Continue →", type="primary", use_container_width=True, key="curious_continue"):
-            st.session_state["curious_part"] = part + 1
-            st.session_state["curious_selector_part"] = None
-            st.session_state["curious_scroll_to_top"] = True
-            st.rerun()
+    step_buttons(
+        step_labels,
+        "curious_step_selector",
+        "curious_part",
+        "curious_scroll_to_top",
+        part,
+        "curious",
+    )
 
 
 def render_syllabus_alignment(year_level: str) -> None:
@@ -2879,15 +2953,23 @@ def reset_demographics_navigation() -> None:
     """Start the selected pathway with clean, independent navigation state."""
     st.session_state["demographics_part"] = 0
     st.session_state["curious_part"] = 0
-    st.session_state["demographics_selector_part"] = None
-    st.session_state["curious_selector_part"] = None
+    st.session_state.pop("demographics_step_selector", None)
+    st.session_state.pop("curious_step_selector", None)
     st.session_state["demographics_scroll_to_top"] = True
     st.session_state["curious_scroll_to_top"] = True
 
 
-def render_demographics_landing() -> None:
+def render_demographics_landing(data: pd.DataFrame) -> None:
     st.title("Explore exoplanets using real NASA data")
     st.markdown("**Developed for UNSW CURIOUS**")
+    count_column, description_column = st.columns([1, 3])
+    with count_column:
+        st.metric("Confirmed exoplanets", f"{len(data):,}")
+    with description_column:
+        st.markdown(
+            "Astronomers have confirmed thousands of planets orbiting stars beyond our Sun. "
+            "This number comes from the NASA Exoplanet Archive and grows as new observations are analysed."
+        )
     st.info(
         "**Currently in development**\n\n"
         "This resource is being actively developed. Please expect some content and features to change during this "
@@ -2901,9 +2983,46 @@ def render_demographics_landing() -> None:
         st.link_button("Give teacher feedback", TEACHER_FEEDBACK_URL, type="primary")
     st.markdown(
         "## Choose an experience\n"
-        "Use the sidebar to open a facilitator-led workshop, one of the classroom learning experiences, or an "
-        "open investigation activity."
+        "Use the sidebar to open the experience that suits your group."
     )
+    experiences = [
+        (
+            FACILITATED_PATHWAY,
+            "A fast-paced, facilitator-led CURIOUS experience. Compare planets, change graph scales and discuss "
+            "why the planets we detect may not tell the whole story.",
+        ),
+        (
+            STAGE4_PATHWAY,
+            "A two-lesson classroom experience for exploring individual discoveries, growing datasets and the "
+            "wonderfully varied planetary systems beyond our own.",
+        ),
+        (
+            STAGE5_PATHWAY,
+            "A two-lesson classroom experience that investigates how different ways of finding planets shape the "
+            "evidence we have—and the planets we have not yet found.",
+        ),
+        (
+            "Exoplanet Data Laboratory",
+            "An open exploration space for inspecting the NASA dataset, choosing variables, building graphs and "
+            "testing your own questions.",
+        ),
+        (
+            "Find Tatooine",
+            "A guided data-science mission: turn clues from Star Wars into testable criteria, inspect candidate "
+            "worlds and communicate uncertainty in your conclusion.",
+        ),
+    ]
+    for left, right in zip(experiences[::2], experiences[1::2]):
+        first, second = st.columns(2)
+        for column, (name, summary) in zip((first, second), (left, right)):
+            with column:
+                with st.container(border=True):
+                    st.markdown(f"### {name}")
+                    st.write(summary)
+    if len(experiences) % 2:
+        with st.container(border=True):
+            st.markdown(f"### {experiences[-1][0]}")
+            st.write(experiences[-1][1])
     with st.expander("About and acknowledgements"):
         st.markdown(
             "**Developed for UNSW CURIOUS**\n\n"
@@ -2918,7 +3037,7 @@ def render_demographics_landing() -> None:
         )
 def render_demographics(data: pd.DataFrame) -> None:
     if not st.session_state.get("demographics_started", False):
-        render_demographics_landing()
+        render_demographics_landing(data)
         return
 
     pathway = st.session_state.get("demographics_pathway")
@@ -2967,7 +3086,7 @@ if "experience" not in st.session_state:
 
 with st.sidebar:
     st.header("Explore exoplanets")
-    st.caption("Activities using real NASA data")
+    st.caption("Experiences using real NASA data")
     st.button(
         "🏠 Introduction",
         type="primary" if st.session_state["experience"] == "Introduction" else "secondary",
@@ -3023,19 +3142,20 @@ with st.sidebar:
     source = st.radio("Choose a dataset", ["Live NASA data", "Bundled notebook sample"])
     st.caption("Live data are cached for six hours. The bundled sample keeps the activity usable offline.")
 
-if experience == "Introduction":
-    render_demographics_landing()
-    st.stop()
-
 data, source_label = load_data(source)
+
+if experience == "Introduction":
+    render_demographics_landing(data)
+    st.stop()
 
 with st.sidebar:
     st.success(source_label)
-    st.metric("Planet records", f"{len(data):,}")
+    st.metric("Confirmed exoplanets", f"{len(data):,}")
     if experience == "Guided Tatooine Mission":
         presenter_mode = st.toggle("Show demonstrator notes", value=True)
         if st.button("Reset guided mission", use_container_width=True):
             st.session_state["mission_step"] = 0
+            st.session_state.pop("mission_tab", None)
             st.rerun()
     elif experience == "Exoplanet Data Laboratory":
         guidance_mode = "Teacher" if st.session_state.get("lab_teacher_view", False) else "Student"
