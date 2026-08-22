@@ -1396,8 +1396,16 @@ def render_map_lab(data: pd.DataFrame, guidance_mode: str) -> None:
 
 
 def render_data_lab(data: pd.DataFrame, guidance_mode: str) -> None:
-    st.title("Exoplanet Data Laboratory")
-    st.caption("Open exploration with contextual guidance for analytical choices")
+    heading, activity_controls = st.columns([4, 2])
+    with heading:
+        st.title("Exoplanet Data Laboratory")
+        st.caption("Open exploration with contextual guidance for analytical choices")
+    with activity_controls:
+        st.toggle(
+            "Teacher view",
+            key="lab_teacher_view",
+            help="Show additional guidance for teaching and facilitating the investigation.",
+        )
     dataset_tab, discovery_tab, relationship_tab, filter_tab, map_tab = st.tabs([
         "Dataset and variables",
         "Discoveries",
@@ -1439,6 +1447,16 @@ def sample_note(data: pd.DataFrame, required: list[str], label: str = "records")
 
 def key_idea(text: str, evidence: str | None = None) -> None:
     """Close a step with the scientific idea and the evidence students used."""
+    if st.session_state.get("demographics_pathway") == FACILITATED_PATHWAY:
+        look_for = evidence or (
+            "Use the graph, examples or comparisons on this page. What do you notice?"
+        )
+        st.success(
+            f"**Big idea**\n\n{text}\n\n"
+            f"**Look for**\n\n{look_for}"
+        )
+        return
+
     evidence = evidence or (
         "I used the evidence on this page—such as the graph, examples or comparisons—to work this out."
     )
@@ -1461,6 +1479,58 @@ def graph_questions(find: str, compare: str) -> None:
         f"1. **Find:** {find}\n"
         f"2. **Compare:** {compare}"
     )
+
+
+def step_navigation_bar(labels: list[str], key: str) -> str:
+    """Render a compact, tab-like step bar without rendering every lesson page at once."""
+    st.markdown(
+        """
+        <style>
+        div[data-testid="stRadio"] div[role="radiogroup"] {
+            gap: 0.2rem;
+            border-bottom: 1px solid rgba(128, 128, 128, 0.35);
+            flex-wrap: wrap;
+        }
+        div[data-testid="stRadio"] div[role="radio"] {
+            border-radius: 0;
+            border: 0;
+            border-bottom: 3px solid transparent;
+            padding: 0.35rem 0.55rem 0.45rem;
+            margin-bottom: -1px;
+        }
+        div[data-testid="stRadio"] div[role="radio"] > div:first-child {
+            display: none;
+        }
+        div[data-testid="stRadio"] div[role="radio"][aria-checked="true"] {
+            border-bottom-color: rgb(255, 75, 75);
+            color: rgb(255, 75, 75);
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+    return st.radio(
+        "Go to a step",
+        labels,
+        key=key,
+        horizontal=True,
+        label_visibility="collapsed",
+    )
+
+
+def log_scale_reveal(prompt: str) -> None:
+    """Scaffold the conceptual move from a linear to a log–log representation."""
+    st.markdown(f"### Pause and predict\n{prompt}")
+    with st.expander("Reveal: How can we make the small planets easier to see?"):
+        st.success(
+            "**Keep the same data; change the spacing on the axes.** A log scale spreads out the small values "
+            "while keeping the giant planets on the same graph."
+        )
+        st.write(
+            "The variables do not change: the graph still shows planet mass and orbital distance. On a log scale, "
+            "equal spaces represent multiplication. For example, the gap from **0.1 to 1** is the same size as "
+            "the gap from **1 to 10**. You do not need to calculate logarithms to read the graph."
+        )
 
 
 def response_box(step: int, prompt: str, sentence_starters: str) -> None:
@@ -1842,7 +1912,7 @@ def curious_teacher_note(part: int) -> None:
 
 
 def render_demographics_classroom(data: pd.DataFrame) -> None:
-    pathway = st.session_state.get("demographics_pathway", STAGE4_PATHWAY)
+    pathway = st.session_state.get("demographics_pathway")
     year_level = {STAGE4_PATHWAY: "Year 8", STAGE5_PATHWAY: "Year 10"}.get(pathway)
     if year_level is None:
         return
@@ -1877,13 +1947,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
         st.session_state["demographics_step_selector"] = step_labels[part]
         st.session_state["demographics_selector_part"] = part
     st.caption("Go to a step")
-    selected_step = st.radio(
-        "Go to a step",
-        step_labels,
-        key="demographics_step_selector",
-        horizontal=True,
-        label_visibility="collapsed",
-    )
+    selected_step = step_navigation_bar(step_labels, "demographics_step_selector")
     selected_part = step_labels.index(selected_step)
     if selected_part != part:
         st.session_state["demographics_part"] = selected_part
@@ -1975,20 +2039,11 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             solar_system_demographics_chart(False),
             use_container_width=True,
         )
-        st.info(
-            "The giant planets make the smaller planets bunch together. It is difficult to compare Mercury, Venus, "
-            "Earth and Mars. What could we change about the representation?"
+        log_scale_reveal(
+            "Jupiter and the distant outer planets set the scale, so Mercury, Venus, Earth and Mars bunch together "
+            "near the bottom-left corner. How could we spread them out without losing the giant planets?"
         )
-        st.markdown(
-            "### Why change the graph?\n"
-            "The linear graph shows the full range, but it hides the differences between the small inner planets. "
-            "The data have not changed; we are changing the representation so we can see more of the data clearly.\n\n"
-            "### What is a log–log graph doing?\n"
-            "Both axes still show ordinary planet mass and orbital distance. The spacing changes: equal distances "
-            "along an axis represent multiplication rather than addition. For example, the gap from **0.1 to 1** "
-            "is the same size as the gap from **1 to 10**. This spreads out small values while keeping very large "
-            "values on the same graph. You do not need to calculate logarithms to read it."
-        )
+        st.subheader("Now compare the log–log view")
         graph_guide(
             "The axes show the same variables as the first graph, but the spacing now represents multiplication.",
             "Find Earth at 1 AU and 1 Earth mass. Then find Jupiter at about 5.2 AU and 318 Earth masses.",
@@ -2293,11 +2348,11 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "Each labelled point is one Solar System planet. Farther right means farther from the Sun; higher means more massive.",
         )
         st.plotly_chart(solar_system_demographics_chart(False), use_container_width=True)
-        st.info(
-            "The giant outer planets make the small inner planets bunch together. A log–log graph spreads out the "
-            "small values without removing the large ones. You do not need to calculate logarithms to read it."
+        log_scale_reveal(
+            "Jupiter and the distant outer planets set the scale, so the small inner planets bunch together near "
+            "the bottom-left corner. How could we spread them out without losing the giant planets?"
         )
-        st.subheader("Now use the log–log view")
+        st.subheader("Now compare the log–log view")
         graph_guide(
             "The variables are the same, but equal spaces now represent multiplication rather than addition.",
             "Compare the positions of the inner planets and the outer giants.",
@@ -2484,7 +2539,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
 
 def render_demographics_curious(data: pd.DataFrame) -> None:
     """A presenter-led route designed to fit an approximately 50-minute outreach session."""
-    if st.session_state.get("demographics_pathway", FACILITATED_PATHWAY) != FACILITATED_PATHWAY:
+    if st.session_state.get("demographics_pathway") != FACILITATED_PATHWAY:
         return
     if "curious_part" not in st.session_state:
         st.session_state["curious_part"] = 0
@@ -2502,13 +2557,7 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
         st.session_state["curious_step_selector"] = step_labels[part]
         st.session_state["curious_selector_part"] = part
     st.caption("Go to a step")
-    selected_step = st.radio(
-        "Go to a step",
-        step_labels,
-        key="curious_step_selector",
-        horizontal=True,
-        label_visibility="collapsed",
-    )
+    selected_step = step_navigation_bar(step_labels, "curious_step_selector")
     selected_part = step_labels.index(selected_step)
     if selected_part != part:
         st.session_state["curious_part"] = selected_part
@@ -2619,22 +2668,11 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
             "Farther right means farther from the Sun. Higher means more massive.",
         )
         st.plotly_chart(solar_system_demographics_chart(False), use_container_width=True)
-        st.info(
+        log_scale_reveal(
             "Jupiter and the distant outer planets set the scale, so the small inner planets bunch together near "
             "the bottom-left corner. How could we spread them out without losing the giant planets?"
         )
-        st.markdown(
-            "### Why change the graph?\n"
-            "The first graph is useful for seeing the overall range, but it hides the differences between the small "
-            "inner planets. This is a representation problem: the data are still there, but the linear spacing does "
-            "not show them clearly. We will keep the same two variables and change only the axis spacing."
-        )
-        st.subheader("Now: change both axes to a log scale")
-        st.write(
-            "The variables do not change: the graph still shows orbital distance and mass. Only the spacing changes. "
-            "On a log scale, equal spaces represent multiplication—for example, **0.1 to 1** takes the same space as "
-            "**1 to 10**. You do not need to calculate logarithms to read the graph."
-        )
+        st.subheader("Now compare the log–log view")
         graph_guide(
             "The axes show the same values, but the new spacing spreads out the small planets.",
             "Find Earth at 1 AU and 1 Earth mass, then compare the positions of the four inner planets.",
@@ -2883,7 +2921,7 @@ def render_demographics(data: pd.DataFrame) -> None:
         render_demographics_landing()
         return
 
-    pathway = st.session_state.get("demographics_pathway", FACILITATED_PATHWAY)
+    pathway = st.session_state.get("demographics_pathway")
     pathway_migrations = {
         "CURIOUS workshop": FACILITATED_PATHWAY,
         "50-minute facilitated experience": FACILITATED_PATHWAY,
@@ -2893,6 +2931,9 @@ def render_demographics(data: pd.DataFrame) -> None:
     if pathway in pathway_migrations:
         pathway = pathway_migrations[pathway]
         st.session_state["demographics_pathway"] = pathway
+    if pathway not in {FACILITATED_PATHWAY, STAGE4_PATHWAY, STAGE5_PATHWAY}:
+        st.session_state["experience"] = "Introduction"
+        st.rerun()
     heading, activity_controls = st.columns([4, 2])
     with heading:
         st.title(pathway)
@@ -2903,9 +2944,6 @@ def render_demographics(data: pd.DataFrame) -> None:
             key="demographics_teacher_view",
             help="Show learning purpose, facilitation guidance and syllabus connections within each step.",
         )
-        if st.button("Back to introduction", use_container_width=True):
-            st.session_state["experience"] = "Introduction"
-            st.rerun()
     if pathway == FACILITATED_PATHWAY:
         render_demographics_curious(data)
     else:
@@ -2980,9 +3018,6 @@ with st.sidebar:
         args=("Guided Tatooine Mission",),
     )
     experience = st.session_state["experience"]
-    st.caption(f"**Open:** {experience}")
-    if experience == "Exoplanet Demographics" and st.session_state.get("demographics_started", False):
-        st.caption(f"**Pathway:** {st.session_state.get('demographics_pathway', FACILITATED_PATHWAY)}")
     st.divider()
     st.header("Data source")
     source = st.radio("Choose a dataset", ["Live NASA data", "Bundled notebook sample"])
@@ -3003,7 +3038,7 @@ with st.sidebar:
             st.session_state["mission_step"] = 0
             st.rerun()
     elif experience == "Exoplanet Data Laboratory":
-        guidance_mode = st.radio("Guidance mode", ["Student", "Teacher", "Minimal"])
+        guidance_mode = "Teacher" if st.session_state.get("lab_teacher_view", False) else "Student"
 
 if experience == "Guided Tatooine Mission":
     render_guided_mission(data, presenter_mode)
