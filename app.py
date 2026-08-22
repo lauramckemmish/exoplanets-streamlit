@@ -1459,7 +1459,86 @@ def response_box(step: int, prompt: str, sentence_starters: str) -> None:
     )
 
 
+def teacher_note(
+    title: str,
+    purpose: str,
+    facilitation: str,
+    alignment: str = "",
+    *,
+    timing: str = "",
+    evidence: str = "",
+    listen_for: str = "",
+    background: str = "",
+    misconceptions: str = "",
+    resources: tuple[tuple[str, str], ...] = (),
+) -> None:
+    if not st.session_state.get("demographics_teacher_view", False):
+        return
+    with st.container(border=True):
+        st.markdown(f"### 👩‍🏫 Teacher view: {title}")
+        if timing:
+            st.caption(f"Suggested time: {timing} · Use this as guidance, not a required pace.")
+        st.markdown(f"**Learning objective:** {purpose}")
+        if alignment:
+            st.markdown(f"**NSW syllabus connection:** {alignment}")
+        if evidence:
+            st.markdown(f"**Evidence of learning:** {evidence}")
+        with st.expander("Teaching this step"):
+            st.markdown(f"**Suggested approach:** {facilitation}")
+            if listen_for:
+                st.markdown(f"**Listen for:** {listen_for}")
+        if background or misconceptions:
+            with st.expander("Teacher background and possible misconceptions"):
+                if background:
+                    st.markdown(background)
+                if misconceptions:
+                    st.markdown(f"**Possible misconceptions:** {misconceptions}")
+        if resources:
+            with st.expander("Resources and optional extension"):
+                for label, url in resources:
+                    st.markdown(f"- [{label}]({url})")
+                st.caption(
+                    "These are optional teacher background or no-equipment research resources; "
+                    "they are not additional required activities."
+                )
+
+
+def classroom_teacher_note(part: int, year_level: str) -> None:
+    stage = "Stage 4" if year_level == "Year 8" else "Stage 5"
+    working_scientifically = (
+        "SC4-WS-05, SC4-WS-06 and SC4-WS-08"
+        if year_level == "Year 8"
+        else "SC5-WS-05, SC5-WS-06 and SC5-WS-08"
+    )
+    notes = {
+        0: dict(title="Workshop overview", purpose="Recognise that astronomical conclusions are built from data that have strengths and limitations.", timing="5 minutes", facilitation="Preview the investigation without explaining the detection-bias conclusion. Ask students what evidence they would need to compare planetary systems.", alignment=f"{stage} Working Scientifically in an astronomy and data-science context.", evidence="Students can state that the workshop will use planet data to investigate a scientific question.", listen_for="Questions about what has been measured, how planets are found, and whether the known planets represent all planets."),
+        1: dict(title="Describe our Solar System", purpose="Use Earth masses and qualitative mass groups to describe familiar planets.", timing="8–10 minutes", facilitation="Treat this as a quick common starting point. Model one bar segment, then let students identify the other groups by hovering. An Earth mass is a comparison unit, not Earth's physical size.", alignment=f"{working_scientifically}: process, represent and identify patterns in data.", evidence="Students correctly describe at least one Solar System planet using its qualitative mass group.", listen_for="Comparisons such as ‘Jupiter is much more massive than Earth’ rather than interpreting a wide segment as a physically wider planet.", misconceptions="Mass and size are related but are not the same variable. The illustration also enlarges planets and places them close together; it is not to scale."),
+        2: dict(title="Move beyond our Solar System", purpose="Distinguish the Sun from other stars, the Solar System from other planetary systems, and an exoplanet from a Solar System planet.", timing="12–15 minutes", facilitation="Establish the vocabulary before comparing the bars. Invite possibilities for other planetary systems, but keep this short enough to preserve time for the data investigation.", alignment=("SC4-OTU-01 and SC4-DA1-01: observations and data increase understanding of the Universe." if year_level == "Year 8" else "SC5-DA2-01: use scientific knowledge and data when evaluating claims."), evidence="Students can explain that an exoplanet orbits another star and that the Solar System is one planetary system.", listen_for="‘Our Sun is one star’ and ‘other stars can have their own planets’. Student ideas may include different numbers, arrangements or types of planets.", background=("**A useful scale ladder for teacher reference**\n\n- Sun to Earth: about 8 light-minutes.\n- Nearest star system, Alpha Centauri: about 4.3 light-years away; Proxima Centauri b is the closest known exoplanet at about 4 light-years.\n- Many Kepler target stars are roughly 500–3,000 light-years away.\n- The Milky Way is about 100,000 light-years across and contains approximately 100–400 billion stars.\n- Andromeda, the nearest major galaxy, is about 2.5 million light-years away.\n\nKnown exoplanets are in the Milky Way. Even thousands of discoveries sample only a small part of it. If students ask about the Big Bang, acknowledge the question, then redirect: differences between planetary systems are investigated through **planet formation**—discs of gas and dust, accretion and later evolution—not through the Big Bang itself."), misconceptions="‘Solar system’ properly names our system; ‘planetary system’ is the general term. Exoplanets are not planets in other galaxies, and stars are not planets.", resources=(("NASA: What are exoplanets?", "https://science.nasa.gov/exoplanets/"), ("NASA: How do planets form?", "https://science.nasa.gov/exoplanets/how-do-planets-form/"))),
+        3: dict(title="Represent a very wide range", purpose="Explain why the same mass-and-distance data may be easier to interpret on log–log axes than on linear axes.", timing="15–20 minutes", facilitation="This is the largest conceptual step. Show the linear graph first and ask what is hard to distinguish. Then reveal the log–log graph. Keep the focus on representation: the planets and variables have not changed; only the spacing has. Logarithm calculations are not required.", alignment=f"{working_scientifically}: represent data and analyse trends, patterns and relationships.", evidence="Students can identify something hidden on the linear graph that becomes visible on the log–log graph.", listen_for="‘The small inner planets were bunched together’ and ‘the new scale spreads them out while keeping Jupiter on the graph’. Students should still read ordinary values from the labels.", background="A logarithmic axis gives equal visual space to equal multiplicative changes: 0.1→1, 1→10 and 10→100. This is a data-representation decision, not a change to the underlying observations.", misconceptions="The log–log graph does not move planets to new physical locations, change units, or mean the data have been logged over time."),
+        4: dict(title="Evaluate whether our system is typical", purpose="Construct a cautious interpretation from a two-variable dataset and identify what would increase confidence.", timing="15–20 minutes", facilitation="Keep ‘normal’ deliberately undefined so students decide whether they mean common, similar or expected. Ask for graph evidence, but do not resolve the apparent gaps yet; the next lesson investigates how the data were produced.", alignment=("SC4-WS-06 and SC4-DA1-01: draw conclusions from patterns in scientific data." if year_level == "Year 8" else "SC5-WS-06 and SC5-DA2-01: draw conclusions and assess evidence-based claims."), evidence="Students define ‘normal’, make a claim and refer to at least one visible feature of the graph.", listen_for="Qualified claims such as ‘based on this graph’ or requests for more observations. Different conclusions are appropriate when supported by evidence.", misconceptions="An empty region does not yet prove that no planets exist there. At this point, leave that as an open question rather than giving students the detection-bias conclusion."),
+        5: dict(title="Investigate direct imaging", purpose="Relate direct imaging to the kinds of detected planets appearing in the mass–orbital-distance graph.", timing="15 minutes", facilitation="Explain the method, ask students to predict where its planets might appear, then reveal the graph. Separate the observed pattern from the physical explanation for it.", alignment=("SC4-OTU-01: observations and scientific advances increase understanding of the Universe." if year_level == "Year 8" else "SC5-DA2-01: consider how the source and collection of data affect a claim."), evidence="Students describe the region occupied by directly imaged planets using both plotted variables.", listen_for="Evidence-based descriptions using ‘massive/less massive’ and ‘close to/far from the star’. Avoid accepting ‘big’ when students have not distinguished mass from physical size.", background="A planet is vastly fainter than its host star. Coronagraphs and other techniques suppress starlight; wider angular separation makes a planet easier to distinguish from the glare.", misconceptions="Direct imaging usually records light from the planet as a point, not a detailed photograph of its surface.", resources=(("NASA: direct imaging and coronagraphs", "https://science.nasa.gov/astrophysics/programs/exep/technology/coronagraph-video/"),)),
+        6: dict(title="Investigate transit detection", purpose="Connect a repeating dip in measured starlight with the population of planets found by transits.", timing="15 minutes", facilitation="Pause after the animation and ask what the telescope measures. Have students predict the graph before revealing it, then use both axes when describing the pattern.", alignment=("SC4-OTU-01: observations are used to build knowledge of the Universe." if year_level == "Year 8" else "Supports SC5-WAM-01 through an application of measured light; it does not cover the whole outcome."), evidence="Students explain that transit detection measures repeated changes in starlight and describe the detected population using the graph.", listen_for="The planet blocks a small fraction of light; repeated dips provide evidence of an orbit. The system must be aligned appropriately from our viewpoint.", misconceptions="The star does not switch off, and astronomers generally do not see the planet cross the star as a resolved disc.", resources=(("NASA: transit-method animation", "https://science.nasa.gov/resource/exoplanet-detection-transit-method/"),)),
+        7: dict(title="Compare discovery methods", purpose="Explain how measurement methods shape the detected dataset and the conclusions that can be drawn from it.", timing="20 minutes", facilitation="Toggle one method at a time, ask students to describe each pattern, and only then reveal all methods. Ask what may be hard for current methods to find. Let students infer the incompleteness of the dataset before consolidating it in the conclusion.", alignment=("SC4-DA1-01 and SC4-WS-06: use and interpret scientific datasets." if year_level == "Year 8" else "SC5-DA2-01 and SC5-WS-06: assess claims using the strengths and limitations of data."), evidence="Students use differences between method views to explain why detected planets may not represent every planet that exists.", listen_for="‘A gap could mean difficult to detect, not impossible’ and ‘future technology may reveal planets in currently sparse regions’. Keep ‘may’ rather than promising that every gap will be filled.", background="**Radial velocity (Doppler method):** an orbiting planet makes its star move slightly towards and away from us, shifting its spectrum towards blue and red. This offers a useful Year 10 waves connection.\n\n**Microlensing:** gravity from a foreground star-system bends and magnifies light from a more distant star. A planet can add a brief feature to that one-off brightening event. It can find distant systems but events usually cannot be repeated.\n\nOther methods can remain optional student research rather than required teacher exposition.", misconceptions="Different methods do not create different planets; they make different existing planets easier to detect.", resources=(("NASA: Doppler and transit overview", "https://science.nasa.gov/astrobiology/learning-resources/alp/discover-worlds-around-other-stars/"), ("NASA: microlensing explainer", "https://science.nasa.gov/resource/exoplanet-detection-microlensing-method/"))),
+        8: dict(title="Consolidate and generate new questions", purpose="Connect planet diversity, graph representation and detection limitations in an evidence-based explanation.", timing="10–15 minutes", facilitation="Ask students for their own conclusion first. Then consolidate the shared idea that scientists have not found every planet and that future technology may change the visible pattern. Finish with a question students genuinely want investigated.", alignment=f"{working_scientifically}: communicate scientific concepts or arguments using evidence.", evidence="Students distinguish the detected sample from all planets that may exist and pose a relevant scientific question.", listen_for="Questions that could be investigated using observations, models or new technology. Preserve uncertainty: some gaps may reflect detection limits and some may reflect how planetary systems form."),
+    }
+    teacher_note(**notes[part])
+
+
+def curious_teacher_note(part: int) -> None:
+    notes = {
+        0: dict(title="Welcome", purpose="Create curiosity and establish the investigation question.", timing="3–4 minutes", facilitation="Invite predictions and frame the session as an investigation. Do not define detection bias in advance.", evidence="Students can state the question the group will investigate.", listen_for="Curiosity about other worlds and questions about what evidence astronomers can collect."),
+        1: dict(title="Our Solar System", purpose="Activate familiar knowledge and establish the planet-mass categories.", timing="5–6 minutes", facilitation="Keep responses spoken and move on once students can read the bar and recognise that mass is being compared.", evidence="Students identify at least one qualitative mass group.", listen_for="Mass comparisons rather than physical width or diameter.", misconceptions="The Solar System image is not to scale; the planets are enlarged and placed close together."),
+        2: dict(title="Meet exoplanets", purpose="Expand students’ scale model from our Solar System to planets orbiting other stars.", timing="7–8 minutes", facilitation="Secure ‘Sun/star’, ‘Solar System/planetary system’ and ‘planet/exoplanet’. Use a brief imagined-system discussion, then return to the data.", evidence="Students can define an exoplanet in their own words.", listen_for="Other stars can host planetary systems that need not resemble ours.", background="For quick questions: Proxima Centauri b is about 4 light-years away; many Kepler targets are 500–3,000 light-years away; the Milky Way is about 100,000 light-years across and contains roughly 100–400 billion stars. Exoplanets discussed here are within our galaxy. Redirect Big Bang questions towards planet formation from discs of gas and dust.", resources=(("NASA Eyes on Exoplanets", "https://eyes.nasa.gov/apps/exo/"), ("NASA: How do planets form?", "https://science.nasa.gov/exoplanets/how-do-planets-form/"))),
+        3: dict(title="Mass and distance", purpose="Understand why changing from linear to log–log axes makes a wide range of values easier to see.", timing="10–12 minutes", facilitation="Treat this as the major conceptual transition. Ask what is hidden on the linear graph, then reveal the log–log view. Do not teach logarithm calculations: the variables and values stay the same; only their spacing changes.", evidence="Students can say what became easier to see.", listen_for="The inner planets separate while the outer giants remain visible.", misconceptions="The planets and measurements have not changed, and ‘log’ does not refer to discovery records over time."),
+        4: dict(title="Are we normal?", purpose="Invite a cautious evidence-based claim before investigating how planets were detected.", timing="7–8 minutes", facilitation="Accept different meanings of ‘normal’ when supported by the graph. Leave sparse regions unresolved so the methods section has a genuine question to answer.", evidence="Students use a visible feature of the graph to support a claim.", listen_for="Uncertainty and requests for more evidence, not a single correct verdict."),
+        5: dict(title="How we find planets", purpose="Infer that different measurement methods reveal different parts of the planet population.", timing="12–15 minutes", facilitation="Move briskly through predict → direct imaging → transit → both → all methods. Ask what could be difficult to find, but let students articulate the detection-bias conclusion themselves.", evidence="Students describe how the point pattern changes when the method changes.", listen_for="‘Not detected’ is not the same as ‘does not exist’; future technology may reveal currently difficult-to-detect planets.", background="Radial velocity can be introduced as the **Doppler method**: a planet makes its star wobble, producing small red and blue shifts. Microlensing uses the gravity of a foreground star-system to briefly magnify a background star; a planet adds a short extra feature. Treat other methods as optional research.", resources=(("NASA: transit method", "https://science.nasa.gov/resource/exoplanet-detection-transit-method/"), ("NASA: microlensing method", "https://science.nasa.gov/resource/exoplanet-detection-microlensing-method/"))),
+        6: dict(title="Conclusion", purpose="Consolidate planet diversity, incomplete evidence and the role of future technology.", timing="4–5 minutes", facilitation="Elicit students’ conclusion before showing the synthesis. Prioritise one memorable idea and one student-generated question over adding more content.", evidence="Students explain why known exoplanets may not represent every planet that exists.", listen_for="Future instruments may reveal small or distant planets, while some patterns may also reflect real planet formation."),
+    }
+    teacher_note(**notes[part])
+
+
 def render_demographics_classroom(data: pd.DataFrame) -> None:
+    year_level = st.session_state.get("demographics_pathway", "Year 8 classroom").split(" classroom")[0]
     if "demographics_part" not in st.session_state:
         st.session_state["demographics_part"] = 0
     part = max(0, min(int(st.session_state["demographics_part"]), 8))
@@ -1504,6 +1583,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             """,
             height=0,
         )
+    classroom_teacher_note(part, year_level)
     if part == 0:
         st.header("Welcome to the workshop")
         st.image(
@@ -1682,6 +1762,18 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "Is our Solar System normal?",
             "How similar is our Solar System to the planetary systems represented by detected exoplanets?",
             "A log–log scatter plot of planet mass against orbital distance, with the Solar System planets highlighted.",
+        )
+        st.write(
+            "We are now comparing thousands of individual exoplanets. Each one can have a different mass and a "
+            "different orbital distance from its star."
+        )
+        st.image(
+            EXOPLANET_QUADRANTS_IMAGE_PATH,
+            caption=(
+                "Four possible combinations of planet mass and orbital distance. The example systems are simplified "
+                "and are not to scale."
+            ),
+            use_container_width=True,
         )
         graph_guide(
             "The bottom axis is orbital distance. The side axis is planet mass. Both use the log scale from Step 3.",
@@ -1887,6 +1979,7 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
             """,
             height=0,
         )
+    curious_teacher_note(part)
     if part == 0:
         st.header("Welcome to the Curious workshop")
         st.image(
@@ -2189,11 +2282,16 @@ def render_demographics(data: pd.DataFrame) -> None:
         return
 
     pathway = st.session_state.get("demographics_pathway", "CURIOUS workshop")
-    heading, change_pathway = st.columns([5, 1])
+    heading, activity_controls = st.columns([4, 2])
     with heading:
         st.title("Exoplanet Demographics")
         st.caption(f"Current pathway: {pathway}")
-    with change_pathway:
+    with activity_controls:
+        st.toggle(
+            "Teacher view",
+            key="demographics_teacher_view",
+            help="Show learning purpose, facilitation guidance and syllabus connections within each step.",
+        )
         if st.button("Change pathway", use_container_width=True):
             st.session_state["demographics_started"] = False
             st.rerun()
