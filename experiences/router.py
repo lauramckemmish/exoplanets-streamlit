@@ -3,6 +3,16 @@
 import streamlit as st
 
 
+def reset_navigation() -> None:
+    """Start a selected demographics pathway with independent step state."""
+    st.session_state["demographics_part"] = 0
+    st.session_state["curious_part"] = 0
+    st.session_state.pop("demographics_step_selector", None)
+    st.session_state.pop("curious_step_selector", None)
+    st.session_state["demographics_scroll_to_top"] = True
+    st.session_state["curious_scroll_to_top"] = True
+
+
 def normalise_pathway(pathway, facilitated_pathway, stage4_pathway, stage5_pathway):
     """Return a current pathway name for current or legacy session values."""
     migrations = {
