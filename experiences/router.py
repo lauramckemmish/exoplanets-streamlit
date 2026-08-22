@@ -16,7 +16,7 @@ def normalise_pathway(pathway, facilitated_pathway, stage4_pathway, stage5_pathw
     return pathway if pathway in valid else None
 
 
-def render_pathway(pathway, data, facilitated_pathway, stage4_pathway, curious_render, stage4_render, stage5_render, curious_implementation, classroom_implementation):
+def render_pathway(pathway, data, facilitated_pathway, stage4_pathway, stage5_pathway, curious_render, stage4_render, stage5_render, curious_implementation, classroom_implementation):
     """Dispatch a selected pathway to its independent experience entry point."""
     if pathway == facilitated_pathway:
         return curious_render(data, curious_implementation)
