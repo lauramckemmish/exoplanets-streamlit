@@ -24,6 +24,9 @@ from charts import (
     discovery_chart,
     discoveries_by_mass_chart,
     discoveries_by_year_chart,
+    demographics_methods_chart as shared_demographics_methods_chart,
+    demographics_over_time_chart as shared_demographics_over_time_chart,
+    current_demographics_chart as shared_current_demographics_chart,
     finish_demographics_chart,
     format_number,
     planet_mass_distribution_chart as shared_planet_mass_distribution_chart,
@@ -2004,7 +2007,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
                 "Blue circles are detected exoplanets. Pink labelled diamonds are our Solar System planets.",
                 "Some number labels have been removed so the many planet points are easier to see.",
             )
-            st.plotly_chart(current_demographics_chart(data), use_container_width=True)
+            st.plotly_chart(shared_current_demographics_chart(data), use_container_width=True)
             data_detective_challenge()
             response_box(
                 4,
@@ -2065,7 +2068,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "Blue circles are planets found using direct imaging. Pink labelled diamonds are Solar System planets.",
         )
         st.plotly_chart(
-            demographics_methods_chart(data, "Direct Imaging"),
+            shared_demographics_methods_chart(data, "Direct Imaging"),
             use_container_width=True,
         )
         graph_questions(
@@ -2132,7 +2135,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "Blue circles are planets found using transits. Pink labelled diamonds are Solar System planets.",
         )
         st.plotly_chart(
-            demographics_methods_chart(data, "Transit"),
+            shared_demographics_methods_chart(data, "Transit"),
             use_container_width=True,
         )
         graph_questions(
@@ -2219,7 +2222,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "Use the buttons above to change the view. Colours show discovery methods; pink diamonds are Solar System planets.",
         )
         st.plotly_chart(
-            demographics_methods_chart(data, method_view),
+            shared_demographics_methods_chart(data, method_view),
             use_container_width=True,
         )
         graph_questions(
@@ -2244,7 +2247,7 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             "Blue circles are detected exoplanets. Pink labelled diamonds are the Solar System planets.",
             "Look for places where the Solar System planets are surrounded by many blue points—and places where they are not.",
         )
-        st.plotly_chart(current_demographics_chart(data), use_container_width=True)
+        st.plotly_chart(shared_current_demographics_chart(data), use_container_width=True)
         data_detective_challenge()
         response_box(
             7,
@@ -2479,7 +2482,7 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
             "The bottom axis shows orbital distance and the side axis shows planet mass. Both use a log scale.",
             "Blue circles are detected exoplanets; pink labelled diamonds are Solar System planets.",
         )
-        st.plotly_chart(current_demographics_chart(data), use_container_width=True)
+        st.plotly_chart(shared_current_demographics_chart(data), use_container_width=True)
         data_detective_challenge()
         st.markdown(
             "### Discuss\nWhat did the Earth challenge show? What did your chosen challenge show? Does this "
@@ -2520,7 +2523,7 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
             "Use the buttons to reveal how the pattern changes.",
             "Compare where each method's points appear on the mass and orbital-distance axes.",
         )
-        st.plotly_chart(demographics_methods_chart(data, method_view), use_container_width=True)
+        st.plotly_chart(shared_demographics_methods_chart(data, method_view), use_container_width=True)
         st.markdown("### Discuss\nWhat changed when we changed the way we searched?")
         key_idea("Different discovery methods find different kinds of planets.", "Toggle the method views and compare where their points appear on the graph.")
     # CURIOUS STEP 6 — Conclusion

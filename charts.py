@@ -150,6 +150,41 @@ def planet_mass_distribution_chart(data: pd.DataFrame, include_exoplanets: bool 
     return figure
 
 
+def demographics_over_time_chart(data: pd.DataFrame, year: int) -> go.Figure:
+    all_plot_data = demographics_plot_data(data)
+    all_plot_data = all_plot_data[all_plot_data["disc_year"].notna()]
+    plot_data = all_plot_data[all_plot_data["disc_year"] <= year]
+    figure = go.Figure()
+    if not plot_data.empty:
+        figure.add_trace(go.Scatter(x=plot_data["pl_orbsmax"], y=plot_data["pl_bmasse"], mode="markers", name=f"Exoplanets discovered by {year}", marker={"size": 8, "color": "#4C78A8", "opacity": 0.65}, customdata=plot_data[["pl_name", "hostname", "disc_year"]].to_numpy(), hovertemplate="<b>%{customdata[0]}</b><br>Host star: %{customdata[1]}<br>Discovery year: %{customdata[2]}<br>Orbital distance: %{x:.3g} AU<br>Mass: %{y:.3g} Earth masses<extra></extra>"))
+    add_solar_system_trace(figure)
+    return finish_demographics_chart(figure, f"Solar System and exoplanets discovered by {year}", SOLAR_SYSTEM_PLANETS["Orbital distance (AU)"].tolist() + all_plot_data["pl_orbsmax"].tolist(), SOLAR_SYSTEM_PLANETS["Planet mass (Earth masses)"].tolist() + all_plot_data["pl_bmasse"].tolist())
+
+
+def current_demographics_chart(data: pd.DataFrame) -> go.Figure:
+    plot_data = demographics_plot_data(data)
+    figure = go.Figure()
+    if not plot_data.empty:
+        figure.add_trace(go.Scatter(x=plot_data["pl_orbsmax"], y=plot_data["pl_bmasse"], mode="markers", name="Known exoplanets", marker={"size": 8, "color": "#4C78A8", "opacity": 0.65}, customdata=plot_data[["pl_name", "hostname", "disc_year"]].to_numpy(), hovertemplate="<b>%{customdata[0]}</b><br>Host star: %{customdata[1]}<br>Discovery year: %{customdata[2]}<br>Orbital distance: %{x:.3g} AU<br>Mass: %{y:.3g} Earth masses<extra></extra>"))
+    add_solar_system_trace(figure)
+    return finish_demographics_chart(figure, "Known exoplanets and Solar System planets")
+
+
+def demographics_methods_chart(data: pd.DataFrame, view: str) -> go.Figure:
+    all_plot_data = demographics_plot_data(data, require_method=True)
+    plot_data = all_plot_data.copy()
+    method_filters = {"Transit": ["Transit"], "Direct Imaging": ["Imaging"], "Transit + Direct Imaging": ["Transit", "Imaging"]}
+    if view in method_filters:
+        plot_data = plot_data[plot_data["discoverymethod"].isin(method_filters[view])]
+    figure = go.Figure()
+    for method in sorted(plot_data["discoverymethod"].unique()):
+        method_data = plot_data[plot_data["discoverymethod"] == method]
+        display_method = "Direct Imaging" if method == "Imaging" else method
+        figure.add_trace(go.Scatter(x=method_data["pl_orbsmax"], y=method_data["pl_bmasse"], mode="markers", name=display_method, marker={"size": 8, "opacity": 0.65}, customdata=method_data[["pl_name", "hostname", "disc_year"]].to_numpy(), hovertemplate=f"<b>%{{customdata[0]}}</b><br>Host star: %{{customdata[1]}}<br>Discovery method: {display_method}<br>Discovery year: %{{customdata[2]}}<br>Orbital distance: %{{x:.3g}} AU<br>Mass: %{{y:.3g}} Earth masses<extra></extra>"))
+    add_solar_system_trace(figure)
+    return finish_demographics_chart(figure, "Known exoplanets and Solar System planets by discovery method", SOLAR_SYSTEM_PLANETS["Orbital distance (AU)"].tolist() + all_plot_data["pl_orbsmax"].tolist(), SOLAR_SYSTEM_PLANETS["Planet mass (Earth masses)"].tolist() + all_plot_data["pl_bmasse"].tolist())
+
+
 def demographics_plot_data(data: pd.DataFrame, require_method: bool = False) -> pd.DataFrame:
     required = ["pl_orbsmax", "pl_bmasse"]
     if require_method:
