@@ -62,6 +62,7 @@ from experiences import (
     curious,
     data_laboratory,
     planets_we_have_not_found,
+    router,
     strange_new_worlds,
     tatooine,
 )
@@ -2292,12 +2293,15 @@ def render_demographics(data: pd.DataFrame) -> None:
             key="demographics_teacher_view",
             help="Show learning purpose, facilitation guidance and syllabus connections within each step.",
         )
-    if pathway == FACILITATED_PATHWAY:
-        curious.render(data, render_demographics_curious)
-    elif pathway == STAGE4_PATHWAY:
-        strange_new_worlds.render(data, render_demographics_classroom)
-    else:
-        planets_we_have_not_found.render(data, render_demographics_classroom)
+    router.render_pathway(
+        pathway,
+        data,
+        FACILITATED_PATHWAY,
+        STAGE4_PATHWAY,
+        curious.render,
+        strange_new_worlds.render,
+        planets_we_have_not_found.render,
+    )
 
 
 def select_experience(name: str) -> None:
