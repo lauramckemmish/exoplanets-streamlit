@@ -2266,37 +2266,15 @@ def render_demographics_landing(data: pd.DataFrame) -> None:
             "[l.mckemmish@unsw.edu.au](mailto:l.mckemmish@unsw.edu.au)"
         )
 def render_demographics(data: pd.DataFrame) -> None:
-    if not st.session_state.get("demographics_started", False):
-        render_demographics_landing(data)
-        return
-
-    pathway = st.session_state.get("demographics_pathway")
-    pathway = router.normalise_pathway(
-        pathway,
+    router.render_demographics_shell(
+        data,
+        st.session_state.get("demographics_started", False),
+        st.session_state.get("demographics_pathway"),
+        DEMOGRAPHICS_TITLE,
         FACILITATED_PATHWAY,
         STAGE4_PATHWAY,
         STAGE5_PATHWAY,
-    )
-    if pathway is not None:
-        st.session_state["demographics_pathway"] = pathway
-    else:
-        st.session_state["experience"] = "Introduction"
-        st.rerun()
-    heading, activity_controls = st.columns([4, 2])
-    with heading:
-        st.title(pathway)
-        st.markdown(f"*{DEMOGRAPHICS_TITLE}*")
-    with activity_controls:
-        st.toggle(
-            "Teacher view",
-            key="demographics_teacher_view",
-            help="Show learning purpose, facilitation guidance and syllabus connections within each step.",
-        )
-    router.render_pathway(
-        pathway,
-        data,
-        FACILITATED_PATHWAY,
-        STAGE4_PATHWAY,
+        render_demographics_landing,
         curious.render,
         strange_new_worlds.render,
         planets_we_have_not_found.render,
