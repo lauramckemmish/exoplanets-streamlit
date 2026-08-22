@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="690" viewBox="0 0 1200 690" role="img" aria-labelledby="title description">
+  <title id="title">Four combinations of exoplanet mass and orbital distance</title>
+  <description id="description">A planet can have lower or higher mass and orbit close to or far from its star. These possibilities correspond to four areas of a mass versus orbital distance graph.</description>
+  <rect width="1200" height="690" rx="28" fill="#F7F9FC"/>
+  <text x="600" y="46" text-anchor="middle" font-family="Arial, sans-serif" font-size="31" font-weight="700" fill="#172033">Each dot will represent one exoplanet</text>
+  <text x="600" y="78" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" fill="#475569">Ask two questions: How massive is it? How far is it from its star?</text>
+
+  <line x1="160" y1="600" x2="1145" y2="600" stroke="#334155" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="160" y1="600" x2="160" y2="115" stroke="#334155" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="650" y1="115" x2="650" y2="600" stroke="#CBD5E1" stroke-width="3" stroke-dasharray="10 10"/>
+  <line x1="160" y1="355" x2="1145" y2="355" stroke="#CBD5E1" stroke-width="3" stroke-dasharray="10 10"/>
+
+  <text x="650" y="660" text-anchor="middle" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#172033">Orbital distance from star</text>
+  <text x="260" y="635" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" fill="#4C78A8">close to star</text>
+  <text x="1030" y="635" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" fill="#D97706">far from star</text>
+  <text transform="translate(48 360) rotate(-90)" text-anchor="middle" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#172033">Planet mass</text>
+  <text x="105" y="505" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" fill="#4C78A8" transform="rotate(-90 105 505)">lower mass</text>
+  <text x="105" y="205" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" fill="#D97706" transform="rotate(-90 105 205)">higher mass</text>
+
+  <g font-family="Arial, sans-serif" text-anchor="middle" fill="#172033">
+    <g transform="translate(405 475)">
+      <text y="-83" font-size="23" font-weight="700">close + lower mass</text>
+      <circle cx="-48" r="29" fill="#FFD54F"/>
+      <ellipse cx="-48" rx="88" ry="55" fill="none" stroke="#94A3B8" stroke-width="2"/>
+      <circle cx="40" r="10" fill="#4C78A8"/>
+      <text y="87" font-size="18" fill="#475569">a low-mass planet on a close orbit</text>
+    </g>
+    <g transform="translate(895 475)">
+      <text y="-83" font-size="23" font-weight="700">far + lower mass</text>
+      <circle cx="-72" r="29" fill="#FFD54F"/>
+      <ellipse cx="-72" rx="164" ry="62" fill="none" stroke="#94A3B8" stroke-width="2"/>
+      <circle cx="92" r="10" fill="#4C78A8"/>
+      <text y="87" font-size="18" fill="#475569">a low-mass planet on a distant orbit</text>
+    </g>
+    <g transform="translate(405 232)">
+      <text y="-83" font-size="23" font-weight="700">close + higher mass</text>
+      <circle cx="-55" r="29" fill="#FFD54F"/>
+      <ellipse cx="-55" rx="92" ry="57" fill="none" stroke="#94A3B8" stroke-width="2"/>
+      <circle cx="37" r="28" fill="#D97706"/>
+      <text y="87" font-size="18" fill="#475569">a massive planet on a close orbit</text>
+    </g>
+    <g transform="translate(895 232)">
+      <text y="-83" font-size="23" font-weight="700">far + higher mass</text>
+      <circle cx="-78" r="29" fill="#FFD54F"/>
+      <ellipse cx="-78" rx="170" ry="65" fill="none" stroke="#94A3B8" stroke-width="2"/>
+      <circle cx="92" r="28" fill="#D97706"/>
+      <text y="87" font-size="18" fill="#475569">a massive planet on a distant orbit</text>
+    </g>
+  </g>
+  <defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="4" orient="auto"><path d="M0,0 L0,8 L11,4 z" fill="#334155"/></marker></defs>
+</svg>

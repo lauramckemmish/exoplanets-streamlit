@@ -20,6 +20,7 @@ DETECTION_METHODS_IMAGE_PATH = APP_DIR / "assets" / "exoplanet-detection-methods
 DIRECT_IMAGING_IMAGE_PATH = APP_DIR / "assets" / "direct-imaging.svg"
 PLANETARY_SYSTEMS_IMAGE_PATH = APP_DIR / "assets" / "planetary-systems.svg"
 INNER_OUTER_PLANETS_IMAGE_PATH = APP_DIR / "assets" / "inner-outer-planets.svg"
+EXOPLANET_QUADRANTS_IMAGE_PATH = APP_DIR / "assets" / "exoplanet-mass-distance-quadrants.svg"
 NASA_TAP_URL = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync"
 NSW_SCIENCE_SYLLABUS_URL = "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/outcomes"
 # Add the public teacher-feedback form URL here when it is ready.
@@ -1997,6 +1998,18 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
         key_idea("A log scale helps us see small and large planets on the same graph.")
     elif part == 4:
         st.header("Step 4: Is our planetary system normal?")
+        st.write(
+            "Now we move from the eight Solar System planets to thousands of individual exoplanets. Each exoplanet "
+            "can have a different mass and a different distance from its star."
+        )
+        st.image(
+            EXOPLANET_QUADRANTS_IMAGE_PATH,
+            caption=(
+                "Four possible combinations of planet mass and orbital distance. The example systems are simplified "
+                "and are not to scale."
+            ),
+            use_container_width=True,
+        )
         graph_guide(
             "The bottom axis shows orbital distance and the side axis shows planet mass. Both use a log scale.",
             "Blue circles are detected exoplanets; pink labelled diamonds are Solar System planets.",
