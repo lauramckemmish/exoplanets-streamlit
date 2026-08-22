@@ -14,6 +14,70 @@ import plotly.graph_objects as go
 from data import SOLAR_SYSTEM_PLANETS
 
 
+def scatter_chart(
+    data: pd.DataFrame,
+    x_field: str,
+    y_field: str,
+    colour_field: str,
+    log_x: bool,
+    log_y: bool,
+    variables: dict,
+    field_labels: dict[str, str],
+    colour_options: dict[str, str],
+) -> tuple[go.Figure | None, dict[str, int]]:
+    """Build the general-purpose scatter plot used in the Data Laboratory."""
+    total = len(data)
+    complete_mask = data[[x_field, y_field, colour_field]].notna().all(axis=1)
+    complete = data[complete_mask].copy()
+    log_excluded = pd.Series(False, index=complete.index)
+    if log_x:
+        log_excluded |= complete[x_field] <= 0
+    if log_y:
+        log_excluded |= complete[y_field] <= 0
+    plot_data = complete[~log_excluded].copy()
+
+    stats = {
+        "Total records": total,
+        "Missing selected values": total - len(complete),
+        "Excluded by log scale": int(log_excluded.sum()),
+        "Records shown": len(plot_data),
+    }
+    if plot_data.empty:
+        return None, stats
+
+    colour_label = next(
+        (label for label, value in colour_options.items() if value == colour_field),
+        colour_field,
+    )
+    figure = px.scatter(
+        plot_data,
+        x=x_field,
+        y=y_field,
+        color=colour_field,
+        hover_name="pl_name",
+        hover_data={
+            "hostname": True,
+            "disc_year": True,
+            "discoverymethod": True,
+            "pl_rade": ":.2f",
+            "pl_bmasse": ":.2f",
+            "pl_eqt": ":.1f",
+            "sy_dist": ":.1f",
+        },
+        log_x=log_x,
+        log_y=log_y,
+        labels={
+            x_field: field_labels[x_field],
+            y_field: field_labels[y_field],
+            colour_field: colour_label,
+        },
+        title=f"{variables[y_field]['label']} compared with {variables[x_field]['label']}",
+    )
+    figure.update_traces(marker={"size": 8, "opacity": 0.65})
+    figure.update_layout(height=610)
+    return figure, stats
+
+
 def discovery_chart(data: pd.DataFrame, methods: list[str]) -> go.Figure:
     subset = data[data["discoverymethod"].isin(methods)].dropna(subset=["disc_year"])
     counts = subset.groupby(["disc_year", "discoverymethod"], observed=True).size().reset_index(name="Planets")
