@@ -314,7 +314,7 @@ st.set_page_config(
 # EXPERIENCE 1 — FIND TATOOINE
 # ============================================================================
 
-def render_guided_mission(data: pd.DataFrame, presenter_mode: bool) -> None:
+def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None) -> None:
     total_steps = 8
     if "mission_step" not in st.session_state:
         st.session_state["mission_step"] = 0
@@ -331,8 +331,16 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool) -> None:
         "Report",
     ]
 
-    st.title("Find Tatooine: Guided Mission")
-    st.caption("A demonstrator-led investigation using real exoplanet data")
+    heading, controls = st.columns([4, 2])
+    with heading:
+        st.title("Find Tatooine: Guided Mission")
+        st.caption("A facilitator-led investigation using real exoplanet data")
+    with controls:
+        presenter_mode = st.toggle(
+            "Teacher view",
+            key="tatooine_teacher_view",
+            help="Show facilitation guidance at the top of the experience.",
+        )
     if presenter_mode:
         teacher_note(
             "Find Tatooine: facilitator guidance",
@@ -2377,7 +2385,6 @@ with st.sidebar:
     st.success(source_label)
     st.metric("Confirmed exoplanets", f"{len(data):,}")
     if experience == "Guided Tatooine Mission":
-        presenter_mode = st.toggle("Teacher view", value=True, help="Show facilitation guidance at the top of the experience.")
         if st.button("Reset guided mission", use_container_width=True):
             st.session_state["mission_step"] = 0
             st.session_state.pop("mission_tab", None)
