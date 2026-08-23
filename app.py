@@ -243,13 +243,18 @@ def render_candidate_comparison(candidates: pd.DataFrame, key_prefix: str, promp
     ordered = candidates.sort_values("pl_name")
     ordered = ordered.copy()
     ordered["Estimated temperature (°C)"] = ordered["pl_eqt"] - 273.15
-    candidate_columns = ["pl_name", "hostname", "pl_rade", "pl_bmasse", "Estimated temperature (°C)", "sy_snum", "sy_pnum"]
-    display_columns = {
-        "pl_name": "Planet name", "hostname": "Host star", "pl_rade": "Planet radius (Earth radii)",
-        "pl_bmasse": "Planet mass (Earth masses)", "sy_snum": "Known stars", "sy_pnum": "Known planets",
-    }
     selected = st.selectbox("Choose a candidate to inspect", ordered["pl_name"].tolist(), key=f"{key_prefix}_candidate")
-    st.dataframe(ordered[candidate_columns].rename(columns=display_columns), use_container_width=True, hide_index=True)
+    row = ordered[ordered["pl_name"] == selected].iloc[0]
+    detail = pd.DataFrame([
+        {"Detail": "Planet name", "Value": row["pl_name"]},
+        {"Detail": "Host star", "Value": row["hostname"]},
+        {"Detail": "Planet radius", "Value": f"{row['pl_rade']:.2f} Earth radii"},
+        {"Detail": "Planet mass", "Value": "Unknown" if pd.isna(row["pl_bmasse"]) else f"{row['pl_bmasse']:.2f} Earth masses"},
+        {"Detail": "Estimated temperature", "Value": "Unknown" if pd.isna(row["pl_eqt"]) else f"{row['pl_eqt'] - 273.15:.1f} °C"},
+        {"Detail": "Distance from Earth", "Value": "Unknown" if pd.isna(row["sy_dist"]) else f"{row['sy_dist'] * PARSEC_TO_LIGHT_YEARS:.0f} light-years"},
+        {"Detail": "Known stars / planets", "Value": f"{row['sy_snum']} / {row['sy_pnum']}"},
+    ])
+    st.dataframe(detail, use_container_width=True, hide_index=True)
     st.text_area(prompt, key=f"{key_prefix}_response", height=110)
 
 
@@ -322,26 +327,24 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
             {"Clue": "A temperature worth investigating", "Variable": "Equilibrium temperature", "Example rule": "−73–127°C"},
         ]), use_container_width=True, hide_index=True)
         st.warning("This is a screening search, not a test for habitability. The host star's brightness also affects temperature.")
+        earth_filter_style = st.radio("How broad should the search be?", ["Tight", "Loose"], horizontal=True, key="earth_filter_style")
+        if earth_filter_style == "Tight":
+            radius_range, orbit_range, temp_range = (0.8, 1.5), (0.5, 2.0), (200, 400)
+        else:
+            radius_range, orbit_range, temp_range = (0.5, 2.0), (0.2, 5.0), (150, 500)
         earth_current = data.copy()
         earth_rows = []
-        earth_current, row = apply_filter(earth_current, "pl_rade", earth_current["pl_rade"].between(0.8, 1.5, inclusive="both"), "Radius 0.8–1.5 Earth radii")
+        earth_current, row = apply_filter(earth_current, "pl_rade", earth_current["pl_rade"].between(*radius_range, inclusive="both"), f"Radius {radius_range[0]}–{radius_range[1]} Earth radii")
         earth_rows.append(row)
-        earth_current, row = apply_filter(earth_current, "pl_orbsmax", earth_current["pl_orbsmax"].between(0.5, 2.0, inclusive="both"), "Orbital distance 0.5–2 AU")
+        earth_current, row = apply_filter(earth_current, "pl_orbsmax", earth_current["pl_orbsmax"].between(*orbit_range, inclusive="both"), f"Orbital distance {orbit_range[0]}–{orbit_range[1]} AU")
         earth_rows.append(row)
-        earth_current, row = apply_filter(earth_current, "pl_eqt", earth_current["pl_eqt"].between(200, 400, inclusive="both"), "Estimated temperature −73–127°C")
+        earth_current, row = apply_filter(earth_current, "pl_eqt", earth_current["pl_eqt"].between(*temp_range, inclusive="both"), f"Estimated temperature {temp_range[0] - 273.15:.0f}–{temp_range[1] - 273.15:.0f}°C")
         earth_rows.append(row)
         earth_like, earth_steps = earth_current, pd.DataFrame(earth_rows)
         st.subheader("Apply the filters in order")
         for criterion, count in zip(earth_steps["Criterion"], earth_steps["Remaining"]):
             st.markdown(f"**Keep only planets where {criterion.lower()}.**")
             st.markdown(f"**{int(count):,} planets remain.**")
-        earth_display = earth_like[["pl_name", "hostname", "pl_rade", "pl_orbsmax", "pl_eqt", "sy_snum", "sy_pnum"]].copy()
-        earth_display["Estimated temperature (°C)"] = earth_display["pl_eqt"] - 273.15
-        earth_display = earth_display.drop(columns="pl_eqt").rename(columns={
-            "pl_name": "Planet name", "hostname": "Host star", "pl_rade": "Planet radius (Earth radii)",
-            "pl_orbsmax": "Orbital distance (AU)", "sy_snum": "Known stars", "sy_pnum": "Known planets",
-        })
-        st.dataframe(earth_display.head(30), use_container_width=True, hide_index=True)
         if st.session_state.get("tatooine_teacher_view", False):
             st.info("Teacher note: orbital distance is not enough to define a habitable zone. A star's brightness changes how much energy reaches a planet; we are keeping that extra calculation out of this activity.")
         st.info("These results use evidence that has actually been recorded. The Milky Way is likely home to millions or billions of planets that we have not discovered.")
