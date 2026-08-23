@@ -313,12 +313,10 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
         st.warning("The rule 'exactly three' comes from the original activity. It is a modelling choice, not certain evidence from the story.")
 
     elif step == 5:
-        st.header("Apply filter 3: planet radius")
-        st.dataframe(steps, use_container_width=True, hide_index=True)
-        st.metric("Possible candidates", f"{len(candidates):,}")
-        candidate_columns = ["pl_name", "hostname", "pl_rade", "pl_bmasse", "pl_eqt", "sy_dist", "sy_snum", "sy_pnum"]
-        st.dataframe(candidates[candidate_columns].sort_values("pl_name"), use_container_width=True, hide_index=True)
-        st.info("Radius is a proxy. It does not directly tell us mass, composition, gravity, atmosphere or habitability.")
+        st.header("Try your own planet criteria")
+        st.write("The original rules were only one possible definition. Change the criteria below and see how the candidate list responds.")
+        guidance_mode = "Teacher" if st.session_state.get("tatooine_teacher_view", False) else "Student"
+        tatooine.render_custom_filters(data, guidance_mode, guidance_box, custom_candidates)
 
     elif step == 6:
         st.header("Compare candidate systems")
