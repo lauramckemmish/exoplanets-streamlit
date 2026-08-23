@@ -9,5 +9,10 @@ YEAR_LEVEL = "Year 10"
 PART_COUNT = len(STEP_LABELS)
 
 
+def render_teacher_note(part, fallback):
+    """Render this pathway's Teacher view during the staged extraction."""
+    return fallback(part, YEAR_LEVEL)
+
+
 def render(data, implementation):
-    return implementation(data)
+    return implementation(data, teacher_note_renderer=render_teacher_note)
