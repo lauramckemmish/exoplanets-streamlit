@@ -142,19 +142,22 @@ def render_one_variable(data, guidance_mode, field_options):
         label = st.selectbox("Choose a numerical variable", list(options), key="lab_one_numeric")
         field = options[label]
         plotted = display_data(data) if field == "sy_dist" else data
-        figure = px.histogram(plotted.dropna(subset=[field]), x=field, nbins=30, title=f"Distribution of {label}")
+        bin_count = st.slider("Number of histogram bins", min_value=5, max_value=60, value=25, help="More bins show finer detail; fewer bins give a simpler overall picture.")
+        figure = px.histogram(plotted.dropna(subset=[field]), x=field, nbins=bin_count, title=f"Distribution of {label}")
         figure.update_layout(xaxis_title=label, yaxis_title="Number of planet records")
     else:
-        field = st.selectbox("Choose a category", ["Discovery method", "Discovery year"], key="lab_one_category")
-        column = "discoverymethod" if field == "Discovery method" else "disc_year"
+        field = st.selectbox("Choose a category", ["Discovery method", "Stars in system", "Planets in system"], key="lab_one_category")
+        column = {"Discovery method": "discoverymethod", "Stars in system": "sy_snum", "Planets in system": "sy_pnum"}[field]
+        chart_type = st.radio("Choose a representation", ["Bar chart", "Pie chart"], horizontal=True, key="lab_one_category_chart")
         counts = data[column].dropna().value_counts().reset_index()
         counts.columns = [field, "Number of planet records"]
-        figure = px.bar(counts, x=field, y="Number of planet records", title=f"Counts by {field}")
-        if column == "disc_year":
-            figure.update_layout(xaxis_type="linear")
+        if chart_type == "Bar chart":
+            figure = px.bar(counts, x=field, y="Number of planet records", title=f"Counts by {field}")
+        else:
+            figure = px.pie(counts, names=field, values="Number of planet records", title=f"Proportion of records by {field}")
     st.plotly_chart(figure, use_container_width=True)
     if guidance_mode != "Minimal":
-        st.info("Look for the tallest bars, the overall spread and any gaps or unusual values. NSW Science link: organise and summarise secondary data using an appropriate representation.")
+        st.info("Try changing the representation. What stays the same, and what becomes easier or harder to notice? NSW Science link: organise and summarise secondary data using an appropriate representation.")
 
 
 def render_two_variables(data, guidance_mode, field_options):
