@@ -161,6 +161,43 @@ TEACHER_BACKGROUNDS = {
 }
 
 
+TEACHER_NOTE_OVERRIDES = {
+    0: dict(
+        title="Workshop overview",
+        purpose="Recognise that astronomical conclusions are built from data that have strengths and limitations.",
+        timing="3 minutes (Lesson 1)",
+        facilitation="Preview the investigation without explaining the detection-bias conclusion. Ask students what evidence they would need to compare planetary systems.",
+        alignment="Stage 5 Working Scientifically in an astronomy and data-science context.",
+        evidence="Students can state that the workshop will use planet data to investigate a scientific question.",
+        listen_for="Questions about what has been measured, how planets are found, and whether the known planets represent all planets.",
+    ),
+    1: dict(
+        title="Describe our Solar System",
+        purpose="Use Earth masses and qualitative mass groups to describe familiar planets.",
+        timing="7 minutes (Lesson 1)",
+        facilitation="Treat this as a quick common starting point. Model one bar segment, then let students identify the other groups by hovering. An Earth mass is a comparison unit, not Earth's physical size.",
+        alignment="SC5-WS-05, SC5-WS-06 and SC5-WS-08: process, represent and identify patterns in data.",
+        evidence="Students correctly describe at least one Solar System planet using its qualitative mass group.",
+        listen_for="Comparisons such as ‘Jupiter is much more massive than Earth’ rather than interpreting a wide segment as a physically wider planet.",
+        misconceptions="Mass and size are related but are not the same variable. The illustration also enlarges planets and places them close together; it is not to scale.",
+    ),
+    2: dict(
+        title="Move beyond our Solar System",
+        purpose="Distinguish the Sun from other stars, the Solar System from other planetary systems, and an exoplanet from a Solar System planet.",
+        timing="10 minutes (Lesson 1)",
+        facilitation="Establish the vocabulary before comparing the bars. Invite possibilities for other planetary systems, but keep this short enough to preserve time for the data investigation.",
+        alignment="SC5-DA2-01: use scientific knowledge and data when evaluating claims.",
+        evidence="Students can explain that an exoplanet orbits another star and that the Solar System is one planetary system.",
+        listen_for="‘Our Sun is one star’ and ‘other stars can have their own planets’. Student ideas may include different numbers, arrangements or types of planets.",
+        misconceptions="‘Solar system’ properly names our system; ‘planetary system’ is the general term. We have found exoplanets within the nearby parts of our Milky Way galaxy (not in other galaxies). Stars are not planets.",
+        resources=(
+            ("NASA: What are exoplanets?", "https://science.nasa.gov/exoplanets/"),
+            ("NASA: How do planets form?", "https://science.nasa.gov/exoplanets/how-do-planets-form/"),
+        ),
+    ),
+}
+
+
 def render_teacher_note(part, fallback):
     """Render this pathway's Teacher view during the staged extraction."""
     return fallback(part, YEAR_LEVEL)
