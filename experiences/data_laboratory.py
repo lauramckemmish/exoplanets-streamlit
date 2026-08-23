@@ -1,5 +1,6 @@
 """Exoplanet Data Laboratory experience entry point."""
 
+import pandas as pd
 import streamlit as st
 
 TITLE = "Exoplanet Data Laboratory"
@@ -44,6 +45,30 @@ def render_discoveries(data, guidance_mode, discovery_chart, guidance_box):
         st.warning("Select at least one discovery method.")
     if guidance_mode != "Minimal":
         st.markdown(DISCOVERY_GUIDANCE["prompt"])
+
+
+def render_dataset(data, guidance_mode, field_options, variables, guidance_box, variable_card, scale_guidance):
+    """Render the dataset tab using shared application services."""
+    st.header("Meet the dataset")
+    guidance_box(
+        guidance_mode,
+        "Start by checking what each row and column represent, then inspect missing values before drawing conclusions.",
+        "Learning intention: students recognise that data structure and completeness determine which questions can be answered reliably.",
+    )
+    display = ["pl_name", "hostname", "disc_year", "discoverymethod", "pl_rade", "pl_bmasse", "pl_orbper", "pl_eqt", "sy_dist", "sy_snum", "sy_pnum"]
+    st.dataframe(data[display], use_container_width=True, hide_index=True)
+    st.subheader("Missing-data summary")
+    missing = pd.DataFrame({
+        "Variable": display,
+        "Missing records": [int(data[col].isna().sum()) for col in display],
+        "Complete records (%)": [round(100 * data[col].notna().mean(), 1) for col in display],
+    }).sort_values("Complete records (%)")
+    st.dataframe(missing, use_container_width=True, hide_index=True)
+    if guidance_mode != "Minimal":
+        st.info("Missing means unknown. It does not mean zero, unsuitable, or evidence that a planet meets a criterion.")
+    st.subheader("Variable guide")
+    selected_label = st.selectbox("Choose a variable to understand", list(field_options), key="dictionary_variable")
+    variable_card(data, field_options[selected_label], guidance_mode, variables, scale_guidance)
 
 INVESTIGATIONS = {
     "Does planet size relate to mass?": {

@@ -424,31 +424,6 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
 # EXPERIENCE 2 — EXOPLANET DATA LABORATORY
 # ============================================================================
 
-def render_dataset_lab(data: pd.DataFrame, guidance_mode: str) -> None:
-    st.header("Meet the dataset")
-    guidance_box(
-        guidance_mode,
-        "Start by checking what each row and column represent, then inspect missing values before drawing conclusions.",
-        "Learning intention: students recognise that data structure and completeness determine which questions can be answered reliably.",
-    )
-    display = ["pl_name", "hostname", "disc_year", "discoverymethod", "pl_rade", "pl_bmasse", "pl_orbper", "pl_eqt", "sy_dist", "sy_snum", "sy_pnum"]
-    st.dataframe(data[display], use_container_width=True, hide_index=True)
-
-    st.subheader("Missing-data summary")
-    missing = pd.DataFrame({
-        "Variable": display,
-        "Missing records": [int(data[col].isna().sum()) for col in display],
-        "Complete records (%)": [round(100 * data[col].notna().mean(), 1) for col in display],
-    }).sort_values("Complete records (%)")
-    st.dataframe(missing, use_container_width=True, hide_index=True)
-    if guidance_mode != "Minimal":
-        st.info("Missing means unknown. It does not mean zero, unsuitable, or evidence that a planet meets a criterion.")
-
-    st.subheader("Variable guide")
-    selected_label = st.selectbox("Choose a variable to understand", list(FIELD_OPTIONS), key="dictionary_variable")
-    variable_card(data, FIELD_OPTIONS[selected_label], guidance_mode, VARIABLES, shared_scale_guidance)
-
-
 def render_relationship_lab(data: pd.DataFrame, guidance_mode: str) -> None:
     st.header("Relationship explorer")
     entry = st.radio("How would you like to begin?", ["Start with a question", "Build your own graph"], horizontal=True)
@@ -681,7 +656,15 @@ def render_data_lab(data: pd.DataFrame, guidance_mode: str) -> None:
     scroll_to_top_if_requested("lab_scroll_to_top")
     if current_tab == 0:
         with tabs[0]:
-            render_dataset_lab(data, guidance_mode)
+            data_laboratory.render_dataset(
+                data,
+                guidance_mode,
+                FIELD_OPTIONS,
+                VARIABLES,
+                guidance_box,
+                variable_card,
+                shared_scale_guidance,
+            )
     elif current_tab == 1:
         with tabs[1]:
             data_laboratory.render_discoveries(data, guidance_mode, discovery_chart, guidance_box)
