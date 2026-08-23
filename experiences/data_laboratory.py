@@ -1,5 +1,7 @@
 """Exoplanet Data Laboratory experience entry point."""
 
+import streamlit as st
+
 TITLE = "Exoplanet Data Laboratory"
 SUBTITLE = "Open exploration with contextual guidance for analytical choices"
 TAB_LABELS = [
@@ -24,6 +26,24 @@ DISCOVERY_GUIDANCE = {
     "teacher": "Ask whether the graph describes the true planet population or the history of available detection methods and surveys.",
     "prompt": "**Look for:** changes over time, dominant categories and sudden shifts.  \n**Consider:** whether detection methods favour certain types of planets.  \n**Describe:** 'Discoveries using ______ increased after ______, which may reflect ______.'",
 }
+
+
+def render_discoveries(data, guidance_mode, discovery_chart, guidance_box):
+    """Render the discoveries tab using shared application services."""
+    st.header("How have exoplanets been discovered?")
+    guidance_box(
+        guidance_mode,
+        DISCOVERY_GUIDANCE["summary"],
+        DISCOVERY_GUIDANCE["teacher"],
+    )
+    methods = sorted(data["discoverymethod"].dropna().unique().tolist())
+    selected_methods = st.multiselect("Discovery methods", methods, default=methods)
+    if selected_methods:
+        st.plotly_chart(discovery_chart(data, selected_methods), use_container_width=True)
+    else:
+        st.warning("Select at least one discovery method.")
+    if guidance_mode != "Minimal":
+        st.markdown(DISCOVERY_GUIDANCE["prompt"])
 
 INVESTIGATIONS = {
     "Does planet size relate to mass?": {

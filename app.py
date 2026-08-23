@@ -449,25 +449,6 @@ def render_dataset_lab(data: pd.DataFrame, guidance_mode: str) -> None:
     variable_card(data, FIELD_OPTIONS[selected_label], guidance_mode, VARIABLES, shared_scale_guidance)
 
 
-def render_discovery_lab(data: pd.DataFrame, guidance_mode: str) -> None:
-    st.header("How have exoplanets been discovered?")
-    guidance_box(
-        guidance_mode,
-        data_laboratory.DISCOVERY_GUIDANCE["summary"],
-        data_laboratory.DISCOVERY_GUIDANCE["teacher"],
-    )
-    methods = sorted(data["discoverymethod"].dropna().unique().tolist())
-    selected_methods = st.multiselect("Discovery methods", methods, default=methods)
-    if selected_methods:
-        st.plotly_chart(discovery_chart(data, selected_methods), use_container_width=True)
-    else:
-        st.warning("Select at least one discovery method.")
-    if guidance_mode != "Minimal":
-        st.markdown(
-            data_laboratory.DISCOVERY_GUIDANCE["prompt"]
-        )
-
-
 def render_relationship_lab(data: pd.DataFrame, guidance_mode: str) -> None:
     st.header("Relationship explorer")
     entry = st.radio("How would you like to begin?", ["Start with a question", "Build your own graph"], horizontal=True)
@@ -703,7 +684,7 @@ def render_data_lab(data: pd.DataFrame, guidance_mode: str) -> None:
             render_dataset_lab(data, guidance_mode)
     elif current_tab == 1:
         with tabs[1]:
-            render_discovery_lab(data, guidance_mode)
+            data_laboratory.render_discoveries(data, guidance_mode, discovery_chart, guidance_box)
     elif current_tab == 2:
         with tabs[2]:
             render_relationship_lab(data, guidance_mode)
