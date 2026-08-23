@@ -327,8 +327,15 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
             {"Clue": "A temperature worth investigating", "Variable": "Equilibrium temperature", "Example rule": "−73–127°C"},
         ]), use_container_width=True, hide_index=True)
         st.warning("This is a screening search, not a test for habitability. The host star's brightness also affects temperature.")
-        earth_filter_style = st.radio("How broad should the search be?", ["Tight", "Loose"], horizontal=True, key="earth_filter_style")
-        if earth_filter_style == "Tight":
+        earth_filter_style = st.radio(
+            "Choose a search level",
+            ["Earth-sized focus", "Earth-size neighbourhood", "Wide search"],
+            horizontal=True,
+            key="earth_filter_style",
+        )
+        if earth_filter_style == "Earth-sized focus":
+            radius_range, orbit_range, temp_range = (0.9, 1.1), (0.8, 1.5), (250, 350)
+        elif earth_filter_style == "Earth-size neighbourhood":
             radius_range, orbit_range, temp_range = (0.8, 1.5), (0.5, 2.0), (200, 400)
         else:
             radius_range, orbit_range, temp_range = (0.5, 2.0), (0.2, 5.0), (150, 500)
