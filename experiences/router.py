@@ -24,6 +24,16 @@ def select_demographics_pathway(pathway: str) -> None:
     st.session_state["experience"] = "Exoplanet Demographics"
 
 
+def open_experience(name: str, facilitated_pathway: str, stage4_pathway: str, stage5_pathway: str) -> None:
+    """Open an experience from the Introduction catalogue."""
+    if name in {facilitated_pathway, stage4_pathway, stage5_pathway}:
+        select_demographics_pathway(name)
+    elif name == "Find Tatooine":
+        select_experience("Guided Tatooine Mission")
+    else:
+        select_experience(name)
+
+
 def normalise_pathway(pathway, facilitated_pathway, stage4_pathway, stage5_pathway):
     """Return a current pathway name for current or legacy session values."""
     migrations = {
