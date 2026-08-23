@@ -324,21 +324,12 @@ st.set_page_config(
 # ============================================================================
 
 def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None) -> None:
-    total_steps = 8
+    total_steps = tatooine.STEP_COUNT
     if "mission_step" not in st.session_state:
         st.session_state["mission_step"] = 0
     step = int(st.session_state["mission_step"])
     step = max(0, min(step, total_steps - 1))
-    step_labels = [
-        "Briefing",
-        "Archive",
-        "Evidence",
-        "Two suns",
-        "Three planets",
-        "Earth-sized",
-        "Compare",
-        "Report",
-    ]
+    step_labels = tatooine.STEP_LABELS
 
     heading, controls = st.columns([4, 2])
     with heading:
