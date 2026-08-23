@@ -868,16 +868,6 @@ def render_demographics_classroom_body(
         )
         learn_more_prompt("classroom")
 
-    step_buttons(
-        step_labels,
-        "demographics_step_selector",
-        "demographics_part",
-        "demographics_scroll_to_top",
-        part,
-        "demographics",
-    )
-
-
 def render_demographics_landing(data: pd.DataFrame) -> None:
     st.title("Explore exoplanets using real NASA data")
     count_column, description_column, image_column = st.columns([1, 2, 2])

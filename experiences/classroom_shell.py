@@ -1,6 +1,7 @@
 """Shared classroom pathway shell, separate from pathway lesson content."""
 
 from experiences import classroom_navigation
+from ui_helpers import step_buttons
 
 
 def render(
@@ -31,3 +32,11 @@ def render(
     if teacher_note_renderer is not None:
         teacher_note_renderer(part)
     render_lesson_body(data, pathway, year_level, part, step_labels)
+    step_buttons(
+        step_labels,
+        "demographics_step_selector",
+        "demographics_part",
+        "demographics_scroll_to_top",
+        part,
+        "demographics",
+    )
