@@ -259,18 +259,6 @@ def classroom_teacher_note(part: int, year_level: str) -> None:
         7: dict(title="Compare discovery methods", purpose="Explain how measurement methods shape the detected dataset and the conclusions that can be drawn from it.", timing="18 minutes (Lesson 2)", facilitation="Toggle one method at a time, ask students to describe each pattern, and only then reveal all methods. Ask what may be hard for current methods to find. Let students infer the incompleteness of the dataset before consolidating it in the conclusion.", alignment=("SC4-DA1-01 and SC4-WS-06: use and interpret scientific datasets." if year_level == "Year 8" else "SC5-DA2-01 and SC5-WS-06: assess claims using the strengths and limitations of data."), evidence="Students use differences between method views to explain why detected planets may not represent every planet that exists.", listen_for="‘A gap could mean difficult to detect, not impossible’ and ‘future technology may reveal planets in currently sparse regions’. Keep ‘may’ rather than promising that every gap will be filled.", background="**Radial velocity (Doppler method):** an orbiting planet makes its star move slightly towards and away from us, shifting its spectrum towards blue and red. This offers a useful Year 10 waves connection.\n\n**Microlensing:** gravity from a foreground star-system bends and magnifies light from a more distant star. A planet can add a brief feature to that one-off brightening event. It can find distant systems but events usually cannot be repeated.\n\nOther methods can remain optional student research rather than required teacher exposition.", misconceptions="Different methods do not create different planets; they make different existing planets easier to detect.", resources=(("NASA: Doppler and transit overview", "https://science.nasa.gov/astrobiology/learning-resources/alp/discover-worlds-around-other-stars/"), ("NASA: microlensing explainer", "https://science.nasa.gov/resource/exoplanet-detection-microlensing-method/"))),
         8: dict(title="Consolidate and generate new questions", purpose="Connect planet diversity, graph representation and detection limitations in an evidence-based explanation.", timing="8 minutes (Lesson 2)", facilitation="Ask students for their own conclusion first. Then consolidate the shared idea that scientists have not found every planet and that future technology may change the visible pattern. Finish with a question students genuinely want investigated.", alignment=f"{working_scientifically}: communicate scientific concepts or arguments using evidence.", evidence="Students distinguish the detected sample from all planets that may exist and pose a relevant scientific question.", listen_for="Questions that could be investigated using observations, models or new technology. Preserve uncertainty: some gaps may reflect detection limits and some may reflect how planetary systems form."),
     }
-    if year_level == "Year 8":
-        notes[5] = dict(
-            title="Reconnect mass and ask what else matters",
-            purpose="Reactivate students' understanding of planet mass, use memorable exoplanets to restore context, and create a reason to introduce orbital distance as a second variable.",
-            timing="10 minutes (start of Lesson 2)",
-            facilitation="Keep this conversational and imaginative. Ask students what kind of planet they would visit and what its mass might be. Then ask what else they would want to know about where that planet sits in its planetary system. End by asking how scientists describe a planet's distance from its star; the following section answers that question.",
-            alignment="SC4-OTU-01 and SC4-WS-06: use observations and scientific questions to build understanding of the Universe.",
-            evidence="Students retrieve mass as a meaningful description of a planet and begin to suggest location or distance from the star as another important characteristic.",
-            listen_for="Students using mass meaningfully, such as choosing a small rocky or much more massive world, and beginning to suggest that a planet's position or distance from its star matters too.",
-            background="These are NASA/JPL artist's impressions based on real exoplanet systems, not photographs. Kepler-16 b orbits two stars; 51 Pegasi b is a hot Jupiter; Kepler-186 f is approximately Earth-sized. TRAPPIST-1 has seven known, roughly Earth-sized planets packed close to one small star. The purpose here is wonder and retrieval, not a complete astronomy lesson. Orbital distance is introduced formally on the next page.",
-            misconceptions="The posters do not show the planets' true sizes or distances to scale. A planet's mass tells us how much matter it has, but not where it orbits or what its surface is like.",
-        )
     classroom_backgrounds = {
         0: (
             "**What teachers need to know**\n\n"
@@ -422,26 +410,6 @@ def classroom_teacher_note(part: int, year_level: str) -> None:
     if year_level == "Year 8":
         notes.update(
             {
-                5: dict(
-                    title="Generate an initial claim from strange worlds",
-                    purpose="Use memorable examples to make an initial claim about how similar planetary systems may be.",
-                    timing="12 minutes (Lesson 2)",
-                    facilitation="Use the NASA/JPL travel-poster image as an invitation to imagine, not as a scientific photograph. Students should make a tentative claim here; Step 7 will test it against the larger dataset.",
-                    alignment="SC4-OTU-01 and SC4-WS-06: observations increase understanding of the Universe and support scientific conclusions.",
-                    evidence="Students make a claim that other systems can differ from ours, supported by one example.",
-                    listen_for="Specific comparisons such as two stars, a giant planet close to a star, or a compact group of planets.",
-                    misconceptions="The travel poster is an illustration of a real system, not a photograph or a prediction that humans could currently visit it.",
-                ),
-                6: dict(
-                    title="Add orbital distance and change representation",
-                    purpose="Interpret a two-variable scatter plot and explain why a log–log representation makes a wide range easier to see.",
-                    timing="12 minutes (Lesson 2)",
-                    facilitation="Use the linear graph to create a genuine visibility problem, then reveal the log–log graph as a representation choice. No logarithm calculations are required.",
-                    alignment="SC4-DA1-01, SC4-WS-05 and SC4-WS-06: use representations to identify relationships in data.",
-                    evidence="Students identify what becomes easier to distinguish after the scale changes.",
-                    listen_for="The variables and values stay the same; only the spacing changes.",
-                    misconceptions="The graph has not changed the planets or their real locations.",
-                ),
                 7: dict(
                     title="Compare planetary systems and check a claim",
                     purpose="Use the larger exoplanet dataset to support, challenge or revise the initial claim from Step 5.",

@@ -64,6 +64,26 @@ TEACHER_NOTE_OVERRIDES = {
         listen_for="A comparison of proportions rather than raw totals, because one group has eight planets and the other has thousands.",
         misconceptions="A wider section represents a larger proportion of that group, not a physically wider planet.",
     ),
+    5: dict(
+        title="Generate an initial claim from strange worlds",
+        purpose="Use memorable examples to make an initial claim about how similar planetary systems may be.",
+        timing="12 minutes (Lesson 2)",
+        facilitation="Use the NASA/JPL travel-poster image as an invitation to imagine, not as a scientific photograph. Students should make a tentative claim here; Step 7 will test it against the larger dataset.",
+        alignment="SC4-OTU-01 and SC4-WS-06: observations increase understanding of the Universe and support scientific conclusions.",
+        evidence="Students make a claim that other systems can differ from ours, supported by one example.",
+        listen_for="Specific comparisons such as two stars, a giant planet close to a star, or a compact group of planets.",
+        misconceptions="The travel poster is an illustration of a real system, not a photograph or a prediction that humans could currently visit it.",
+    ),
+    6: dict(
+        title="Add orbital distance and change representation",
+        purpose="Interpret a two-variable scatter plot and explain why a log–log representation makes a wide range easier to see.",
+        timing="12 minutes (Lesson 2)",
+        facilitation="Use the linear graph to create a genuine visibility problem, then reveal the log–log graph as a representation choice. No logarithm calculations are required.",
+        alignment="SC4-DA1-01, SC4-WS-05 and SC4-WS-06: use representations to identify relationships in data.",
+        evidence="Students identify what becomes easier to distinguish after the scale changes.",
+        listen_for="The variables and values stay the same; only the spacing changes.",
+        misconceptions="The graph has not changed the planets or their real locations.",
+    ),
 }
 
 
