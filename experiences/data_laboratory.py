@@ -135,41 +135,42 @@ def numeric_options(field_options):
 
 def render_one_variable(data, guidance_mode, field_options):
     st.header("One variable")
-    st.write("Start by looking at one feature at a time. A numerical variable shows a distribution; a category shows how many records are in each group.")
-    kind = st.radio("What kind of variable would you like to explore?", ["Numerical", "Category"], horizontal=True, key="lab_one_kind")
-    if kind == "Numerical":
-        options = numeric_options(field_options)
-        label = st.selectbox("Choose a numerical variable", list(options), key="lab_one_numeric")
-        field = options[label]
-        plotted = display_data(data) if field == "sy_dist" else data
-        bin_count = st.slider("Number of histogram bins", min_value=5, max_value=60, value=25, help="More bins show finer detail; fewer bins give a simpler overall picture.")
-        axis_left, axis_right = st.columns(2)
-        use_log_axis = axis_left.checkbox("Use a logarithmic horizontal axis", help="Useful when values range from very small to very large. The values do not change—only the spacing on the axis changes.")
-        use_log_count_axis = axis_right.checkbox("Use a logarithmic vertical axis", help="Useful when some bar counts are much larger than others. The values do not change—only the spacing on the axis changes.")
-        valid = plotted.dropna(subset=[field])
-        if use_log_axis:
-            valid = valid[valid[field] > 0]
-        figure = px.histogram(valid, x=field, nbins=bin_count, title=f"Distribution of {label}")
-        figure.update_layout(xaxis_title=label, yaxis_title="Number of planet records")
-        if use_log_axis:
-            figure.update_xaxes(type="log")
-        if use_log_count_axis:
-            figure.update_yaxes(type="log")
-        if use_log_axis or use_log_count_axis:
-            st.caption("A log axis spreads out small and large positive values. Records with zero or negative values cannot be shown on a log axis.")
+    st.write("There are two useful ways to describe one variable. We can group numerical values into ranges, or count values that are already categories.")
+
+    st.subheader("A. Group a numerical variable into ranges")
+    st.write("Grouping turns measurements into categories that we can count and compare. The group boundaries are a choice, so try changing them.")
+    options = numeric_options(field_options)
+    label = st.selectbox("Choose a numerical variable", list(options), key="lab_one_numeric")
+    field = options[label]
+    plotted = display_data(data) if field == "sy_dist" else data
+    group_count = st.slider("Number of ranges", min_value=3, max_value=8, value=5, help="Each range has the same numerical width. Changing the number of ranges changes the summary, not the original values.")
+    chart_type = st.radio("Show these grouped values as", ["Bar chart", "Pie chart"], horizontal=True, key="lab_one_numeric_chart")
+    values = plotted[field].dropna()
+    grouped = pd.cut(values, bins=group_count, include_lowest=True)
+    counts = grouped.value_counts(sort=False).reset_index()
+    counts.columns = ["Value range", "Number of planet records"]
+    counts["Value range"] = counts["Value range"].astype(str)
+    if chart_type == "Bar chart":
+        figure = px.bar(counts, x="Value range", y="Number of planet records", title=f"{label}, grouped into {group_count} ranges")
+        figure.update_layout(xaxis_title=label, xaxis_tickangle=-35)
     else:
-        field = st.selectbox("Choose a category", ["Discovery method", "Stars in system", "Planets in system"], key="lab_one_category")
-        column = {"Discovery method": "discoverymethod", "Stars in system": "sy_snum", "Planets in system": "sy_pnum"}[field]
-        chart_type = st.radio("Choose a representation", ["Bar chart", "Pie chart"], horizontal=True, key="lab_one_category_chart")
-        counts = data[column].dropna().value_counts().reset_index()
-        counts.columns = [field, "Number of planet records"]
-        if chart_type == "Bar chart":
-            figure = px.bar(counts, x=field, y="Number of planet records", title=f"Counts by {field}")
-        else:
-            figure = px.pie(counts, names=field, values="Number of planet records", title=f"Proportion of records by {field}")
+        figure = px.pie(counts, names="Value range", values="Number of planet records", title=f"{label}, grouped into {group_count} ranges")
     st.plotly_chart(figure, use_container_width=True)
+
+    st.subheader("B. Count an existing category")
+    st.write("Some variables already describe groups. We can count how many records belong to each group.")
+    category_label = st.selectbox("Choose a category", ["Discovery method", "Stars in system", "Planets in system"], key="lab_one_category")
+    column = {"Discovery method": "discoverymethod", "Stars in system": "sy_snum", "Planets in system": "sy_pnum"}[category_label]
+    category_chart = st.radio("Show these category counts as", ["Bar chart", "Pie chart"], horizontal=True, key="lab_one_category_chart")
+    category_counts = data[column].dropna().value_counts().reset_index()
+    category_counts.columns = [category_label, "Number of planet records"]
+    if category_chart == "Bar chart":
+        category_figure = px.bar(category_counts, x=category_label, y="Number of planet records", title=f"Counts by {category_label}")
+    else:
+        category_figure = px.pie(category_counts, names=category_label, values="Number of planet records", title=f"Proportion of records by {category_label}")
+    st.plotly_chart(category_figure, use_container_width=True)
     if guidance_mode != "Minimal":
-        st.info("Try changing the representation or axis spacing. What stays the same, and what becomes easier or harder to notice? NSW Science link: organise and summarise secondary data using an appropriate representation.")
+        st.info("Try two grouping choices or two representations. What stays the same, and what becomes easier or harder to notice? NSW Science link: organise and summarise secondary data using an appropriate representation.")
 
 
 def render_two_variables(data, guidance_mode, field_options):
