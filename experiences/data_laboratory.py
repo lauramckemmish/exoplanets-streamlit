@@ -409,5 +409,66 @@ INVESTIGATIONS = {
 }
 
 
-def render(data, guidance_mode, implementation):
-    return implementation(data, guidance_mode)
+def render(
+    data,
+    guidance_mode,
+    *,
+    teacher_note,
+    step_tabs,
+    scroll_to_top_if_requested,
+    step_buttons,
+    guidance_box,
+    field_options,
+    variables,
+    variable_card,
+    scale_guidance,
+    custom_candidates,
+    sky_map,
+):
+    """Render the complete Data Laboratory experience using shared services."""
+    heading, activity_controls = st.columns([4, 2])
+    with heading:
+        st.title(TITLE)
+        st.caption(SUBTITLE)
+    with activity_controls:
+        st.toggle("Teacher view", key="lab_teacher_view", help="Show additional guidance for teaching and facilitating the investigation.")
+    if guidance_mode == "Teacher":
+        teacher_note(
+            TEACHER_GUIDANCE["title"],
+            TEACHER_GUIDANCE["purpose"],
+            TEACHER_GUIDANCE["approach"],
+            alignment=TEACHER_GUIDANCE["alignment"],
+            timing=TEACHER_GUIDANCE["timing"],
+            listen_for=TEACHER_GUIDANCE["listen_for"],
+        )
+    current_tab = int(st.session_state.get("lab_tab_step", 0))
+    tabs, selected_tab = step_tabs(TAB_LABELS, "lab_tab", current_tab)
+    if selected_tab != current_tab:
+        current_tab = selected_tab
+        st.session_state["lab_tab_step"] = current_tab
+    scroll_to_top_if_requested("lab_scroll_to_top")
+    if current_tab == 0:
+        with tabs[0]:
+            render_intro(data, guidance_mode, guidance_box)
+    elif current_tab == 1:
+        with tabs[1]:
+            render_variables(data, guidance_mode, field_options, variables, variable_card, scale_guidance)
+    elif current_tab == 2:
+        with tabs[2]:
+            render_dataset_and_missing(data, guidance_mode)
+    elif current_tab == 3:
+        with tabs[3]:
+            render_one_variable(data, guidance_mode, field_options)
+    elif current_tab == 4:
+        with tabs[4]:
+            render_two_variables(data, guidance_mode, field_options)
+    elif current_tab == 5:
+        with tabs[5]:
+            render_three_variables(data, guidance_mode, field_options)
+    elif current_tab == 6:
+        with tabs[6]:
+            render_filters(data, guidance_mode, guidance_box, custom_candidates)
+    else:
+        with tabs[7]:
+            render_map(data, guidance_mode, sky_map)
+    step_buttons(TAB_LABELS, "lab_tab", "lab_tab_step", "lab_scroll_to_top", current_tab, "lab")

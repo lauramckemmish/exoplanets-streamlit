@@ -425,67 +425,6 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
 # EXPERIENCE 2 — EXOPLANET DATA LABORATORY
 # ============================================================================
 
-def render_data_lab(data: pd.DataFrame, guidance_mode: str) -> None:
-    heading, activity_controls = st.columns([4, 2])
-    with heading:
-        st.title(data_laboratory.TITLE)
-        st.caption(data_laboratory.SUBTITLE)
-    with activity_controls:
-        st.toggle(
-            "Teacher view",
-            key="lab_teacher_view",
-            help="Show additional guidance for teaching and facilitating the investigation.",
-        )
-    if guidance_mode == "Teacher":
-        teacher_note(
-            data_laboratory.TEACHER_GUIDANCE["title"],
-            data_laboratory.TEACHER_GUIDANCE["purpose"],
-            data_laboratory.TEACHER_GUIDANCE["approach"],
-            alignment=data_laboratory.TEACHER_GUIDANCE["alignment"],
-            timing=data_laboratory.TEACHER_GUIDANCE["timing"],
-            listen_for=data_laboratory.TEACHER_GUIDANCE["listen_for"],
-        )
-    tab_labels = data_laboratory.TAB_LABELS
-    current_tab = int(st.session_state.get("lab_tab_step", 0))
-    tabs, selected_tab = step_tabs(tab_labels, "lab_tab", current_tab)
-    if selected_tab != current_tab:
-        current_tab = selected_tab
-        st.session_state["lab_tab_step"] = current_tab
-    scroll_to_top_if_requested("lab_scroll_to_top")
-    if current_tab == 0:
-        with tabs[0]:
-            data_laboratory.render_intro(data, guidance_mode, guidance_box)
-    elif current_tab == 1:
-        with tabs[1]:
-            data_laboratory.render_variables(data, guidance_mode, FIELD_OPTIONS, VARIABLES, variable_card, shared_scale_guidance)
-    elif current_tab == 2:
-        with tabs[2]:
-            data_laboratory.render_dataset_and_missing(data, guidance_mode)
-    elif current_tab == 3:
-        with tabs[3]:
-            data_laboratory.render_one_variable(data, guidance_mode, FIELD_OPTIONS)
-    elif current_tab == 4:
-        with tabs[4]:
-            data_laboratory.render_two_variables(data, guidance_mode, FIELD_OPTIONS)
-    elif current_tab == 5:
-        with tabs[5]:
-            data_laboratory.render_three_variables(data, guidance_mode, FIELD_OPTIONS)
-    elif current_tab == 6:
-        with tabs[6]:
-            data_laboratory.render_filters(data, guidance_mode, guidance_box, custom_candidates)
-    else:
-        with tabs[7]:
-            data_laboratory.render_map(data, guidance_mode, sky_map)
-    step_buttons(
-        tab_labels,
-        "lab_tab",
-        "lab_tab_step",
-        "lab_scroll_to_top",
-        current_tab,
-        "lab",
-    )
-
-
 # ============================================================================
 # EXPERIENCE 3 — EXOPLANET DEMOGRAPHICS: SHARED CONTENT HELPERS
 # The pathway renderers below contain the editable student-facing lesson text.
@@ -1968,7 +1907,21 @@ if experience == "Guided Tatooine Mission":
 elif experience == "Exoplanet Demographics":
     render_demographics(data)
 else:
-    data_laboratory.render(data, guidance_mode, render_data_lab)
+    data_laboratory.render(
+        data,
+        guidance_mode,
+        teacher_note=teacher_note,
+        step_tabs=step_tabs,
+        scroll_to_top_if_requested=scroll_to_top_if_requested,
+        step_buttons=step_buttons,
+        guidance_box=guidance_box,
+        field_options=FIELD_OPTIONS,
+        variables=VARIABLES,
+        variable_card=variable_card,
+        scale_guidance=shared_scale_guidance,
+        custom_candidates=custom_candidates,
+        sky_map=sky_map,
+    )
 
 st.divider()
 st.caption(
