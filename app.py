@@ -1145,7 +1145,10 @@ def curious_teacher_note(part: int) -> None:
 def render_demographics_classroom(data: pd.DataFrame) -> None:
     """Render the Year 8 and Year 10 lessons, one selected step at a time."""
     pathway = st.session_state.get("demographics_pathway")
-    year_level = {STAGE4_PATHWAY: "Year 8", STAGE5_PATHWAY: "Year 10"}.get(pathway)
+    year_level = {
+        STAGE4_PATHWAY: strange_new_worlds.YEAR_LEVEL,
+        STAGE5_PATHWAY: planets_we_have_not_found.YEAR_LEVEL,
+    }.get(pathway)
     if year_level is None:
         return
     if "demographics_part" not in st.session_state:
