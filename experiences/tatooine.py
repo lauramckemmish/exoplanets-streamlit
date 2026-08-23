@@ -117,19 +117,43 @@ def prepare_page(teacher_note, step_tabs, scroll_to_top_if_requested):
 
 
 def render_custom_filters(data, guidance_mode, guidance_box, custom_candidates, defaults=(2, 3, (0.8, 1.5)), key_prefix="perfect"):
-    """Render the reusable planet-search filter controls."""
+    """Render each optional filter as an inline choice → missing data → result story."""
     st.header("Choose your planet criteria")
     guidance_box(guidance_mode, "Turn an idea about a planet into rules, then apply the rules one at a time.", "Ask students which criteria are essential, which are proxies and what missing values mean.")
+    st.write(f"We start with **{len(data):,} detected planet records**.")
+    current = data.copy()
+
+    def apply_choice(field, label, rule_text, mask):
+        nonlocal current
+        before = len(current)
+        missing = int(current[field].isna().sum())
+        available = current[current[field].notna()].copy()
+        st.info(f"Choice: consider **{label}**.")
+        st.warning(f"Missing data: {missing:,} of the {before:,} planets do not have this value recorded.")
+        st.success(f"Result after checking the data: {len(available):,} planets remain available for this filter.")
+        current = available[mask(available)].copy()
+        st.info(f"Choice: {rule_text}")
+        st.success(f"Result after applying the rule: {len(current):,} planets remain.")
+
     st.subheader("Variable 1: Orbital distance from the star")
     use_orbital_distance = st.checkbox("Consider orbital distance", key=f"{key_prefix}_use_orbital_distance")
     orbital_distance = st.slider("Orbital distance (AU)", 0.01, 100.0, (0.5, 5.0), 0.01, disabled=not use_orbital_distance, key=f"{key_prefix}_orbital_distance")
+    if use_orbital_distance:
+        apply_choice("pl_orbsmax", "orbital distance", f"keep planets between {orbital_distance[0]:.2f} and {orbital_distance[1]:.2f} AU.", lambda frame: frame["pl_orbsmax"].between(*orbital_distance, inclusive="both"))
+
     st.subheader("Variable 2: Planet radius")
     use_radius = st.checkbox("Consider planet radius", value=True, key=f"{key_prefix}_use_radius")
     radius = st.slider("Planet radius (Earth radii)", 0.1, 10.0, defaults[2], 0.05, disabled=not use_radius, key=f"{key_prefix}_radius")
+    if use_radius:
+        apply_choice("pl_rade", "planet radius", f"keep planets with a radius between {radius[0]:.2f} and {radius[1]:.2f} Earth radii.", lambda frame: frame["pl_rade"].between(*radius, inclusive="both"))
+
     st.subheader("Variable 3: Estimated temperature")
     use_temperature = st.checkbox("Consider estimated temperature", key=f"{key_prefix}_use_temperature")
     temperature_c = st.slider("Estimated temperature (°C)", -200, 1500, (-23, 77), 5, disabled=not use_temperature, key=f"{key_prefix}_temperature")
     temperature_k = (temperature_c[0] + 273.15, temperature_c[1] + 273.15) if use_temperature else None
+    if use_temperature:
+        apply_choice("pl_eqt", "estimated temperature", f"keep planets between {temperature_c[0]}°C and {temperature_c[1]}°C.", lambda frame: frame["pl_eqt"].between(*temperature_k, inclusive="both"))
+
     st.subheader("Variable 4: Planetary system")
     c1, c2, c3 = st.columns(3)
     use_stars = c1.checkbox("Use known stars", value=True, key=f"{key_prefix}_use_stars")
@@ -137,40 +161,18 @@ def render_custom_filters(data, guidance_mode, guidance_box, custom_candidates, 
     planet_rule = c2.selectbox("Known planets", ["Any number", "Exactly", "At least"], key=f"{key_prefix}_planet_rule")
     use_planets = c3.checkbox("Use known planets", value=True, key=f"{key_prefix}_use_planets")
     planets = c3.number_input("Known planets", 1, 20, defaults[1], key=f"{key_prefix}_planets", disabled=not use_planets)
-    active_labels = []
-    if use_orbital_distance:
-        active_labels.append("Orbital distance")
-    if use_radius:
-        active_labels.append("Planet radius")
-    if use_temperature:
-        active_labels.append("Estimated temperature")
     if use_stars:
-        active_labels.append("Known stars")
+        apply_choice("sy_snum", "number of known stars", f"keep systems with exactly {int(stars)} known stars.", lambda frame: frame["sy_snum"] == int(stars))
     if use_planets and planet_rule != "Any number":
-        active_labels.append("Known planets")
-    stage = st.selectbox("Apply filters through", ["No filters yet"] + [f"{i + 1}: {label}" for i, label in enumerate(active_labels)], key=f"{key_prefix}_filter_stage")
-    max_filters = 0 if stage == "No filters yet" else int(stage.split(":", 1)[0])
-    candidates, steps = custom_candidates(data, int(stars) if use_stars else None, planet_rule, int(planets) if use_planets and planet_rule != "Any number" else None, radius if use_radius else None, temperature_k, None, orbital_distance if use_orbital_distance else None, max_filters=max_filters)
-    if max_filters == 0:
+        relation = "exactly" if planet_rule == "Exactly" else "at least"
+        mask = (lambda frame: frame["sy_pnum"] == int(planets)) if planet_rule == "Exactly" else (lambda frame: frame["sy_pnum"] >= int(planets))
+        apply_choice("sy_pnum", "number of known planets", f"keep systems with {relation} {int(planets)} known planets.", mask)
+
+    candidates = current
+    if not any([use_orbital_distance, use_radius, use_temperature, use_stars, use_planets and planet_rule != "Any number"]):
         st.metric("Remaining candidates", f"{len(data):,}")
-        st.info("No filters have been applied yet. Choose a filter stage above to begin narrowing the dataset.")
+        st.info("No variables are being considered yet. Turn on a variable above to begin your search.")
         return
-    st.subheader("Apply your filters one at a time")
-    st.write(f"We start with **{len(data):,} detected planet records**.")
-    for _, row in steps.iterrows():
-        before = int(row["Before"])
-        missing = int(row["Missing or unknown"])
-        recorded = before - missing
-        criterion = str(row["Criterion"])
-        variable = criterion.split(" ", 1)[0].replace("Exactly", "number of")
-        st.info(f"Choice: consider the {variable} information.")
-        if missing:
-            st.warning(f"Missing data: {missing:,} of the {before:,} planets do not have this value recorded.")
-        else:
-            st.caption(f"Data check: {recorded:,} of the {before:,} planets have this value recorded.")
-        st.success(f"Result after checking the data: {recorded:,} planets remain available for this filter.")
-        st.info(f"Choice: apply the rule **{criterion}**.")
-        st.success(f"Result after applying the rule: {int(row['Remaining']):,} planets remain.")
     st.caption("A missing value means the measurement was not recorded. It does not mean that the planet failed the rule.")
     st.metric("Remaining candidates", f"{len(candidates):,}")
     if candidates.empty:
