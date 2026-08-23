@@ -131,14 +131,23 @@ def solar_system_demographics_chart(log_axes: bool) -> go.Figure:
     return figure
 
 
-def sky_map(data: pd.DataFrame, selected_planet: str) -> go.Figure:
+def sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field: str | None = None, colour_label: str | None = None) -> go.Figure:
     mapped = data.dropna(subset=["x", "y", "z"]).copy()
-    selected = mapped[mapped["pl_name"] == selected_planet]
-    background = mapped[mapped["pl_name"] != selected_planet]
     figure = go.Figure()
-    figure.add_trace(go.Scatter3d(x=background["x"], y=background["y"], z=background["z"], mode="markers", name="Known exoplanets", marker={"size": 3, "opacity": 0.3}, text=background["pl_name"], customdata=np.column_stack([background["sy_dist"].fillna(np.nan), background["discoverymethod"].fillna("Unknown")]) if not background.empty else None, hovertemplate="<b>%{text}</b><br>Distance: %{customdata[0]:.1f} pc<br>Method: %{customdata[1]}<extra></extra>"))
-    if not selected.empty:
-        figure.add_trace(go.Scatter3d(x=selected["x"], y=selected["y"], z=selected["z"], mode="markers+text", name=selected_planet, marker={"size": 9, "symbol": "diamond"}, text=selected["pl_name"], textposition="top center", hovertemplate="<b>%{text}</b><extra></extra>"))
+    mapped["_distance_ly"] = mapped["sy_dist"] * 3.26156
+    if colour_field and colour_field in mapped:
+        if pd.api.types.is_numeric_dtype(mapped[colour_field]):
+            figure.add_trace(go.Scatter3d(x=mapped["x"], y=mapped["y"], z=mapped["z"], mode="markers", name="Known exoplanets", marker={"size": 4, "opacity": 0.55, "color": mapped[colour_field], "colorscale": "Viridis", "colorbar": {"title": colour_label or colour_field}}, text=mapped["pl_name"], customdata=np.column_stack([mapped["_distance_ly"], mapped["discoverymethod"].fillna("Unknown")]), hovertemplate="<b>%{text}</b><br>Distance: %{customdata[0]:.1f} light-years<br>Method: %{customdata[1]}<extra></extra>"))
+        else:
+            for value, group in mapped.groupby(colour_field, dropna=False):
+                label = "Unknown" if pd.isna(value) else str(value)
+                figure.add_trace(go.Scatter3d(x=group["x"], y=group["y"], z=group["z"], mode="markers", name=label, marker={"size": 4, "opacity": 0.55}, text=group["pl_name"], customdata=np.column_stack([group["_distance_ly"], group["discoverymethod"].fillna("Unknown")]), hovertemplate="<b>%{text}</b><br>Distance: %{customdata[0]:.1f} light-years<br>Method: %{customdata[1]}<extra></extra>"))
+    else:
+        figure.add_trace(go.Scatter3d(x=mapped["x"], y=mapped["y"], z=mapped["z"], mode="markers", name="Known exoplanets", marker={"size": 4, "opacity": 0.45}, text=mapped["pl_name"], customdata=np.column_stack([mapped["_distance_ly"], mapped["discoverymethod"].fillna("Unknown")]), hovertemplate="<b>%{text}</b><br>Distance: %{customdata[0]:.1f} light-years<br>Method: %{customdata[1]}<extra></extra>"))
+    if selected_planet:
+        selected = mapped[mapped["pl_name"] == selected_planet]
+        if not selected.empty:
+            figure.add_trace(go.Scatter3d(x=selected["x"], y=selected["y"], z=selected["z"], mode="markers+text", name=f"Selected: {selected_planet}", marker={"size": 9, "symbol": "diamond", "color": "black"}, text=selected["pl_name"], textposition="top center", hovertemplate="<b>%{text}</b><extra></extra>"))
     figure.update_layout(height=650, margin={"l": 0, "r": 0, "t": 20, "b": 0}, legend={"orientation": "h", "y": 0.02}, scene={"xaxis": {"title": "x", "showticklabels": False}, "yaxis": {"title": "y", "showticklabels": False}, "zaxis": {"title": "z", "showticklabels": False}, "aspectmode": "cube"})
     return figure
 

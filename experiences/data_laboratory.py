@@ -302,8 +302,22 @@ def render_dataset(data, guidance_mode, field_options, variables, guidance_box, 
 
 
 def render_map(data, guidance_mode, sky_map):
-    """Render the celestial map tab using the shared chart factory."""
+    """Render the celestial map with the same colour choices as Three variables."""
     st.header("Celestial map")
+    st.write("Each point shows a known exoplanet's direction in the sky. Use colour to look for patterns in another variable.")
+    colour_options = ["No colour grouping", "Discovery method", "Discovery year"] + [f"{label} group" for label in PHYSICAL_GROUPS]
+    colour_label = st.selectbox("Colour points by", colour_options, key="lab_map_colour")
+    map_data = data.copy()
+    colour_field = None
+    if colour_label.endswith(" group"):
+        group_label = colour_label.removesuffix(" group")
+        group_field, breaks, labels = PHYSICAL_GROUPS[group_label]
+        colour_field = "_map_colour_group"
+        map_data[colour_field] = pd.cut(map_data[group_field], bins=breaks, labels=labels, include_lowest=True)
+    elif colour_label == "Discovery method":
+        colour_field = "discoverymethod"
+    elif colour_label == "Discovery year":
+        colour_field = "disc_year"
     names = st.session_state.get("lab_candidate_names", [])
     selected = st.session_state.get("lab_selected_candidate")
     if names:
@@ -314,10 +328,10 @@ def render_map(data, guidance_mode, sky_map):
     elif not data.empty:
         selected = data.iloc[0]["pl_name"]
     if selected:
-        mapped = data.dropna(subset=["ra", "dec"])
+        mapped = map_data.dropna(subset=["x", "y", "z"])
         if guidance_mode != "Minimal":
-            st.info(f"The map uses right ascension and declination for {len(mapped):,} records. It shows direction on the celestial sphere, not physical separation between systems.")
-        st.plotly_chart(sky_map(data, selected), use_container_width=True)
+            st.info(f"The map uses celestial direction for {len(mapped):,} records. It shows where systems appear in the sky, not their physical separation.")
+        st.plotly_chart(sky_map(map_data, selected, colour_field, colour_label), use_container_width=True)
         row = data[data["pl_name"] == selected].iloc[0]
         a, b, c, d = st.columns(4)
         a.metric("Right ascension", "Unknown" if pd.isna(row["ra"]) else f"{row['ra']:.2f}°")
