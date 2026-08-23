@@ -305,7 +305,7 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
         )
         st.subheader("Use the story to choose your filters")
         st.write("Start with the default settings, then change the filters to represent the clues in the story. Each choice changes which real planet records remain.")
-        tatooine.render_custom_filters(data, "Teacher" if st.session_state.get("tatooine_teacher_view", False) else "Student", guidance_box, custom_candidates, defaults=(1, 1, (0.8, 1.2)))
+        tatooine.render_custom_filters(data, "Teacher" if st.session_state.get("tatooine_teacher_view", False) else "Student", guidance_box, custom_candidates, defaults=(1, 1, (0.8, 1.2)), key_prefix="tatooine")
 
     elif content_step == 2:
         st.header("Worked example: an Earth-like candidate")
@@ -342,7 +342,7 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
         st.subheader("Choose your variables and filters")
         st.caption("Each choice is a rule. Try to explain why the rule represents part of your story.")
         guidance_mode = "Teacher" if st.session_state.get("tatooine_teacher_view", False) else "Student"
-        tatooine.render_custom_filters(data, guidance_mode, guidance_box, custom_candidates)
+        tatooine.render_custom_filters(data, guidance_mode, guidance_box, custom_candidates, key_prefix="perfect")
 
     elif step == 4:
         st.header("Conclusion")

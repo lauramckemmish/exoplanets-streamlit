@@ -116,27 +116,27 @@ def prepare_page(teacher_note, step_tabs, scroll_to_top_if_requested):
     return step
 
 
-def render_custom_filters(data, guidance_mode, guidance_box, custom_candidates, defaults=(2, 3, (0.8, 1.5))):
+def render_custom_filters(data, guidance_mode, guidance_box, custom_candidates, defaults=(2, 3, (0.8, 1.5)), key_prefix="perfect"):
     """Render the reusable planet-search filter controls."""
     st.header("Choose your planet criteria")
     guidance_box(guidance_mode, "Turn an idea about a planet into rules, then apply the rules one at a time.", "Ask students which criteria are essential, which are proxies and what missing values mean.")
     st.subheader("Variable 1: Orbital distance from the star")
-    use_orbital_distance = st.checkbox("Consider orbital distance", key="perfect_use_orbital_distance")
-    orbital_distance = st.slider("Orbital distance (AU)", 0.01, 100.0, (0.5, 5.0), 0.01, disabled=not use_orbital_distance, key="perfect_orbital_distance")
+    use_orbital_distance = st.checkbox("Consider orbital distance", key=f"{key_prefix}_use_orbital_distance")
+    orbital_distance = st.slider("Orbital distance (AU)", 0.01, 100.0, (0.5, 5.0), 0.01, disabled=not use_orbital_distance, key=f"{key_prefix}_orbital_distance")
     st.subheader("Variable 2: Planet radius")
-    use_radius = st.checkbox("Consider planet radius", value=True, key="perfect_use_radius")
-    radius = st.slider("Planet radius (Earth radii)", 0.1, 10.0, defaults[2], 0.05, disabled=not use_radius, key="perfect_radius")
+    use_radius = st.checkbox("Consider planet radius", value=True, key=f"{key_prefix}_use_radius")
+    radius = st.slider("Planet radius (Earth radii)", 0.1, 10.0, defaults[2], 0.05, disabled=not use_radius, key=f"{key_prefix}_radius")
     st.subheader("Variable 3: Estimated temperature")
-    use_temperature = st.checkbox("Consider estimated temperature", key="perfect_use_temperature")
-    temperature_c = st.slider("Estimated temperature (°C)", -200, 1500, (-23, 77), 5, disabled=not use_temperature, key="perfect_temperature")
+    use_temperature = st.checkbox("Consider estimated temperature", key=f"{key_prefix}_use_temperature")
+    temperature_c = st.slider("Estimated temperature (°C)", -200, 1500, (-23, 77), 5, disabled=not use_temperature, key=f"{key_prefix}_temperature")
     temperature_k = (temperature_c[0] + 273.15, temperature_c[1] + 273.15) if use_temperature else None
     st.subheader("Variable 4: Planetary system")
     c1, c2, c3 = st.columns(3)
-    use_stars = c1.checkbox("Use known stars", value=True, key="perfect_use_stars")
-    stars = c1.number_input("Known stars", 1, 10, defaults[0], key="perfect_stars", disabled=not use_stars)
-    planet_rule = c2.selectbox("Known planets", ["Any number", "Exactly", "At least"], key="perfect_planet_rule")
-    use_planets = c3.checkbox("Use known planets", value=True, key="perfect_use_planets")
-    planets = c3.number_input("Known planets", 1, 20, defaults[1], key="perfect_planets", disabled=not use_planets)
+    use_stars = c1.checkbox("Use known stars", value=True, key=f"{key_prefix}_use_stars")
+    stars = c1.number_input("Known stars", 1, 10, defaults[0], key=f"{key_prefix}_stars", disabled=not use_stars)
+    planet_rule = c2.selectbox("Known planets", ["Any number", "Exactly", "At least"], key=f"{key_prefix}_planet_rule")
+    use_planets = c3.checkbox("Use known planets", value=True, key=f"{key_prefix}_use_planets")
+    planets = c3.number_input("Known planets", 1, 20, defaults[1], key=f"{key_prefix}_planets", disabled=not use_planets)
     active_labels = []
     if use_orbital_distance:
         active_labels.append("Orbital distance")
@@ -148,11 +148,13 @@ def render_custom_filters(data, guidance_mode, guidance_box, custom_candidates, 
         active_labels.append("Known stars")
     if use_planets and planet_rule != "Any number":
         active_labels.append("Known planets")
-    stage = st.selectbox("Apply filters through", ["No filters yet"] + [f"{i + 1}: {label}" for i, label in enumerate(active_labels)], key="perfect_filter_stage")
+    stage = st.selectbox("Apply filters through", ["No filters yet"] + [f"{i + 1}: {label}" for i, label in enumerate(active_labels)], key=f"{key_prefix}_filter_stage")
     max_filters = 0 if stage == "No filters yet" else int(stage.split(":", 1)[0])
     candidates, steps = custom_candidates(data, int(stars) if use_stars else None, planet_rule, int(planets) if use_planets and planet_rule != "Any number" else None, radius if use_radius else None, temperature_k, None, orbital_distance if use_orbital_distance else None, max_filters=max_filters)
     if max_filters == 0:
-        candidates = data.iloc[0:0].copy()
+        st.metric("Remaining candidates", f"{len(data):,}")
+        st.info("No filters have been applied yet. Choose a filter stage above to begin narrowing the dataset.")
+        return
     st.subheader("Apply your filters one at a time")
     st.write(f"We start with **{len(data):,} detected planet records**.")
     for _, row in steps.iterrows():
