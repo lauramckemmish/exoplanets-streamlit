@@ -260,7 +260,6 @@ def render_demographics_classroom(data: pd.DataFrame, teacher_note_renderer=None
 def render_demographics_classroom_body(
     data: pd.DataFrame,
     pathway: str,
-    year_level: str,
     part: int,
     step_labels: list[str],
 ) -> None:
@@ -289,7 +288,7 @@ def render_demographics_classroom_body(
         strange_new_worlds.render_lesson(data, part, dependencies)
         return
 
-    """Render the remaining Year 10 lesson-step body."""
+    # The Year 8 pathway returned above; the remaining branches are Year 10.
     # CLASSROOM STEP 0 — Welcome
     if part == 0:
         st.header(pathway)
@@ -301,39 +300,23 @@ def render_demographics_classroom_body(
             ),
             use_container_width=True,
         )
-        if year_level == "Year 8":
-            st.markdown(
-                "Other stars have planets too—and some planetary systems are very different from ours. You will "
-                "start with individual discoveries, then use real NASA data to find larger patterns."
-            )
-            st.markdown(
-                "#### Our journey\n"
-                "1. Start with our Solar System.\n"
-                "2. Meet memorable planets and planetary systems.\n"
-                "3. Watch exoplanet discoveries grow over time.\n"
-                "4. Compare planet masses.\n"
-                "5. Add orbital distance and change the graph scale.\n"
-                "6. Explore strange new worlds.\n"
-                "7. Make a claim supported by evidence."
-            )
-        else:
-            st.markdown(
-                "The planets we have detected form a scientific dataset—but does that dataset show every kind of "
-                "planet that exists? You will make an initial claim, investigate how the evidence was collected, and "
-                "then decide whether your claim needs to change."
-            )
-            st.markdown(
-                "#### Our journey\n"
-                "1. Establish our Solar System as a reference.\n"
-                "2. Compare it with detected exoplanets.\n"
-                "3. Use mass and orbital distance to identify patterns.\n"
-                "4. Make an initial claim.\n"
-                "5. Investigate direct imaging and transit detection.\n"
-                "6. Compare the observational windows.\n"
-                "7. Reconsider what the evidence supports."
-            )
+        st.markdown(
+            "The planets we have detected form a scientific dataset—but does that dataset show every kind of "
+            "planet that exists? You will make an initial claim, investigate how the evidence was collected, and "
+            "then decide whether your claim needs to change."
+        )
+        st.markdown(
+            "#### Our journey\n"
+            "1. Establish our Solar System as a reference.\n"
+            "2. Compare it with detected exoplanets.\n"
+            "3. Use mass and orbital distance to identify patterns.\n"
+            "4. Make an initial claim.\n"
+            "5. Investigate direct imaging and transit detection.\n"
+            "6. Compare the observational windows.\n"
+            "7. Reconsider what the evidence supports."
+        )
     # YEAR 10 STEP 3 — Mass and distance
-    if part == 3 and year_level != "Year 8":
+    if part == 3:
         st.header("Step 3: Explore our Solar System")
         st.write(
             "Mass is not the only thing we might want to know about a planet. We might also ask how far it is from "
@@ -375,37 +358,8 @@ def render_demographics_classroom_body(
                 "“The log–log graph makes it easier to see…” or “On the linear graph…, but on the log–log graph…”",
             )
             key_idea("A log scale helps us see small and large planets on the same graph.", "The inner planets separate from one another while Jupiter and the other giant planets remain visible.")
-    # CLASSROOM STEP 1 — Meet our Solar System / Our Solar System
-    elif part == 1:
-        st.header("Step 1: Meet our Solar System")
-        st.image(
-            SOLAR_SYSTEM_IMAGE_PATH,
-            caption="An illustration of our Solar System. Credit: NASA",
-            use_container_width=True,
-        )
-        st.write(
-            "Our Solar System contains the Sun and everything held in orbit around it. Eight planets orbit the Sun, "
-            "from small rocky worlds such as Earth to giant planets such as Jupiter."
-        )
-        st.markdown(
-            "We will group planets by mass: **Very small** (less than 1 Earth mass), **Small** (1–10 Earth masses), "
-            "**Medium** (10–100 Earth masses), **Large** (100–1,000 Earth masses), and **Very large** "
-            "(more than 1,000 Earth masses). For example, Earth is **Small**, Neptune is **Medium**, and Jupiter is "
-            "**Large**."
-        )
-        graph_guide(
-            "The whole bar represents all eight Solar System planets, from 0% to 100%.",
-            "Each coloured section is one planet-size group. A wider section contains a larger share of the planets.",
-        )
-        solar_figure = shared_planet_mass_distribution_chart(data, include_exoplanets=False)
-        if solar_figure is not None:
-            st.plotly_chart(solar_figure, use_container_width=True)
-        st.caption(
-            "**Hover over a section—or tap it on a touchscreen—to see the planet names.**"
-        )
-        key_idea("The planets in our Solar System have very different masses.", "Which labelled mass group contains the greatest share of our eight planets?")
     # YEAR 10 STEP 2 — Meet exoplanets
-    elif part == 2 and year_level != "Year 8":
+    elif part == 2:
         st.header("Step 2: Meet exoplanets")
         st.info(
             "### What is an exoplanet?\n"
@@ -470,88 +424,8 @@ def render_demographics_classroom_body(
             "“The two bars are similar because…” or “They are different because…”",
         )
         key_idea("Detected exoplanets have a different mix of sizes from the planets in our Solar System.", "Compare the same labelled section in the two bars, especially the widest section in each.")
-    # YEAR 8 STEP 2 — Planets around other stars
-    elif part == 2:
-        st.header("Step 2: There are planets around other stars")
-        st.info(
-            "An **exoplanet** is a planet orbiting a star other than the Sun. We will start with a few individual "
-            "stories before looking at the whole dataset."
-        )
-        st.image(
-            PLANETARY_SYSTEMS_IMAGE_PATH,
-            caption="Our Solar System is one planetary system; other stars can have their own planetary systems.",
-            use_container_width=True,
-        )
-        st.info(
-            "### A sense of scale\n"
-            "The nearest known exoplanet is about **4 light-years** away. Many of the stars searched by telescopes "
-            "are **hundreds to thousands of light-years** away, but they are still in our Milky Way. A light-year "
-            "measures distance: it is how far light travels in one year."
-        )
-        st.subheader("Three discoveries to meet")
-        case_studies = st.columns(3)
-        with case_studies[0]:
-            st.markdown("**51 Pegasi b**")
-            st.write(
-                "The first planet found orbiting a Sun-like star, announced in 1995. It is a gas giant very close "
-                "to its star, completing an orbit in only a few days."
-            )
-        with case_studies[1]:
-            st.markdown("**Kepler-90**")
-            st.write(
-                "A planetary system with eight known planets— the same number as our Solar System, but packed much "
-                "more closely around its star."
-            )
-        with case_studies[2]:
-            st.markdown("**TRAPPIST-1**")
-            st.write(
-                "A nearby star with seven roughly Earth-sized planets. Several orbit closer to their star than "
-                "Mercury orbits the Sun."
-            )
-        st.markdown(
-            "### What do these stories suggest?\n"
-            "Planetary systems can be arranged in ways that are familiar, surprising or completely different from "
-            "our own. We will now look at the larger collection of discoveries."
-        )
-        response_box(
-            2,
-            "Choose one system. What makes it similar to or different from our Solar System?",
-            "“This system is different because…” or “It is similar to ours because…”",
-        )
-        key_idea("Individual discoveries show that other planetary systems can be very different from ours.", "Choose one case study and identify its unusual star, planet size or arrangement.")
-    # YEAR 8 STEP 3 — Discoveries over time
-    elif part == 3:
-        st.header("Step 3: Exoplanet discoveries over time")
-        st.write(
-            "The first confirmed exoplanets were announced in 1992. Since then, the number of confirmed planets has "
-            "grown rapidly. A tall bar can mean that a large observing project released or confirmed many results at "
-            "once; it does not mean all those planets were first noticed in that single year."
-        )
-        graph_guide(
-            "The horizontal axis shows the year a planet was recorded as discovered or confirmed.",
-            "The vertical axis shows how many confirmed planets were recorded in that year.",
-        )
-        discovery_figure = discoveries_by_year_chart(data)
-        if discovery_figure is None:
-            st.warning("No discovery-year data are available for this graph.")
-        else:
-            st.plotly_chart(discovery_figure, use_container_width=True)
-        st.info(
-            "NASA's Kepler mission contributed a particularly large group of results in 2014. Another large release "
-            "followed in 2016 as scientists analysed more of the mission's data."
-        )
-        graph_questions(
-            "What pattern do you notice in the number of discoveries over time?",
-            "What might a large group of results released in one year tell us about how science works?",
-        )
-        response_box(
-            3,
-            "Describe one pattern in the annual discovery graph and give a possible explanation.",
-            "“I notice that…” or “One possible reason is…”",
-        )
-        key_idea("Astronomy is a rapidly growing science, and new analyses can add many confirmed planets to the record.", "Look for years with unusually tall bars and consider why a large group of discoveries might appear together.")
     # YEAR 10 STEP 4 — Are our planets typical?
-    elif part == 4 and year_level != "Year 8":
+    elif part == 4:
         st.header("Step 4: Are planets in other systems like ours?")
         st.markdown("### Question we can answer with data\nHow similar are detected exoplanets to Solar System planets in mass and orbital distance?")
         st.markdown("### What we will plot\nA log–log scatter plot of planet mass against orbital distance, with the Solar System planets highlighted.")
@@ -607,38 +481,8 @@ def render_demographics_classroom_body(
                 "### Suggested end of Lesson 1\n"
                 "Lesson 2 begins by investigating how the way astronomers search affects the planets they find."
             )
-    # YEAR 8 STEP 4 — Compare planet masses
-    elif part == 4:
-        st.header("Step 4: Compare planet masses")
-        st.write(
-            "We have met a few individual planetary systems. Now we can use the larger NASA dataset to ask whether "
-            "the detected exoplanets have the same mix of planet masses as our Solar System."
-        )
-        graph_guide(
-            "The top bar is our Solar System. The bottom bar is the detected exoplanets that can be placed in these mass groups.",
-            "Each bar represents 100% of its group. Compare sections carrying the same label.",
-        )
-        figure = shared_planet_mass_distribution_chart(data)
-        if figure is None:
-            st.warning("No planets have the mass data needed for this graph.")
-        else:
-            st.plotly_chart(figure, use_container_width=True)
-        graph_questions(
-            "Which planet-mass group takes up the most space in each bar?",
-            "Which group looks most different between our Solar System and the detected exoplanets?",
-        )
-        response_box(
-            4,
-            "What is one similarity or difference between the two groups?",
-            "“The groups are similar because…” or “They are different because…”",
-        )
-        key_idea("A larger dataset helps us move from individual examples to patterns across many planets.", "Compare the widths of matching mass groups, not the raw number of planets in each group.")
-        st.info(
-            "### Suggested end of Lesson 1\n"
-            "Lesson 2 adds orbital distance and asks how strange planetary systems can be."
-        )
     # YEAR 10 STEP 5 — Direct imaging
-    elif part == 5 and year_level != "Year 8":
+    elif part == 5:
         st.header("Step 5: Direct imaging")
         st.caption("Lesson 2 starts here")
         st.write(
@@ -669,47 +513,8 @@ def render_demographics_classroom_body(
             "“Direct imaging tends to find planets that are…” or “Most of the blue points are…”",
         )
         key_idea("Direct imaging tends to find massive planets that are far from their stars.", "Most blue points sit high and to the right: high mass and far from their host stars.")
-    # YEAR 8 STEP 5 — Strange new worlds (start of Lesson 2)
-    elif part == 5:
-        st.header("Step 5: Strange new worlds")
-        st.caption("Lesson 2 starts here")
-        st.caption("NASA/JPL Exoplanet Travel Bureau posters: artists' illustrations based on real exoplanet systems.")
-        poster_columns = st.columns(3)
-        posters = [
-            (NASA_KEPLER_16B_POSTER_PATH, "Kepler-16 b: two suns"),
-            (NASA_51_PEGASI_B_POSTER_PATH, "51 Pegasi b: hot Jupiter"),
-            (NASA_KEPLER_186F_POSTER_PATH, "Kepler-186 f: Earth-size world"),
-        ]
-        for column, (poster_path, caption) in zip(poster_columns, posters):
-            with column:
-                st.image(poster_path, use_container_width=True)
-                st.caption(caption)
-        st.info(
-            "### Seven worlds around one tiny star\n"
-            "TRAPPIST-1 has seven known planets, all roughly the size of Earth. They are packed incredibly close "
-            "together: all seven orbit closer to their star than Mercury orbits the Sun. The planets are so close "
-            "together that, from one world, neighbouring planets could sometimes appear larger in the sky than our "
-            "Moon does from Earth."
-        )
-        st.markdown("## Pick your holiday planet")
-        st.write(
-            "If you could visit an exoplanet, what kind of world would you choose? Would you choose a small rocky "
-            "world like Earth or a much more massive planet? Would you visit a planet with two suns? Would you choose "
-            "a system where other planets loom large in the sky?"
-        )
-        st.text_area(
-            "How massive would your planet be?",
-            key="demographics_response_Strange New Worlds_5",
-            height=90,
-            placeholder="Describe your holiday planet and its mass…",
-        )
-        st.markdown(
-            "### But mass isn't the whole story\n"
-            "Where would your planet be? Would it orbit very close to its star, or much farther away?\n\n"
-            "**How can we describe how far a planet is from its star?**"
-        )
     # YEAR 10 STEP 6 — Transit detection
-    elif part == 6 and year_level != "Year 8":
+    elif part == 6:
         st.header("Step 6: Transit detection")
         st.write(
             "A **transit** happens when a planet passes in front of its star from our viewpoint. The planet blocks a "
@@ -736,44 +541,8 @@ def render_demographics_classroom_body(
             "“Transit detection tends to find planets that are…” or “Most of the blue points are…”",
         )
         key_idea("Most planets found using transits orbit close to their stars.", "Most transit points are on the left of the graph, showing short distances from their host stars.")
-    # YEAR 8 STEP 6 — Add orbital distance
-    elif part == 6:
-        st.header("Step 6: Add orbital distance")
-        st.write(
-            "Mass is not the only way to describe a planet. We can also ask how far it is from the star it orbits. "
-            "One astronomical unit (AU) is the average distance from Earth to the Sun."
-        )
-        st.subheader("First, try ordinary linear axes")
-        graph_guide(
-            "The horizontal axis shows orbital distance in AU. The vertical axis shows planet mass in Earth masses.",
-            "Each labelled point is one Solar System planet. Farther right means farther from the Sun; higher means more massive.",
-        )
-        st.plotly_chart(solar_system_demographics_chart(False), use_container_width=True)
-        st.markdown("### Before you change the graph")
-        if log_scale_reveal(
-            "Jupiter and the distant outer planets set the scale, so the small inner planets bunch together near "
-            "the bottom-left corner. How could we spread them out without losing the giant planets? Make a prediction, "
-            "then reveal a second view of the **same data**.",
-            "year8_log_scale_revealed",
-        ):
-            st.subheader("Now compare the log–log view")
-            graph_guide(
-                "The variables are the same, but equal spaces now represent multiplication rather than addition.",
-                "Compare the positions of the inner planets and the outer giants.",
-            )
-            st.plotly_chart(solar_system_demographics_chart(True), use_container_width=True)
-            graph_questions(
-                "Which planets are easiest to compare on the log–log graph?",
-                "What can you see on the log–log graph that was difficult to see on the linear graph?",
-            )
-            response_box(
-                6,
-                "What does the log–log graph help you say about the planets?",
-                "“The linear graph shows…, but the log–log graph shows…” or “I can now see…”",
-            )
-            key_idea("Changing the graph scale can make patterns easier to see.", "Compare the inner planets before and after the scale changes: which view separates them most clearly?")
     # YEAR 10 STEP 7 — Compare discovery methods
-    elif part == 7 and year_level != "Year 8":
+    elif part == 7:
         st.header("Step 7: Compare discovery methods")
         st.write(
             "First, bring together the patterns from Steps 5 and 6. Then use the graph to test those ideas and reveal "
@@ -823,62 +592,27 @@ def render_demographics_classroom_body(
             "“The methods find different planets because…” or “A planet is easier to find when…”",
         )
         key_idea("Different discovery methods find different kinds of planets.", "Switch between methods and watch how the occupied parts of the graph change.")
-    # YEAR 8 STEP 7 — Compare planetary systems
-    elif part == 7:
-        st.header("Step 7: Compare planetary systems")
-        st.write(
-            "This graph adds detected exoplanets to the same mass-and-orbital-distance view as the Solar System planets. "
-            "Use this larger dataset to support, challenge or change your Step 5 claim."
-        )
-        graph_guide(
-            "The bottom axis is orbital distance from a star; the side axis is planet mass. Both use log scales.",
-            "Blue circles are detected exoplanets. Pink labelled diamonds are the Solar System planets.",
-            "Look for places where the Solar System planets are surrounded by many blue points—and places where they are not.",
-        )
-        st.plotly_chart(shared_current_demographics_chart(data), use_container_width=True)
-        data_detective_challenge()
-        response_box(
-            7,
-            "Check your claim and your chosen planet: is there a detected exoplanet nearby? What can you now say about whether other planetary systems need to look like ours?",
-            "“My first claim was…, but the graph shows…” or “Near ___, I found…”",
-        )
-        key_idea("A larger dataset helps us test an idea that began with a few memorable examples.", "Return to Earth and your chosen Solar System planet: where are nearby blue points, and where are there few?")
     # CLASSROOM STEP 8 — Conclusion
     elif part == 8:
         st.header("Conclusion")
-        if year_level == "Year 8":
-            st.markdown("### Looking forward: other planetary systems are weird—and wonderful")
-            st.info(
-                "Our Solar System is one example, not the only possible design. As astronomers discover more systems, "
-                "they keep finding giant planets close to their stars, compact groups of planets and worlds unlike "
-                "anything in our neighbourhood. What else might be waiting to be found?"
-            )
-            st.markdown(
-                "### What have we learned?\n"
-                "- Other stars can have their own planetary systems.\n"
-                "- The number of known exoplanets has grown rapidly as observations and data analysis improve.\n"
-                "- Planetary systems can be very different from our own.\n"
-                "- Graphs help us connect individual discoveries with larger patterns."
-            )
-        else:
-            st.markdown("### Looking forward: finding another Earth")
-            st.info(
-                "Our current picture is incomplete. New telescopes and observing methods should help scientists find "
-                "smaller planets, planets farther from their stars, and more planets similar to Earth. Planetary systems "
-                "may keep surprising us as our technology improves."
-            )
-            st.markdown(
-                "### What have we learned?\n"
-                "- Data lets astronomers investigate planets far beyond our Solar System.\n"
-                "- A graph's scale can change which patterns are easy to see.\n"
-                "- Our Solar System is one planetary system among many—and defining whether it is ‘normal’ requires evidence.\n"
-                "- Our picture of exoplanets is incomplete because different methods find different kinds of planets."
-            )
-            response_box(
-                8,
-                "What can the known exoplanets tell us about whether our Solar System is typical—and what prevents us from being completely certain?",
-                "“My claim is…” + “The evidence is…” + “A limitation is…”",
-            )
+        st.markdown("### Looking forward: finding another Earth")
+        st.info(
+            "Our current picture is incomplete. New telescopes and observing methods should help scientists find "
+            "smaller planets, planets farther from their stars, and more planets similar to Earth. Planetary systems "
+            "may keep surprising us as our technology improves."
+        )
+        st.markdown(
+            "### What have we learned?\n"
+            "- Data lets astronomers investigate planets far beyond our Solar System.\n"
+            "- A graph's scale can change which patterns are easy to see.\n"
+            "- Our Solar System is one planetary system among many—and defining whether it is ‘normal’ requires evidence.\n"
+            "- Our picture of exoplanets is incomplete because different methods find different kinds of planets."
+        )
+        response_box(
+            8,
+            "What can the known exoplanets tell us about whether our Solar System is typical—and what prevents us from being completely certain?",
+            "“My claim is…” + “The evidence is…” + “A limitation is…”",
+        )
         st.markdown("### Keep wondering")
         st.write(
             "Scientists do not finish with all the answers—they finish with new questions. What do you now wonder "
