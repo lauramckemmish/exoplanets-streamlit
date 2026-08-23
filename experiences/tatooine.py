@@ -5,6 +5,7 @@ the Streamlit application back into itself (which would create a cycle).
 """
 
 import streamlit as st
+import pandas as pd
 
 STEP_LABELS = [
     "Start here", "Dataset", "Turn clues into filters", "Filter stars", "Filter planets",
@@ -114,6 +115,50 @@ def prepare_page(teacher_note, step_tabs, scroll_to_top_if_requested):
         st.session_state["mission_step"] = step
     scroll_to_top_if_requested("mission_scroll_to_top")
     return step
+
+
+def render_custom_filters(data, guidance_mode, guidance_box, custom_candidates):
+    """Render the reusable planet-search filter controls."""
+    st.header("Choose your planet criteria")
+    guidance_box(guidance_mode, "Turn an idea about a planet into rules, then apply the rules one at a time.", "Ask students which criteria are essential, which are proxies and what missing values mean.")
+    c1, c2, c3 = st.columns(3)
+    stars = c1.number_input("Known stars", 1, 10, 2, key="perfect_stars")
+    planet_rule = c2.selectbox("Planet-count rule", ["Exactly", "At least"], key="perfect_planet_rule")
+    planets = c3.number_input("Known planets", 1, 20, 3, key="perfect_planets")
+    radius = st.slider("Planet radius (Earth radii)", 0.1, 5.0, (0.8, 1.5), 0.05, key="perfect_radius")
+    t1, t2 = st.columns(2)
+    use_temperature = t1.checkbox("Use equilibrium temperature", key="perfect_use_temperature")
+    temperature = t1.slider("Temperature (K)", 100, 1500, (250, 350), 10, disabled=not use_temperature, key="perfect_temperature")
+    use_distance = t2.checkbox("Limit distance from Earth", key="perfect_use_distance")
+    known_distances = data["sy_dist"].dropna()
+    distance_ceiling = max(10.0, float(known_distances.max())) if not known_distances.empty else 1000.0
+    max_distance_ly = t2.slider("Maximum distance (light-years)", 3.3, distance_ceiling * 3.26156, min(500.0 * 3.26156, distance_ceiling * 3.26156), disabled=not use_distance, key="perfect_distance")
+    candidates, steps = custom_candidates(data, int(stars), planet_rule, int(planets), radius, temperature if use_temperature else None, max_distance_ly / 3.26156 if use_distance else None)
+    st.subheader("Effect of each criterion")
+    st.dataframe(steps, use_container_width=True, hide_index=True)
+    st.metric("Remaining candidates", f"{len(candidates):,}")
+    if candidates.empty:
+        st.warning("No records meet every active criterion. Broaden one criterion to see where candidates reappear.")
+        st.session_state["lab_candidate_names"] = []
+        return
+    candidate_columns = ["pl_name", "hostname", "disc_year", "pl_rade", "pl_bmasse", "pl_eqt", "sy_dist", "sy_snum", "sy_pnum"]
+    candidates = candidates.sort_values("pl_name")
+    st.dataframe(candidates[candidate_columns], use_container_width=True, hide_index=True)
+    names = candidates["pl_name"].tolist()
+    selected = st.selectbox("Candidate to investigate", names, key="perfect_candidate")
+    st.session_state["lab_candidate_names"] = names
+    st.session_state["lab_selected_candidate"] = selected
+    row = candidates[candidates["pl_name"] == selected].iloc[0]
+    evidence = pd.DataFrame([
+        {"Property": "Known stars", "Value": row["sy_snum"], "Evidence status": "Known"},
+        {"Property": "Known planets", "Value": row["sy_pnum"], "Evidence status": "Known"},
+        {"Property": "Radius", "Value": f"{row['pl_rade']:.2f} Earth radii", "Evidence status": "Known"},
+        {"Property": "Mass", "Value": "Unknown" if pd.isna(row["pl_bmasse"]) else f"{row['pl_bmasse']:.2f} Earth masses", "Evidence status": "Unknown" if pd.isna(row["pl_bmasse"]) else "Known"},
+        {"Property": "Temperature", "Value": "Unknown" if pd.isna(row["pl_eqt"]) else f"{row['pl_eqt']:.0f} K", "Evidence status": "Unknown" if pd.isna(row["pl_eqt"]) else "Known"},
+    ])
+    st.subheader(f"Evidence for {selected}")
+    st.dataframe(evidence, use_container_width=True, hide_index=True)
+    st.download_button("Download candidate table", candidates[candidate_columns].to_csv(index=False).encode("utf-8"), "perfect_planet_candidates.csv", "text/csv")
 
 
 def render(data, presenter_mode, implementation):
