@@ -19,6 +19,12 @@ TEACHER_GUIDANCE = {
     "listen_for": "Students explaining why a graph answers a particular question rather than treating graph settings as decoration.",
 }
 
+DISCOVERY_GUIDANCE = {
+    "summary": "Use this graph to compare categories over time. Look for changes in dominant discovery methods, sudden increases and periods with sparse data.",
+    "teacher": "Ask whether the graph describes the true planet population or the history of available detection methods and surveys.",
+    "prompt": "**Look for:** changes over time, dominant categories and sudden shifts.  \n**Consider:** whether detection methods favour certain types of planets.  \n**Describe:** 'Discoveries using ______ increased after ______, which may reflect ______.'",
+}
+
 INVESTIGATIONS = {
     "Does planet size relate to mass?": {
         "x": "pl_rade", "y": "pl_bmasse", "colour": "discoverymethod",

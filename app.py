@@ -453,8 +453,8 @@ def render_discovery_lab(data: pd.DataFrame, guidance_mode: str) -> None:
     st.header("How have exoplanets been discovered?")
     guidance_box(
         guidance_mode,
-        "Use this graph to compare categories over time. Look for changes in dominant discovery methods, sudden increases and periods with sparse data.",
-        "Ask whether the graph describes the true planet population or the history of available detection methods and surveys.",
+        data_laboratory.DISCOVERY_GUIDANCE["summary"],
+        data_laboratory.DISCOVERY_GUIDANCE["teacher"],
     )
     methods = sorted(data["discoverymethod"].dropna().unique().tolist())
     selected_methods = st.multiselect("Discovery methods", methods, default=methods)
@@ -464,9 +464,7 @@ def render_discovery_lab(data: pd.DataFrame, guidance_mode: str) -> None:
         st.warning("Select at least one discovery method.")
     if guidance_mode != "Minimal":
         st.markdown(
-            "**Look for:** changes over time, dominant categories and sudden shifts.  \n"
-            "**Consider:** whether detection methods favour certain types of planets.  \n"
-            "**Describe:** 'Discoveries using ______ increased after ______, which may reflect ______.'"
+            data_laboratory.DISCOVERY_GUIDANCE["prompt"]
         )
 
 
