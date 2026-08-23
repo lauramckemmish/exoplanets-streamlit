@@ -222,18 +222,24 @@ def render_tatooine_worked_example(data):
     st.warning(f"Data recorded: {len(recorded):,} planets have a number of known stars ({missing:,} not recorded).")
     st.success(f"Result after checking the data: {len(recorded):,} planets remain available for this clue.")
 
-    two_sun_candidates = recorded[recorded["sy_snum"] == 2].copy()
-    st.info("Choice: keep planets in systems with exactly **two known stars**.")
-    st.success(f"Result: {len(two_sun_candidates):,} detected planets remain.")
+    star_count = st.select_slider(
+        "Choose the number of known stars in the system",
+        options=list(range(1, 11)),
+        value=2,
+        key="tatooine_worked_star_count",
+    )
+    star_matches = recorded[recorded["sy_snum"] == star_count].copy()
+    st.info(f"Choice: keep planets in systems with exactly **{star_count} known star{'s' if star_count != 1 else ''}**.")
+    st.success(f"Result: {len(star_matches):,} detected planets remain.")
 
-    if two_sun_candidates.empty:
+    if star_matches.empty:
         st.warning("No matching records are available in this dataset.")
         return
 
     st.subheader("Try a second question: how many planets are in the system?")
-    planet_recorded = two_sun_candidates[two_sun_candidates["sy_pnum"].notna()].copy()
-    planet_missing = len(two_sun_candidates) - len(planet_recorded)
-    st.info("Choice: consider the number of known planets in each two-sun system.")
+    planet_recorded = star_matches[star_matches["sy_pnum"].notna()].copy()
+    planet_missing = len(star_matches) - len(planet_recorded)
+    st.info("Choice: consider the number of known planets in each matching system.")
     st.warning(
         f"Data recorded: {len(planet_recorded):,} of these planets have a known planet count "
         f"({planet_missing:,} not recorded)."
@@ -241,7 +247,7 @@ def render_tatooine_worked_example(data):
     st.success(f"Result after checking the data: {len(planet_recorded):,} planets remain available for this clue.")
     planet_count = st.select_slider(
         "Choose the number of known planets in the system",
-        options=[1, 2, 3, 4],
+        options=list(range(1, 11)),
         value=1,
         key="tatooine_worked_planet_count",
     )
@@ -252,7 +258,7 @@ def render_tatooine_worked_example(data):
         st.warning("No matching records are available for this number. Try another planet count.")
         return
 
-    st.subheader("Explore a few two-sun systems")
+    st.subheader("Explore a few matching systems")
     display_columns = ["pl_name", "hostname", "sy_snum", "sy_pnum", "pl_rade"]
     display = candidates[display_columns].rename(columns={
         "pl_name": "Planet name",
@@ -262,7 +268,7 @@ def render_tatooine_worked_example(data):
         "pl_rade": "Planet radius (Earth radii)",
     })
     st.dataframe(display.head(12), use_container_width=True, hide_index=True)
-    selected = st.selectbox("Choose a two-sun planet to inspect", candidates["pl_name"].tolist(), key="tatooine_worked_candidate")
+    selected = st.selectbox("Choose a planet to inspect", candidates["pl_name"].tolist(), key="tatooine_worked_candidate")
     row = candidates[candidates["pl_name"] == selected].iloc[0]
     details = pd.DataFrame([
         {"Detail": "Host star", "Value": row["hostname"]},
