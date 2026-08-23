@@ -143,8 +143,15 @@ def render_one_variable(data, guidance_mode, field_options):
         field = options[label]
         plotted = display_data(data) if field == "sy_dist" else data
         bin_count = st.slider("Number of histogram bins", min_value=5, max_value=60, value=25, help="More bins show finer detail; fewer bins give a simpler overall picture.")
-        figure = px.histogram(plotted.dropna(subset=[field]), x=field, nbins=bin_count, title=f"Distribution of {label}")
+        use_log_axis = st.checkbox("Use a logarithmic horizontal axis", help="Useful when values range from very small to very large. The values do not change—only the spacing on the axis changes.")
+        valid = plotted.dropna(subset=[field])
+        if use_log_axis:
+            valid = valid[valid[field] > 0]
+        figure = px.histogram(valid, x=field, nbins=bin_count, title=f"Distribution of {label}")
         figure.update_layout(xaxis_title=label, yaxis_title="Number of planet records")
+        if use_log_axis:
+            figure.update_xaxes(type="log")
+            st.caption("The log axis spreads out small and large positive values. Records with zero or negative values cannot be shown on a log axis.")
     else:
         field = st.selectbox("Choose a category", ["Discovery method", "Stars in system", "Planets in system"], key="lab_one_category")
         column = {"Discovery method": "discoverymethod", "Stars in system": "sy_snum", "Planets in system": "sy_pnum"}[field]
@@ -157,7 +164,7 @@ def render_one_variable(data, guidance_mode, field_options):
             figure = px.pie(counts, names=field, values="Number of planet records", title=f"Proportion of records by {field}")
     st.plotly_chart(figure, use_container_width=True)
     if guidance_mode != "Minimal":
-        st.info("Try changing the representation. What stays the same, and what becomes easier or harder to notice? NSW Science link: organise and summarise secondary data using an appropriate representation.")
+        st.info("Try changing the representation or axis spacing. What stays the same, and what becomes easier or harder to notice? NSW Science link: organise and summarise secondary data using an appropriate representation.")
 
 
 def render_two_variables(data, guidance_mode, field_options):
