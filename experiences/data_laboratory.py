@@ -371,7 +371,7 @@ def render_filters(data, guidance_mode, guidance_box, custom_candidates):
         ])
         st.subheader(f"Evidence for {selected}")
         st.dataframe(evidence, use_container_width=True, hide_index=True)
-        st.download_button("Download candidate table", candidates[candidate_columns].to_csv(index=False).encode("utf-8"), "tatooine_candidates.csv", "text/csv")
+        st.download_button("Download candidate table", candidates[candidate_columns].to_csv(index=False).encode("utf-8"), "perfect_planet_candidates.csv", "text/csv")
     if guidance_mode != "Minimal":
         st.info("Unknown evidence should remain labelled unknown. It should not be counted as support for the candidate.")
 

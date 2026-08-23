@@ -28,7 +28,7 @@ def open_experience(name: str, facilitated_pathway: str, stage4_pathway: str, st
     """Open an experience from the Introduction catalogue."""
     if name in {facilitated_pathway, stage4_pathway, stage5_pathway}:
         select_demographics_pathway(name)
-    elif name == "Find Tatooine":
+    elif name == "Find Your Perfect Planet":
         select_experience("Guided Tatooine Mission")
     else:
         select_experience(name)

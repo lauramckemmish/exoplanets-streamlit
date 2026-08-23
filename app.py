@@ -214,7 +214,7 @@ COLOUR_OPTIONS = {
 }
 
 st.set_page_config(
-    page_title="Find Tatooine | Exoplanet Data Investigation",
+    page_title="Find Your Perfect Planet | Exoplanet Data Investigation",
     page_icon="🪐",
     layout="wide",
 )
@@ -265,7 +265,7 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
         st.info("Choose a template as a starting point, or invent your own planet profile. Every filter involves an assumption, and a close match is not a confirmed identity.")
 
     elif step == 1:
-        st.header("Inspect the Imperial exoplanet archive")
+        st.header("Inspect the exoplanet dataset")
         a, b, c, d = st.columns(4)
         a.metric("Planet records", f"{len(data):,}")
         b.metric("Host systems", f"{data['hostname'].nunique(dropna=True):,}")
@@ -278,7 +278,7 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
             "Missing records": [int(data[col].isna().sum()) for col in display],
             "Complete records (%)": [round(100 * data[col].notna().mean(), 1) for col in display],
         }).sort_values("Complete records (%)")
-        st.subheader("Incomplete intelligence")
+        st.subheader("What information is missing?")
         st.dataframe(missing, use_container_width=True, hide_index=True)
         st.info("Missing means unknown. It does not mean zero, unsuitable, or a possible match.")
 
@@ -293,10 +293,10 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
             {"Story evidence": "Find the destination", "Dataset variable": "Right ascension and declination", "Initial rule": "Map the final candidates"},
         ])
         st.dataframe(operational, use_container_width=True, hide_index=True)
-        st.warning("These are analytical choices. A different definition of Tatooine could produce a different result.")
+        st.warning("These are analytical choices. A different definition of the planet you are looking for could produce a different result.")
 
     elif step == 3:
-        st.header("Intelligence filter 1: two suns")
+        st.header("Apply filter 1: number of stars")
         row = steps.iloc[0]
         a, b, c = st.columns(3)
         a.metric("Records before", f"{row['Before']:,}")
@@ -306,14 +306,14 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
         st.info("Records with unknown star counts are not confirmed matches. They are incomplete evidence.")
 
     elif step == 4:
-        st.header("Intelligence filter 2: a three-planet system")
+        st.header("Apply filter 2: number of planets")
         st.dataframe(steps.iloc[:2], use_container_width=True, hide_index=True)
         st.metric("Records remaining", f"{len(stages[2]):,}")
         st.dataframe(stages[2][["pl_name", "hostname", "sy_snum", "sy_pnum", "pl_rade", "pl_eqt"]], use_container_width=True, hide_index=True)
         st.warning("The rule 'exactly three' comes from the original activity. It is a modelling choice, not certain evidence from the story.")
 
     elif step == 5:
-        st.header("Intelligence filter 3: approximately Earth-sized")
+        st.header("Apply filter 3: planet radius")
         st.dataframe(steps, use_container_width=True, hide_index=True)
         st.metric("Possible candidates", f"{len(candidates):,}")
         candidate_columns = ["pl_name", "hostname", "pl_rade", "pl_bmasse", "pl_eqt", "sy_dist", "sy_snum", "sy_pnum"]
@@ -349,7 +349,7 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
             )
 
     elif step == 7:
-        st.header("Navigation coordinates and mission report")
+        st.header("Map and report your candidate")
         names = candidates.sort_values("pl_name")["pl_name"].tolist() if not candidates.empty else []
         selected = st.session_state.get("selected_candidate")
         if names:
@@ -1836,7 +1836,7 @@ with st.sidebar:
         args=("Exoplanet Data Laboratory",),
     )
     st.button(
-        "🌅 Find Tatooine",
+        "🌅 Find Your Perfect Planet",
         type="primary" if st.session_state["experience"] == "Guided Tatooine Mission" else "secondary",
         use_container_width=True,
         disabled=st.session_state["experience"] == "Guided Tatooine Mission",
