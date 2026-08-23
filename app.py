@@ -238,6 +238,7 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
     step = tatooine.prepare_page(teacher_note, step_tabs, scroll_to_top_if_requested)
     step_labels = tatooine.STEP_LABELS
     candidates, steps, stages = mission_candidates(data)
+    content_step = {1: 2, 2: 1}.get(step, step)
 
     if step == 0:
         st.header("What kind of planet would you like to find?")
@@ -264,7 +265,7 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
             )
         st.info("Choose a template as a starting point, or invent your own planet profile. Every filter involves an assumption, and a close match is not a confirmed identity.")
 
-    elif step == 1:
+    elif content_step == 1:
         st.header("Worked example: a Tatooine-like world")
         st.image("assets/nasa-kepler-16b-travel-poster.jpg", width=300, caption="NASA/JPL artist's impression of Kepler-16 b, a real planet orbiting two stars")
         st.markdown(
@@ -299,20 +300,31 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
             st.text_area("What do you notice about this candidate? What evidence is still missing?", key="tatooine_worked_response", height=110)
             st.caption("This search uses only planets that have been detected and measured. Many more planets are likely to exist in the Milky Way than we have discovered.")
 
-    elif step == 2:
+    elif content_step == 2:
         st.header("Worked example: an Earth-like candidate")
-        st.write("Now use a different question: where might we look for a world with a similar size and a temperature worth investigating?")
+        st.write("Now use a different question: where might we look for a world with a similar size, orbital distance and estimated temperature?")
         st.dataframe(pd.DataFrame([
             {"Clue": "Similar size to Earth", "Variable": "Planet radius", "Example rule": "0.8–1.5 Earth radii"},
-            {"Clue": "Temperature worth investigating", "Variable": "Equilibrium temperature", "Example rule": "Choose a range"},
-            {"Clue": "A known planetary system", "Variable": "Known planets", "Example rule": "At least 1"},
+            {"Clue": "An orbit not too close or far from its star", "Variable": "Orbital distance", "Example rule": "0.5–2 AU"},
+            {"Clue": "A temperature worth investigating", "Variable": "Equilibrium temperature", "Example rule": "200–400 K"},
         ]), use_container_width=True, hide_index=True)
-        st.warning("Earth-sized or temperate does not prove that a planet is habitable. These are screening rules for a first search.")
-        earth_like, earth_steps = custom_candidates(data, 1, "At least", 1, (0.8, 1.5), (250, 350), None)
+        st.warning("This is a screening search, not a test for habitability. The host star's brightness also affects temperature.")
+        earth_current = data.copy()
+        earth_rows = []
+        earth_current, row = apply_filter(earth_current, "pl_rade", earth_current["pl_rade"].between(0.8, 1.5, inclusive="both"), "Radius 0.8–1.5 Earth radii")
+        earth_rows.append(row)
+        earth_current, row = apply_filter(earth_current, "pl_orbsmax", earth_current["pl_orbsmax"].between(0.5, 2.0, inclusive="both"), "Orbital distance 0.5–2 AU")
+        earth_rows.append(row)
+        earth_current, row = apply_filter(earth_current, "pl_eqt", earth_current["pl_eqt"].between(200, 400, inclusive="both"), "Equilibrium temperature 200–400 K")
+        earth_rows.append(row)
+        earth_like, earth_steps = earth_current, pd.DataFrame(earth_rows)
         st.subheader("Apply the filters in order")
-        st.dataframe(earth_steps, use_container_width=True, hide_index=True)
-        st.metric("Candidates after all four rules", f"{len(earth_like):,}")
-        st.dataframe(earth_like[["pl_name", "hostname", "pl_rade", "pl_eqt", "sy_snum", "sy_pnum"]].head(30), use_container_width=True, hide_index=True)
+        for criterion, count in zip(earth_steps["Criterion"], earth_steps["Remaining"]):
+            st.markdown(f"**Keep only planets where {criterion.lower()}.**")
+            st.markdown(f"**{int(count):,} planets remain.**")
+        st.dataframe(earth_like[["pl_name", "hostname", "pl_rade", "pl_orbsmax", "pl_eqt", "sy_snum", "sy_pnum"]].head(30), use_container_width=True, hide_index=True)
+        if st.session_state.get("tatooine_teacher_view", False):
+            st.info("Teacher note: orbital distance is not enough to define a habitable zone. A star's brightness changes how much energy reaches a planet; we are keeping that extra calculation out of this activity.")
         st.info("These results use evidence that has actually been recorded. The Milky Way is likely home to millions or billions of planets that we have not discovered.")
 
     elif step == 98:

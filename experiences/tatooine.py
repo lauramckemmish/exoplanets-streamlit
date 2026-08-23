@@ -8,7 +8,7 @@ import streamlit as st
 import pandas as pd
 
 STEP_LABELS = [
-    "Start here", "Tatooine example", "Earth-like example", "Your planet",
+    "Start here", "Earth-like example", "Tatooine example", "Your planet",
     "Compare candidates", "Report",
 ]
 STEP_COUNT = len(STEP_LABELS)
@@ -126,14 +126,9 @@ def render_custom_filters(data, guidance_mode, guidance_box, custom_candidates):
     planet_rule = c2.selectbox("Planet-count rule", ["Exactly", "At least"], key="perfect_planet_rule")
     planets = c3.number_input("Known planets", 1, 20, 3, key="perfect_planets")
     radius = st.slider("Planet radius (Earth radii)", 0.1, 5.0, (0.8, 1.5), 0.05, key="perfect_radius")
-    t1, t2 = st.columns(2)
-    use_temperature = t1.checkbox("Use equilibrium temperature", key="perfect_use_temperature")
-    temperature = t1.slider("Temperature (K)", 100, 1500, (250, 350), 10, disabled=not use_temperature, key="perfect_temperature")
-    use_distance = t2.checkbox("Limit distance from Earth", key="perfect_use_distance")
-    known_distances = data["sy_dist"].dropna()
-    distance_ceiling = max(10.0, float(known_distances.max())) if not known_distances.empty else 1000.0
-    max_distance_ly = t2.slider("Maximum distance (light-years)", 3.3, distance_ceiling * 3.26156, min(500.0 * 3.26156, distance_ceiling * 3.26156), disabled=not use_distance, key="perfect_distance")
-    candidates, steps = custom_candidates(data, int(stars), planet_rule, int(planets), radius, temperature if use_temperature else None, max_distance_ly / 3.26156 if use_distance else None)
+    use_temperature = st.checkbox("Use equilibrium temperature", key="perfect_use_temperature")
+    temperature = st.slider("Temperature (K)", 100, 1500, (250, 350), 10, disabled=not use_temperature, key="perfect_temperature")
+    candidates, steps = custom_candidates(data, int(stars), planet_rule, int(planets), radius, temperature if use_temperature else None, None)
     st.subheader("Effect of each criterion")
     st.dataframe(steps, use_container_width=True, hide_index=True)
     st.metric("Remaining candidates", f"{len(candidates):,}")
