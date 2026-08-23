@@ -13,7 +13,6 @@ TAB_LABELS = [
     "One variable",
     "Two variables",
     "Three variables",
-    "Find your perfect planet",
     "Sky map",
 ]
 
@@ -422,7 +421,6 @@ def render(
     variables,
     variable_card,
     scale_guidance,
-    custom_candidates,
     sky_map,
 ):
     """Render the complete Data Laboratory experience using shared services."""
@@ -465,10 +463,7 @@ def render(
     elif current_tab == 5:
         with tabs[5]:
             render_three_variables(data, guidance_mode, field_options)
-    elif current_tab == 6:
-        with tabs[6]:
-            render_filters(data, guidance_mode, guidance_box, custom_candidates)
     else:
-        with tabs[7]:
+        with tabs[6]:
             render_map(data, guidance_mode, sky_map)
     step_buttons(TAB_LABELS, "lab_tab", "lab_tab_step", "lab_scroll_to_top", current_tab, "lab")

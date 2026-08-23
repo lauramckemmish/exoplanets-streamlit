@@ -1889,7 +1889,6 @@ else:
         variables=VARIABLES,
         variable_card=variable_card,
         scale_guidance=shared_scale_guidance,
-        custom_candidates=custom_candidates,
         sky_map=sky_map,
     )
 
