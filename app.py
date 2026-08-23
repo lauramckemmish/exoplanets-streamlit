@@ -1152,29 +1152,9 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
         st.session_state["demographics_part"] = 0
     part = max(0, min(int(st.session_state["demographics_part"]), 8))
     if year_level == "Year 8":
-        step_labels = [
-            "Welcome",
-            "1 · Meet our Solar System",
-            "2 · Planets around other stars",
-            "3 · Discoveries over time",
-            "4 · Compare planet masses",
-            "5 · Strange new worlds",
-            "6 · Add orbital distance",
-            "7 · Compare planetary systems",
-            "Conclusion",
-        ]
+        step_labels = strange_new_worlds.STEP_LABELS
     else:
-        step_labels = [
-            "Welcome",
-            "1 · Our Solar System",
-            "2 · Meet exoplanets",
-            "3 · Mass and distance",
-            "4 · Are our planets typical?",
-            "5 · Direct imaging",
-            "6 · Transit detection",
-            "7 · Compare methods",
-            "Conclusion",
-        ]
+        step_labels = planets_we_have_not_found.STEP_LABELS
     _, selected_part = step_tabs(step_labels, "demographics_step_selector", part)
     if selected_part != part:
         part = selected_part
