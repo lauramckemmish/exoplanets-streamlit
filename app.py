@@ -266,14 +266,41 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
 
     elif step == 1:
         st.header("Worked example: a Tatooine-like world")
-        st.write("Start with a story idea, turn it into measurable criteria, and see what the dataset can and cannot tell us.")
+        st.image("assets/nasa-kepler-16b-travel-poster.jpg", width=300, caption="NASA/JPL artist's impression of Kepler-16 b, a real planet orbiting two stars")
+        st.markdown(
+            "**On a galaxy far, far away, there was once a Jedi called Luke Skywalker.** "
+            "His home planet, Tatooine, had two suns. We cannot search for a fictional planet directly, "
+            "but we can use real measurements to look for planets with some similar clues."
+        )
+        st.info(
+            "The NASA Exoplanet Archive is a table of planets that have already been detected. "
+            "It does not contain every planet in the Milky Way, and a blank value means that a measurement was not recorded."
+        )
+        st.subheader("Turn the story into filters")
         st.dataframe(pd.DataFrame([
-            {"Clue": "Two suns", "Variable": "Known stars", "Example rule": "Exactly 2"},
-            {"Clue": "A planetary system", "Variable": "Known planets", "Example rule": "At least 3"},
-            {"Clue": "A roughly Earth-sized world", "Variable": "Planet radius", "Example rule": "0.8–1.5 Earth radii"},
+            {"Story clue": "Two suns", "Dataset variable": "Known stars", "Rule": "Exactly 2"},
+            {"Story clue": "Part of a planetary system", "Dataset variable": "Known planets", "Rule": "Exactly 3"},
+            {"Story clue": "A roughly Earth-sized world", "Dataset variable": "Planet radius", "Rule": "0.8–1.5 Earth radii"},
         ]), use_container_width=True, hide_index=True)
-        st.info("This is a worked example, not a claim that any candidate is literally Tatooine. Unknown values remain unknown.")
-        tatooine.render_custom_filters(data, "Teacher" if st.session_state.get("tatooine_teacher_view", False) else "Student", guidance_box, custom_candidates)
+        st.caption("These rules are choices that represent the story. They are not proof that a planet is literally Tatooine.")
+        st.subheader("Apply one filter at a time")
+        readable_steps = steps.rename(columns={
+            "Before": "Planets before this filter",
+            "Remaining": "Planets left",
+            "Did not meet criterion": "Removed by this filter",
+            "Missing or unknown": "Not recorded",
+        })[["Criterion", "Planets before this filter", "Removed by this filter", "Not recorded", "Planets left"]]
+        st.dataframe(readable_steps, use_container_width=True, hide_index=True)
+        st.write(f"The search starts with **{len(data):,} detected planet records**. Each row shows how the candidate set changes after the next rule.")
+        st.subheader("Explore the remaining candidates")
+        if candidates.empty:
+            st.warning("No candidates meet all three rules in this dataset.")
+        else:
+            candidate_columns = ["pl_name", "hostname", "pl_rade", "pl_bmasse", "pl_eqt", "sy_snum", "sy_pnum"]
+            selected = st.selectbox("Choose a candidate to inspect", candidates.sort_values("pl_name")["pl_name"].tolist(), key="tatooine_worked_candidate")
+            st.dataframe(candidates[candidate_columns].sort_values("pl_name"), use_container_width=True, hide_index=True)
+            st.text_area("What do you notice about this candidate? What evidence is still missing?", key="tatooine_worked_response", height=110)
+            st.caption("This search uses only planets that have been detected and measured. Many more planets are likely to exist in the Milky Way than we have discovered.")
 
     elif step == 2:
         st.header("Worked example: an Earth-like candidate")
