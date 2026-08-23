@@ -676,8 +676,8 @@ def render_map_lab(data: pd.DataFrame, guidance_mode: str) -> None:
 def render_data_lab(data: pd.DataFrame, guidance_mode: str) -> None:
     heading, activity_controls = st.columns([4, 2])
     with heading:
-        st.title("Exoplanet Data Laboratory")
-        st.caption("Open exploration with contextual guidance for analytical choices")
+        st.title(data_laboratory.TITLE)
+        st.caption(data_laboratory.SUBTITLE)
     with activity_controls:
         st.toggle(
             "Teacher view",
@@ -693,13 +693,7 @@ def render_data_lab(data: pd.DataFrame, guidance_mode: str) -> None:
             timing="Flexible investigation",
             listen_for="Students explaining why a graph answers a particular question rather than treating graph settings as decoration.",
         )
-    tab_labels = [
-        "Dataset and variables",
-        "Discoveries",
-        "Relationship explorer",
-        "Custom Tatooine filters",
-        "Sky map",
-    ]
+    tab_labels = data_laboratory.TAB_LABELS
     current_tab = int(st.session_state.get("lab_tab_step", 0))
     tabs, selected_tab = step_tabs(tab_labels, "lab_tab", current_tab)
     if selected_tab != current_tab:

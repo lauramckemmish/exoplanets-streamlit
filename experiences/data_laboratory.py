@@ -1,5 +1,15 @@
 """Exoplanet Data Laboratory experience entry point."""
 
+TITLE = "Exoplanet Data Laboratory"
+SUBTITLE = "Open exploration with contextual guidance for analytical choices"
+TAB_LABELS = [
+    "Dataset and variables",
+    "Discoveries",
+    "Relationship explorer",
+    "Custom Tatooine filters",
+    "Sky map",
+]
+
 INVESTIGATIONS = {
     "Does planet size relate to mass?": {
         "x": "pl_rade", "y": "pl_bmasse", "colour": "discoverymethod",
