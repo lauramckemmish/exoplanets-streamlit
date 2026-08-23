@@ -9,7 +9,7 @@ TAB_LABELS = [
     "Dataset and variables",
     "Discoveries",
     "Relationship explorer",
-    "Custom Tatooine filters",
+    "Find your perfect planet",
     "Sky map",
 ]
 
@@ -92,7 +92,7 @@ def render_map(data, guidance_mode, sky_map):
         a, b, c, d = st.columns(4)
         a.metric("Right ascension", "Unknown" if pd.isna(row["ra"]) else f"{row['ra']:.2f}°")
         b.metric("Declination", "Unknown" if pd.isna(row["dec"]) else f"{row['dec']:.2f}°")
-        c.metric("Distance", "Unknown" if pd.isna(row["sy_dist"]) else f"{row['sy_dist']:.1f} pc")
+        c.metric("Distance", "Unknown" if pd.isna(row["sy_dist"]) else f"{row['sy_dist'] * 3.26156:.1f} ly")
         d.metric("Discovery year", "Unknown" if pd.isna(row["disc_year"]) else str(row["disc_year"]))
         if guidance_mode == "Teacher":
             with st.expander("Teacher guidance", expanded=False):
@@ -101,7 +101,7 @@ def render_map(data, guidance_mode, sky_map):
 
 def render_filters(data, guidance_mode, guidance_box, custom_candidates):
     """Render custom candidate filters using the shared filtering service."""
-    st.header("Build your own Tatooine definition")
+    st.header("Find your perfect planet")
     guidance_box(guidance_mode, "Change one assumption at a time and observe which records fail the criterion, which are unknown and which remain.", "Learning intention: students understand that operational definitions and thresholds shape the candidate set.")
     c1, c2, c3 = st.columns(3)
     stars = c1.number_input("Known stars", 1, 10, 2)
@@ -114,8 +114,9 @@ def render_filters(data, guidance_mode, guidance_box, custom_candidates):
     use_distance = t2.checkbox("Limit distance from Earth")
     known_distances = data["sy_dist"].dropna()
     distance_ceiling = max(10.0, float(known_distances.max())) if not known_distances.empty else 1000.0
-    max_distance = t2.slider("Maximum distance (parsecs)", 1.0, distance_ceiling, min(500.0, distance_ceiling), disabled=not use_distance)
-    candidates, steps = custom_candidates(data, int(stars), planet_rule, int(planets), radius, temperature if use_temperature else None, max_distance if use_distance else None)
+    max_distance_ly = t2.slider("Maximum distance (light-years)", 3.3, distance_ceiling * 3.26156, min(500.0 * 3.26156, distance_ceiling * 3.26156), disabled=not use_distance)
+    max_distance_pc = max_distance_ly / 3.26156 if use_distance else None
+    candidates, steps = custom_candidates(data, int(stars), planet_rule, int(planets), radius, temperature if use_temperature else None, max_distance_pc)
     st.subheader("Effect of each criterion")
     st.dataframe(steps, use_container_width=True, hide_index=True)
     st.metric("Remaining candidates", f"{len(candidates):,}")

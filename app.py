@@ -12,6 +12,7 @@ import requests
 import streamlit as st
 import streamlit.components.v1 as components
 from data import (
+    PARSEC_TO_LIGHT_YEARS,
     apply_filter,
     custom_candidates,
     load_data as load_selected_data,
@@ -166,7 +167,7 @@ VARIABLES = {
     },
     "sy_dist": {
         "label": "Distance from Earth",
-        "unit": "parsecs",
+        "unit": "light-years",
         "description": "The distance from Earth to the planetary system.",
         "measurement": "Measured astronomically, commonly using parallax and related methods.",
         "log": "recommended",
@@ -400,7 +401,7 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
             a, b, c, d = st.columns(4)
             a.metric("Right ascension", "Unknown" if pd.isna(row["ra"]) else f"{row['ra']:.2f}°")
             b.metric("Declination", "Unknown" if pd.isna(row["dec"]) else f"{row['dec']:.2f}°")
-            c.metric("Distance", "Unknown" if pd.isna(row["sy_dist"]) else f"{row['sy_dist']:.1f} pc")
+            c.metric("Distance", "Unknown" if pd.isna(row["sy_dist"]) else f"{row['sy_dist'] * PARSEC_TO_LIGHT_YEARS:.1f} ly")
             d.metric("Discovery year", "Unknown" if pd.isna(row["disc_year"]) else str(row["disc_year"]))
             st.success(
                 f"Mission conclusion: {selected} is a candidate under the selected rules, not a confirmed identification. "

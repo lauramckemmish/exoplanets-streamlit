@@ -9,6 +9,8 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+
+PARSEC_TO_LIGHT_YEARS = 3.26156
 import requests
 import streamlit as st
 
@@ -126,6 +128,6 @@ def custom_candidates(data: pd.DataFrame, stars: int, planet_rule: str, planets:
         current, row = apply_filter(current, "pl_eqt", current["pl_eqt"].between(*temperature, inclusive="both"), f"Temperature {temperature[0]} to {temperature[1]} K")
         rows.append(row)
     if max_distance is not None:
-        current, row = apply_filter(current, "sy_dist", current["sy_dist"] <= max_distance, f"Within {max_distance:.0f} parsecs")
+        current, row = apply_filter(current, "sy_dist", current["sy_dist"] <= max_distance, f"Within {max_distance * PARSEC_TO_LIGHT_YEARS:.0f} light-years")
         rows.append(row)
     return current, pd.DataFrame(rows)
