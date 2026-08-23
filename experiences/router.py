@@ -56,13 +56,6 @@ def is_catalog_experience_selected(name: str) -> bool:
     return st.session_state.get("experience") == experience["app_experience"]
 
 
-def normalise_experience(app_experience: str) -> str:
-    """Fall back to Introduction when session state selects a hidden route."""
-    if app_experience in {"Introduction", "Exoplanet Demographics"}:
-        return app_experience
-    return app_experience if catalog.is_enabled_app_experience(app_experience) else "Introduction"
-
-
 def normalise_pathway(pathway, facilitated_pathway, stage4_pathway, stage5_pathway):
     """Return a current pathway name for current or legacy session values."""
     migrations = {

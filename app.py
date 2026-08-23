@@ -244,9 +244,15 @@ def render_demographics(data: pd.DataFrame) -> None:
 if "experience" not in st.session_state:
     st.session_state["experience"] = "Introduction"
 
-st.session_state["experience"] = router.normalise_experience(
+enabled_app_experiences = {
+    experience_entry["app_experience"]
+    for experience_entry in catalog.experience_catalog()
+}
+if (
     st.session_state["experience"]
-)
+    not in {"Introduction", "Exoplanet Demographics", *enabled_app_experiences}
+):
+    st.session_state["experience"] = "Introduction"
 
 with st.sidebar:
     st.header("Explore exoplanets")
