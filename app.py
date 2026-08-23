@@ -316,7 +316,7 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
         st.subheader("Variable 1: Estimated temperature")
         known_temperature = data[data["pl_eqt"].notna()].copy()
         st.info("Choice 1: keep only planets with an estimated temperature recorded.")
-        st.warning(f"Missing data: {len(data) - len(known_temperature):,} planet records do not have a recorded temperature.")
+        st.warning(f"Data recorded: {len(known_temperature):,} planets have an estimated temperature ({len(data) - len(known_temperature):,} not recorded).")
         st.success(f"Result: {len(known_temperature):,} planets remain.")
         temp_c = st.slider("Choose an estimated temperature range (°C)", -50, 100, (-23, 77), 5, key="earth_temperature_range")
         temperature_k = (temp_c[0] + 273.15, temp_c[1] + 273.15)
@@ -325,7 +325,7 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
         st.success(f"Result: {len(temperature_matches):,} planets remain.")
         st.subheader("Variable 2: Planet radius")
         radius_recorded = temperature_matches[temperature_matches["pl_rade"].notna()]
-        st.warning(f"Missing data: {len(temperature_matches) - len(radius_recorded):,} of these planets do not have a recorded radius.")
+        st.warning(f"Data recorded: {len(radius_recorded):,} of these planets have a radius ({len(temperature_matches) - len(radius_recorded):,} not recorded).")
         radius_range = st.slider("Choose a planet radius range (Earth radii)", 0.5, 2.0, (0.8, 1.5), 0.05, key="earth_radius_range")
         earth_like = radius_recorded[radius_recorded["pl_rade"].between(*radius_range, inclusive="both")].copy()
         st.info(f"Choice 3: keep planets with a radius between {radius_range[0]:.2f} and {radius_range[1]:.2f} Earth radii.")

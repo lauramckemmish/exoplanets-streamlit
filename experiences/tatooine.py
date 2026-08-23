@@ -129,7 +129,7 @@ def render_custom_filters(data, guidance_mode, guidance_box, custom_candidates, 
         missing = int(current[field].isna().sum())
         available = current[current[field].notna()].copy()
         st.info(f"Choice: consider **{label}**.")
-        st.warning(f"Missing data: {missing:,} of the {before:,} planets do not have this value recorded.")
+        st.warning(f"Data recorded: {recorded:,} of the {before:,} planets have this value ({missing:,} not recorded).")
         st.success(f"Result after checking the data: {len(available):,} planets remain available for this filter.")
         current = available[mask(available)].copy()
         st.info(f"Choice: {rule_text}")
@@ -179,9 +179,13 @@ def render_custom_filters(data, guidance_mode, guidance_box, custom_candidates, 
         st.warning("No records meet every active criterion. Broaden one criterion to see where candidates reappear.")
         st.session_state["lab_candidate_names"] = []
         return
-    candidate_columns = ["pl_name", "hostname", "disc_year", "pl_rade", "pl_bmasse", "pl_eqt", "sy_dist", "sy_snum", "sy_pnum"]
+    candidate_columns = ["pl_name", "hostname", "pl_rade", "sy_snum", "sy_pnum"]
     candidates = candidates.sort_values("pl_name")
-    st.dataframe(candidates[candidate_columns], use_container_width=True, hide_index=True)
+    display = candidates[candidate_columns].rename(columns={
+        "pl_name": "Planet name", "hostname": "Host star", "pl_rade": "Planet radius (Earth radii)",
+        "sy_snum": "Known stars", "sy_pnum": "Known planets",
+    })
+    st.dataframe(display, use_container_width=True, hide_index=True)
     names = candidates["pl_name"].tolist()
     selected = st.selectbox("Candidate to investigate", names, key="perfect_candidate")
     st.session_state["lab_candidate_names"] = names
@@ -197,7 +201,7 @@ def render_custom_filters(data, guidance_mode, guidance_box, custom_candidates, 
     st.subheader(f"Evidence for {selected}")
     st.dataframe(evidence, use_container_width=True, hide_index=True)
     st.text_area("What does this candidate tell you about your planet story? What is still unknown?", key="perfect_planet_conclusion", height=110)
-    st.download_button("Download candidate table", candidates[candidate_columns].to_csv(index=False).encode("utf-8"), "perfect_planet_candidates.csv", "text/csv")
+    st.download_button("Download candidate table", display.to_csv(index=False).encode("utf-8"), "perfect_planet_candidates.csv", "text/csv")
     st.caption("This search uses the evidence recorded so far. We think there are probably hundreds of billions of planets in our galaxy alone.")
 
 
