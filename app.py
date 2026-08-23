@@ -10,7 +10,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 import requests
 import streamlit as st
-import streamlit.components.v1 as components
 from data import (
     apply_filter,
     load_data as load_selected_data,
@@ -58,6 +57,7 @@ from ui_helpers import (
 )
 from experiences import (
     curious,
+    classroom_navigation,
     data_laboratory,
     planets_we_have_not_found,
     catalog,
@@ -250,39 +250,16 @@ def render_demographics_classroom(data: pd.DataFrame, teacher_note_renderer=None
     }.get(pathway)
     if year_level is None:
         return
-    if "demographics_part" not in st.session_state:
-        st.session_state["demographics_part"] = 0
     part_count = (
         strange_new_worlds.PART_COUNT
         if year_level == strange_new_worlds.YEAR_LEVEL
         else planets_we_have_not_found.PART_COUNT
     )
-    part = max(0, min(int(st.session_state["demographics_part"]), part_count - 1))
     if year_level == "Year 8":
         step_labels = strange_new_worlds.STEP_LABELS
     else:
         step_labels = planets_we_have_not_found.STEP_LABELS
-    _, selected_part = step_tabs(step_labels, "demographics_step_selector", part)
-    if selected_part != part:
-        part = selected_part
-        st.session_state["demographics_part"] = part
-        st.session_state["demographics_scroll_to_top"] = True
-    if st.session_state.pop("demographics_scroll_to_top", False):
-        components.html(
-            """
-            <script>
-                const parentDocument = window.parent.document;
-                const scrollContainer =
-                    parentDocument.querySelector('[data-testid="stAppViewContainer"]') ||
-                    parentDocument.querySelector('section.main');
-                if (scrollContainer) {
-                    scrollContainer.scrollTo({top: 0, left: 0, behavior: 'instant'});
-                }
-                window.parent.scrollTo({top: 0, left: 0, behavior: 'instant'});
-            </script>
-            """,
-            height=0,
-        )
+    part = classroom_navigation.select_step(step_labels, part_count)
     if teacher_note_renderer is not None:
         teacher_note_renderer(part)
     # CLASSROOM STEP 0 — Welcome
