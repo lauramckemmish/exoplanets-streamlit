@@ -2204,8 +2204,8 @@ def render_demographics_landing(data: pd.DataFrame) -> None:
                         "Open experience →",
                         key=f"open_experience_{name}",
                         use_container_width=True,
-                        on_click=open_experience,
-                        args=(name,),
+                        on_click=router.open_experience,
+                        args=(name, FACILITATED_PATHWAY, STAGE4_PATHWAY, STAGE5_PATHWAY),
                     )
     if len(experiences) % 2:
         with st.container(border=True):
@@ -2215,8 +2215,8 @@ def render_demographics_landing(data: pd.DataFrame) -> None:
                 "Open experience →",
                 key=f"open_experience_{experiences[-1][0]}",
                 use_container_width=True,
-                on_click=open_experience,
-                args=(experiences[-1][0],),
+                on_click=router.open_experience,
+                args=(experiences[-1][0], FACILITATED_PATHWAY, STAGE4_PATHWAY, STAGE5_PATHWAY),
             )
     with st.expander("About and acknowledgements"):
         st.markdown(
@@ -2246,16 +2246,6 @@ def render_demographics(data: pd.DataFrame) -> None:
         render_demographics_curious,
         render_demographics_classroom,
     )
-
-
-def open_experience(name: str) -> None:
-    """Launch an experience from the Introduction overview card."""
-    if name in {FACILITATED_PATHWAY, STAGE4_PATHWAY, STAGE5_PATHWAY}:
-        router.select_demographics_pathway(name)
-    elif name == "Find Tatooine":
-        router.select_experience("Guided Tatooine Mission")
-    else:
-        router.select_experience(name)
 
 
 if "experience" not in st.session_state:
