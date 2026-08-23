@@ -159,6 +159,7 @@ def render_custom_filters(data, guidance_mode, guidance_box, custom_candidates):
     st.subheader(f"Evidence for {selected}")
     st.dataframe(evidence, use_container_width=True, hide_index=True)
     st.download_button("Download candidate table", candidates[candidate_columns].to_csv(index=False).encode("utf-8"), "perfect_planet_candidates.csv", "text/csv")
+    st.caption("This search uses the evidence recorded so far. Many more planets are likely to exist in the Milky Way than we have discovered.")
 
 
 def render(data, presenter_mode, implementation):

@@ -284,9 +284,12 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
             {"Clue": "A known planetary system", "Variable": "Known planets", "Example rule": "At least 1"},
         ]), use_container_width=True, hide_index=True)
         st.warning("Earth-sized or temperate does not prove that a planet is habitable. These are screening rules for a first search.")
-        earth_like, _ = custom_candidates(data, 1, "At least", 1, (0.8, 1.5), (250, 350), None)
-        st.metric("Candidates under this example", f"{len(earth_like):,}")
+        earth_like, earth_steps = custom_candidates(data, 1, "At least", 1, (0.8, 1.5), (250, 350), None)
+        st.subheader("Apply the filters in order")
+        st.dataframe(earth_steps, use_container_width=True, hide_index=True)
+        st.metric("Candidates after all four rules", f"{len(earth_like):,}")
         st.dataframe(earth_like[["pl_name", "hostname", "pl_rade", "pl_eqt", "sy_snum", "sy_pnum"]].head(30), use_container_width=True, hide_index=True)
+        st.info("These results use evidence that has actually been recorded. The Milky Way is likely home to millions or billions of planets that we have not discovered.")
 
     elif step == 98:
         st.header("Apply filter 1: number of stars")
