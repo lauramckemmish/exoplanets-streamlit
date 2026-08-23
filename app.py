@@ -57,6 +57,7 @@ from ui_helpers import (
 )
 from experiences import (
     curious,
+    classroom_dependencies,
     classroom_shell,
     data_laboratory,
     planets_we_have_not_found,
@@ -209,6 +210,32 @@ COLOUR_OPTIONS = {
     "Planets in system": "sy_pnum",
 }
 
+# Shared infrastructure supplied to the two independently owned classroom lessons.
+CLASSROOM_RESOURCES = {
+    "exoplanet_image_path": EXOPLANET_IMAGE_PATH,
+    "solar_system_image_path": SOLAR_SYSTEM_IMAGE_PATH,
+    "planetary_systems_image_path": PLANETARY_SYSTEMS_IMAGE_PATH,
+    "exoplanet_quadrants_image_path": EXOPLANET_QUADRANTS_IMAGE_PATH,
+    "direct_imaging_image_path": DIRECT_IMAGING_IMAGE_PATH,
+    "transit_detection_image_path": TRANSIT_DETECTION_IMAGE_PATH,
+    "nasa_kepler_16b_poster_path": NASA_KEPLER_16B_POSTER_PATH,
+    "nasa_51_pegasi_b_poster_path": NASA_51_PEGASI_B_POSTER_PATH,
+    "nasa_kepler_186f_poster_path": NASA_KEPLER_186F_POSTER_PATH,
+    "solar_system_demographics_chart": solar_system_demographics_chart,
+    "planet_mass_distribution_chart": shared_planet_mass_distribution_chart,
+    "discoveries_by_year_chart": discoveries_by_year_chart,
+    "current_demographics_chart": shared_current_demographics_chart,
+    "demographics_methods_chart": shared_demographics_methods_chart,
+    "demographics_question": demographics_question,
+    "graph_guide": graph_guide,
+    "graph_questions": graph_questions,
+    "response_box": response_box,
+    "key_idea": key_idea,
+    "log_scale_reveal": log_scale_reveal,
+    "data_detective_challenge": data_detective_challenge,
+    "learn_more_prompt": learn_more_prompt,
+}
+
 st.set_page_config(
     page_title="Find Your Perfect Planet | Exoplanet Data Investigation",
     page_icon="🪐",
@@ -263,51 +290,14 @@ def render_demographics_classroom_body(
     part: int,
 ) -> None:
     """Dispatch a classroom lesson step to its pathway-owned body."""
-    if pathway == STAGE4_PATHWAY:
-        dependencies = strange_new_worlds.LessonDependencies(
-            pathway_name=STAGE4_PATHWAY,
-            exoplanet_image_path=EXOPLANET_IMAGE_PATH,
-            solar_system_image_path=SOLAR_SYSTEM_IMAGE_PATH,
-            planetary_systems_image_path=PLANETARY_SYSTEMS_IMAGE_PATH,
-            nasa_kepler_16b_poster_path=NASA_KEPLER_16B_POSTER_PATH,
-            nasa_51_pegasi_b_poster_path=NASA_51_PEGASI_B_POSTER_PATH,
-            nasa_kepler_186f_poster_path=NASA_KEPLER_186F_POSTER_PATH,
-            solar_system_demographics_chart=solar_system_demographics_chart,
-            planet_mass_distribution_chart=shared_planet_mass_distribution_chart,
-            discoveries_by_year_chart=discoveries_by_year_chart,
-            current_demographics_chart=shared_current_demographics_chart,
-            graph_guide=graph_guide,
-            graph_questions=graph_questions,
-            response_box=response_box,
-            key_idea=key_idea,
-            log_scale_reveal=log_scale_reveal,
-            data_detective_challenge=data_detective_challenge,
-            learn_more_prompt=learn_more_prompt,
-        )
-        strange_new_worlds.render_lesson(data, part, dependencies)
-        return
-
-    dependencies = planets_we_have_not_found.LessonDependencies(
-        pathway_name=STAGE5_PATHWAY,
-        exoplanet_image_path=EXOPLANET_IMAGE_PATH,
-        planetary_systems_image_path=PLANETARY_SYSTEMS_IMAGE_PATH,
-        exoplanet_quadrants_image_path=EXOPLANET_QUADRANTS_IMAGE_PATH,
-        direct_imaging_image_path=DIRECT_IMAGING_IMAGE_PATH,
-        transit_detection_image_path=TRANSIT_DETECTION_IMAGE_PATH,
-        solar_system_demographics_chart=solar_system_demographics_chart,
-        planet_mass_distribution_chart=shared_planet_mass_distribution_chart,
-        current_demographics_chart=shared_current_demographics_chart,
-        demographics_methods_chart=shared_demographics_methods_chart,
-        demographics_question=demographics_question,
-        graph_guide=graph_guide,
-        graph_questions=graph_questions,
-        response_box=response_box,
-        key_idea=key_idea,
-        log_scale_reveal=log_scale_reveal,
-        data_detective_challenge=data_detective_challenge,
-        learn_more_prompt=learn_more_prompt,
+    classroom_dependencies.render_lesson(
+        data,
+        pathway,
+        part,
+        STAGE4_PATHWAY,
+        STAGE5_PATHWAY,
+        CLASSROOM_RESOURCES,
     )
-    planets_we_have_not_found.render_lesson(data, part, dependencies)
 
 
 def render_demographics_landing(data: pd.DataFrame) -> None:
