@@ -320,40 +320,26 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
     elif content_step == 2:
         st.header("Worked example: an Earth-like candidate")
         st.write("Now use a different question: where might we look for a world with a similar size, orbital distance and estimated temperature?")
-        st.info("An astronomical unit (AU) is the average distance from Earth to the Sun. Earth is about 1 AU from the Sun.")
         st.dataframe(pd.DataFrame([
             {"Clue": "Similar size to Earth", "Variable": "Planet radius", "Example rule": "0.8–1.5 Earth radii"},
-            {"Clue": "An orbit not too close or far from its star", "Variable": "Orbital distance", "Example rule": "0.5–2 AU"},
-            {"Clue": "A temperature worth investigating", "Variable": "Equilibrium temperature", "Example rule": "−73–127°C"},
+            {"Clue": "A temperature worth investigating", "Variable": "Estimated temperature", "Example rule": "Choose a range"},
         ]), use_container_width=True, hide_index=True)
-        st.warning("This is a screening search, not a test for habitability. The host star's brightness also affects temperature.")
-        earth_filter_style = st.radio(
-            "Choose a search level",
-            ["Earth-sized focus", "Earth-size neighbourhood", "Wide search"],
-            horizontal=True,
-            key="earth_filter_style",
-        )
-        if earth_filter_style == "Earth-sized focus":
-            radius_range, orbit_range, temp_range = (0.9, 1.1), (0.8, 1.5), (250, 350)
-        elif earth_filter_style == "Earth-size neighbourhood":
-            radius_range, orbit_range, temp_range = (0.8, 1.5), (0.5, 2.0), (200, 400)
-        else:
-            radius_range, orbit_range, temp_range = (0.5, 2.0), (0.2, 5.0), (150, 500)
-        earth_current = data.copy()
-        earth_rows = []
-        earth_current, row = apply_filter(earth_current, "pl_rade", earth_current["pl_rade"].between(*radius_range, inclusive="both"), f"Radius {radius_range[0]}–{radius_range[1]} Earth radii")
-        earth_rows.append(row)
-        earth_current, row = apply_filter(earth_current, "pl_orbsmax", earth_current["pl_orbsmax"].between(*orbit_range, inclusive="both"), f"Orbital distance {orbit_range[0]}–{orbit_range[1]} AU")
-        earth_rows.append(row)
-        earth_current, row = apply_filter(earth_current, "pl_eqt", earth_current["pl_eqt"].between(*temp_range, inclusive="both"), f"Estimated temperature {temp_range[0] - 273.15:.0f}–{temp_range[1] - 273.15:.0f}°C")
-        earth_rows.append(row)
-        earth_like, earth_steps = earth_current, pd.DataFrame(earth_rows)
+        st.warning("This is a screening search, not a test for habitability. Temperature does not prove that a planet has liquid water.")
         st.subheader("Apply the filters in order")
-        for criterion, count in zip(earth_steps["Criterion"], earth_steps["Remaining"]):
-            st.markdown(f"**Keep only planets where {criterion.lower()}.**")
-            st.markdown(f"**{int(count):,} planets remain.**")
+        st.write(f"We start with **{len(data):,} detected planet records**.")
+        known_temperature = data[data["pl_eqt"].notna()].copy()
+        st.markdown("**First, keep only planets with an estimated temperature recorded.**")
+        st.markdown(f"**{len(known_temperature):,} planets remain.**")
+        temp_c = st.slider("Choose an estimated temperature range (°C)", -173, 1200, (-23, 77), 5, key="earth_temperature_range")
+        temperature_k = (temp_c[0] + 273.15, temp_c[1] + 273.15)
+        temperature_matches = known_temperature[known_temperature["pl_eqt"].between(*temperature_k, inclusive="both")]
+        st.markdown(f"**Next, keep planets between {temp_c[0]}°C and {temp_c[1]}°C.**")
+        st.markdown(f"**{len(temperature_matches):,} planets remain.**")
+        earth_like = temperature_matches[temperature_matches["pl_rade"].between(0.8, 1.5, inclusive="both")].copy()
+        st.markdown("**Finally, keep planets with a radius between 0.8 and 1.5 Earth radii.**")
+        st.markdown(f"**{len(earth_like):,} planets remain.**")
         if st.session_state.get("tatooine_teacher_view", False):
-            st.info("Teacher note: orbital distance is not enough to define a habitable zone. A star's brightness changes how much energy reaches a planet; we are keeping that extra calculation out of this activity.")
+            st.info("Teacher note: missing temperature is not evidence that a planet is too hot or too cold. It means the value was not recorded. Temperature also does not prove habitability.")
         st.info("These results use evidence that has actually been recorded. The Milky Way is likely home to millions or billions of planets that we have not discovered.")
         render_candidate_comparison(earth_like, "earth_like_worked", "Which candidate would you investigate further? What evidence would you want before discussing liquid water?")
 
