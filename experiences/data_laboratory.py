@@ -45,6 +45,14 @@ DATASET_FIELDS = [
     ("Known planets in system", "sy_pnum"),
 ]
 
+PHYSICAL_GROUPS = {
+    "Planet mass (Earth masses)": ("pl_bmasse", [-float("inf"), 1, 10, 100, 1000, float("inf")], ["Less than 1 Earth mass", "1–10 Earth masses", "10–100 Earth masses", "100–1,000 Earth masses", "More than 1,000 Earth masses"]),
+    "Planet radius (Earth radii)": ("pl_rade", [-float("inf"), 1, 2, 4, 10, float("inf")], ["Less than 1 Earth radius", "1–2 Earth radii", "2–4 Earth radii", "4–10 Earth radii", "More than 10 Earth radii"]),
+    "Equilibrium temperature (K)": ("pl_eqt", [-float("inf"), 200, 300, 500, 1000, float("inf")], ["Below 200 K", "200–300 K", "300–500 K", "500–1,000 K", "Above 1,000 K"]),
+    "Orbital period": ("pl_orbper", [-float("inf"), 1, 7, 30, 365, 3650, float("inf")], ["Less than 1 day", "1–7 days", "7–30 days", "30 days–1 year", "1–10 years", "More than 10 years"]),
+    "Orbital distance (AU)": ("pl_orbsmax", [-float("inf"), 0.1, 1, 5, 30, float("inf")], ["Less than 0.1 AU", "0.1–1 AU", "1–5 AU", "5–30 AU", "More than 30 AU"]),
+}
+
 
 def render_intro(data, guidance_mode, guidance_box):
     st.header("What is the Exoplanet Data Laboratory?")
@@ -135,42 +143,40 @@ def numeric_options(field_options):
 
 def render_one_variable(data, guidance_mode, field_options):
     st.header("One variable")
-    st.write("There are two useful ways to describe one variable. We can group numerical values into ranges, or count values that are already categories.")
+    st.write("Start by looking at one variable. A histogram counts how many records fall into each range; for an existing category, the same idea appears as a bar-count graph.")
 
-    st.subheader("A. Group a numerical variable into ranges")
-    st.write("Grouping turns measurements into categories that we can count and compare. The group boundaries are a choice, so try changing them.")
-    options = numeric_options(field_options)
-    label = st.selectbox("Choose a numerical variable", list(options), key="lab_one_numeric")
-    field = options[label]
-    plotted = display_data(data) if field == "sy_dist" else data
-    group_count = st.slider("Number of ranges", min_value=3, max_value=8, value=5, help="Each range has the same numerical width. Changing the number of ranges changes the summary, not the original values.")
-    chart_type = st.radio("Show these grouped values as", ["Bar chart", "Pie chart"], horizontal=True, key="lab_one_numeric_chart")
-    values = plotted[field].dropna()
-    grouped = pd.cut(values, bins=group_count, include_lowest=True)
-    counts = grouped.value_counts(sort=False).reset_index()
-    counts.columns = ["Value range", "Number of planet records"]
-    counts["Value range"] = counts["Value range"].astype(str)
-    if chart_type == "Bar chart":
-        figure = px.bar(counts, x="Value range", y="Number of planet records", title=f"{label}, grouped into {group_count} ranges")
-        figure.update_layout(xaxis_title=label, xaxis_tickangle=-35)
+    st.subheader("A. Start with a histogram")
+    histogram_choices = {**numeric_options(field_options), "Discovery method": "discoverymethod"}
+    histogram_label = st.selectbox("Choose a variable", list(histogram_choices), key="lab_one_histogram")
+    histogram_field = histogram_choices[histogram_label]
+    histogram_data = display_data(data) if histogram_field == "sy_dist" else data
+    if histogram_field == "discoverymethod":
+        figure = px.histogram(histogram_data.dropna(subset=[histogram_field]), x=histogram_field, title=f"Counts by {histogram_label}")
+        figure.update_layout(xaxis_title=histogram_label, yaxis_title="Number of planet records")
+        st.caption("For a category such as discovery method, the histogram is read like a bar chart: one bar for each group.")
     else:
-        figure = px.pie(counts, names="Value range", values="Number of planet records", title=f"{label}, grouped into {group_count} ranges")
+        bin_count = st.slider("Number of histogram ranges", min_value=5, max_value=60, value=20, help="The histogram groups nearby values into ranges. More ranges show finer detail; fewer ranges show a simpler overall pattern.")
+        figure = px.histogram(histogram_data.dropna(subset=[histogram_field]), x=histogram_field, nbins=bin_count, title=f"Histogram of {histogram_label}")
+        figure.update_layout(xaxis_title=histogram_label, yaxis_title="Number of planet records")
     st.plotly_chart(figure, use_container_width=True)
 
-    st.subheader("B. Count an existing category")
-    st.write("Some variables already describe groups. We can count how many records belong to each group.")
-    category_label = st.selectbox("Choose a category", ["Discovery method", "Stars in system", "Planets in system"], key="lab_one_category")
-    column = {"Discovery method": "discoverymethod", "Stars in system": "sy_snum", "Planets in system": "sy_pnum"}[category_label]
-    category_chart = st.radio("Show these category counts as", ["Bar chart", "Pie chart"], horizontal=True, key="lab_one_category_chart")
-    category_counts = data[column].dropna().value_counts().reset_index()
-    category_counts.columns = [category_label, "Number of planet records"]
-    if category_chart == "Bar chart":
-        category_figure = px.bar(category_counts, x=category_label, y="Number of planet records", title=f"Counts by {category_label}")
+    st.subheader("B. Group values using planet and Solar System analogies")
+    st.write("Sometimes equal-width histogram ranges are not the most meaningful groups. Scientists can also use ranges linked to familiar planets and orbital scales.")
+    group_label = st.selectbox("Choose a measurement to group", list(PHYSICAL_GROUPS), key="lab_one_physical_group")
+    group_field, breaks, labels = PHYSICAL_GROUPS[group_label]
+    group_values = data[group_field].dropna()
+    groups = pd.cut(group_values, bins=breaks, labels=labels, include_lowest=True)
+    group_counts = groups.value_counts(sort=False).reset_index()
+    group_counts.columns = ["Group", "Number of planet records"]
+    group_chart = st.radio("Show these groups as", ["Bar chart", "Pie chart"], horizontal=True, key="lab_one_group_chart")
+    if group_chart == "Bar chart":
+        grouped_figure = px.bar(group_counts, x="Group", y="Number of planet records", title=f"{group_label}, grouped into meaningful ranges")
+        grouped_figure.update_layout(xaxis_tickangle=-35)
     else:
-        category_figure = px.pie(category_counts, names=category_label, values="Number of planet records", title=f"Proportion of records by {category_label}")
-    st.plotly_chart(category_figure, use_container_width=True)
+        grouped_figure = px.pie(group_counts, names="Group", values="Number of planet records", title=f"{group_label}, grouped into meaningful ranges")
+    st.plotly_chart(grouped_figure, use_container_width=True)
     if guidance_mode != "Minimal":
-        st.info("Try two grouping choices or two representations. What stays the same, and what becomes easier or harder to notice? NSW Science link: organise and summarise secondary data using an appropriate representation.")
+        st.info("Compare the histogram ranges with the physical groups. What story does each representation make easier to tell? NSW Science link: organise and summarise secondary data using an appropriate representation.")
 
 
 def render_two_variables(data, guidance_mode, field_options):
