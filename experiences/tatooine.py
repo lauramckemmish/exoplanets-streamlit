@@ -207,5 +207,59 @@ def render_custom_filters(data, guidance_mode, guidance_box, custom_candidates, 
     st.caption("This search uses the evidence recorded so far. We think there are probably hundreds of billions of planets in our galaxy alone.")
 
 
+def render_tatooine_worked_example(data):
+    """Render a short, story-led example before students create their own search."""
+    st.subheader("Turn the story into one data rule")
+    st.write(
+        "The key clue is simple: Tatooine has **two suns**. In the dataset, we can represent that "
+        "as a system with **two known stars**."
+    )
+    st.write(f"We start with **{len(data):,} detected planet records**.")
+
+    recorded = data[data["sy_snum"].notna()].copy()
+    missing = len(data) - len(recorded)
+    st.info("Choice: consider the number of stars in the system.")
+    st.warning(f"Data recorded: {len(recorded):,} planets have a number of known stars ({missing:,} not recorded).")
+    st.success(f"Result after checking the data: {len(recorded):,} planets remain available for this clue.")
+
+    candidates = recorded[recorded["sy_snum"] == 2].sort_values("pl_name").copy()
+    st.info("Choice: keep planets in systems with exactly **two known stars**.")
+    st.success(f"Result: {len(candidates):,} detected planets remain.")
+
+    st.caption(
+        "Some of these systems also have several known planets. That is interesting context, but it is not "
+        "a rule we need for this short example."
+    )
+    if candidates.empty:
+        st.warning("No matching records are available in this dataset.")
+        return
+
+    st.subheader("Explore a few two-sun systems")
+    display_columns = ["pl_name", "hostname", "sy_snum", "sy_pnum", "pl_rade"]
+    display = candidates[display_columns].rename(columns={
+        "pl_name": "Planet name",
+        "hostname": "Host star",
+        "sy_snum": "Known stars",
+        "sy_pnum": "Known planets",
+        "pl_rade": "Planet radius (Earth radii)",
+    })
+    st.dataframe(display.head(12), use_container_width=True, hide_index=True)
+    selected = st.selectbox("Choose a two-sun planet to inspect", candidates["pl_name"].tolist(), key="tatooine_worked_candidate")
+    row = candidates[candidates["pl_name"] == selected].iloc[0]
+    details = pd.DataFrame([
+        {"Detail": "Host star", "Value": row["hostname"]},
+        {"Detail": "Known stars in the system", "Value": int(row["sy_snum"])},
+        {"Detail": "Known planets in the system", "Value": int(row["sy_pnum"])},
+        {"Detail": "Planet radius", "Value": "Not recorded" if pd.isna(row["pl_rade"]) else f"{row['pl_rade']:.2f} Earth radii"},
+    ])
+    st.dataframe(details, use_container_width=True, hide_index=True)
+    st.text_area(
+        "What else would you want to know before calling this world Tatooine-like?",
+        key="tatooine_worked_response",
+        height=100,
+    )
+    st.caption("This finds real planets matching one clue from a fictional story. It does not identify a real Tatooine.")
+
+
 def render(data, presenter_mode, implementation):
     return implementation(data, presenter_mode)

@@ -303,9 +303,7 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
             "The NASA Exoplanet Archive is a table of planets that have already been detected. "
             "It does not contain every planet in the Milky Way, and a blank value means that a measurement was not recorded."
         )
-        st.subheader("Use the story to choose your filters")
-        st.write("Start with the default settings, then change the filters to represent the clues in the story. Each choice changes which real planet records remain.")
-        tatooine.render_custom_filters(data, "Teacher" if st.session_state.get("tatooine_teacher_view", False) else "Student", guidance_box, custom_candidates, defaults=(1, 1, (0.8, 1.2)), key_prefix="tatooine")
+        tatooine.render_tatooine_worked_example(data)
 
     elif content_step == 2:
         st.header("Worked example: an Earth-like candidate")
