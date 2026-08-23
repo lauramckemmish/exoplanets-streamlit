@@ -1,21 +1,22 @@
-# Find Tatooine
+# Exoplanet Discovery with NASA Data
 
-A Streamlit conversion of the exoplanet notebook, redesigned as a guided data-science investigation rather than a Python-coding lesson.
+A Streamlit collection of five astronomy and data-science learning experiences using real NASA Exoplanet Archive data.
 
-## Run locally on Windows CMD
+## Experiences
 
-```cmd
-conda activate exoplanets-streamlit
+- **Is Our Solar System Normal?** — a CURIOUS facilitator-led experience.
+- **Strange New Worlds** — a Year 8 classroom pathway.
+- **The Planets We Haven't Found** — a Year 10 classroom pathway.
+- **Exoplanet Data Laboratory** — explore variables, data representations and patterns.
+- **Find Your Perfect Planet** — turn an imagined world into adjustable data filters.
+
+See [CONTENT_MAP.md](CONTENT_MAP.md) for the current editing map: it identifies where lesson text, Teacher-view notes, shared charts and navigation live.
+
+## Run locally
+
+```bash
 python -m pip install -r requirements.txt
 python -m streamlit run app.py
 ```
 
-## App stages
-
-1. Meet the data and inspect missing values.
-2. Explore discoveries by year and method.
-3. Compare exoplanet properties interactively.
-4. Convert the description of Tatooine into adjustable filters.
-5. Map the selected candidate using right ascension and declination.
-
-The app first tries to retrieve selected fields from the NASA Exoplanet Archive. If the request fails, use the bundled notebook sample from the sidebar.
+The app offers live NASA data and a bundled notebook sample from the sidebar. Live data are cached; the bundled sample keeps the activities usable when a network request is unavailable.

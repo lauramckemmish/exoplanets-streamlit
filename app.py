@@ -48,8 +48,8 @@ APP_DIR = Path(__file__).resolve().parent
 
 # ---------------------------------------------------------------------------
 # SHARED DATA AND ASSET CONFIGURATION
-# Edit the lesson wording much further down; these constants keep data paths
-# and reusable images in one easy-to-find place.
+# These constants keep reusable data paths and images in one easy-to-find
+# place. Edit lesson wording in the relevant module under `experiences/`.
 # ---------------------------------------------------------------------------
 SOLAR_SYSTEM_IMAGE_PATH = APP_DIR / "assets" / "solar-system-nasa.jpeg"
 EXOPLANET_IMAGE_PATH = APP_DIR / "assets" / "exoplanets-artists-concept-nasa.jpeg"
