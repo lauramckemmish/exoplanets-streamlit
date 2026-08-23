@@ -129,8 +129,12 @@ def render_custom_filters(data, guidance_mode, guidance_box, custom_candidates):
     temperature_c = st.slider("Estimated temperature (°C)", -173, 1200, (-23, 77), 5, disabled=not use_temperature, key="perfect_temperature")
     temperature_k = (temperature_c[0] + 273.15, temperature_c[1] + 273.15) if use_temperature else None
     candidates, steps = custom_candidates(data, int(stars), planet_rule, int(planets), radius, temperature_k, None)
-    st.subheader("Effect of each criterion")
-    st.dataframe(steps, use_container_width=True, hide_index=True)
+    st.subheader("Apply your filters one at a time")
+    st.write(f"We start with **{len(data):,} detected planet records**.")
+    for criterion, count in zip(steps["Criterion"], steps["Remaining"]):
+        st.markdown(f"**Keep only planets where {criterion.lower()}.**")
+        st.markdown(f"**{int(count):,} planets remain.**")
+    st.caption("The number gets smaller because each new rule narrows the search.")
     st.metric("Remaining candidates", f"{len(candidates):,}")
     if candidates.empty:
         st.warning("No records meet every active criterion. Broaden one criterion to see where candidates reappear.")
@@ -153,6 +157,7 @@ def render_custom_filters(data, guidance_mode, guidance_box, custom_candidates):
     ])
     st.subheader(f"Evidence for {selected}")
     st.dataframe(evidence, use_container_width=True, hide_index=True)
+    st.text_area("What does this candidate tell you about your planet story? What is still unknown?", key="perfect_planet_conclusion", height=110)
     st.download_button("Download candidate table", candidates[candidate_columns].to_csv(index=False).encode("utf-8"), "perfect_planet_candidates.csv", "text/csv")
     st.caption("This search uses the evidence recorded so far. Many more planets are likely to exist in the Milky Way than we have discovered.")
 

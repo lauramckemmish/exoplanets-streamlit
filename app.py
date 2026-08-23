@@ -357,8 +357,11 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
         st.warning("The rule 'exactly three' comes from the original activity. It is a modelling choice, not certain evidence from the story.")
 
     elif step == 3:
-        st.header("Try your own planet criteria")
-        st.write("The original rules were only one possible definition. Change the criteria below and see how the candidate list responds.")
+        st.header("Your planet")
+        st.write("Create a short story about the planet you would like to find. Then turn the clues in your story into variables and filters.")
+        st.text_area("What kind of planet are you looking for?", placeholder="For example: a small, warm planet in a system with several worlds.", key="perfect_planet_story", height=100)
+        st.subheader("Choose your variables and filters")
+        st.caption("Each choice is a rule. Try to explain why the rule represents part of your story.")
         guidance_mode = "Teacher" if st.session_state.get("tatooine_teacher_view", False) else "Student"
         tatooine.render_custom_filters(data, guidance_mode, guidance_box, custom_candidates)
 
