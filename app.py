@@ -1,36 +1,18 @@
 from __future__ import annotations
 
-import io
-import math
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
-import requests
 import streamlit as st
 from data import (
-    apply_filter,
     load_data as load_selected_data,
 )
 from charts import (
-    add_solar_system_trace,
-    apply_readable_log_axes,
-    demographics_plot_data,
-    discovery_chart,
-    discoveries_by_mass_chart,
     discoveries_by_year_chart,
     demographics_methods_chart as shared_demographics_methods_chart,
-    demographics_over_time_chart as shared_demographics_over_time_chart,
     current_demographics_chart as shared_current_demographics_chart,
-    finish_demographics_chart,
-    format_number,
     planet_mass_distribution_chart as shared_planet_mass_distribution_chart,
-    readable_log_ticks,
-    scale_profile,
     scale_guidance as shared_scale_guidance,
-    scatter_chart as shared_scatter_chart,
     sky_map,
     solar_system_demographics_chart,
 )
@@ -43,15 +25,10 @@ from ui_helpers import (
     key_idea,
     learn_more_prompt,
     log_scale_reveal,
-    mission_navigation,
-    presenter_notes,
     response_box,
-    sample_note,
     scroll_to_top_if_requested,
     teacher_note,
-    select_tab_step,
     step_buttons,
-    step_navigation_bar,
     step_tabs,
     variable_card,
 )
@@ -74,20 +51,15 @@ APP_DIR = Path(__file__).resolve().parent
 # Edit the lesson wording much further down; these constants keep data paths
 # and reusable images in one easy-to-find place.
 # ---------------------------------------------------------------------------
-SAMPLE_PATH = APP_DIR / "data" / "notebook_sample.csv"
 SOLAR_SYSTEM_IMAGE_PATH = APP_DIR / "assets" / "solar-system-nasa.jpeg"
 EXOPLANET_IMAGE_PATH = APP_DIR / "assets" / "exoplanets-artists-concept-nasa.jpeg"
-DETECTION_METHODS_IMAGE_PATH = APP_DIR / "assets" / "exoplanet-detection-methods.svg"
 DIRECT_IMAGING_IMAGE_PATH = APP_DIR / "assets" / "DirectImaging.png"
 TRANSIT_DETECTION_IMAGE_PATH = APP_DIR / "assets" / "Transit.png"
 PLANETARY_SYSTEMS_IMAGE_PATH = APP_DIR / "assets" / "planetary-systems.svg"
-INNER_OUTER_PLANETS_IMAGE_PATH = APP_DIR / "assets" / "inner-outer-planets.svg"
 EXOPLANET_QUADRANTS_IMAGE_PATH = APP_DIR / "assets" / "exoplanet-mass-distance-quadrants.svg"
 NASA_KEPLER_16B_POSTER_PATH = APP_DIR / "assets" / "nasa-kepler-16b-travel-poster.jpg"
 NASA_51_PEGASI_B_POSTER_PATH = APP_DIR / "assets" / "nasa-51-pegasi-b-travel-poster.jpg"
 NASA_KEPLER_186F_POSTER_PATH = APP_DIR / "assets" / "nasa-kepler-186f-travel-poster.jpg"
-NASA_TRAPPIST_1E_POSTER_PATH = APP_DIR / "assets" / "nasa-trappist-1e-travel-poster.jpg"
-NASA_TAP_URL = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync"
 # Add the public teacher-feedback form URL here when it is ready.
 TEACHER_FEEDBACK_URL = ""
 DEMOGRAPHICS_TITLE = "Exoplanet Discovery with NASA Data"
@@ -98,27 +70,6 @@ GRANT_RECIPIENTS_URL = (
     "https://business.gov.au/grants-and-programs/"
     "maker-projects-community-stem-engagement-grants-2024/grant-recipients"
 )
-
-COLUMNS = [
-    "pl_name", "hostname", "disc_year", "discoverymethod", "disc_telescope",
-    "ra", "dec", "pl_orbper", "pl_orbsmax", "pl_rade", "pl_bmasse",
-    "pl_bmassj", "pl_eqt", "sy_dist", "sy_snum", "sy_pnum", "st_spectype",
-]
-NUMERIC = [
-    "disc_year", "ra", "dec", "pl_orbper", "pl_orbsmax", "pl_rade",
-    "pl_bmasse", "pl_bmassj", "pl_eqt", "sy_dist", "sy_snum", "sy_pnum",
-]
-
-SOLAR_SYSTEM_PLANETS = pd.DataFrame([
-    {"Planet": "Mercury", "Orbital distance (AU)": 0.387, "Planet mass (Earth masses)": 0.0553},
-    {"Planet": "Venus", "Orbital distance (AU)": 0.723, "Planet mass (Earth masses)": 0.815},
-    {"Planet": "Earth", "Orbital distance (AU)": 1.000, "Planet mass (Earth masses)": 1.000},
-    {"Planet": "Mars", "Orbital distance (AU)": 1.524, "Planet mass (Earth masses)": 0.107},
-    {"Planet": "Jupiter", "Orbital distance (AU)": 5.203, "Planet mass (Earth masses)": 317.8},
-    {"Planet": "Saturn", "Orbital distance (AU)": 9.537, "Planet mass (Earth masses)": 95.16},
-    {"Planet": "Uranus", "Orbital distance (AU)": 19.191, "Planet mass (Earth masses)": 14.54},
-    {"Planet": "Neptune", "Orbital distance (AU)": 30.070, "Planet mass (Earth masses)": 17.15},
-])
 
 VARIABLES = {
     "pl_rade": {
@@ -199,16 +150,6 @@ FIELD_OPTIONS = {
     f"{details['label']} ({details['unit']})": field
     for field, details in VARIABLES.items()
 }
-FIELD_LABEL = {field: label for label, field in FIELD_OPTIONS.items()}
-
-COLOUR_OPTIONS = {
-    "Discovery method": "discoverymethod",
-    "Discovery year": "disc_year",
-    "Distance from Earth": "sy_dist",
-    "Stars in system": "sy_snum",
-    "Planets in system": "sy_pnum",
-}
-
 # Shared infrastructure supplied to the two independently owned classroom lessons.
 CLASSROOM_RESOURCES = {
     "exoplanet_image_path": EXOPLANET_IMAGE_PATH,
