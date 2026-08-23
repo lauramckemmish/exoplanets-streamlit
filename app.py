@@ -284,14 +284,11 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
         ]), use_container_width=True, hide_index=True)
         st.caption("These rules are choices that represent the story. They are not proof that a planet is literally Tatooine.")
         st.subheader("Apply one filter at a time")
-        readable_steps = steps.rename(columns={
-            "Before": "Planets before this filter",
-            "Remaining": "Planets left",
-            "Did not meet criterion": "Removed by this filter",
-            "Missing or unknown": "Not recorded",
-        })[["Criterion", "Planets before this filter", "Removed by this filter", "Not recorded", "Planets left"]]
-        st.dataframe(readable_steps, use_container_width=True, hide_index=True)
-        st.write(f"The search starts with **{len(data):,} detected planet records**. Each row shows how the candidate set changes after the next rule.")
+        st.write(f"We start with **{len(data):,} detected planet records**.")
+        for criterion, count in zip(steps["Criterion"], steps["Remaining"]):
+            st.markdown(f"**Keep only planets where {criterion.lower()}.**")
+            st.markdown(f"**{int(count):,} planets remain.**")
+        st.caption("The number gets smaller because each new rule narrows the search.")
         st.subheader("Explore the remaining candidates")
         if candidates.empty:
             st.warning("No candidates meet all three rules in this dataset.")
