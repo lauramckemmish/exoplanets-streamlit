@@ -34,6 +34,16 @@ TEACHER_NOTE_OVERRIDES = {
         evidence="Students can state that they will use examples and graphs to learn what planetary systems can be like.",
         listen_for="Curiosity about other worlds and questions that can later be connected to evidence.",
     ),
+    1: dict(
+        title="Describe our Solar System",
+        purpose="Use Earth masses and qualitative mass groups to describe familiar planets.",
+        timing="7 minutes (Lesson 1)",
+        facilitation="Treat this as a quick common starting point. Model one bar segment, then let students identify the other groups by hovering. An Earth mass is a comparison unit, not Earth's physical size.",
+        alignment="SC4-WS-05, SC4-WS-06 and SC4-WS-08: process, represent and identify patterns in data.",
+        evidence="Students correctly describe at least one Solar System planet using its qualitative mass group.",
+        listen_for="Comparisons such as ‘Jupiter is much more massive than Earth’ rather than interpreting a wide segment as a physically wider planet.",
+        misconceptions="Mass and size are related but are not the same variable. The illustration also enlarges planets and places them close together; it is not to scale.",
+    ),
     2: dict(
         title="Move from our Solar System to memorable examples",
         purpose="Use individual exoplanet examples to recognise that other stars host varied planetary systems.",
@@ -83,6 +93,25 @@ TEACHER_NOTE_OVERRIDES = {
         evidence="Students identify what becomes easier to distinguish after the scale changes.",
         listen_for="The variables and values stay the same; only the spacing changes.",
         misconceptions="The graph has not changed the planets or their real locations.",
+    ),
+    7: dict(
+        title="Compare planetary systems and check a claim",
+        purpose="Use the larger exoplanet dataset to support, challenge or revise the initial claim from Step 5.",
+        timing="18 minutes (Lesson 2)",
+        facilitation="Bring students back to their Step 5 response. Everyone first investigates Earth; then pairs choose one further data-detective challenge. Model one comparison between a Solar System planet and nearby detected points, then ask students to decide whether their first claim is supported, challenged or needs revision.",
+        alignment="SC4-WS-06 and SC4-WS-08: draw and communicate conclusions from data.",
+        evidence="Students revise or support a claim by referring to a visible pattern in the graph.",
+        listen_for="A clear connection between an initial idea, the Earth or chosen-planet challenge, graph evidence and a revised conclusion.",
+        misconceptions="Students do not need to decide whether our Solar System is statistically normal.",
+    ),
+    8: dict(
+        title="Consolidate diversity and generate questions",
+        purpose="Communicate what the evidence shows about planetary diversity and identify a productive next question.",
+        timing="8 minutes (Lesson 2)",
+        facilitation="Invite several claims before summarising. Use the learn-more prompt to value astronomy, astrobiology and broader human questions without adding required content.",
+        alignment="SC4-WS-06 and SC4-WS-08: draw conclusions and communicate scientific ideas.",
+        evidence="Students support one claim about planetary systems with an example or pattern from the activity.",
+        listen_for="A clear connection between evidence and the conclusion that planetary systems can be diverse.",
     ),
 }
 

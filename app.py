@@ -410,25 +410,6 @@ def classroom_teacher_note(part: int, year_level: str) -> None:
     if year_level == "Year 8":
         notes.update(
             {
-                7: dict(
-                    title="Compare planetary systems and check a claim",
-                    purpose="Use the larger exoplanet dataset to support, challenge or revise the initial claim from Step 5.",
-                    timing="18 minutes (Lesson 2)",
-                    facilitation="Bring students back to their Step 5 response. Everyone first investigates Earth; then pairs choose one further data-detective challenge. Model one comparison between a Solar System planet and nearby detected points, then ask students to decide whether their first claim is supported, challenged or needs revision.",
-                    alignment="SC4-WS-06 and SC4-WS-08: draw and communicate conclusions from data.",
-                    evidence="Students revise or support a claim by referring to a visible pattern in the graph.",
-                    listen_for="A clear connection between an initial idea, the Earth or chosen-planet challenge, graph evidence and a revised conclusion.",
-                    misconceptions="Students do not need to decide whether our Solar System is statistically normal.",
-                ),
-                8: dict(
-                    title="Consolidate diversity and generate questions",
-                    purpose="Communicate what the evidence shows about planetary diversity and identify a productive next question.",
-                    timing="8 minutes (Lesson 2)",
-                    facilitation="Invite several claims before summarising. Use the learn-more prompt to value astronomy, astrobiology and broader human questions without adding required content.",
-                    alignment="SC4-WS-06 and SC4-WS-08: draw conclusions and communicate scientific ideas.",
-                    evidence="Students support one claim about planetary systems with an example or pattern from the activity.",
-                    listen_for="A clear connection between evidence and the conclusion that planetary systems can be diverse.",
-                ),
             }
         )
         notes.update(strange_new_worlds.TEACHER_NOTE_OVERRIDES)
