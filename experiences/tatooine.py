@@ -116,21 +116,24 @@ def prepare_page(teacher_note, step_tabs, scroll_to_top_if_requested):
     return step
 
 
-def render_custom_filters(data, guidance_mode, guidance_box, custom_candidates):
+def render_custom_filters(data, guidance_mode, guidance_box, custom_candidates, defaults=(2, 3, (0.8, 1.5))):
     """Render the reusable planet-search filter controls."""
     st.header("Choose your planet criteria")
     guidance_box(guidance_mode, "Turn an idea about a planet into rules, then apply the rules one at a time.", "Ask students which criteria are essential, which are proxies and what missing values mean.")
     use_orbital_distance = st.checkbox("Use orbital distance from the star", key="perfect_use_orbital_distance")
     orbital_distance = st.slider("Orbital distance (AU)", 0.01, 100.0, (0.5, 5.0), 0.01, disabled=not use_orbital_distance, key="perfect_orbital_distance")
-    radius = st.slider("Planet radius (Earth radii)", 0.1, 5.0, (0.8, 1.5), 0.05, key="perfect_radius")
+    use_radius = st.checkbox("Use planet radius", value=True, key="perfect_use_radius")
+    radius = st.slider("Planet radius (Earth radii)", 0.1, 5.0, defaults[2], 0.05, disabled=not use_radius, key="perfect_radius")
     use_temperature = st.checkbox("Use estimated temperature", key="perfect_use_temperature")
-    temperature_c = st.slider("Estimated temperature (°C)", -173, 1200, (-23, 77), 5, disabled=not use_temperature, key="perfect_temperature")
+    temperature_c = st.slider("Estimated temperature (°C)", -100, 300, (-23, 77), 5, disabled=not use_temperature, key="perfect_temperature")
     temperature_k = (temperature_c[0] + 273.15, temperature_c[1] + 273.15) if use_temperature else None
     c1, c2, c3 = st.columns(3)
-    stars = c1.number_input("Known stars", 1, 10, 2, key="perfect_stars")
+    use_stars = c1.checkbox("Use known stars", value=True, key="perfect_use_stars")
+    stars = c1.number_input("Known stars", 1, 10, defaults[0], key="perfect_stars", disabled=not use_stars)
     planet_rule = c2.selectbox("Planet-count rule", ["Exactly", "At least"], key="perfect_planet_rule")
-    planets = c3.number_input("Known planets", 1, 20, 3, key="perfect_planets")
-    candidates, steps = custom_candidates(data, int(stars), planet_rule, int(planets), radius, temperature_k, None, orbital_distance if use_orbital_distance else None)
+    use_planets = c3.checkbox("Use known planets", value=True, key="perfect_use_planets")
+    planets = c3.number_input("Known planets", 1, 20, defaults[1], key="perfect_planets", disabled=not use_planets)
+    candidates, steps = custom_candidates(data, int(stars) if use_stars else None, planet_rule, int(planets) if use_planets else None, radius if use_radius else None, temperature_k, None, orbital_distance if use_orbital_distance else None)
     st.subheader("Apply your filters one at a time")
     st.write(f"We start with **{len(data):,} detected planet records**.")
     for criterion, count in zip(steps["Criterion"], steps["Remaining"]):

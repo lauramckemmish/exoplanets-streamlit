@@ -310,14 +310,9 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
             {"Story clue": "A roughly Earth-sized world", "Dataset variable": "Planet radius", "Rule": "0.8–1.5 Earth radii"},
         ]), use_container_width=True, hide_index=True)
         st.caption("These rules are choices that represent the story. They are not proof that a planet is literally Tatooine.")
-        st.subheader("Apply one filter at a time")
-        st.write(f"We start with **{len(data):,} detected planet records**.")
-        for criterion, count in zip(steps["Criterion"], steps["Remaining"]):
-            st.markdown(f"**Keep only planets where {criterion.lower()}.**")
-            st.markdown(f"**{int(count):,} planets remain.**")
-        st.caption("The number gets smaller because each new rule narrows the search.")
-        st.caption("This search uses only planets that have been detected and measured. Many more planets are likely to exist in the Milky Way than we have discovered.")
-        render_candidate_comparison(candidates, "tatooine_worked", "What do you notice about this candidate? What evidence is still missing?")
+        st.subheader("Move the filters to match the story")
+        st.write("Start with the default settings, then change the filters to represent the clues in the story.")
+        tatooine.render_custom_filters(data, "Teacher" if st.session_state.get("tatooine_teacher_view", False) else "Student", guidance_box, custom_candidates, defaults=(1, 1, (0.8, 1.2)))
 
     elif content_step == 2:
         st.header("Worked example: an Earth-like candidate")
