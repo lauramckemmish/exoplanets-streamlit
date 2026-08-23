@@ -171,7 +171,7 @@ def render_custom_filters(data, guidance_mode, guidance_box, custom_candidates, 
     st.dataframe(evidence, use_container_width=True, hide_index=True)
     st.text_area("What does this candidate tell you about your planet story? What is still unknown?", key="perfect_planet_conclusion", height=110)
     st.download_button("Download candidate table", candidates[candidate_columns].to_csv(index=False).encode("utf-8"), "perfect_planet_candidates.csv", "text/csv")
-    st.caption("This search uses the evidence recorded so far. Many more planets are likely to exist in the Milky Way than we have discovered.")
+    st.caption("This search uses the evidence recorded so far. We think there are probably hundreds of billions of planets in our galaxy alone.")
 
 
 def render(data, presenter_mode, implementation):

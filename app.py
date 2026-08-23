@@ -330,7 +330,7 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
         st.success(f"Result: {len(earth_like):,} planets remain.")
         if st.session_state.get("tatooine_teacher_view", False):
             st.info("Teacher note: missing temperature is not evidence that a planet is too hot or too cold. It means the value was not recorded. Temperature also does not prove habitability.")
-        st.info("These results use evidence that has actually been recorded. The Milky Way is likely home to millions or billions of planets that we have not discovered.")
+        st.info("These results use evidence that has actually been recorded. We think there are probably hundreds of billions of planets in our galaxy alone.")
         render_candidate_comparison(earth_like, "earth_like_worked", "Which candidate would you investigate further if you wanted to find another world to visit? What would you want to learn next?", include_system=False)
 
     elif step == 3:
@@ -346,7 +346,7 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
         st.header("Conclusion")
         st.write("A filter search can find the closest matches to a story, but it cannot prove that a planet is truly like the world we imagined.")
         st.text_area("What did your search show? What evidence was missing?", key="mission_conclusion_response", height=140)
-        st.info("The dataset contains detected planets only. Many more planets are likely to exist in the Milky Way than we have discovered.")
+        st.info("The dataset contains detected planets only. We think there are probably hundreds of billions of planets in our galaxy alone.")
         names = candidates.sort_values("pl_name")["pl_name"].tolist() if not candidates.empty else []
         selected = st.session_state.get("selected_candidate")
         if names:
