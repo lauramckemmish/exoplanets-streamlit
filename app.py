@@ -244,8 +244,12 @@ def render_candidate_comparison(candidates: pd.DataFrame, key_prefix: str, promp
     ordered = ordered.copy()
     ordered["Estimated temperature (°C)"] = ordered["pl_eqt"] - 273.15
     candidate_columns = ["pl_name", "hostname", "pl_rade", "pl_bmasse", "Estimated temperature (°C)", "sy_snum", "sy_pnum"]
+    display_columns = {
+        "pl_name": "Planet name", "hostname": "Host star", "pl_rade": "Planet radius (Earth radii)",
+        "pl_bmasse": "Planet mass (Earth masses)", "sy_snum": "Known stars", "sy_pnum": "Known planets",
+    }
     selected = st.selectbox("Choose a candidate to inspect", ordered["pl_name"].tolist(), key=f"{key_prefix}_candidate")
-    st.dataframe(ordered[candidate_columns], use_container_width=True, hide_index=True)
+    st.dataframe(ordered[candidate_columns].rename(columns=display_columns), use_container_width=True, hide_index=True)
     st.text_area(prompt, key=f"{key_prefix}_response", height=110)
 
 
@@ -333,7 +337,11 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
             st.markdown(f"**{int(count):,} planets remain.**")
         earth_display = earth_like[["pl_name", "hostname", "pl_rade", "pl_orbsmax", "pl_eqt", "sy_snum", "sy_pnum"]].copy()
         earth_display["Estimated temperature (°C)"] = earth_display["pl_eqt"] - 273.15
-        st.dataframe(earth_display.drop(columns="pl_eqt").head(30), use_container_width=True, hide_index=True)
+        earth_display = earth_display.drop(columns="pl_eqt").rename(columns={
+            "pl_name": "Planet name", "hostname": "Host star", "pl_rade": "Planet radius (Earth radii)",
+            "pl_orbsmax": "Orbital distance (AU)", "sy_snum": "Known stars", "sy_pnum": "Known planets",
+        })
+        st.dataframe(earth_display.head(30), use_container_width=True, hide_index=True)
         if st.session_state.get("tatooine_teacher_view", False):
             st.info("Teacher note: orbital distance is not enough to define a habitable zone. A star's brightness changes how much energy reaches a planet; we are keeping that extra calculation out of this activity.")
         st.info("These results use evidence that has actually been recorded. The Milky Way is likely home to millions or billions of planets that we have not discovered.")
