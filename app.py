@@ -414,6 +414,8 @@ def classroom_teacher_note(part: int, year_level: str) -> None:
         )
         notes.update(strange_new_worlds.TEACHER_NOTE_OVERRIDES)
         classroom_backgrounds.update(strange_new_worlds.TEACHER_BACKGROUNDS)
+    else:
+        classroom_backgrounds.update(planets_we_have_not_found.TEACHER_BACKGROUNDS)
     for step, background in classroom_backgrounds.items():
         notes[step]["background"] = background
     teacher_note(**notes[part])
