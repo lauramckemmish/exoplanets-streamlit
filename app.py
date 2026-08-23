@@ -464,10 +464,8 @@ def render_demographics_classroom(data: pd.DataFrame, teacher_note_renderer=None
             """,
             height=0,
         )
-    if teacher_note_renderer is None:
-        classroom_teacher_note(part, year_level)
-    else:
-        teacher_note_renderer(part, classroom_teacher_note)
+    if teacher_note_renderer is not None:
+        teacher_note_renderer(part)
     # CLASSROOM STEP 0 — Welcome
     if part == 0:
         st.header(pathway)

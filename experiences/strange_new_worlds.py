@@ -157,7 +157,7 @@ TEACHER_NOTE_OVERRIDES = {
 }
 
 
-def render_teacher_note(part, _fallback):
+def render_teacher_note(part):
     """Render this pathway's complete Teacher view from pathway-owned content."""
     note = dict(TEACHER_NOTE_OVERRIDES[part])
     note["background"] = TEACHER_BACKGROUNDS[part]
