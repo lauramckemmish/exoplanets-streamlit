@@ -313,6 +313,7 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
         st.write("We will use two clues: a temperature range and a planet size range. These clues help us search, but they cannot tell us what a planet is like on its surface.")
         st.subheader("Apply the filters in order")
         st.write(f"We start with **{len(data):,} detected planet records**.")
+        st.subheader("Variable 1: Estimated temperature")
         known_temperature = data[data["pl_eqt"].notna()].copy()
         st.info("Choice 1: keep only planets with an estimated temperature recorded.")
         st.warning(f"Missing data: {len(data) - len(known_temperature):,} planet records do not have a recorded temperature.")
@@ -322,6 +323,7 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
         temperature_matches = known_temperature[known_temperature["pl_eqt"].between(*temperature_k, inclusive="both")]
         st.info(f"Choice 2: keep planets between {temp_c[0]}°C and {temp_c[1]}°C.")
         st.success(f"Result: {len(temperature_matches):,} planets remain.")
+        st.subheader("Variable 2: Planet radius")
         radius_recorded = temperature_matches[temperature_matches["pl_rade"].notna()]
         st.warning(f"Missing data: {len(temperature_matches) - len(radius_recorded):,} of these planets do not have a recorded radius.")
         radius_range = st.slider("Choose a planet radius range (Earth radii)", 0.5, 2.0, (0.8, 1.5), 0.05, key="earth_radius_range")
