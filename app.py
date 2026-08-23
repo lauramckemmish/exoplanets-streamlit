@@ -333,8 +333,8 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
 
     heading, controls = st.columns([4, 2])
     with heading:
-        st.title("Find Tatooine: Guided Mission")
-        st.caption("A facilitator-led investigation using real exoplanet data")
+        st.title(tatooine.TITLE)
+        st.caption(tatooine.SUBTITLE)
     with controls:
         presenter_mode = st.toggle(
             "Teacher view",
