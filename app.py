@@ -283,76 +283,6 @@ def render_demographics_classroom(data: pd.DataFrame, teacher_note_renderer=None
     )
 
 
-def render_demographics_landing(data: pd.DataFrame) -> None:
-    st.title("Explore exoplanets using real NASA data")
-    count_column, description_column, image_column = st.columns([1, 2, 2])
-    with count_column:
-        st.metric("Confirmed exoplanets", f"{len(data):,}")
-    with description_column:
-        st.markdown(
-            "Astronomers have confirmed thousands of planets orbiting stars beyond our Sun. "
-            "This number comes from the NASA Exoplanet Archive and grows as new observations are analysed."
-        )
-    with image_column:
-        st.image(
-            EXOPLANET_IMAGE_PATH,
-            caption="Artist's concept of the variety of known exoplanets. Credit: NASA/JPL-Caltech",
-            use_container_width=True,
-        )
-    st.markdown("**Developed for UNSW CURIOUS**")
-    st.info(
-        "**Currently in development**\n\n"
-        "This resource is being actively developed. Please expect some content and features to change during this "
-        "period; a stable version will be created in due course.\n\n"
-        "Feedback is very welcome—especially detailed suggestions from teachers and facilitators. The resource is "
-        "easy to update, so content can readily be added, removed or revised. Please email "
-        "[l.mckemmish@unsw.edu.au](mailto:l.mckemmish@unsw.edu.au), and feel free to share the resource with "
-        "colleagues and through your local networks."
-    )
-    if TEACHER_FEEDBACK_URL:
-        st.link_button("Give teacher feedback", TEACHER_FEEDBACK_URL, type="primary")
-    st.markdown(
-        "## Choose an experience\n"
-        "Use the sidebar to open the experience that suits your group."
-    )
-    experiences = catalog.experience_catalog(FACILITATED_PATHWAY, STAGE4_PATHWAY, STAGE5_PATHWAY)
-    for left, right in zip(experiences[::2], experiences[1::2]):
-        first, second = st.columns(2)
-        for column, (name, summary) in zip((first, second), (left, right)):
-            with column:
-                with st.container(border=True):
-                    st.markdown(f"### {name}")
-                    st.write(summary)
-                    st.button(
-                        "Open experience →",
-                        key=f"open_experience_{name}",
-                        use_container_width=True,
-                        on_click=router.open_experience,
-                        args=(name, FACILITATED_PATHWAY, STAGE4_PATHWAY, STAGE5_PATHWAY),
-                    )
-    if len(experiences) % 2:
-        with st.container(border=True):
-            st.markdown(f"### {experiences[-1][0]}")
-            st.write(experiences[-1][1])
-            st.button(
-                "Open experience →",
-                key=f"open_experience_{experiences[-1][0]}",
-                use_container_width=True,
-                on_click=router.open_experience,
-                args=(experiences[-1][0], FACILITATED_PATHWAY, STAGE4_PATHWAY, STAGE5_PATHWAY),
-            )
-    with st.expander("About and acknowledgements"):
-        st.markdown(
-            "**Developed for UNSW CURIOUS**\n\n"
-            "Created by **Maria Pettyjohn, Dr Lauren McKnight, James Cleaver and Dr Laura McKemmish**.\n\n"
-            "This resource has also been shaped by the ideas, observations and feedback of many CURIOUS "
-            "facilitators, teachers and student participants. We gratefully acknowledge everyone who has helped "
-            "test and improve it over time.\n\n"
-            "Development was supported through the Australian Government's "
-            f"[Maker Projects: Community STEM Engagement Grants 2024 program]({GRANT_RECIPIENTS_URL}).\n\n"
-            "**Contact:** Dr Laura McKemmish — "
-            "[l.mckemmish@unsw.edu.au](mailto:l.mckemmish@unsw.edu.au)"
-        )
 def render_demographics(data: pd.DataFrame) -> None:
     router.render_demographics_shell(
         data,
@@ -434,7 +364,17 @@ with st.sidebar:
 data, source_label = load_selected_data(source)
 
 if experience == "Introduction":
-    render_demographics_landing(data)
+    landing.render(
+        data,
+        EXOPLANET_IMAGE_PATH,
+        TEACHER_FEEDBACK_URL,
+        GRANT_RECIPIENTS_URL,
+        catalog,
+        FACILITATED_PATHWAY,
+        STAGE4_PATHWAY,
+        STAGE5_PATHWAY,
+        router.open_experience,
+    )
     st.stop()
 
 with st.sidebar:
