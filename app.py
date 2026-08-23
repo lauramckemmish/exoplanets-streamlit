@@ -234,7 +234,7 @@ st.set_page_config(
 # EXPERIENCE 1 — FIND TATOOINE
 # ============================================================================
 
-def render_candidate_comparison(candidates: pd.DataFrame, key_prefix: str, prompt: str) -> None:
+def render_candidate_comparison(candidates: pd.DataFrame, key_prefix: str, prompt: str, include_system: bool = True) -> None:
     """Shared interactive candidate comparison for the worked examples."""
     st.subheader("Compare the candidates")
     if candidates.empty:
@@ -245,15 +245,17 @@ def render_candidate_comparison(candidates: pd.DataFrame, key_prefix: str, promp
     ordered["Estimated temperature (°C)"] = ordered["pl_eqt"] - 273.15
     selected = st.selectbox("Choose a candidate to inspect", ordered["pl_name"].tolist(), key=f"{key_prefix}_candidate")
     row = ordered[ordered["pl_name"] == selected].iloc[0]
-    detail = pd.DataFrame([
+    detail_rows = [
         {"Detail": "Planet name", "Value": row["pl_name"]},
         {"Detail": "Host star", "Value": row["hostname"]},
         {"Detail": "Planet radius", "Value": f"{row['pl_rade']:.2f} Earth radii"},
         {"Detail": "Planet mass", "Value": "Unknown" if pd.isna(row["pl_bmasse"]) else f"{row['pl_bmasse']:.2f} Earth masses"},
         {"Detail": "Estimated temperature", "Value": "Unknown" if pd.isna(row["pl_eqt"]) else f"{row['pl_eqt'] - 273.15:.1f} °C"},
         {"Detail": "Distance from Earth", "Value": "Unknown" if pd.isna(row["sy_dist"]) else f"{row['sy_dist'] * PARSEC_TO_LIGHT_YEARS:.0f} light-years"},
-        {"Detail": "Known stars / planets", "Value": f"{row['sy_snum']} / {row['sy_pnum']}"},
-    ])
+    ]
+    if include_system:
+        detail_rows.append({"Detail": "Known stars / planets", "Value": f"{row['sy_snum']} / {row['sy_pnum']}"})
+    detail = pd.DataFrame(detail_rows)
     st.dataframe(detail, use_container_width=True, hide_index=True)
     st.text_area(prompt, key=f"{key_prefix}_response", height=110)
 
@@ -319,12 +321,8 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
 
     elif content_step == 2:
         st.header("Worked example: an Earth-like candidate")
-        st.write("Now use a different question: where might we look for a world with a similar size, orbital distance and estimated temperature?")
-        st.dataframe(pd.DataFrame([
-            {"Clue": "Similar size to Earth", "Variable": "Planet radius", "Example rule": "0.8–1.5 Earth radii"},
-            {"Clue": "A temperature worth investigating", "Variable": "Estimated temperature", "Example rule": "Choose a range"},
-        ]), use_container_width=True, hide_index=True)
-        st.warning("This is a screening search, not a test for habitability. Temperature does not prove that a planet has liquid water.")
+        st.write("We have become curious about worlds beyond our Solar System. What if we wanted to find another planet to visit someday?")
+        st.write("We will use two clues: a temperature range and a planet size range. These clues help us search, but they cannot tell us what a planet is like on its surface.")
         st.subheader("Apply the filters in order")
         st.write(f"We start with **{len(data):,} detected planet records**.")
         known_temperature = data[data["pl_eqt"].notna()].copy()
@@ -335,13 +333,14 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
         temperature_matches = known_temperature[known_temperature["pl_eqt"].between(*temperature_k, inclusive="both")]
         st.markdown(f"**Next, keep planets between {temp_c[0]}°C and {temp_c[1]}°C.**")
         st.markdown(f"**{len(temperature_matches):,} planets remain.**")
-        earth_like = temperature_matches[temperature_matches["pl_rade"].between(0.8, 1.5, inclusive="both")].copy()
-        st.markdown("**Finally, keep planets with a radius between 0.8 and 1.5 Earth radii.**")
+        radius_range = st.slider("Choose a planet radius range (Earth radii)", 0.1, 5.0, (0.8, 1.5), 0.05, key="earth_radius_range")
+        earth_like = temperature_matches[temperature_matches["pl_rade"].between(*radius_range, inclusive="both")].copy()
+        st.markdown(f"**Finally, keep planets with a radius between {radius_range[0]:.2f} and {radius_range[1]:.2f} Earth radii.**")
         st.markdown(f"**{len(earth_like):,} planets remain.**")
         if st.session_state.get("tatooine_teacher_view", False):
             st.info("Teacher note: missing temperature is not evidence that a planet is too hot or too cold. It means the value was not recorded. Temperature also does not prove habitability.")
         st.info("These results use evidence that has actually been recorded. The Milky Way is likely home to millions or billions of planets that we have not discovered.")
-        render_candidate_comparison(earth_like, "earth_like_worked", "Which candidate would you investigate further? What evidence would you want before discussing liquid water?")
+        render_candidate_comparison(earth_like, "earth_like_worked", "Which candidate would you investigate further if you wanted to find another world to visit? What would you want to learn next?", include_system=False)
 
     elif step == 3:
         st.header("Your planet")
