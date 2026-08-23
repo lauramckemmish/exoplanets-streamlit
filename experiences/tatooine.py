@@ -222,16 +222,34 @@ def render_tatooine_worked_example(data):
     st.warning(f"Data recorded: {len(recorded):,} planets have a number of known stars ({missing:,} not recorded).")
     st.success(f"Result after checking the data: {len(recorded):,} planets remain available for this clue.")
 
-    candidates = recorded[recorded["sy_snum"] == 2].sort_values("pl_name").copy()
+    two_sun_candidates = recorded[recorded["sy_snum"] == 2].copy()
     st.info("Choice: keep planets in systems with exactly **two known stars**.")
-    st.success(f"Result: {len(candidates):,} detected planets remain.")
+    st.success(f"Result: {len(two_sun_candidates):,} detected planets remain.")
 
-    st.caption(
-        "Some of these systems also have several known planets. That is interesting context, but it is not "
-        "a rule we need for this short example."
-    )
-    if candidates.empty:
+    if two_sun_candidates.empty:
         st.warning("No matching records are available in this dataset.")
+        return
+
+    st.subheader("Try a second question: how many planets are in the system?")
+    planet_recorded = two_sun_candidates[two_sun_candidates["sy_pnum"].notna()].copy()
+    planet_missing = len(two_sun_candidates) - len(planet_recorded)
+    st.info("Choice: consider the number of known planets in each two-sun system.")
+    st.warning(
+        f"Data recorded: {len(planet_recorded):,} of these planets have a known planet count "
+        f"({planet_missing:,} not recorded)."
+    )
+    st.success(f"Result after checking the data: {len(planet_recorded):,} planets remain available for this clue.")
+    planet_count = st.select_slider(
+        "Choose the number of known planets in the system",
+        options=[1, 2, 3, 4],
+        value=1,
+        key="tatooine_worked_planet_count",
+    )
+    candidates = planet_recorded[planet_recorded["sy_pnum"] == planet_count].sort_values("pl_name").copy()
+    st.info(f"Choice: keep planets in systems with exactly **{planet_count} known planet{'s' if planet_count != 1 else ''}**.")
+    st.success(f"Result: {len(candidates):,} detected planets remain.")
+    if candidates.empty:
+        st.warning("No matching records are available for this number. Try another planet count.")
         return
 
     st.subheader("Explore a few two-sun systems")
