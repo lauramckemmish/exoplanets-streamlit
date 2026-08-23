@@ -137,7 +137,22 @@ def render_custom_filters(data, guidance_mode, guidance_box, custom_candidates, 
     planet_rule = c2.selectbox("Known planets", ["Any number", "Exactly", "At least"], key="perfect_planet_rule")
     use_planets = c3.checkbox("Use known planets", value=True, key="perfect_use_planets")
     planets = c3.number_input("Known planets", 1, 20, defaults[1], key="perfect_planets", disabled=not use_planets)
-    candidates, steps = custom_candidates(data, int(stars) if use_stars else None, planet_rule, int(planets) if use_planets and planet_rule != "Any number" else None, radius if use_radius else None, temperature_k, None, orbital_distance if use_orbital_distance else None)
+    active_labels = []
+    if use_orbital_distance:
+        active_labels.append("Orbital distance")
+    if use_radius:
+        active_labels.append("Planet radius")
+    if use_temperature:
+        active_labels.append("Estimated temperature")
+    if use_stars:
+        active_labels.append("Known stars")
+    if use_planets and planet_rule != "Any number":
+        active_labels.append("Known planets")
+    stage = st.selectbox("Apply filters through", ["No filters yet"] + [f"{i + 1}: {label}" for i, label in enumerate(active_labels)], key="perfect_filter_stage")
+    max_filters = 0 if stage == "No filters yet" else int(stage.split(":", 1)[0])
+    candidates, steps = custom_candidates(data, int(stars) if use_stars else None, planet_rule, int(planets) if use_planets and planet_rule != "Any number" else None, radius if use_radius else None, temperature_k, None, orbital_distance if use_orbital_distance else None, max_filters=max_filters)
+    if max_filters == 0:
+        candidates = data.iloc[0:0].copy()
     st.subheader("Apply your filters one at a time")
     st.write(f"We start with **{len(data):,} detected planet records**.")
     for _, row in steps.iterrows():

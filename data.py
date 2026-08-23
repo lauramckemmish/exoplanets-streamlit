@@ -114,25 +114,37 @@ def mission_candidates(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, 
     return current, pd.DataFrame(steps), stages
 
 
-def custom_candidates(data: pd.DataFrame, stars: int | None, planet_rule: str, planets: int | None, radius: tuple[float, float] | None, temperature: tuple[int, int] | None, max_distance: float | None, orbital_distance: tuple[float, float] | None = None) -> tuple[pd.DataFrame, pd.DataFrame]:
+def custom_candidates(data: pd.DataFrame, stars: int | None, planet_rule: str, planets: int | None, radius: tuple[float, float] | None, temperature: tuple[int, int] | None, max_distance: float | None, orbital_distance: tuple[float, float] | None = None, max_filters: int | None = None) -> tuple[pd.DataFrame, pd.DataFrame]:
     current = data.copy()
     rows: list[dict[str, int | str]] = []
+    if max_filters == 0:
+        return current, pd.DataFrame(rows)
     if orbital_distance is not None:
         current, row = apply_filter(current, "pl_orbsmax", current["pl_orbsmax"].between(*orbital_distance, inclusive="both"), f"Orbital distance {orbital_distance[0]:.2f} to {orbital_distance[1]:.2f} AU")
         rows.append(row)
+        if max_filters is not None and len(rows) >= max_filters:
+            return current, pd.DataFrame(rows)
     if radius is not None:
         current, row = apply_filter(current, "pl_rade", current["pl_rade"].between(*radius, inclusive="both"), f"Radius {radius[0]:.2f} to {radius[1]:.2f} Earth radii")
         rows.append(row)
+        if max_filters is not None and len(rows) >= max_filters:
+            return current, pd.DataFrame(rows)
     if temperature is not None:
         current, row = apply_filter(current, "pl_eqt", current["pl_eqt"].between(*temperature, inclusive="both"), f"Temperature {temperature[0]} to {temperature[1]} K")
         rows.append(row)
+        if max_filters is not None and len(rows) >= max_filters:
+            return current, pd.DataFrame(rows)
     if stars is not None:
         current, row = apply_filter(current, "sy_snum", current["sy_snum"] == stars, f"Exactly {stars} known stars")
         rows.append(row)
+        if max_filters is not None and len(rows) >= max_filters:
+            return current, pd.DataFrame(rows)
     if planets is not None:
         planet_mask = current["sy_pnum"] == planets if planet_rule == "Exactly" else current["sy_pnum"] >= planets
         current, row = apply_filter(current, "sy_pnum", planet_mask, f"{planet_rule} {planets} known planets")
         rows.append(row)
+        if max_filters is not None and len(rows) >= max_filters:
+            return current, pd.DataFrame(rows)
     if max_distance is not None:
         current, row = apply_filter(current, "sy_dist", current["sy_dist"] <= max_distance, f"Within {max_distance * PARSEC_TO_LIGHT_YEARS:.0f} light-years")
         rows.append(row)
