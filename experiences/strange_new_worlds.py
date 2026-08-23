@@ -22,6 +22,31 @@ TEACHER_BACKGROUNDS = {
 }
 
 
+# Pathway-specific Teacher-view metadata, extracted in small steps so the
+# existing classroom rendering and Year 10 pathway remain unchanged.
+TEACHER_NOTE_OVERRIDES = {
+    0: dict(
+        title="Pathway overview",
+        purpose="Use authentic astronomy examples and data to move from individual discoveries to patterns and an evidence-based conclusion.",
+        timing="3 minutes (Lesson 1)",
+        facilitation="Preview the two-lesson journey as an exploration of strange planetary systems. Students do not need prior astronomy knowledge or detailed detection methods.",
+        alignment="Stage 4 Observing the Universe, Data Science 1 and Working Scientifically.",
+        evidence="Students can state that they will use examples and graphs to learn what planetary systems can be like.",
+        listen_for="Curiosity about other worlds and questions that can later be connected to evidence.",
+    ),
+    2: dict(
+        title="Move from our Solar System to memorable examples",
+        purpose="Use individual exoplanet examples to recognise that other stars host varied planetary systems.",
+        timing="10 minutes (Lesson 1)",
+        facilitation="Define star, planetary system and exoplanet before introducing the three cases. Students do not need to memorise the names; use each story as evidence that systems can be arranged differently.",
+        alignment="SC4-OTU-01 and SC4-WS-08: use observations and examples to build and communicate understanding of the Universe.",
+        evidence="Students explain that the Sun is one star and identify one way another planetary system differs from ours.",
+        listen_for="Comparisons involving number, type or arrangement of planets rather than recall of proper names.",
+        misconceptions="‘Solar System’ names our own system; ‘planetary system’ is the general term.",
+    ),
+}
+
+
 def render_teacher_note(part, fallback):
     """Render this pathway's Teacher view during the staged extraction."""
     return fallback(part, YEAR_LEVEL)
