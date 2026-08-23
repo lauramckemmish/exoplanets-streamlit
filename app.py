@@ -596,37 +596,6 @@ def render_filter_lab(data: pd.DataFrame, guidance_mode: str) -> None:
         st.info("Unknown evidence should remain labelled unknown. It should not be counted as support for the candidate.")
 
 
-def render_map_lab(data: pd.DataFrame, guidance_mode: str) -> None:
-    st.header("Celestial map")
-    names = st.session_state.get("lab_candidate_names", [])
-    selected = st.session_state.get("lab_selected_candidate")
-    if names:
-        selected = st.selectbox("Highlighted planet", names, index=names.index(selected) if selected in names else 0, key="lab_map_choice")
-    elif "K2-148 b" in data["pl_name"].tolist():
-        selected = "K2-148 b"
-        st.info("No custom candidate set is active, so the original notebook candidate is shown.")
-    elif not data.empty:
-        selected = data.iloc[0]["pl_name"]
-
-    if selected:
-        mapped = data.dropna(subset=["ra", "dec"])
-        if guidance_mode != "Minimal":
-            st.info(
-                f"The map uses right ascension and declination for {len(mapped):,} records. "
-                "It shows direction on the celestial sphere, not physical separation between systems."
-            )
-        st.plotly_chart(sky_map(data, selected), use_container_width=True)
-        row = data[data["pl_name"] == selected].iloc[0]
-        a, b, c, d = st.columns(4)
-        a.metric("Right ascension", "Unknown" if pd.isna(row["ra"]) else f"{row['ra']:.2f}°")
-        b.metric("Declination", "Unknown" if pd.isna(row["dec"]) else f"{row['dec']:.2f}°")
-        c.metric("Distance", "Unknown" if pd.isna(row["sy_dist"]) else f"{row['sy_dist']:.1f} pc")
-        d.metric("Discovery year", "Unknown" if pd.isna(row["disc_year"]) else str(row["disc_year"]))
-        if guidance_mode == "Teacher":
-            with st.expander("Teacher guidance", expanded=False):
-                st.write("Ask students what dimension is missing from this visualisation and how distance could be incorporated into a different three-dimensional model.")
-
-
 def render_data_lab(data: pd.DataFrame, guidance_mode: str) -> None:
     heading, activity_controls = st.columns([4, 2])
     with heading:
@@ -676,7 +645,7 @@ def render_data_lab(data: pd.DataFrame, guidance_mode: str) -> None:
             render_filter_lab(data, guidance_mode)
     else:
         with tabs[4]:
-            render_map_lab(data, guidance_mode)
+            data_laboratory.render_map(data, guidance_mode, sky_map)
     step_buttons(
         tab_labels,
         "lab_tab",

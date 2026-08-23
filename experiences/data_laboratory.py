@@ -70,6 +70,34 @@ def render_dataset(data, guidance_mode, field_options, variables, guidance_box, 
     selected_label = st.selectbox("Choose a variable to understand", list(field_options), key="dictionary_variable")
     variable_card(data, field_options[selected_label], guidance_mode, variables, scale_guidance)
 
+
+def render_map(data, guidance_mode, sky_map):
+    """Render the celestial map tab using the shared chart factory."""
+    st.header("Celestial map")
+    names = st.session_state.get("lab_candidate_names", [])
+    selected = st.session_state.get("lab_selected_candidate")
+    if names:
+        selected = st.selectbox("Highlighted planet", names, index=names.index(selected) if selected in names else 0, key="lab_map_choice")
+    elif "K2-148 b" in data["pl_name"].tolist():
+        selected = "K2-148 b"
+        st.info("No custom candidate set is active, so the original notebook candidate is shown.")
+    elif not data.empty:
+        selected = data.iloc[0]["pl_name"]
+    if selected:
+        mapped = data.dropna(subset=["ra", "dec"])
+        if guidance_mode != "Minimal":
+            st.info(f"The map uses right ascension and declination for {len(mapped):,} records. It shows direction on the celestial sphere, not physical separation between systems.")
+        st.plotly_chart(sky_map(data, selected), use_container_width=True)
+        row = data[data["pl_name"] == selected].iloc[0]
+        a, b, c, d = st.columns(4)
+        a.metric("Right ascension", "Unknown" if pd.isna(row["ra"]) else f"{row['ra']:.2f}°")
+        b.metric("Declination", "Unknown" if pd.isna(row["dec"]) else f"{row['dec']:.2f}°")
+        c.metric("Distance", "Unknown" if pd.isna(row["sy_dist"]) else f"{row['sy_dist']:.1f} pc")
+        d.metric("Discovery year", "Unknown" if pd.isna(row["disc_year"]) else str(row["disc_year"]))
+        if guidance_mode == "Teacher":
+            with st.expander("Teacher guidance", expanded=False):
+                st.write("Ask students what dimension is missing from this visualisation and how distance could be incorporated into a different three-dimensional model.")
+
 INVESTIGATIONS = {
     "Does planet size relate to mass?": {
         "x": "pl_rade", "y": "pl_bmasse", "colour": "discoverymethod",
