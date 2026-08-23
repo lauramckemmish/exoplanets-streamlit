@@ -256,7 +256,7 @@ def render_candidate_comparison(candidates: pd.DataFrame, key_prefix: str, promp
 def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None) -> None:
     step = tatooine.prepare_page(teacher_note, step_tabs, scroll_to_top_if_requested)
     step_labels = tatooine.STEP_LABELS
-    candidates, steps, stages = mission_candidates(data)
+    candidates, steps, _ = mission_candidates(data)
     content_step = {1: 2, 2: 1}.get(step, step)
 
     if step == 0:
@@ -347,23 +347,6 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
         st.info("These results use evidence that has actually been recorded. The Milky Way is likely home to millions or billions of planets that we have not discovered.")
         render_candidate_comparison(earth_like, "earth_like_worked", "Which candidate would you investigate further? What evidence would you want before discussing liquid water?")
 
-    elif step == 98:
-        st.header("Apply filter 1: number of stars")
-        row = steps.iloc[0]
-        a, b, c = st.columns(3)
-        a.metric("Records before", f"{row['Before']:,}")
-        b.metric("Unknown star count", f"{row['Missing or unknown']:,}")
-        c.metric("Confirmed two-star records", f"{row['Remaining']:,}")
-        st.dataframe(stages[1][["pl_name", "hostname", "sy_snum", "sy_pnum", "pl_rade"]].head(50), use_container_width=True, hide_index=True)
-        st.info("Records with unknown star counts are not confirmed matches. They are incomplete evidence.")
-
-    elif step == 99:
-        st.header("Apply filter 2: number of planets")
-        st.dataframe(steps.iloc[:2], use_container_width=True, hide_index=True)
-        st.metric("Records remaining", f"{len(stages[2]):,}")
-        st.dataframe(stages[2][["pl_name", "hostname", "sy_snum", "sy_pnum", "pl_rade", "pl_eqt"]], use_container_width=True, hide_index=True)
-        st.warning("The rule 'exactly three' comes from the original activity. It is a modelling choice, not certain evidence from the story.")
-
     elif step == 3:
         st.header("Your planet")
         st.write("Create a short story about the planet you would like to find. Then turn the clues in your story into variables and filters.")
@@ -372,34 +355,6 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
         st.caption("Each choice is a rule. Try to explain why the rule represents part of your story.")
         guidance_mode = "Teacher" if st.session_state.get("tatooine_teacher_view", False) else "Student"
         tatooine.render_custom_filters(data, guidance_mode, guidance_box, custom_candidates)
-
-    elif step == 98:
-        st.header("Compare candidate systems")
-        candidate_columns = ["pl_name", "hostname", "disc_year", "pl_rade", "pl_bmasse", "pl_eqt", "sy_dist", "sy_snum", "sy_pnum"]
-        if candidates.empty:
-            st.warning("The current live dataset has no candidates under the original rules.")
-        else:
-            candidates = candidates.sort_values("pl_name")
-            names = candidates["pl_name"].tolist()
-            default = names.index("K2-148 b") if "K2-148 b" in names else 0
-            selected = st.selectbox("Candidate to examine", names, index=default, key="mission_candidate")
-            st.session_state["selected_candidate"] = selected
-            st.dataframe(candidates[candidate_columns], use_container_width=True, hide_index=True)
-            row = candidates[candidates["pl_name"] == selected].iloc[0]
-            evidence = pd.DataFrame([
-                {"Evidence": "Two known stars", "Status": "Matches" if row["sy_snum"] == 2 else "Conflict", "Value": row["sy_snum"]},
-                {"Evidence": "Three known planets", "Status": "Matches" if row["sy_pnum"] == 3 else "Conflict", "Value": row["sy_pnum"]},
-                {"Evidence": "Earth-sized radius", "Status": "Matches" if 0.8 <= row["pl_rade"] <= 1.5 else "Conflict", "Value": f"{row['pl_rade']:.2f} Earth radii"},
-                {"Evidence": "Mass", "Status": "Unknown" if pd.isna(row["pl_bmasse"]) else "Known", "Value": "Unknown" if pd.isna(row["pl_bmasse"]) else f"{row['pl_bmasse']:.2f} Earth masses"},
-                {"Evidence": "Temperature", "Status": "Unknown" if pd.isna(row["pl_eqt"]) else "Known", "Value": "Unknown" if pd.isna(row["pl_eqt"]) else f"{row['pl_eqt']:.0f} K"},
-            ])
-            st.subheader(f"Evidence assessment: {selected}")
-            st.dataframe(evidence, use_container_width=True, hide_index=True)
-            st.markdown(
-                "**Mission report starter:**  \n"
-                f"Our selected candidate is **{selected}**. It meets the criteria for ______. "
-                "The evidence remains uncertain because ______. Our conclusion depends on the assumption that ______."
-            )
 
     elif step == 4:
         st.header("Conclusion")
