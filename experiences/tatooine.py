@@ -224,7 +224,7 @@ def render_tatooine_worked_example(data):
 
     star_count = st.select_slider(
         "Choose the number of known stars in the system",
-        options=list(range(1, 11)),
+        options=list(range(1, 6)),
         value=2,
         key="tatooine_worked_star_count",
     )
