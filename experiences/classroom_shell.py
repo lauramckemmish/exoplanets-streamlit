@@ -29,7 +29,7 @@ def render(
     part = classroom_navigation.select_step(step_labels, part_count)
     if teacher_note_renderer is not None:
         teacher_note_renderer(part)
-    render_lesson_body(data, pathway, part, step_labels)
+    render_lesson_body(data, pathway, part)
     step_buttons(
         step_labels,
         "demographics_step_selector",
