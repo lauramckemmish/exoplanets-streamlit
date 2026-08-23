@@ -422,26 +422,6 @@ def classroom_teacher_note(part: int, year_level: str) -> None:
     if year_level == "Year 8":
         notes.update(
             {
-                3: dict(
-                    title="Move from examples to an annual dataset",
-                    purpose="Interpret an annual bar chart and describe how the recorded exoplanet population has changed over time.",
-                    timing="15 minutes (Lesson 1)",
-                    facilitation="Model the axes and one bar, then ask students to describe the overall pattern before discussing the 2014 and 2016 Kepler releases.",
-                    alignment="SC4-OTU-01, SC4-DA1-01, SC4-WS-05 and SC4-WS-06: represent and interpret changing scientific knowledge.",
-                    evidence="Students use the annual bars to describe growth and explain that a spike can reflect a large scientific release.",
-                    listen_for="The graph counts confirmations recorded in each year, not planets physically forming or all being noticed on one night.",
-                    misconceptions="The vertical axis is an annual count, not a running cumulative total.",
-                ),
-                4: dict(
-                    title="Compare planet-mass distributions",
-                    purpose="Compare two 100% bar representations and communicate a similarity or difference supported by the graph.",
-                    timing="15 minutes (Lesson 1)",
-                    facilitation="Remind students that each complete bar represents a different-sized group. Model comparing the same labelled section across the two bars.",
-                    alignment="SC4-WS-05, SC4-WS-06 and SC4-WS-08: represent data, identify patterns and communicate conclusions.",
-                    evidence="Students make a comparison and refer to a labelled mass group as evidence.",
-                    listen_for="A comparison of proportions rather than raw totals, because one group has eight planets and the other has thousands.",
-                    misconceptions="A wider section represents a larger proportion of that group, not a physically wider planet.",
-                ),
                 5: dict(
                     title="Generate an initial claim from strange worlds",
                     purpose="Use memorable examples to make an initial claim about how similar planetary systems may be.",
