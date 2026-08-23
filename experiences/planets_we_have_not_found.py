@@ -1,5 +1,7 @@
 """Year 10 The Planets We Haven't Found entry point."""
 
+from ui_helpers import teacher_note
+
 STEP_LABELS = [
     "Welcome", "1 · Our Solar System", "2 · Meet exoplanets", "3 · Mass and distance",
     "4 · Are our planets typical?", "5 · Direct imaging", "6 · Transit detection",
@@ -266,9 +268,11 @@ TEACHER_NOTE_OVERRIDES = {
 }
 
 
-def render_teacher_note(part, fallback):
-    """Render this pathway's Teacher view during the staged extraction."""
-    return fallback(part, YEAR_LEVEL)
+def render_teacher_note(part, _fallback):
+    """Render this pathway's complete Teacher view from pathway-owned content."""
+    note = dict(TEACHER_NOTE_OVERRIDES[part])
+    note["background"] = TEACHER_BACKGROUNDS[part]
+    teacher_note(**note)
 
 
 def render(data, implementation):
