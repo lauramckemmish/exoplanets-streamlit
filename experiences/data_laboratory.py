@@ -98,6 +98,53 @@ def render_map(data, guidance_mode, sky_map):
             with st.expander("Teacher guidance", expanded=False):
                 st.write("Ask students what dimension is missing from this visualisation and how distance could be incorporated into a different three-dimensional model.")
 
+
+def render_filters(data, guidance_mode, guidance_box, custom_candidates):
+    """Render custom candidate filters using the shared filtering service."""
+    st.header("Build your own Tatooine definition")
+    guidance_box(guidance_mode, "Change one assumption at a time and observe which records fail the criterion, which are unknown and which remain.", "Learning intention: students understand that operational definitions and thresholds shape the candidate set.")
+    c1, c2, c3 = st.columns(3)
+    stars = c1.number_input("Known stars", 1, 10, 2)
+    planet_rule = c2.selectbox("Planet-count rule", ["Exactly", "At least"])
+    planets = c3.number_input("Known planets", 1, 20, 3)
+    radius = st.slider("Planet radius (Earth radii)", 0.1, 5.0, (0.8, 1.5), 0.05)
+    t1, t2 = st.columns(2)
+    use_temperature = t1.checkbox("Use equilibrium temperature")
+    temperature = t1.slider("Temperature (K)", 100, 1500, (250, 350), 10, disabled=not use_temperature)
+    use_distance = t2.checkbox("Limit distance from Earth")
+    known_distances = data["sy_dist"].dropna()
+    distance_ceiling = max(10.0, float(known_distances.max())) if not known_distances.empty else 1000.0
+    max_distance = t2.slider("Maximum distance (parsecs)", 1.0, distance_ceiling, min(500.0, distance_ceiling), disabled=not use_distance)
+    candidates, steps = custom_candidates(data, int(stars), planet_rule, int(planets), radius, temperature if use_temperature else None, max_distance if use_distance else None)
+    st.subheader("Effect of each criterion")
+    st.dataframe(steps, use_container_width=True, hide_index=True)
+    st.metric("Remaining candidates", f"{len(candidates):,}")
+    candidate_columns = ["pl_name", "hostname", "disc_year", "pl_rade", "pl_bmasse", "pl_eqt", "sy_dist", "sy_snum", "sy_pnum"]
+    if candidates.empty:
+        st.warning("No records meet every active criterion. Broaden one criterion to see where candidates reappear.")
+        st.session_state["lab_candidate_names"] = []
+    else:
+        candidates = candidates.sort_values("pl_name")
+        st.dataframe(candidates[candidate_columns], use_container_width=True, hide_index=True)
+        names = candidates["pl_name"].tolist()
+        default = names.index("K2-148 b") if "K2-148 b" in names else 0
+        selected = st.selectbox("Candidate to investigate", names, index=default, key="lab_candidate")
+        st.session_state["lab_candidate_names"] = names
+        st.session_state["lab_selected_candidate"] = selected
+        row = candidates[candidates["pl_name"] == selected].iloc[0]
+        evidence = pd.DataFrame([
+            {"Property": "Known stars", "Value": row["sy_snum"], "Evidence status": "Known"},
+            {"Property": "Known planets", "Value": row["sy_pnum"], "Evidence status": "Known"},
+            {"Property": "Radius", "Value": f"{row['pl_rade']:.2f} Earth radii", "Evidence status": "Known"},
+            {"Property": "Mass", "Value": "Unknown" if pd.isna(row["pl_bmasse"]) else f"{row['pl_bmasse']:.2f} Earth masses", "Evidence status": "Unknown" if pd.isna(row["pl_bmasse"]) else "Known"},
+            {"Property": "Temperature", "Value": "Unknown" if pd.isna(row["pl_eqt"]) else f"{row['pl_eqt']:.0f} K", "Evidence status": "Unknown" if pd.isna(row["pl_eqt"]) else "Known"},
+        ])
+        st.subheader(f"Evidence for {selected}")
+        st.dataframe(evidence, use_container_width=True, hide_index=True)
+        st.download_button("Download candidate table", candidates[candidate_columns].to_csv(index=False).encode("utf-8"), "tatooine_candidates.csv", "text/csv")
+    if guidance_mode != "Minimal":
+        st.info("Unknown evidence should remain labelled unknown. It should not be counted as support for the candidate.")
+
 INVESTIGATIONS = {
     "Does planet size relate to mass?": {
         "x": "pl_rade", "y": "pl_bmasse", "colour": "discoverymethod",

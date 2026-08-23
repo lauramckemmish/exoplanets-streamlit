@@ -642,7 +642,7 @@ def render_data_lab(data: pd.DataFrame, guidance_mode: str) -> None:
             render_relationship_lab(data, guidance_mode)
     elif current_tab == 3:
         with tabs[3]:
-            render_filter_lab(data, guidance_mode)
+            data_laboratory.render_filters(data, guidance_mode, guidance_box, custom_candidates)
     else:
         with tabs[4]:
             data_laboratory.render_map(data, guidance_mode, sky_map)
