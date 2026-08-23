@@ -10,6 +10,7 @@ STEP_LABELS = [
     "5 · How we find planets",
     "Conclusion",
 ]
+PART_COUNT = len(STEP_LABELS)
 
 
 def render(data, implementation):
