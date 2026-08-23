@@ -264,7 +264,7 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
     step = tatooine.prepare_page(teacher_note, step_tabs, scroll_to_top_if_requested)
     step_labels = tatooine.STEP_LABELS
     candidates, steps, _ = mission_candidates(data)
-    content_step = {1: 2, 2: 1}.get(step, step)
+    content_step = step
 
     if step == 0:
         st.header("What kind of planet would you like to find?")
@@ -299,6 +299,7 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
             "His home planet, Tatooine, had two suns. We cannot search for a fictional planet directly, "
             "but we can use real measurements to look for planets with some similar clues."
         )
+        st.subheader("How many detected planets orbit two stars?")
         st.info(
             "The NASA Exoplanet Archive is a table of planets that have already been detected. "
             "It does not contain every planet in the Milky Way, and a blank value means that a measurement was not recorded."

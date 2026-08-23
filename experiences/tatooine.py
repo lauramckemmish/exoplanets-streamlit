@@ -8,7 +8,7 @@ import streamlit as st
 import pandas as pd
 
 STEP_LABELS = [
-    "Start here", "Earth-like example", "Tatooine example", "Your planet", "Conclusion",
+    "Start here", "Tatooine example", "Earth-like example", "Your planet", "Conclusion",
 ]
 STEP_COUNT = len(STEP_LABELS)
 TITLE = "Find Your Perfect Planet"
