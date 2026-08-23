@@ -47,16 +47,16 @@ def normalise_pathway(pathway, facilitated_pathway, stage4_pathway, stage5_pathw
     return pathway if pathway in valid else None
 
 
-def render_pathway(pathway, data, facilitated_pathway, stage4_pathway, stage5_pathway, curious_render, stage4_render, stage5_render, curious_implementation, classroom_implementation):
+def render_pathway(pathway, data, facilitated_pathway, stage4_pathway, stage5_pathway, curious_render, stage4_render, stage5_render, classroom_implementation):
     """Dispatch a selected pathway to its independent experience entry point."""
     if pathway == facilitated_pathway:
-        return curious_render(data, curious_implementation)
+        return curious_render(data)
     if pathway == stage4_pathway:
         return stage4_render(data, classroom_implementation)
     return stage5_render(data, classroom_implementation)
 
 
-def render_demographics_shell(data, demographics_started, pathway, title, facilitated_pathway, stage4_pathway, stage5_pathway, landing, curious_render, stage4_render, stage5_render, curious_implementation, classroom_implementation):
+def render_demographics_shell(data, demographics_started, pathway, title, facilitated_pathway, stage4_pathway, stage5_pathway, landing, curious_render, stage4_render, stage5_render, classroom_implementation):
     """Render the common demographics heading, toggle and pathway dispatch."""
     if not demographics_started:
         return landing(data)
@@ -71,4 +71,4 @@ def render_demographics_shell(data, demographics_started, pathway, title, facili
         st.markdown(f"*{title}*")
     with activity_controls:
         st.toggle("Teacher view", key="demographics_teacher_view", help="Show learning purpose, facilitation guidance and syllabus connections within each step.")
-    return render_pathway(pathway, data, facilitated_pathway, stage4_pathway, stage5_pathway, curious_render, stage4_render, stage5_render, curious_implementation, classroom_implementation)
+    return render_pathway(pathway, data, facilitated_pathway, stage4_pathway, stage5_pathway, curious_render, stage4_render, stage5_render, classroom_implementation)
