@@ -1810,7 +1810,7 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
         return
     if "curious_part" not in st.session_state:
         st.session_state["curious_part"] = 0
-    part = max(0, min(int(st.session_state["curious_part"]), 6))
+    part = max(0, min(int(st.session_state["curious_part"]), curious.PART_COUNT - 1))
     step_labels = curious.STEP_LABELS
     _, selected_part = step_tabs(step_labels, "curious_step_selector", part)
     if selected_part != part:
