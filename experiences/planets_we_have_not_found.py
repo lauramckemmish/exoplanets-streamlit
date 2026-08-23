@@ -109,6 +109,55 @@ TEACHER_BACKGROUNDS = {
         "Students only need to connect **star glare and separation** to the observed graph. Details of diffraction, "
         "adaptive optics and infrared detectors are optional senior extensions."
     ),
+    6: (
+        "**Transit detection without advanced calculations**\n\n"
+        "- A **transit** occurs when a planet passes between its star and the observer. The planet blocks a tiny "
+        "fraction of the star's light, producing a dip in measured brightness.\n"
+        "- A telescope records brightness over time as a **light curve**. Several regularly repeating dips provide "
+        "evidence that an orbiting object repeatedly crosses the star.\n"
+        "- The orbital system must be oriented nearly edge-on from Earth. Most planetary systems are not aligned "
+        "this way, so most existing planets will not transit from our viewpoint.\n"
+        "- Planets with short orbits transit more often during an observing program. Larger-radius planets block "
+        "a larger fraction of starlight and usually produce easier-to-measure dips.\n"
+        "- Transit depth primarily helps estimate **planet radius**, not mass. Mass may come from additional "
+        "observations, often radial velocity measurements; this is why mass is missing for some transit planets.\n\n"
+        "Students do not need formulas for transit depth or orbital period. The key chain is: **planet crosses star "
+        "→ brightness dips → repeated pattern supports a planet detection**."
+    ),
+    7: (
+        "**How the other main detection methods work**\n\n"
+        "- **Radial velocity**, also called the **Doppler method**, measures a star's small motion towards and away "
+        "from Earth. A planet and star both orbit their shared centre of mass, so lines in the star's spectrum "
+        "shift slightly towards blue and red. This is an accessible Year 10 Doppler-effect connection; equations "
+        "are not required.\n"
+        "- **Microlensing** occurs when a foreground star passes almost exactly in front of a distant background "
+        "star. The foreground star's gravity bends and magnifies the background light. A planet around the "
+        "foreground star can add a short extra feature. The alignment is rare and normally does not repeat.\n"
+        "- **Timing methods** detect small changes in an otherwise regular astronomical clock, such as pulses from "
+        "a pulsar or the timing of repeated transits.\n"
+        "- **Astrometry** measures a star's tiny side-to-side change in position on the sky as an orbiting planet "
+        "pulls on it.\n"
+        "- Every method has a different detection threshold and geometric requirement. Combining methods gives a "
+        "broader—but still incomplete—sample.\n\n"
+        "The important conclusion is not that a method is ‘bad’. A dataset records what instruments and survey "
+        "designs were capable of detecting. Empty graph regions may contain difficult-to-detect planets, although "
+        "some gaps may also be genuine results of planet formation."
+    ),
+    8: (
+        "**The scientifically careful conclusion**\n\n"
+        "- Thousands of detected exoplanets show that planetary systems are diverse. They do not provide a "
+        "complete inventory of planets in the Milky Way.\n"
+        "- Detection methods favour different signals, so the known sample is shaped by technology, observing "
+        "time, target selection and planetary-system orientation.\n"
+        "- ‘We have not detected it’ is different from ‘it does not exist’. Future instruments may reveal smaller, "
+        "cooler or more widely orbiting planets that are currently difficult to detect.\n"
+        "- Scientists also avoid assuming that every gap is bias. Planet formation and later changes to orbits may "
+        "produce real patterns. More evidence helps distinguish these explanations.\n"
+        "- A useful scientific question identifies what is being compared or measured and can lead to new "
+        "observations, a model or further analysis.\n\n"
+        "The desired takeaway is confident curiosity rather than certainty: **our picture is powerful, incomplete "
+        "and likely to change as technology improves**."
+    ),
 }
 
 
