@@ -10,6 +10,15 @@ TAB_LABELS = [
     "Sky map",
 ]
 
+TEACHER_GUIDANCE = {
+    "title": "Exoplanet Data Laboratory",
+    "purpose": "Support open-ended exploration while making analytical choices visible and discussable.",
+    "approach": "Invite students to state a question before changing variables. Ask what each axis, colour and scale contributes, and whether missing data or detection methods could affect the pattern.",
+    "alignment": "Working Scientifically: analyse data, identify patterns and evaluate evidence.",
+    "timing": "Flexible investigation",
+    "listen_for": "Students explaining why a graph answers a particular question rather than treating graph settings as decoration.",
+}
+
 INVESTIGATIONS = {
     "Does planet size relate to mass?": {
         "x": "pl_rade", "y": "pl_bmasse", "colour": "discoverymethod",

@@ -686,12 +686,12 @@ def render_data_lab(data: pd.DataFrame, guidance_mode: str) -> None:
         )
     if guidance_mode == "Teacher":
         teacher_note(
-            "Exoplanet Data Laboratory",
-            "Support open-ended exploration while making analytical choices visible and discussable.",
-            "Invite students to state a question before changing variables. Ask what each axis, colour and scale contributes, and whether missing data or detection methods could affect the pattern.",
-            alignment="Working Scientifically: analyse data, identify patterns and evaluate evidence.",
-            timing="Flexible investigation",
-            listen_for="Students explaining why a graph answers a particular question rather than treating graph settings as decoration.",
+            data_laboratory.TEACHER_GUIDANCE["title"],
+            data_laboratory.TEACHER_GUIDANCE["purpose"],
+            data_laboratory.TEACHER_GUIDANCE["approach"],
+            alignment=data_laboratory.TEACHER_GUIDANCE["alignment"],
+            timing=data_laboratory.TEACHER_GUIDANCE["timing"],
+            listen_for=data_laboratory.TEACHER_GUIDANCE["listen_for"],
         )
     tab_labels = data_laboratory.TAB_LABELS
     current_tab = int(st.session_state.get("lab_tab_step", 0))
