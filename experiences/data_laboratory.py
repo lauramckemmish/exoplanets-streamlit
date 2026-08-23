@@ -181,29 +181,31 @@ def render_one_variable(data, guidance_mode, field_options):
 
 def render_two_variables(data, guidance_mode, field_options):
     st.header("Two variables")
-    st.write("Two variables let us compare measurements or compare a measurement across groups.")
-    kind = st.radio("Choose a comparison", ["Two numerical variables", "A numerical variable and a category"], horizontal=True, key="lab_two_kind")
+    st.write("Choose two variables and look for a pattern. They might both be measurements, or one might describe a group.")
     options = numeric_options(field_options)
-    if kind == "Two numerical variables":
-        left, right = st.columns(2)
-        x_label = left.selectbox("Horizontal variable", list(options), index=list(options.values()).index("pl_orbsmax"), key="lab_two_x")
-        y_label = right.selectbox("Vertical variable", list(options), index=list(options.values()).index("pl_bmasse"), key="lab_two_y")
-        x_field, y_field = options[x_label], options[y_label]
-        plotted = display_data(data) if "sy_dist" in {x_field, y_field} else data
-        figure = px.scatter(plotted.dropna(subset=[x_field, y_field]), x=x_field, y=y_field, hover_name="pl_name", title=f"{y_label} and {x_label}")
-        figure.update_layout(xaxis_title=x_label, yaxis_title=y_label)
-    else:
-        left, right = st.columns(2)
-        value_label = left.selectbox("Numerical variable", list(options), key="lab_two_value")
-        category_label = right.selectbox("Category", ["Discovery method", "Discovery year"], key="lab_two_category")
-        value_field = options[value_label]
-        category_field = "discoverymethod" if category_label == "Discovery method" else "disc_year"
-        plotted = display_data(data) if value_field == "sy_dist" else data
-        figure = px.strip(plotted.dropna(subset=[value_field, category_field]), x=category_field, y=value_field, hover_name="pl_name", title=f"{value_label} by {category_label}")
-        figure.update_layout(xaxis_title=category_label, yaxis_title=value_label)
+    all_options = {**options, "Discovery method": "discoverymethod"}
+    left, right = st.columns(2)
+    x_label = left.selectbox("Horizontal variable", list(all_options), index=list(all_options.values()).index("pl_orbsmax"), key="lab_two_x")
+    y_label = right.selectbox("Vertical variable", list(all_options), index=list(all_options.values()).index("pl_bmasse"), key="lab_two_y")
+    x_field, y_field = all_options[x_label], all_options[y_label]
+    plotted = display_data(data) if "sy_dist" in {x_field, y_field} else data
+    scale_left, scale_right = st.columns(2)
+    use_log_x = scale_left.checkbox("Use a logarithmic horizontal axis", disabled=x_field == "discoverymethod", key="lab_two_log_x")
+    use_log_y = scale_right.checkbox("Use a logarithmic vertical axis", disabled=y_field == "discoverymethod", key="lab_two_log_y")
+    valid = plotted.dropna(subset=[x_field, y_field])
+    if use_log_x:
+        valid = valid[valid[x_field] > 0]
+    if use_log_y:
+        valid = valid[valid[y_field] > 0]
+    figure = px.scatter(valid, x=x_field, y=y_field, hover_name="pl_name", title=f"{y_label} and {x_label}")
+    figure.update_layout(xaxis_title=x_label, yaxis_title=y_label)
+    if use_log_x:
+        figure.update_xaxes(type="log")
+    if use_log_y:
+        figure.update_yaxes(type="log")
     st.plotly_chart(figure, use_container_width=True)
     if guidance_mode != "Minimal":
-        st.info("Describe the pattern first. Then consider whether the data support a relationship or a difference between groups. NSW Science link: identify trends, patterns and relationships in secondary data.")
+        st.info("Describe the pattern first. Then try a log axis if small and large values are crowded together. The values stay the same; only the spacing changes. NSW Science link: identify trends, patterns and relationships in secondary data.")
 
 
 def render_three_variables(data, guidance_mode, field_options):
