@@ -1,11 +1,17 @@
-"""Find Tatooine experience entry point.
-
-The implementation is injected by ``app.py`` so this module does not import
-the Streamlit application back into itself (which would create a cycle).
-"""
+"""Find Your Perfect Planet experience."""
 
 import streamlit as st
 import pandas as pd
+
+from charts import sky_map
+from data import PARSEC_TO_LIGHT_YEARS, mission_candidates
+from ui_helpers import (
+    guidance_box,
+    scroll_to_top_if_requested,
+    step_buttons,
+    step_tabs,
+    teacher_note,
+)
 
 STEP_LABELS = [
     "Start here", "Tatooine example", "Earth-like example", "Your planet", "Conclusion",
@@ -87,7 +93,7 @@ TEACHER_GUIDANCE = {
 }
 
 
-def prepare_page(teacher_note, step_tabs, scroll_to_top_if_requested):
+def prepare_page():
     """Render the shared mission shell and return the active mission step."""
     if "mission_step" not in st.session_state:
         st.session_state["mission_step"] = 0
@@ -116,7 +122,7 @@ def prepare_page(teacher_note, step_tabs, scroll_to_top_if_requested):
     return step
 
 
-def render_custom_filters(data, guidance_mode, guidance_box, custom_candidates, defaults=(2, 3, (0.8, 1.5)), key_prefix="perfect"):
+def render_custom_filters(data, guidance_mode, defaults=(2, 3, (0.8, 1.5)), key_prefix="perfect"):
     """Render each optional filter as an inline choice → missing data → result story."""
     st.header("Choose your planet criteria")
     guidance_box(guidance_mode, "Turn an idea about a planet into rules, then apply the rules one at a time.", "Ask students which criteria are essential, which are proxies and what missing values mean.")
@@ -278,5 +284,147 @@ def render_tatooine_worked_example(data):
     st.caption("This finds real planets matching clues from a fictional story. It does not identify a real Tatooine.")
 
 
-def render(data, presenter_mode, implementation):
-    return implementation(data, presenter_mode)
+def render_candidate_comparison(candidates: pd.DataFrame, key_prefix: str, prompt: str, include_system: bool = True) -> None:
+    """Render the interactive candidate comparison used in the Earth-like example."""
+    st.subheader("Compare the candidates")
+    if candidates.empty:
+        st.warning("No candidates meet all the example rules in this dataset.")
+        return
+    ordered = candidates.sort_values("pl_name").copy()
+    ordered["Estimated temperature (°C)"] = ordered["pl_eqt"] - 273.15
+    selected = st.selectbox("Choose a candidate to inspect", ordered["pl_name"].tolist(), key=f"{key_prefix}_candidate")
+    row = ordered[ordered["pl_name"] == selected].iloc[0]
+    detail_rows = [
+        {"Detail": "Planet name", "Value": row["pl_name"]},
+        {"Detail": "Host star", "Value": row["hostname"]},
+        {"Detail": "Planet radius", "Value": f"{row['pl_rade']:.2f} Earth radii"},
+        {"Detail": "Planet mass", "Value": "Unknown" if pd.isna(row["pl_bmasse"]) else f"{row['pl_bmasse']:.2f} Earth masses"},
+        {"Detail": "Estimated temperature", "Value": "Unknown" if pd.isna(row["pl_eqt"]) else f"{row['pl_eqt'] - 273.15:.1f} °C"},
+        {"Detail": "Distance from Earth", "Value": "Unknown" if pd.isna(row["sy_dist"]) else f"{row['sy_dist'] * PARSEC_TO_LIGHT_YEARS:.0f} light-years"},
+    ]
+    if include_system:
+        detail_rows.append({"Detail": "Known stars / planets", "Value": f"{row['sy_snum']} / {row['sy_pnum']}"})
+    st.dataframe(pd.DataFrame(detail_rows), use_container_width=True, hide_index=True)
+    st.text_area(prompt, key=f"{key_prefix}_response", height=110)
+
+
+def render(data: pd.DataFrame) -> None:
+    """Render the complete Find Your Perfect Planet experience."""
+    step = prepare_page()
+    candidates, _, _ = mission_candidates(data)
+
+    if step == 0:
+        st.header("What kind of planet would you like to find?")
+        st.markdown(
+            "A **filter** is a rule used to narrow a dataset. We can turn an idea about a planet into rules, "
+            "apply them one at a time and see which known planets remain."
+        )
+        a, b = st.columns(2)
+        with a:
+            st.subheader("Worked example: a Tatooine-like world")
+            st.markdown(
+                "- Two known stars\n"
+                "- Part of a wider planetary system\n"
+                "- Perhaps approximately Earth-sized\n\n"
+                "These are starting rules, not proof that a planet is like a fictional world."
+            )
+        with b:
+            st.subheader("Worked example: an Earth-like candidate")
+            st.markdown(
+                "- Roughly Earth-sized\n"
+                "- A temperature in a chosen range\n"
+                "- An orbital distance worth investigating\n\n"
+                "Earth-sized and potentially suitable are not the same as habitable."
+            )
+        st.info("Choose a template as a starting point, or invent your own planet profile. Every filter involves an assumption, and a close match is not a confirmed identity.")
+
+    elif step == 1:
+        st.header("Worked example: a Tatooine-like world")
+        st.image("assets/nasa-kepler-16b-travel-poster.jpg", width=300, caption="NASA/JPL artist's impression of Kepler-16 b, a real planet orbiting two stars")
+        st.markdown(
+            "**On a galaxy far, far away, there was once a Jedi called Luke Skywalker.** "
+            "His home planet, Tatooine, had two suns. We cannot search for a fictional planet directly, "
+            "but we can use real measurements to look for planets with some similar clues."
+        )
+        st.subheader("How many detected planets orbit two stars?")
+        st.info(
+            "The NASA Exoplanet Archive is a table of planets that have already been detected. "
+            "It does not contain every planet in the Milky Way, and a blank value means that a measurement was not recorded."
+        )
+        render_tatooine_worked_example(data)
+
+    elif step == 2:
+        st.header("Worked example: an Earth-like candidate")
+        st.write("We have become curious about worlds beyond our Solar System. What if we wanted to find another planet to visit someday?")
+        st.write("We will use two clues: a temperature range and a planet size range. These clues help us search, but they cannot tell us what a planet is like on its surface.")
+        st.subheader("Apply the filters in order")
+        st.write(f"We start with **{len(data):,} detected planet records**.")
+        st.subheader("Variable 1: Estimated temperature")
+        known_temperature = data[data["pl_eqt"].notna()].copy()
+        st.info("Choice 1: keep only planets with an estimated temperature recorded.")
+        st.warning(f"Data recorded: {len(known_temperature):,} planets have an estimated temperature ({len(data) - len(known_temperature):,} not recorded).")
+        st.success(f"Result: {len(known_temperature):,} planets remain.")
+        temp_c = st.slider("Choose an estimated temperature range (°C)", -50, 100, (-23, 77), 5, key="earth_temperature_range")
+        temperature_k = (temp_c[0] + 273.15, temp_c[1] + 273.15)
+        temperature_matches = known_temperature[known_temperature["pl_eqt"].between(*temperature_k, inclusive="both")]
+        st.info(f"Choice 2: keep planets between {temp_c[0]}°C and {temp_c[1]}°C.")
+        st.success(f"Result: {len(temperature_matches):,} planets remain.")
+        st.subheader("Variable 2: Planet radius")
+        radius_recorded = temperature_matches[temperature_matches["pl_rade"].notna()]
+        st.warning(f"Data recorded: {len(radius_recorded):,} of these planets have a radius ({len(temperature_matches) - len(radius_recorded):,} not recorded).")
+        radius_range = st.slider("Choose a planet radius range (Earth radii)", 0.5, 2.0, (0.8, 1.5), 0.05, key="earth_radius_range")
+        earth_like = radius_recorded[radius_recorded["pl_rade"].between(*radius_range, inclusive="both")].copy()
+        st.info(f"Choice 3: keep planets with a radius between {radius_range[0]:.2f} and {radius_range[1]:.2f} Earth radii.")
+        st.success(f"Result: {len(earth_like):,} planets remain.")
+        if st.session_state.get("tatooine_teacher_view", False):
+            st.info("Teacher note: missing temperature is not evidence that a planet is too hot or too cold. It means the value was not recorded. Temperature also does not prove habitability.")
+        st.info("These results use evidence that has actually been recorded. We think there are probably hundreds of billions of planets in our galaxy alone.")
+        render_candidate_comparison(earth_like, "earth_like_worked", "Which candidate would you investigate further if you wanted to find another world to visit? What would you want to learn next?", include_system=False)
+
+    elif step == 3:
+        st.header("Your planet")
+        st.write("Create a short story about the planet you would like to find. Then turn the clues in your story into variables and filters.")
+        st.text_area("What kind of planet are you looking for?", placeholder="For example: a small, warm planet in a system with several worlds.", key="perfect_planet_story", height=100)
+        st.subheader("Choose your variables and filters")
+        st.caption("Each choice is a rule. Try to explain why the rule represents part of your story.")
+        guidance_mode = "Teacher" if st.session_state.get("tatooine_teacher_view", False) else "Student"
+        render_custom_filters(data, guidance_mode, key_prefix="perfect")
+
+    elif step == 4:
+        st.header("Conclusion")
+        st.write("A filter search can find the closest matches to a story, but it cannot prove that a planet is truly like the world we imagined.")
+        st.text_area("What did your search show? What evidence was missing?", key="mission_conclusion_response", height=140)
+        st.info("The dataset contains detected planets only. We think there are probably hundreds of billions of planets in our galaxy alone.")
+        names = candidates.sort_values("pl_name")["pl_name"].tolist() if not candidates.empty else []
+        selected = st.session_state.get("selected_candidate")
+        if names:
+            if selected not in names:
+                selected = "K2-148 b" if "K2-148 b" in names else names[0]
+            selected = st.selectbox("Highlighted candidate", names, index=names.index(selected), key="mission_map_candidate")
+        elif "K2-148 b" in data["pl_name"].tolist():
+            selected = "K2-148 b"
+            st.info("No current candidates meet all original rules, so the notebook's original candidate is shown.")
+        else:
+            selected = data.iloc[0]["pl_name"] if not data.empty else None
+
+        if selected:
+            st.plotly_chart(sky_map(data, selected), use_container_width=True)
+            row = data[data["pl_name"] == selected].iloc[0]
+            a, b, c, d = st.columns(4)
+            a.metric("Right ascension", "Unknown" if pd.isna(row["ra"]) else f"{row['ra']:.2f}°")
+            b.metric("Declination", "Unknown" if pd.isna(row["dec"]) else f"{row['dec']:.2f}°")
+            c.metric("Distance", "Unknown" if pd.isna(row["sy_dist"]) else f"{row['sy_dist'] * PARSEC_TO_LIGHT_YEARS:.1f} ly")
+            d.metric("Discovery year", "Unknown" if pd.isna(row["disc_year"]) else str(row["disc_year"]))
+            st.success(
+                f"Mission conclusion: {selected} is a candidate under the selected rules, not a confirmed identification. "
+                "The final report should state the evidence, assumptions and missing information."
+            )
+
+    step_buttons(
+        STEP_LABELS,
+        "mission_tab",
+        "mission_step",
+        "mission_scroll_to_top",
+        step,
+        "mission",
+    )
