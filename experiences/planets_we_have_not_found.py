@@ -228,6 +228,41 @@ TEACHER_NOTE_OVERRIDES = {
         misconceptions="Direct imaging usually records light from the planet as a point, not a detailed photograph of its surface.",
         resources=(("NASA: direct imaging and coronagraphs", "https://science.nasa.gov/astrophysics/programs/exep/technology/coronagraph-video/"),),
     ),
+    6: dict(
+        title="Investigate transit detection",
+        purpose="Connect a repeating dip in measured starlight with the population of planets found by transits.",
+        timing="12 minutes (Lesson 2)",
+        facilitation="Pause after the animation and ask what the telescope measures. Have students predict the graph before revealing it, then use both axes when describing the pattern.",
+        alignment="Supports SC5-WAM-01 through an application of measured light; it does not cover the whole outcome.",
+        evidence="Students explain that transit detection measures repeated changes in starlight and describe the detected population using the graph.",
+        listen_for="The planet blocks a small fraction of light; repeated dips provide evidence of an orbit. The system must be aligned appropriately from our viewpoint.",
+        misconceptions="The star does not switch off, and astronomers generally do not see the planet cross the star as a resolved disc.",
+        resources=(("NASA: transit-method animation", "https://science.nasa.gov/resource/exoplanet-detection-transit-method/"),),
+    ),
+    7: dict(
+        title="Compare discovery methods",
+        purpose="Explain how measurement methods shape the detected dataset and the conclusions that can be drawn from it.",
+        timing="18 minutes (Lesson 2)",
+        facilitation="Toggle one method at a time, ask students to describe each pattern, and only then reveal all methods. Ask what may be hard for current methods to find. Let students infer the incompleteness of the dataset before consolidating it in the conclusion.",
+        alignment="SC5-DA2-01 and SC5-WS-06: assess claims using the strengths and limitations of data.",
+        evidence="Students use differences between method views to explain why detected planets may not represent every planet that exists.",
+        listen_for="‘A gap could mean difficult to detect, not impossible’ and ‘future technology may reveal planets in currently sparse regions’. Keep ‘may’ rather than promising that every gap will be filled.",
+        background="**Radial velocity (Doppler method):** an orbiting planet makes its star move slightly towards and away from us, shifting its spectrum towards blue and red. This offers a useful Year 10 waves connection.\n\n**Microlensing:** gravity from a foreground star-system bends and magnifies light from a more distant star. A planet can add a brief feature to that one-off brightening event. It can find distant systems but events usually cannot be repeated.\n\nOther methods can remain optional student research rather than required teacher exposition.",
+        misconceptions="Different methods do not create different planets; they make different existing planets easier to detect.",
+        resources=(
+            ("NASA: Doppler and transit overview", "https://science.nasa.gov/astrobiology/learning-resources/alp/discover-worlds-around-other-stars/"),
+            ("NASA: microlensing explainer", "https://science.nasa.gov/resource/exoplanet-detection-microlensing-method/"),
+        ),
+    ),
+    8: dict(
+        title="Consolidate and generate new questions",
+        purpose="Connect planet diversity, graph representation and detection limitations in an evidence-based explanation.",
+        timing="8 minutes (Lesson 2)",
+        facilitation="Ask students for their own conclusion first. Then consolidate the shared idea that scientists have not found every planet and that future technology may change the visible pattern. Finish with a question students genuinely want investigated.",
+        alignment="SC5-WS-05, SC5-WS-06 and SC5-WS-08: communicate scientific concepts or arguments using evidence.",
+        evidence="Students distinguish the detected sample from all planets that may exist and pose a relevant scientific question.",
+        listen_for="Questions that could be investigated using observations, models or new technology. Preserve uncertainty: some gaps may reflect detection limits and some may reflect how planetary systems form.",
+    ),
 }
 
 
