@@ -1,18 +1,18 @@
 """Exoplanet Data Laboratory experience entry point."""
 
 import pandas as pd
+import plotly.express as px
 import streamlit as st
 
 TITLE = "Exoplanet Data Laboratory"
 SUBTITLE = "Open exploration with contextual guidance for analytical choices"
 TAB_LABELS = [
     "Start here",
-    "Summary",
     "Variables",
-    "Dataset",
-    "Missing data",
-    "Discoveries",
-    "Relationship explorer",
+    "Dataset and missing values",
+    "One variable",
+    "Two variables",
+    "Three variables",
     "Find your perfect planet",
     "Sky map",
 ]
@@ -76,6 +76,13 @@ def render_summary(data, guidance_mode):
         st.caption("The number of records can change as astronomers confirm new planets and update the archive.")
 
 
+def display_data(data):
+    """Return a copy with student-facing distance values shown in light-years."""
+    shown = data.copy()
+    shown["sy_dist"] = shown["sy_dist"] * 3.26156
+    return shown
+
+
 def render_variables(data, guidance_mode, field_options, variables, variable_card, scale_guidance):
     st.header("Variables")
     st.write("A variable is a feature we can record or compare. The archive field is the short name used in the NASA table.")
@@ -90,7 +97,7 @@ def render_dataset_table(data):
     st.write("Each row is one known exoplanet record. This is a sample of what astronomers have measured so far—not a list of every planet that exists.")
     display = [field for _, field in DATASET_FIELDS]
     friendly_columns = {field: label for label, field in DATASET_FIELDS}
-    st.dataframe(data[display].rename(columns=friendly_columns), use_container_width=True, hide_index=True)
+    st.dataframe(display_data(data)[display].rename(columns=friendly_columns), use_container_width=True, hide_index=True)
 
 
 def render_missing(data, guidance_mode):
@@ -101,6 +108,98 @@ def render_missing(data, guidance_mode):
     st.dataframe(missing, use_container_width=True, hide_index=True)
     if guidance_mode != "Minimal":
         st.info("Missing values limit which questions can be answered reliably.")
+
+
+def render_dataset_and_missing(data, guidance_mode):
+    """Show the data table, basic counts and recorded-value limitations together."""
+    st.header("Dataset and missing values")
+    st.write("Each row is one known exoplanet record. This table is a sample of what astronomers have measured so far—not a list of every planet that exists.")
+    a, b, c = st.columns(3)
+    a.metric("Planet records", f"{len(data):,}")
+    b.metric("Host stars", f"{data['hostname'].nunique():,}")
+    c.metric("Discovery methods", f"{data['discoverymethod'].nunique():,}")
+    display = [field for _, field in DATASET_FIELDS]
+    friendly_columns = {field: label for label, field in DATASET_FIELDS}
+    st.dataframe(display_data(data)[display].rename(columns=friendly_columns), use_container_width=True, hide_index=True)
+    st.subheader("What does a blank value mean?")
+    st.write("A blank value means that property has not been recorded for that planet. It does not mean zero or that the property does not exist.")
+    missing = pd.DataFrame({"Variable": [label for label, _ in DATASET_FIELDS], "Missing records": [int(data[col].isna().sum()) for col in display], "Complete records (%)": [round(100 * data[col].notna().mean(), 1) for col in display]}).sort_values("Complete records (%)")
+    st.dataframe(missing, use_container_width=True, hide_index=True)
+    if guidance_mode == "Teacher":
+        st.caption("NSW Science link: process and analyse secondary data, including evaluating the quality and limitations of data.")
+
+
+def numeric_options(field_options):
+    return {label: field for label, field in field_options.items() if field != "discoverymethod"}
+
+
+def render_one_variable(data, guidance_mode, field_options):
+    st.header("One variable")
+    st.write("Start by looking at one feature at a time. A numerical variable shows a distribution; a category shows how many records are in each group.")
+    kind = st.radio("What kind of variable would you like to explore?", ["Numerical", "Category"], horizontal=True, key="lab_one_kind")
+    if kind == "Numerical":
+        options = numeric_options(field_options)
+        label = st.selectbox("Choose a numerical variable", list(options), key="lab_one_numeric")
+        field = options[label]
+        plotted = display_data(data) if field == "sy_dist" else data
+        figure = px.histogram(plotted.dropna(subset=[field]), x=field, nbins=30, title=f"Distribution of {label}")
+        figure.update_layout(xaxis_title=label, yaxis_title="Number of planet records")
+    else:
+        field = st.selectbox("Choose a category", ["Discovery method", "Discovery year"], key="lab_one_category")
+        column = "discoverymethod" if field == "Discovery method" else "disc_year"
+        counts = data[column].dropna().value_counts().reset_index()
+        counts.columns = [field, "Number of planet records"]
+        figure = px.bar(counts, x=field, y="Number of planet records", title=f"Counts by {field}")
+        if column == "disc_year":
+            figure.update_layout(xaxis_type="linear")
+    st.plotly_chart(figure, use_container_width=True)
+    if guidance_mode != "Minimal":
+        st.info("Look for the tallest bars, the overall spread and any gaps or unusual values. NSW Science link: organise and summarise secondary data using an appropriate representation.")
+
+
+def render_two_variables(data, guidance_mode, field_options):
+    st.header("Two variables")
+    st.write("Two variables let us compare measurements or compare a measurement across groups.")
+    kind = st.radio("Choose a comparison", ["Two numerical variables", "A numerical variable and a category"], horizontal=True, key="lab_two_kind")
+    options = numeric_options(field_options)
+    if kind == "Two numerical variables":
+        left, right = st.columns(2)
+        x_label = left.selectbox("Horizontal variable", list(options), index=list(options.values()).index("pl_orbsmax"), key="lab_two_x")
+        y_label = right.selectbox("Vertical variable", list(options), index=list(options.values()).index("pl_bmasse"), key="lab_two_y")
+        x_field, y_field = options[x_label], options[y_label]
+        plotted = display_data(data) if "sy_dist" in {x_field, y_field} else data
+        figure = px.scatter(plotted.dropna(subset=[x_field, y_field]), x=x_field, y=y_field, hover_name="pl_name", title=f"{y_label} and {x_label}")
+        figure.update_layout(xaxis_title=x_label, yaxis_title=y_label)
+    else:
+        left, right = st.columns(2)
+        value_label = left.selectbox("Numerical variable", list(options), key="lab_two_value")
+        category_label = right.selectbox("Category", ["Discovery method", "Discovery year"], key="lab_two_category")
+        value_field = options[value_label]
+        category_field = "discoverymethod" if category_label == "Discovery method" else "disc_year"
+        plotted = display_data(data) if value_field == "sy_dist" else data
+        figure = px.strip(plotted.dropna(subset=[value_field, category_field]), x=category_field, y=value_field, hover_name="pl_name", title=f"{value_label} by {category_label}")
+        figure.update_layout(xaxis_title=category_label, yaxis_title=value_label)
+    st.plotly_chart(figure, use_container_width=True)
+    if guidance_mode != "Minimal":
+        st.info("Describe the pattern first. Then consider whether the data support a relationship or a difference between groups. NSW Science link: identify trends, patterns and relationships in secondary data.")
+
+
+def render_three_variables(data, guidance_mode, field_options):
+    st.header("Three variables")
+    st.write("Use two numerical variables to locate each planet, then add a category through colour to compare groups.")
+    options = numeric_options(field_options)
+    left, middle, right = st.columns(3)
+    x_label = left.selectbox("Horizontal variable", list(options), index=list(options.values()).index("pl_orbsmax"), key="lab_three_x")
+    y_label = middle.selectbox("Vertical variable", list(options), index=list(options.values()).index("pl_bmasse"), key="lab_three_y")
+    category_label = right.selectbox("Colour category", ["Discovery method", "Discovery year"], key="lab_three_category")
+    x_field, y_field = options[x_label], options[y_label]
+    category_field = "discoverymethod" if category_label == "Discovery method" else "disc_year"
+    plotted = display_data(data) if "sy_dist" in {x_field, y_field} else data
+    figure = px.scatter(plotted.dropna(subset=[x_field, y_field, category_field]), x=x_field, y=y_field, color=category_field, hover_name="pl_name", title=f"{y_label} and {x_label}, coloured by {category_label}")
+    figure.update_layout(xaxis_title=x_label, yaxis_title=y_label, legend_title=category_label)
+    st.plotly_chart(figure, use_container_width=True)
+    if guidance_mode != "Minimal":
+        st.info("Ask whether the coloured groups occupy different parts of the graph, then consider whether the way the data were collected could affect the pattern. NSW Science link: use representations to analyse evidence and evaluate data limitations.")
 
 DISCOVERY_GUIDANCE = {
     "summary": "Use this graph to compare categories over time. Look for changes in dominant discovery methods, sudden increases and periods with sparse data.",
