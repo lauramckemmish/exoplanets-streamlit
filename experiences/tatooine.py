@@ -140,10 +140,12 @@ def render_custom_filters(data, guidance_mode, guidance_box, custom_candidates, 
         before = int(row["Before"])
         missing = int(row["Missing or unknown"])
         recorded = before - missing
-        st.markdown(f"**This step starts with {before:,} planets.**")
-        st.markdown(f"First, check the data: **{recorded:,} have this value recorded** ({missing:,} are unknown).")
-        st.markdown(f"Then apply the rule: **{row['Criterion']}.**")
-        st.markdown(f"**{int(row['Remaining']):,} planets remain.**")
+        st.info(f"Choice: {row['Criterion']}.")
+        if missing:
+            st.warning(f"Missing data: {missing:,} of the {before:,} planets do not have this value recorded.")
+        else:
+            st.caption(f"Data check: {recorded:,} of the {before:,} planets have this value recorded.")
+        st.success(f"Result: {int(row['Remaining']):,} planets remain.")
     st.caption("A missing value means the measurement was not recorded. It does not mean that the planet failed the rule.")
     st.metric("Remaining candidates", f"{len(candidates):,}")
     if candidates.empty:
