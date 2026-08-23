@@ -2,6 +2,8 @@
 
 import streamlit as st
 
+from experiences import catalog
+
 
 def reset_navigation() -> None:
     """Start a selected demographics pathway with independent step state."""
@@ -24,14 +26,41 @@ def select_demographics_pathway(pathway: str) -> None:
     st.session_state["experience"] = "Exoplanet Demographics"
 
 
-def open_experience(name: str, facilitated_pathway: str, stage4_pathway: str, stage5_pathway: str) -> None:
+def select_catalog_experience(name: str) -> None:
+    """Open an enabled experience selected from the shared catalogue."""
+    experience = catalog.get_experience(name)
+    if experience is None:
+        select_experience("Introduction")
+        return
+    if experience["pathway"] is not None:
+        select_demographics_pathway(experience["pathway"])
+        return
+    select_experience(experience["app_experience"])
+
+
+def open_experience(name: str) -> None:
     """Open an experience from the Introduction catalogue."""
-    if name in {facilitated_pathway, stage4_pathway, stage5_pathway}:
-        select_demographics_pathway(name)
-    elif name == "Find Your Perfect Planet":
-        select_experience("Guided Tatooine Mission")
-    else:
-        select_experience(name)
+    select_catalog_experience(name)
+
+
+def is_catalog_experience_selected(name: str) -> bool:
+    """Return whether a public catalogue entry is the current route."""
+    experience = catalog.get_experience(name)
+    if experience is None:
+        return False
+    if experience["pathway"] is not None:
+        return (
+            st.session_state.get("experience") == "Exoplanet Demographics"
+            and st.session_state.get("demographics_pathway") == experience["pathway"]
+        )
+    return st.session_state.get("experience") == experience["app_experience"]
+
+
+def normalise_experience(app_experience: str) -> str:
+    """Fall back to Introduction when session state selects a hidden route."""
+    if app_experience in {"Introduction", "Exoplanet Demographics"}:
+        return app_experience
+    return app_experience if catalog.is_enabled_app_experience(app_experience) else "Introduction"
 
 
 def normalise_pathway(pathway, facilitated_pathway, stage4_pathway, stage5_pathway):
@@ -43,8 +72,7 @@ def normalise_pathway(pathway, facilitated_pathway, stage4_pathway, stage5_pathw
         "Year 10 classroom": stage5_pathway,
     }
     pathway = migrations.get(pathway, pathway)
-    valid = {facilitated_pathway, stage4_pathway, stage5_pathway}
-    return pathway if pathway in valid else None
+    return pathway if pathway in catalog.enabled_pathway_names() else None
 
 
 def render_pathway(pathway, data, facilitated_pathway, stage4_pathway, stage5_pathway, curious_render, stage4_render, stage5_render, classroom_implementation):

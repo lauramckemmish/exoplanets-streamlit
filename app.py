@@ -233,7 +233,7 @@ def render_demographics(data: pd.DataFrame) -> None:
         FACILITATED_PATHWAY,
         STAGE4_PATHWAY,
         STAGE5_PATHWAY,
-        lambda frame: landing.render(frame, EXOPLANET_IMAGE_PATH, TEACHER_FEEDBACK_URL, GRANT_RECIPIENTS_URL, catalog, FACILITATED_PATHWAY, STAGE4_PATHWAY, STAGE5_PATHWAY, router.open_experience),
+        lambda frame: landing.render(frame, EXOPLANET_IMAGE_PATH, TEACHER_FEEDBACK_URL, GRANT_RECIPIENTS_URL, catalog, router.open_experience),
         curious.render,
         strange_new_worlds.render,
         planets_we_have_not_found.render,
@@ -243,6 +243,10 @@ def render_demographics(data: pd.DataFrame) -> None:
 
 if "experience" not in st.session_state:
     st.session_state["experience"] = "Introduction"
+
+st.session_state["experience"] = router.normalise_experience(
+    st.session_state["experience"]
+)
 
 with st.sidebar:
     st.header("Explore exoplanets")
@@ -256,46 +260,16 @@ with st.sidebar:
         args=("Introduction",),
     )
     st.markdown("#### Learning experiences")
-    st.button(
-        f"🪐 {FACILITATED_PATHWAY}",
-        type="primary" if st.session_state.get("demographics_pathway") == FACILITATED_PATHWAY and st.session_state["experience"] == "Exoplanet Demographics" else "secondary",
-        use_container_width=True,
-        disabled=st.session_state.get("demographics_pathway") == FACILITATED_PATHWAY and st.session_state["experience"] == "Exoplanet Demographics",
-        on_click=router.select_demographics_pathway,
-        args=(FACILITATED_PATHWAY,),
-    )
-    st.button(
-        f"✨ {STAGE4_PATHWAY}",
-        type="primary" if st.session_state.get("demographics_pathway") == STAGE4_PATHWAY and st.session_state["experience"] == "Exoplanet Demographics" else "secondary",
-        use_container_width=True,
-        disabled=st.session_state.get("demographics_pathway") == STAGE4_PATHWAY and st.session_state["experience"] == "Exoplanet Demographics",
-        on_click=router.select_demographics_pathway,
-        args=(STAGE4_PATHWAY,),
-    )
-    st.button(
-        f"🔭 {STAGE5_PATHWAY}",
-        type="primary" if st.session_state.get("demographics_pathway") == STAGE5_PATHWAY and st.session_state["experience"] == "Exoplanet Demographics" else "secondary",
-        use_container_width=True,
-        disabled=st.session_state.get("demographics_pathway") == STAGE5_PATHWAY and st.session_state["experience"] == "Exoplanet Demographics",
-        on_click=router.select_demographics_pathway,
-        args=(STAGE5_PATHWAY,),
-    )
-    st.button(
-        "🔬 Exoplanet Data Laboratory",
-        type="primary" if st.session_state["experience"] == "Exoplanet Data Laboratory" else "secondary",
-        use_container_width=True,
-        disabled=st.session_state["experience"] == "Exoplanet Data Laboratory",
-        on_click=router.select_experience,
-        args=("Exoplanet Data Laboratory",),
-    )
-    st.button(
-        "🌅 Find Your Perfect Planet",
-        type="primary" if st.session_state["experience"] == "Guided Tatooine Mission" else "secondary",
-        use_container_width=True,
-        disabled=st.session_state["experience"] == "Guided Tatooine Mission",
-        on_click=router.select_experience,
-        args=("Guided Tatooine Mission",),
-    )
+    for experience_entry in catalog.experience_catalog():
+        selected = router.is_catalog_experience_selected(experience_entry["name"])
+        st.button(
+            f"{experience_entry['icon']} {experience_entry['name']}",
+            type="primary" if selected else "secondary",
+            use_container_width=True,
+            disabled=selected,
+            on_click=router.select_catalog_experience,
+            args=(experience_entry["name"],),
+        )
     experience = st.session_state["experience"]
     st.divider()
     st.header("Data source")
@@ -311,9 +285,6 @@ if experience == "Introduction":
         TEACHER_FEEDBACK_URL,
         GRANT_RECIPIENTS_URL,
         catalog,
-        FACILITATED_PATHWAY,
-        STAGE4_PATHWAY,
-        STAGE5_PATHWAY,
         router.open_experience,
     )
     st.stop()
