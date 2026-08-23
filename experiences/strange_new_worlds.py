@@ -6,6 +6,7 @@ STEP_LABELS = [
     "6 · Add orbital distance", "7 · Compare planetary systems", "Conclusion",
 ]
 YEAR_LEVEL = "Year 8"
+PART_COUNT = len(STEP_LABELS)
 
 
 def render(data, implementation):

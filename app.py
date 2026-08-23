@@ -1153,7 +1153,12 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
         return
     if "demographics_part" not in st.session_state:
         st.session_state["demographics_part"] = 0
-    part = max(0, min(int(st.session_state["demographics_part"]), 8))
+    part_count = (
+        strange_new_worlds.PART_COUNT
+        if year_level == strange_new_worlds.YEAR_LEVEL
+        else planets_we_have_not_found.PART_COUNT
+    )
+    part = max(0, min(int(st.session_state["demographics_part"]), part_count - 1))
     if year_level == "Year 8":
         step_labels = strange_new_worlds.STEP_LABELS
     else:
