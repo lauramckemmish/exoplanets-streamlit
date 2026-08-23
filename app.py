@@ -303,13 +303,6 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
             "The NASA Exoplanet Archive is a table of planets that have already been detected. "
             "It does not contain every planet in the Milky Way, and a blank value means that a measurement was not recorded."
         )
-        st.subheader("Turn the story into filters")
-        st.dataframe(pd.DataFrame([
-            {"Story clue": "Two suns", "Dataset variable": "Known stars", "Rule": "Exactly 2"},
-            {"Story clue": "Part of a planetary system", "Dataset variable": "Known planets", "Rule": "Exactly 3"},
-            {"Story clue": "A roughly Earth-sized world", "Dataset variable": "Planet radius", "Rule": "0.8–1.5 Earth radii"},
-        ]), use_container_width=True, hide_index=True)
-        st.caption("These rules are choices that represent the story. They are not proof that a planet is literally Tatooine.")
         st.subheader("Move the filters to match the story")
         st.write("Start with the default settings, then change the filters to represent the clues in the story.")
         tatooine.render_custom_filters(data, "Teacher" if st.session_state.get("tatooine_teacher_view", False) else "Student", guidance_box, custom_candidates, defaults=(1, 1, (0.8, 1.2)))
@@ -323,12 +316,12 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
         known_temperature = data[data["pl_eqt"].notna()].copy()
         st.markdown("**First, keep only planets with an estimated temperature recorded.**")
         st.markdown(f"**{len(known_temperature):,} planets remain.**")
-        temp_c = st.slider("Choose an estimated temperature range (°C)", -173, 1200, (-23, 77), 5, key="earth_temperature_range")
+        temp_c = st.slider("Choose an estimated temperature range (°C)", -50, 100, (-23, 77), 5, key="earth_temperature_range")
         temperature_k = (temp_c[0] + 273.15, temp_c[1] + 273.15)
         temperature_matches = known_temperature[known_temperature["pl_eqt"].between(*temperature_k, inclusive="both")]
         st.markdown(f"**Next, keep planets between {temp_c[0]}°C and {temp_c[1]}°C.**")
         st.markdown(f"**{len(temperature_matches):,} planets remain.**")
-        radius_range = st.slider("Choose a planet radius range (Earth radii)", 0.1, 5.0, (0.8, 1.5), 0.05, key="earth_radius_range")
+        radius_range = st.slider("Choose a planet radius range (Earth radii)", 0.5, 2.0, (0.8, 1.5), 0.05, key="earth_radius_range")
         earth_like = temperature_matches[temperature_matches["pl_rade"].between(*radius_range, inclusive="both")].copy()
         st.markdown(f"**Finally, keep planets with a radius between {radius_range[0]:.2f} and {radius_range[1]:.2f} Earth radii.**")
         st.markdown(f"**{len(earth_like):,} planets remain.**")
