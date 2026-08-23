@@ -143,7 +143,9 @@ def render_one_variable(data, guidance_mode, field_options):
         field = options[label]
         plotted = display_data(data) if field == "sy_dist" else data
         bin_count = st.slider("Number of histogram bins", min_value=5, max_value=60, value=25, help="More bins show finer detail; fewer bins give a simpler overall picture.")
-        use_log_axis = st.checkbox("Use a logarithmic horizontal axis", help="Useful when values range from very small to very large. The values do not change—only the spacing on the axis changes.")
+        axis_left, axis_right = st.columns(2)
+        use_log_axis = axis_left.checkbox("Use a logarithmic horizontal axis", help="Useful when values range from very small to very large. The values do not change—only the spacing on the axis changes.")
+        use_log_count_axis = axis_right.checkbox("Use a logarithmic vertical axis", help="Useful when some bar counts are much larger than others. The values do not change—only the spacing on the axis changes.")
         valid = plotted.dropna(subset=[field])
         if use_log_axis:
             valid = valid[valid[field] > 0]
@@ -151,7 +153,10 @@ def render_one_variable(data, guidance_mode, field_options):
         figure.update_layout(xaxis_title=label, yaxis_title="Number of planet records")
         if use_log_axis:
             figure.update_xaxes(type="log")
-            st.caption("The log axis spreads out small and large positive values. Records with zero or negative values cannot be shown on a log axis.")
+        if use_log_count_axis:
+            figure.update_yaxes(type="log")
+        if use_log_axis or use_log_count_axis:
+            st.caption("A log axis spreads out small and large positive values. Records with zero or negative values cannot be shown on a log axis.")
     else:
         field = st.selectbox("Choose a category", ["Discovery method", "Stars in system", "Planets in system"], key="lab_one_category")
         column = {"Discovery method": "discoverymethod", "Stars in system": "sy_snum", "Planets in system": "sy_pnum"}[field]
