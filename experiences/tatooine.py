@@ -136,10 +136,15 @@ def render_custom_filters(data, guidance_mode, guidance_box, custom_candidates, 
     candidates, steps = custom_candidates(data, int(stars) if use_stars else None, planet_rule, int(planets) if use_planets and planet_rule != "Any number" else None, radius if use_radius else None, temperature_k, None, orbital_distance if use_orbital_distance else None)
     st.subheader("Apply your filters one at a time")
     st.write(f"We start with **{len(data):,} detected planet records**.")
-    for criterion, count in zip(steps["Criterion"], steps["Remaining"]):
-        st.markdown(f"**Keep only planets where {criterion.lower()}.**")
-        st.markdown(f"**{int(count):,} planets remain.**")
-    st.caption("The number gets smaller because each new rule narrows the search.")
+    for _, row in steps.iterrows():
+        before = int(row["Before"])
+        missing = int(row["Missing or unknown"])
+        recorded = before - missing
+        st.markdown(f"**This step starts with {before:,} planets.**")
+        st.markdown(f"First, check the data: **{recorded:,} have this value recorded** ({missing:,} are unknown).")
+        st.markdown(f"Then apply the rule: **{row['Criterion']}.**")
+        st.markdown(f"**{int(row['Remaining']):,} planets remain.**")
+    st.caption("A missing value means the measurement was not recorded. It does not mean that the planet failed the rule.")
     st.metric("Remaining candidates", f"{len(candidates):,}")
     if candidates.empty:
         st.warning("No records meet every active criterion. Broaden one criterion to see where candidates reappear.")

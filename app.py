@@ -321,8 +321,10 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
         temperature_matches = known_temperature[known_temperature["pl_eqt"].between(*temperature_k, inclusive="both")]
         st.markdown(f"**Next, keep planets between {temp_c[0]}°C and {temp_c[1]}°C.**")
         st.markdown(f"**{len(temperature_matches):,} planets remain.**")
+        radius_recorded = temperature_matches[temperature_matches["pl_rade"].notna()]
+        st.markdown(f"**Before the size filter, check the data again: {len(radius_recorded):,} of these planets have a radius recorded.**")
         radius_range = st.slider("Choose a planet radius range (Earth radii)", 0.5, 2.0, (0.8, 1.5), 0.05, key="earth_radius_range")
-        earth_like = temperature_matches[temperature_matches["pl_rade"].between(*radius_range, inclusive="both")].copy()
+        earth_like = radius_recorded[radius_recorded["pl_rade"].between(*radius_range, inclusive="both")].copy()
         st.markdown(f"**Finally, keep planets with a radius between {radius_range[0]:.2f} and {radius_range[1]:.2f} Earth radii.**")
         st.markdown(f"**{len(earth_like):,} planets remain.**")
         if st.session_state.get("tatooine_teacher_view", False):
