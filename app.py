@@ -476,8 +476,8 @@ def render_relationship_lab(data: pd.DataFrame, guidance_mode: str) -> None:
 
     preset = None
     if entry == "Start with a question":
-        preset_name = st.selectbox("Choose an investigation", list(tatooine.INVESTIGATIONS))
-        preset = tatooine.INVESTIGATIONS[preset_name]
+        preset_name = st.selectbox("Choose an investigation", list(data_laboratory.INVESTIGATIONS))
+        preset = data_laboratory.INVESTIGATIONS[preset_name]
         st.markdown(f"**Investigation question:** {preset['question']}")
         if guidance_mode != "Minimal":
             st.warning(f"**Caution:** {preset['caution']}")
