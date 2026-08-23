@@ -1,75 +1,52 @@
 # Exoplanet Discovery content map
 
-This is a quick map for editing the teaching text without having to understand the whole Streamlit app first. The app logic and shared NASA data functions remain in `app.py`; the comments below mark the boundaries of the editable experiences and steps.
+This guide is for editing teaching text without needing to understand the whole Streamlit application first.
 
-## Where to start
+## Start with an experience
 
-- **Shared data loading and preparation:** `app.py`, near the top (`load_live`, `load_sample`, `prepare`, `load_data`).
-- **Shared chart builders:** `app.py`, after the data functions (`current_demographics_chart`, `demographics_methods_chart`, `solar_system_demographics_chart`, and related functions).
-- **Shared teaching scaffolds:** `app.py`, under `EXPERIENCE 3 — EXOPLANET DEMOGRAPHICS: SHARED CONTENT HELPERS` (`graph_guide`, `graph_questions`, `response_box`, `key_idea`, `teacher_note`, reveals and navigation).
+Each experience has its own module in `experiences/`. Student-facing wording, lesson order and pathway-specific Teacher view content belong with that experience.
 
-## Experiences
+| Experience | Edit here | Notes |
+| --- | --- | --- |
+| **Is Our Solar System Normal?** (CURIOUS) | `experiences/curious.py` | Facilitator-led sequence, discussion prompts and Teacher view. |
+| **Strange New Worlds** (Year 8) | `experiences/strange_new_worlds.py` | Year 8 student steps, Teacher-view notes and background information. |
+| **The Planets We Haven't Found** (Year 10) | `experiences/planets_we_have_not_found.py` | Year 10 student steps, Teacher-view notes and background information. |
+| **Exoplanet Data Laboratory** | `experiences/data_laboratory.py` | Data visualisation and representation investigation. |
+| **Find Your Perfect Planet** | `experiences/tatooine.py` | Filtering investigation; Tatooine is a compact worked example. |
+| **Introduction** | `experiences/landing.py` | Landing-page text, experience cards and acknowledgements. |
 
-### Find Tatooine
+## Classroom pathways
 
-The renderer is `render_guided_mission`. Its mission steps are controlled by `MISSION_NOTES` and the step branches inside that function.
+The Year 8 and Year 10 pathways are separate lesson modules. They share only technical infrastructure:
 
-### Exoplanet Data Laboratory
+- `experiences/classroom_navigation.py` — selected-step state and scroll-to-top behaviour.
+- `experiences/classroom_shell.py` — top step tabs, Teacher-view placement and Back/Continue controls.
+- `experiences/classroom_dependencies.py` — supplies shared charts, images and UI helpers to each pathway. It contains no lesson wording.
 
-The renderer is `render_data_lab`. Its top-level tabs call these focused sections:
+Do not edit these files to change a lesson’s student-facing text or Teacher guidance. Edit the relevant Year 8 or Year 10 module instead.
 
-- `render_dataset_lab` — dataset and variables
-- `render_discovery_lab` — discoveries
-- `render_relationship_lab` — relationship explorer
-- `render_filter_lab` — custom Tatooine filters
-- `render_map_lab` — sky map
+## Shared building blocks
 
-### Exoplanet Demographics — classroom pathways
+- `data.py` — NASA Exoplanet Archive loading, bundled sample loading and data preparation.
+- `charts.py` — reusable Plotly chart builders, including the Solar System/exoplanet comparison graphs.
+- `ui_helpers.py` — reusable visual scaffolds such as graph-reading guidance, response boxes, key ideas, reveals, Teacher notes and navigation controls.
+- `app.py` — Streamlit setup, sidebar, dataset choice, shared asset configuration and top-level experience routing. It should not normally be the place to edit lesson text.
 
-The renderer is `render_demographics_classroom`. Comments in the function identify every step branch.
+## Editing wording safely
 
-**Stage 4 — Strange New Worlds**
+Most editable student-facing wording appears in calls such as:
 
-1. Meet our Solar System
-2. Planets around other stars
-3. Discoveries over time
-4. Compare planet masses
-5. Strange new worlds — start of Lesson 2; retrieve mass and introduce the need for orbital distance
-6. Add orbital distance
-7. Compare planetary systems
-8. Conclusion
+- `st.header`, `st.write`, `st.markdown`, `st.info`, `st.caption`
+- `graph_guide`, `graph_questions`, `response_box`, `key_idea`
+- `st.text_area`
 
-**Stage 5 — The Planets We Haven't Found**
+Teacher-view wording is stored in `TEACHER_NOTE_OVERRIDES` and `TEACHER_BACKGROUNDS` inside the relevant classroom pathway module.
 
-1. Our Solar System
-2. Meet exoplanets
-3. Mass and distance
-4. Are our planets typical?
-5. Direct imaging
-6. Transit detection
-7. Compare discovery methods
-8. Conclusion
-
-Teacher-view wording for these pathways is collected in `classroom_teacher_note`, immediately above the classroom renderer. The `notes[5]` override for Year 8 is the Teacher view for the Strange New Worlds Lesson 2 opening.
-
-### Exoplanet Demographics — CURIOUS
-
-The renderer is `render_demographics_curious`. The comments marked `CURIOUS STEP` identify the shorter facilitator-led sequence:
-
-1. Meet our Solar System
-2. Planets around other stars
-3. Discoveries over time
-4. Compare planet masses and orbital distance
-5. Detection methods
-6. Conclusion
-
-## Editing safely
-
-Most student-facing wording is inside `st.header`, `st.write`, `st.markdown`, `st.info`, `st.caption`, `graph_guide`, `graph_questions`, `response_box`, `key_idea` and `st.text_area` calls. Keep the surrounding Python indentation and commas intact. After wording-only edits, run:
+Keep surrounding indentation, brackets and commas intact. After a wording-only change, run:
 
 ```bash
-../work/venv/bin/python -m py_compile app.py
+../work/venv/bin/python -m py_compile app.py charts.py data.py ui_helpers.py experiences/*.py
 git diff --check
 ```
 
-If a change is only text, you should not need to alter the data-loading or chart-building functions.
+Then open the edited experience in Streamlit and check the relevant page, Teacher view and any linked chart or reveal.
