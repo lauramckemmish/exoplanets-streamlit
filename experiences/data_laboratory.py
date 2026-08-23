@@ -21,9 +21,14 @@ TEACHER_GUIDANCE = {
     "title": "Exoplanet Data Laboratory",
     "purpose": "Support open-ended exploration while making analytical choices visible and discussable.",
     "approach": "Invite students to state a question before changing variables. Ask what each axis, colour and scale contributes, and whether missing data or detection methods could affect the pattern.",
-    "alignment": "Working Scientifically: analyse data, identify patterns and evaluate evidence.",
+    "alignment": "NSW Science 7–10 Working Scientifically: process and analyse secondary data; construct and use representations; identify trends, patterns and relationships; draw evidence-based conclusions; evaluate data quality and limitations.",
     "timing": "Flexible investigation",
     "listen_for": "Students explaining why a graph answers a particular question rather than treating graph settings as decoration.",
+}
+
+SYLLABUS_LANGUAGE = {
+    "stage4": "Stage 4 emphasis: summarise data from secondary sources; use tables and graphs; identify trends, patterns and relationships; use evidence to support or discount a question; and reflect on data quality.",
+    "stage5": "Stage 5 extension: explain relationships between variables, evaluate reliability and limitations, and assess how the source and collection of data affect a claim.",
 }
 
 DATASET_FIELDS = [
@@ -54,6 +59,10 @@ def render_intro(data, guidance_mode, guidance_box):
     st.info("A graph is an answer to a question. Before changing a setting, say what you want to find out.")
     st.subheader("A useful investigation cycle")
     st.markdown("1. Ask a question  \n2. Choose variables  \n3. Make a graph  \n4. Describe the pattern  \n5. Consider what might affect the pattern")
+    if guidance_mode == "Teacher":
+        with st.expander("NSW syllabus connections", expanded=False):
+            st.write(SYLLABUS_LANGUAGE["stage4"])
+            st.write(SYLLABUS_LANGUAGE["stage5"])
 
 
 def render_summary(data, guidance_mode):
