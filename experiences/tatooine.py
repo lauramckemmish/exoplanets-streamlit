@@ -155,15 +155,16 @@ def render_custom_filters(data, guidance_mode, guidance_box, custom_candidates, 
     if use_temperature:
         apply_choice("pl_eqt", "estimated temperature", f"keep planets between {temperature_c[0]}°C and {temperature_c[1]}°C.", lambda frame: frame["pl_eqt"].between(*temperature_k, inclusive="both"))
 
-    st.subheader("Variable 4: Planetary system")
-    c1, c2, c3 = st.columns(3)
-    use_stars = c1.checkbox("Use known stars", value=True, key=f"{key_prefix}_use_stars")
-    stars = c1.number_input("Known stars", 1, 10, defaults[0], key=f"{key_prefix}_stars", disabled=not use_stars)
-    planet_rule = c2.selectbox("Known planets", ["Any number", "Exactly", "At least"], key=f"{key_prefix}_planet_rule")
-    use_planets = c3.checkbox("Use known planets", value=True, key=f"{key_prefix}_use_planets")
-    planets = c3.number_input("Known planets", 1, 20, defaults[1], key=f"{key_prefix}_planets", disabled=not use_planets)
+    st.subheader("Variable 4: Number of stars in the system")
+    use_stars = st.checkbox("Consider the number of stars", value=True, key=f"{key_prefix}_use_stars")
+    stars = st.number_input("Number of known stars", 1, 10, defaults[0], key=f"{key_prefix}_stars", disabled=not use_stars)
     if use_stars:
         apply_choice("sy_snum", "number of known stars", f"keep systems with exactly {int(stars)} known stars.", lambda frame: frame["sy_snum"] == int(stars))
+
+    st.subheader("Variable 5: Number of planets in the system")
+    use_planets = st.checkbox("Consider the number of planets", value=True, key=f"{key_prefix}_use_planets")
+    planet_rule = st.selectbox("Planet-count rule", ["Any number", "Exactly", "At least"], key=f"{key_prefix}_planet_rule", disabled=not use_planets)
+    planets = st.number_input("Number of known planets", 1, 20, defaults[1], key=f"{key_prefix}_planets", disabled=not use_planets or planet_rule == "Any number")
     if use_planets and planet_rule != "Any number":
         relation = "exactly" if planet_rule == "Exactly" else "at least"
         mask = (lambda frame: frame["sy_pnum"] == int(planets)) if planet_rule == "Exactly" else (lambda frame: frame["sy_pnum"] >= int(planets))
