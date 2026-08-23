@@ -127,6 +127,7 @@ def render_custom_filters(data, guidance_mode, guidance_box, custom_candidates, 
         nonlocal current
         before = len(current)
         missing = int(current[field].isna().sum())
+        recorded = before - missing
         available = current[current[field].notna()].copy()
         st.info(f"Choice: consider **{label}**.")
         st.warning(f"Data recorded: {recorded:,} of the {before:,} planets have this value ({missing:,} not recorded).")
