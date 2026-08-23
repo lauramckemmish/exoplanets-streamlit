@@ -5,6 +5,7 @@ STEP_LABELS = [
     "4 · Are our planets typical?", "5 · Direct imaging", "6 · Transit detection",
     "7 · Compare methods", "Conclusion",
 ]
+YEAR_LEVEL = "Year 10"
 
 
 def render(data, implementation):
