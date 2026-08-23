@@ -234,6 +234,21 @@ st.set_page_config(
 # EXPERIENCE 1 — FIND TATOOINE
 # ============================================================================
 
+def render_candidate_comparison(candidates: pd.DataFrame, key_prefix: str, prompt: str) -> None:
+    """Shared interactive candidate comparison for the worked examples."""
+    st.subheader("Compare the candidates")
+    if candidates.empty:
+        st.warning("No candidates meet all the example rules in this dataset.")
+        return
+    ordered = candidates.sort_values("pl_name")
+    ordered = ordered.copy()
+    ordered["Estimated temperature (°C)"] = ordered["pl_eqt"] - 273.15
+    candidate_columns = ["pl_name", "hostname", "pl_rade", "pl_bmasse", "Estimated temperature (°C)", "sy_snum", "sy_pnum"]
+    selected = st.selectbox("Choose a candidate to inspect", ordered["pl_name"].tolist(), key=f"{key_prefix}_candidate")
+    st.dataframe(ordered[candidate_columns], use_container_width=True, hide_index=True)
+    st.text_area(prompt, key=f"{key_prefix}_response", height=110)
+
+
 def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None) -> None:
     step = tatooine.prepare_page(teacher_note, step_tabs, scroll_to_top_if_requested)
     step_labels = tatooine.STEP_LABELS
@@ -290,23 +305,17 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
             st.markdown(f"**Keep only planets where {criterion.lower()}.**")
             st.markdown(f"**{int(count):,} planets remain.**")
         st.caption("The number gets smaller because each new rule narrows the search.")
-        st.subheader("Explore the remaining candidates")
-        if candidates.empty:
-            st.warning("No candidates meet all three rules in this dataset.")
-        else:
-            candidate_columns = ["pl_name", "hostname", "pl_rade", "pl_bmasse", "pl_eqt", "sy_snum", "sy_pnum"]
-            selected = st.selectbox("Choose a candidate to inspect", candidates.sort_values("pl_name")["pl_name"].tolist(), key="tatooine_worked_candidate")
-            st.dataframe(candidates[candidate_columns].sort_values("pl_name"), use_container_width=True, hide_index=True)
-            st.text_area("What do you notice about this candidate? What evidence is still missing?", key="tatooine_worked_response", height=110)
-            st.caption("This search uses only planets that have been detected and measured. Many more planets are likely to exist in the Milky Way than we have discovered.")
+        st.caption("This search uses only planets that have been detected and measured. Many more planets are likely to exist in the Milky Way than we have discovered.")
+        render_candidate_comparison(candidates, "tatooine_worked", "What do you notice about this candidate? What evidence is still missing?")
 
     elif content_step == 2:
         st.header("Worked example: an Earth-like candidate")
         st.write("Now use a different question: where might we look for a world with a similar size, orbital distance and estimated temperature?")
+        st.info("An astronomical unit (AU) is the average distance from Earth to the Sun. Earth is about 1 AU from the Sun.")
         st.dataframe(pd.DataFrame([
             {"Clue": "Similar size to Earth", "Variable": "Planet radius", "Example rule": "0.8–1.5 Earth radii"},
             {"Clue": "An orbit not too close or far from its star", "Variable": "Orbital distance", "Example rule": "0.5–2 AU"},
-            {"Clue": "A temperature worth investigating", "Variable": "Equilibrium temperature", "Example rule": "200–400 K"},
+            {"Clue": "A temperature worth investigating", "Variable": "Equilibrium temperature", "Example rule": "−73–127°C"},
         ]), use_container_width=True, hide_index=True)
         st.warning("This is a screening search, not a test for habitability. The host star's brightness also affects temperature.")
         earth_current = data.copy()
@@ -315,17 +324,20 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
         earth_rows.append(row)
         earth_current, row = apply_filter(earth_current, "pl_orbsmax", earth_current["pl_orbsmax"].between(0.5, 2.0, inclusive="both"), "Orbital distance 0.5–2 AU")
         earth_rows.append(row)
-        earth_current, row = apply_filter(earth_current, "pl_eqt", earth_current["pl_eqt"].between(200, 400, inclusive="both"), "Equilibrium temperature 200–400 K")
+        earth_current, row = apply_filter(earth_current, "pl_eqt", earth_current["pl_eqt"].between(200, 400, inclusive="both"), "Estimated temperature −73–127°C")
         earth_rows.append(row)
         earth_like, earth_steps = earth_current, pd.DataFrame(earth_rows)
         st.subheader("Apply the filters in order")
         for criterion, count in zip(earth_steps["Criterion"], earth_steps["Remaining"]):
             st.markdown(f"**Keep only planets where {criterion.lower()}.**")
             st.markdown(f"**{int(count):,} planets remain.**")
-        st.dataframe(earth_like[["pl_name", "hostname", "pl_rade", "pl_orbsmax", "pl_eqt", "sy_snum", "sy_pnum"]].head(30), use_container_width=True, hide_index=True)
+        earth_display = earth_like[["pl_name", "hostname", "pl_rade", "pl_orbsmax", "pl_eqt", "sy_snum", "sy_pnum"]].copy()
+        earth_display["Estimated temperature (°C)"] = earth_display["pl_eqt"] - 273.15
+        st.dataframe(earth_display.drop(columns="pl_eqt").head(30), use_container_width=True, hide_index=True)
         if st.session_state.get("tatooine_teacher_view", False):
             st.info("Teacher note: orbital distance is not enough to define a habitable zone. A star's brightness changes how much energy reaches a planet; we are keeping that extra calculation out of this activity.")
         st.info("These results use evidence that has actually been recorded. The Milky Way is likely home to millions or billions of planets that we have not discovered.")
+        render_candidate_comparison(earth_like, "earth_like_worked", "Which candidate would you investigate further? What evidence would you want before discussing liquid water?")
 
     elif step == 98:
         st.header("Apply filter 1: number of stars")
@@ -350,7 +362,7 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
         guidance_mode = "Teacher" if st.session_state.get("tatooine_teacher_view", False) else "Student"
         tatooine.render_custom_filters(data, guidance_mode, guidance_box, custom_candidates)
 
-    elif step == 4:
+    elif step == 98:
         st.header("Compare candidate systems")
         candidate_columns = ["pl_name", "hostname", "disc_year", "pl_rade", "pl_bmasse", "pl_eqt", "sy_dist", "sy_snum", "sy_pnum"]
         if candidates.empty:
@@ -378,8 +390,11 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
                 "The evidence remains uncertain because ______. Our conclusion depends on the assumption that ______."
             )
 
-    elif step == 5:
-        st.header("Map and report your candidate")
+    elif step == 4:
+        st.header("Conclusion")
+        st.write("A filter search can find the closest matches to a story, but it cannot prove that a planet is truly like the world we imagined.")
+        st.text_area("What did your search show? What evidence was missing?", key="mission_conclusion_response", height=140)
+        st.info("The dataset contains detected planets only. Many more planets are likely to exist in the Milky Way than we have discovered.")
         names = candidates.sort_values("pl_name")["pl_name"].tolist() if not candidates.empty else []
         selected = st.session_state.get("selected_candidate")
         if names:

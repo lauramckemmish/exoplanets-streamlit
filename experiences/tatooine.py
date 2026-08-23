@@ -8,8 +8,7 @@ import streamlit as st
 import pandas as pd
 
 STEP_LABELS = [
-    "Start here", "Earth-like example", "Tatooine example", "Your planet",
-    "Compare candidates", "Report",
+    "Start here", "Earth-like example", "Tatooine example", "Your planet", "Conclusion",
 ]
 STEP_COUNT = len(STEP_LABELS)
 TITLE = "Find Your Perfect Planet"
@@ -126,9 +125,10 @@ def render_custom_filters(data, guidance_mode, guidance_box, custom_candidates):
     planet_rule = c2.selectbox("Planet-count rule", ["Exactly", "At least"], key="perfect_planet_rule")
     planets = c3.number_input("Known planets", 1, 20, 3, key="perfect_planets")
     radius = st.slider("Planet radius (Earth radii)", 0.1, 5.0, (0.8, 1.5), 0.05, key="perfect_radius")
-    use_temperature = st.checkbox("Use equilibrium temperature", key="perfect_use_temperature")
-    temperature = st.slider("Temperature (K)", 100, 1500, (250, 350), 10, disabled=not use_temperature, key="perfect_temperature")
-    candidates, steps = custom_candidates(data, int(stars), planet_rule, int(planets), radius, temperature if use_temperature else None, None)
+    use_temperature = st.checkbox("Use estimated temperature", key="perfect_use_temperature")
+    temperature_c = st.slider("Estimated temperature (°C)", -173, 1200, (-23, 77), 5, disabled=not use_temperature, key="perfect_temperature")
+    temperature_k = (temperature_c[0] + 273.15, temperature_c[1] + 273.15) if use_temperature else None
+    candidates, steps = custom_candidates(data, int(stars), planet_rule, int(planets), radius, temperature_k, None)
     st.subheader("Effect of each criterion")
     st.dataframe(steps, use_container_width=True, hide_index=True)
     st.metric("Remaining candidates", f"{len(candidates):,}")
