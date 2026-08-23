@@ -321,12 +321,7 @@ if experience == "Introduction":
 with st.sidebar:
     st.success(source_label)
     st.metric("Confirmed exoplanets", f"{len(data):,}")
-    if experience == "Guided Tatooine Mission":
-        if st.button("Reset guided mission", use_container_width=True):
-            st.session_state["mission_step"] = 0
-            st.session_state.pop("mission_tab", None)
-            st.rerun()
-    elif experience == "Exoplanet Data Laboratory":
+    if experience == "Exoplanet Data Laboratory":
         guidance_mode = "Teacher" if st.session_state.get("lab_teacher_view", False) else "Student"
 
 if experience == "Guided Tatooine Mission":
