@@ -240,32 +240,29 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
     candidates, steps, stages = mission_candidates(data)
 
     if step == 0:
-        st.header("Mission briefing")
+        st.header("What kind of planet would you like to find?")
         st.markdown(
-            "The Rebel Alliance has obtained an archive of known exoplanets. Your mission is to use the data "
-            "to identify the strongest candidate for **Tatooine**, a planet described as orbiting in a system "
-            "with two suns."
+            "A **filter** is a rule used to narrow a dataset. We can turn an idea about a planet into rules, "
+            "apply them one at a time and see which known planets remain."
         )
         a, b = st.columns(2)
         with a:
-            st.subheader("What the story gives us")
+            st.subheader("Worked example: a Tatooine-like world")
             st.markdown(
-                "- Two visible suns\n"
-                "- A planet within a wider planetary system\n"
-                "- People appear able to stand and move normally\n"
-                "- A warm, dry environment\n"
-                "- A destination that must be located"
+                "- Two known stars\n"
+                "- Part of a wider planetary system\n"
+                "- Perhaps approximately Earth-sized\n\n"
+                "These are starting rules, not proof that a planet is like a fictional world."
             )
         with b:
-            st.subheader("What the data can help us test")
+            st.subheader("Worked example: an Earth-like candidate")
             st.markdown(
-                "- Number of known stars\n"
-                "- Number of known planets\n"
-                "- Planet radius and mass\n"
-                "- Estimated equilibrium temperature\n"
-                "- Celestial coordinates and distance"
+                "- Roughly Earth-sized\n"
+                "- A temperature in a chosen range\n"
+                "- An orbital distance worth investigating\n\n"
+                "Earth-sized and potentially suitable are not the same as habitable."
             )
-        st.warning("The story evidence is not a precise scientific specification. Every filter will involve an assumption.")
+        st.info("Choose a template as a starting point, or invent your own planet profile. Every filter involves an assumption, and a close match is not a confirmed identity.")
 
     elif step == 1:
         st.header("Inspect the Imperial exoplanet archive")
@@ -377,9 +374,6 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
                 f"Mission conclusion: {selected} is a candidate under the selected rules, not a confirmed identification. "
                 "The final report should state the evidence, assumptions and missing information."
             )
-        if st.button("Restart mission", type="secondary"):
-            st.session_state["mission_step"] = 0
-            st.rerun()
 
     step_buttons(
         step_labels,

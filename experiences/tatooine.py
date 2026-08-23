@@ -7,12 +7,12 @@ the Streamlit application back into itself (which would create a cycle).
 import streamlit as st
 
 STEP_LABELS = [
-    "Briefing", "Archive", "Evidence", "Two suns", "Three planets",
-    "Earth-sized", "Compare", "Report",
+    "Start here", "Dataset", "Turn clues into filters", "Filter stars", "Filter planets",
+    "Filter size", "Compare candidates", "Report",
 ]
 STEP_COUNT = len(STEP_LABELS)
-TITLE = "Find Tatooine: Guided Mission"
-SUBTITLE = "A facilitator-led investigation using real exoplanet data"
+TITLE = "Find Your Perfect Planet"
+SUBTITLE = "Turn a planet idea into filters and investigate real exoplanet data"
 
 # Editable facilitator guidance for each stage of the mission.  Keeping this
 # alongside the experience makes wording changes possible without navigating
@@ -77,9 +77,9 @@ MISSION_NOTES = {
 }
 
 TEACHER_GUIDANCE = {
-    "title": "Find Tatooine: facilitator guidance",
-    "purpose": "Use a fictional mission to practise turning story clues into data variables, applying filters and judging evidence.",
-    "approach": "Keep the story playful, but pause at each filter to ask what the rule assumes and what missing values mean. The final candidate is not a confirmed identification.",
+    "title": "Find Your Perfect Planet: facilitator guidance",
+    "purpose": "Practise turning a planet idea into data variables, applying filters and judging evidence.",
+    "approach": "Use the worked examples to introduce filtering, then let students create or adjust their own criteria. Pause at each filter to ask what the rule assumes and what missing values mean.",
     "alignment": "Working Scientifically: plan questions, process data and communicate a conclusion.",
     "timing": "20–30 minutes",
     "listen_for": "Students distinguishing a rule chosen for the investigation from direct evidence about a planet.",
