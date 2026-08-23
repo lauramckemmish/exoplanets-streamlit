@@ -22,6 +22,20 @@ TEACHER_GUIDANCE = {
     "listen_for": "Students explaining why a graph answers a particular question rather than treating graph settings as decoration.",
 }
 
+DATASET_FIELDS = [
+    ("Planet name", "pl_name"),
+    ("Host star", "hostname"),
+    ("Discovery year", "disc_year"),
+    ("Discovery method", "discoverymethod"),
+    ("Planet radius (Earth radii)", "pl_rade"),
+    ("Planet mass (Earth masses)", "pl_bmasse"),
+    ("Orbital period (days)", "pl_orbper"),
+    ("Equilibrium temperature (K)", "pl_eqt"),
+    ("Distance from Earth (light-years)", "sy_dist"),
+    ("Known stars in system", "sy_snum"),
+    ("Known planets in system", "sy_pnum"),
+]
+
 DISCOVERY_GUIDANCE = {
     "summary": "Use this graph to compare categories over time. Look for changes in dominant discovery methods, sudden increases and periods with sparse data.",
     "teacher": "Ask whether the graph describes the true planet population or the history of available detection methods and surveys.",
@@ -49,15 +63,25 @@ def render_discoveries(data, guidance_mode, discovery_chart, guidance_box):
 
 def render_dataset(data, guidance_mode, field_options, variables, guidance_box, variable_card, scale_guidance):
     """Render the dataset tab using shared application services."""
-    st.header("Meet the dataset")
+    st.header("Meet the variables and dataset")
     guidance_box(
         guidance_mode,
-        "Start by checking what each row and column represent, then inspect missing values before drawing conclusions.",
-        "Learning intention: students recognise that data structure and completeness determine which questions can be answered reliably.",
+        "Start with the variables you might use to describe a planet. Then inspect how those variables are recorded in the dataset.",
+        "Learning intention: students distinguish a question-friendly variable name from the archive field used to store it, and recognise that missing values limit which questions can be answered.",
     )
-    display = ["pl_name", "hostname", "disc_year", "discoverymethod", "pl_rade", "pl_bmasse", "pl_orbper", "pl_eqt", "sy_dist", "sy_snum", "sy_pnum"]
-    st.dataframe(data[display], use_container_width=True, hide_index=True)
-    st.subheader("Missing-data summary")
+    st.subheader("1. Variables we can use")
+    st.write("The student-friendly name describes the idea. The NASA archive field is the short name used in the original data table.")
+    variable_rows = [{"Variable": label, "NASA archive field": field, "What it tells us": variables.get(field, {}).get("description", "")} for label, field in DATASET_FIELDS]
+    st.dataframe(pd.DataFrame(variable_rows), use_container_width=True, hide_index=True)
+    selected_label = st.selectbox("Choose a variable to explore", list(field_options), key="dictionary_variable")
+    variable_card(data, field_options[selected_label], guidance_mode, variables, scale_guidance)
+    st.subheader("2. The dataset")
+    st.write("Each row is one known exoplanet record. This is a sample of what astronomers have measured so far—not a list of every planet that exists.")
+    display = [field for _, field in DATASET_FIELDS]
+    friendly_columns = {field: label for label, field in DATASET_FIELDS}
+    st.dataframe(data[display].rename(columns=friendly_columns), use_container_width=True, hide_index=True)
+    st.subheader("3. What is missing?")
+    st.write("A blank value means that property has not been recorded for that planet. It does not mean zero or that the property does not exist.")
     missing = pd.DataFrame({
         "Variable": display,
         "Missing records": [int(data[col].isna().sum()) for col in display],
@@ -66,9 +90,6 @@ def render_dataset(data, guidance_mode, field_options, variables, guidance_box, 
     st.dataframe(missing, use_container_width=True, hide_index=True)
     if guidance_mode != "Minimal":
         st.info("Missing means unknown. It does not mean zero, unsuitable, or evidence that a planet meets a criterion.")
-    st.subheader("Variable guide")
-    selected_label = st.selectbox("Choose a variable to understand", list(field_options), key="dictionary_variable")
-    variable_card(data, field_options[selected_label], guidance_mode, variables, scale_guidance)
 
 
 def render_map(data, guidance_mode, sky_map):
