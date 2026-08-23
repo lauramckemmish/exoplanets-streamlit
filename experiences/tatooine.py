@@ -259,30 +259,23 @@ def render_tatooine_worked_example(data):
         return
 
     st.subheader("Explore a few matching systems")
-    display_columns = ["pl_name", "hostname", "sy_snum", "sy_pnum", "pl_rade"]
-    display = candidates[display_columns].rename(columns={
+    display = candidates[["pl_name", "hostname", "sy_snum", "sy_pnum", "pl_rade", "pl_orbsmax", "pl_eqt", "sy_dist"]].copy()
+    display["pl_eqt"] = display["pl_eqt"] - 273.15
+    display["sy_dist"] = display["sy_dist"] * 3.26156
+    display = display.rename(columns={
         "pl_name": "Planet name",
         "hostname": "Host star",
         "sy_snum": "Known stars",
         "sy_pnum": "Known planets",
         "pl_rade": "Planet radius (Earth radii)",
+        "pl_orbsmax": "Orbital distance (AU)",
+        "pl_eqt": "Estimated temperature (°C)",
+        "sy_dist": "Distance from Earth (light-years)",
     })
+    display["Estimated temperature (°C)"] = display["Estimated temperature (°C)"].round(0)
+    display["Distance from Earth (light-years)"] = display["Distance from Earth (light-years)"].round(1)
     st.dataframe(display.head(12), use_container_width=True, hide_index=True)
-    selected = st.selectbox("Choose a planet to inspect", candidates["pl_name"].tolist(), key="tatooine_worked_candidate")
-    row = candidates[candidates["pl_name"] == selected].iloc[0]
-    details = pd.DataFrame([
-        {"Detail": "Host star", "Value": row["hostname"]},
-        {"Detail": "Known stars in the system", "Value": int(row["sy_snum"])},
-        {"Detail": "Known planets in the system", "Value": int(row["sy_pnum"])},
-        {"Detail": "Planet radius", "Value": "Not recorded" if pd.isna(row["pl_rade"]) else f"{row['pl_rade']:.2f} Earth radii"},
-    ])
-    st.dataframe(details, use_container_width=True, hide_index=True)
-    st.text_area(
-        "What else would you want to know before calling this world Tatooine-like?",
-        key="tatooine_worked_response",
-        height=100,
-    )
-    st.caption("This finds real planets matching one clue from a fictional story. It does not identify a real Tatooine.")
+    st.caption("This finds real planets matching clues from a fictional story. It does not identify a real Tatooine.")
 
 
 def render(data, presenter_mode, implementation):
