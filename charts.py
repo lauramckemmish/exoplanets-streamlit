@@ -148,7 +148,7 @@ def sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field
         selected = mapped[mapped["pl_name"] == selected_planet]
         if not selected.empty:
             figure.add_trace(go.Scatter3d(x=selected["x"], y=selected["y"], z=selected["z"], mode="markers+text", name=f"Selected: {selected_planet}", marker={"size": 9, "symbol": "diamond", "color": "black"}, text=selected["pl_name"], textposition="top center", hovertemplate="<b>%{text}</b><extra></extra>"))
-    figure.update_layout(height=650, margin={"l": 0, "r": 0, "t": 20, "b": 0}, legend={"orientation": "h", "y": 0.02}, scene={"xaxis": {"title": "x", "showticklabels": False}, "yaxis": {"title": "y", "showticklabels": False}, "zaxis": {"title": "z", "showticklabels": False}, "aspectmode": "cube"})
+    figure.update_layout(height=650, margin={"l": 0, "r": 0, "t": 20, "b": 0}, legend={"orientation": "h", "y": 0.02}, scene={"xaxis": {"title": "Sky direction", "showticklabels": False}, "yaxis": {"title": "Sky direction", "showticklabels": False}, "zaxis": {"title": "Sky direction", "showticklabels": False}, "aspectmode": "cube"})
     return figure
 
 

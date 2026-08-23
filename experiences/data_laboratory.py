@@ -318,29 +318,14 @@ def render_map(data, guidance_mode, sky_map):
         colour_field = "discoverymethod"
     elif colour_label == "Discovery year":
         colour_field = "disc_year"
-    names = st.session_state.get("lab_candidate_names", [])
-    selected = st.session_state.get("lab_selected_candidate")
-    if names:
-        selected = st.selectbox("Highlighted planet", names, index=names.index(selected) if selected in names else 0, key="lab_map_choice")
-    elif "K2-148 b" in data["pl_name"].tolist():
-        selected = "K2-148 b"
-        st.info("No custom candidate set is active, so the original notebook candidate is shown.")
-    elif not data.empty:
-        selected = data.iloc[0]["pl_name"]
-    if selected:
-        mapped = map_data.dropna(subset=["x", "y", "z"])
-        if guidance_mode != "Minimal":
-            st.info(f"The map uses celestial direction for {len(mapped):,} records. It shows where systems appear in the sky, not their physical separation.")
-        st.plotly_chart(sky_map(map_data, selected, colour_field, colour_label), use_container_width=True)
-        row = data[data["pl_name"] == selected].iloc[0]
-        a, b, c, d = st.columns(4)
-        a.metric("Right ascension", "Unknown" if pd.isna(row["ra"]) else f"{row['ra']:.2f}°")
-        b.metric("Declination", "Unknown" if pd.isna(row["dec"]) else f"{row['dec']:.2f}°")
-        c.metric("Distance", "Unknown" if pd.isna(row["sy_dist"]) else f"{row['sy_dist'] * 3.26156:.1f} ly")
-        d.metric("Discovery year", "Unknown" if pd.isna(row["disc_year"]) else str(row["disc_year"]))
-        if guidance_mode == "Teacher":
-            with st.expander("Teacher guidance", expanded=False):
-                st.write("Ask students what dimension is missing from this visualisation and how distance could be incorporated into a different three-dimensional model.")
+    mapped = map_data.dropna(subset=["x", "y", "z"])
+    if guidance_mode != "Minimal":
+        st.info(f"The map uses celestial direction for {len(mapped):,} records. It shows where systems appear in the sky, not their physical separation.")
+    st.plotly_chart(sky_map(map_data, None, colour_field, colour_label), use_container_width=True)
+    st.caption("The three directions are a way to display position on the sky. They are not distances or physical axes through space.")
+    if guidance_mode == "Teacher":
+        with st.expander("Teacher guidance", expanded=False):
+            st.write("The points are placed using direction on the celestial sphere. Distance is deliberately not used to position them, so a nearby star and a distant star can appear in the same sky region.")
 
 
 def render_filters(data, guidance_mode, guidance_box, custom_candidates):
