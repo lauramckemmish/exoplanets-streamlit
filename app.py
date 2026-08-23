@@ -518,7 +518,7 @@ def classroom_teacher_note(part: int, year_level: str) -> None:
     teacher_note(**notes[part])
 
 
-def render_demographics_classroom(data: pd.DataFrame) -> None:
+def render_demographics_classroom(data: pd.DataFrame, teacher_note_renderer=None) -> None:
     """Render the Year 8 and Year 10 lessons, one selected step at a time."""
     pathway = st.session_state.get("demographics_pathway")
     year_level = {
@@ -560,7 +560,10 @@ def render_demographics_classroom(data: pd.DataFrame) -> None:
             """,
             height=0,
         )
-    classroom_teacher_note(part, year_level)
+    if teacher_note_renderer is None:
+        classroom_teacher_note(part, year_level)
+    else:
+        teacher_note_renderer(part, classroom_teacher_note)
     # CLASSROOM STEP 0 — Welcome
     if part == 0:
         st.header(pathway)
