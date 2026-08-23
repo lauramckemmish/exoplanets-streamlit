@@ -235,38 +235,8 @@ st.set_page_config(
 # ============================================================================
 
 def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None) -> None:
-    total_steps = tatooine.STEP_COUNT
-    if "mission_step" not in st.session_state:
-        st.session_state["mission_step"] = 0
-    step = int(st.session_state["mission_step"])
-    step = max(0, min(step, total_steps - 1))
+    step = tatooine.prepare_page(teacher_note, step_tabs, scroll_to_top_if_requested)
     step_labels = tatooine.STEP_LABELS
-
-    heading, controls = st.columns([4, 2])
-    with heading:
-        st.title(tatooine.TITLE)
-        st.caption(tatooine.SUBTITLE)
-    with controls:
-        presenter_mode = st.toggle(
-            "Teacher view",
-            key="tatooine_teacher_view",
-            help="Show facilitation guidance at the top of the experience.",
-        )
-    if presenter_mode:
-        teacher_note(
-            "Find Tatooine: facilitator guidance",
-            "Use a fictional mission to practise turning story clues into data variables, applying filters and judging evidence.",
-            "Keep the story playful, but pause at each filter to ask what the rule assumes and what missing values mean. The final candidate is not a confirmed identification.",
-            alignment="Working Scientifically: plan questions, process data and communicate a conclusion.",
-            timing="20–30 minutes",
-            listen_for="Students distinguishing a rule chosen for the investigation from direct evidence about a planet.",
-            misconceptions="An unknown value is not a match or a failed match; it is incomplete evidence.",
-        )
-    _, selected_step = step_tabs(step_labels, "mission_tab", step)
-    if selected_step != step:
-        step = selected_step
-        st.session_state["mission_step"] = step
-    scroll_to_top_if_requested("mission_scroll_to_top")
     candidates, steps, stages = mission_candidates(data)
 
     if step == 0:
