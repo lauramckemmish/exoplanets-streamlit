@@ -1,6 +1,6 @@
 """Shared classroom pathway shell, separate from pathway lesson content."""
 
-from experiences import classroom_navigation
+from experiences import classroom_dependencies, classroom_navigation
 from ui_helpers import step_buttons
 
 
@@ -37,4 +37,38 @@ def render(
         "demographics_scroll_to_top",
         part,
         "demographics",
+    )
+
+
+def render_pathway(
+    data,
+    pathway,
+    stage4_pathway,
+    stage5_pathway,
+    stage4_labels,
+    stage5_labels,
+    stage4_part_count,
+    stage5_part_count,
+    teacher_note_renderer,
+    resources,
+):
+    """Render a classroom pathway using shared navigation and dependencies."""
+    return render(
+        data,
+        pathway,
+        stage4_pathway,
+        stage5_pathway,
+        stage4_labels,
+        stage5_labels,
+        stage4_part_count,
+        stage5_part_count,
+        teacher_note_renderer,
+        lambda frame, selected_pathway, part: classroom_dependencies.render_lesson(
+            frame,
+            selected_pathway,
+            part,
+            stage4_pathway,
+            stage5_pathway,
+            resources,
+        ),
     )

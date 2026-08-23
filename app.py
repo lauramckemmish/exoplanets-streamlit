@@ -57,7 +57,6 @@ from ui_helpers import (
 )
 from experiences import (
     curious,
-    classroom_dependencies,
     classroom_shell,
     data_laboratory,
     planets_we_have_not_found,
@@ -269,8 +268,8 @@ st.set_page_config(
 # ============================================================================
 
 def render_demographics_classroom(data: pd.DataFrame, teacher_note_renderer=None) -> None:
-    """Render a classroom pathway through the shared shell and lesson body."""
-    classroom_shell.render(
+    """Render a classroom pathway through the shared classroom infrastructure."""
+    classroom_shell.render_pathway(
         data,
         st.session_state.get("demographics_pathway"),
         STAGE4_PATHWAY,
@@ -280,22 +279,6 @@ def render_demographics_classroom(data: pd.DataFrame, teacher_note_renderer=None
         strange_new_worlds.PART_COUNT,
         planets_we_have_not_found.PART_COUNT,
         teacher_note_renderer,
-        render_demographics_classroom_body,
-    )
-
-
-def render_demographics_classroom_body(
-    data: pd.DataFrame,
-    pathway: str,
-    part: int,
-) -> None:
-    """Dispatch a classroom lesson step to its pathway-owned body."""
-    classroom_dependencies.render_lesson(
-        data,
-        pathway,
-        part,
-        STAGE4_PATHWAY,
-        STAGE5_PATHWAY,
         CLASSROOM_RESOURCES,
     )
 
