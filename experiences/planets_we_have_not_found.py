@@ -6,6 +6,7 @@ STEP_LABELS = [
     "7 · Compare methods", "Conclusion",
 ]
 YEAR_LEVEL = "Year 10"
+PART_COUNT = len(STEP_LABELS)
 
 
 def render(data, implementation):
