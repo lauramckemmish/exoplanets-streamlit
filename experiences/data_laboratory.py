@@ -6,7 +6,11 @@ import streamlit as st
 TITLE = "Exoplanet Data Laboratory"
 SUBTITLE = "Open exploration with contextual guidance for analytical choices"
 TAB_LABELS = [
-    "Dataset and variables",
+    "Start here",
+    "Summary",
+    "Variables",
+    "Dataset",
+    "Missing data",
     "Discoveries",
     "Relationship explorer",
     "Find your perfect planet",
@@ -35,6 +39,53 @@ DATASET_FIELDS = [
     ("Known stars in system", "sy_snum"),
     ("Known planets in system", "sy_pnum"),
 ]
+
+
+def render_intro(data, guidance_mode, guidance_box):
+    st.header("What is the Exoplanet Data Laboratory?")
+    guidance_box(guidance_mode, "Use real NASA data to ask questions, choose variables and build graphs about planets beyond our Solar System.", "Frame this as open investigation: students make analytical choices, inspect patterns and discuss what the data can and cannot show.")
+    st.write("In this laboratory, each row represents a known exoplanet record. We will explore what has been measured, compare variables and look for patterns.")
+    st.info("A graph is an answer to a question. Before changing a setting, say what you want to find out.")
+    st.subheader("A useful investigation cycle")
+    st.markdown("1. Ask a question  \n2. Choose variables  \n3. Make a graph  \n4. Describe the pattern  \n5. Consider what might affect the pattern")
+
+
+def render_summary(data, guidance_mode):
+    st.header("A quick summary of the data")
+    st.write("These numbers describe the records in this table. They do not describe every planet that exists.")
+    a, b, c = st.columns(3)
+    a.metric("Planet records", f"{len(data):,}")
+    b.metric("Host stars", f"{data['hostname'].nunique():,}")
+    c.metric("Discovery methods", f"{data['discoverymethod'].nunique():,}")
+    if guidance_mode != "Minimal":
+        st.caption("The number of records can change as astronomers confirm new planets and update the archive.")
+
+
+def render_variables(data, guidance_mode, field_options, variables, variable_card, scale_guidance):
+    st.header("Variables")
+    st.write("A variable is a feature we can record or compare. The archive field is the short name used in the NASA table.")
+    variable_rows = [{"Variable": label, "NASA archive field": field, "What it tells us": variables.get(field, {}).get("description", "")} for label, field in DATASET_FIELDS]
+    st.dataframe(pd.DataFrame(variable_rows), use_container_width=True, hide_index=True)
+    selected_label = st.selectbox("Choose a variable to explore", list(field_options), key="dictionary_variable")
+    variable_card(data, field_options[selected_label], guidance_mode, variables, scale_guidance)
+
+
+def render_dataset_table(data):
+    st.header("Dataset")
+    st.write("Each row is one known exoplanet record. This is a sample of what astronomers have measured so far—not a list of every planet that exists.")
+    display = [field for _, field in DATASET_FIELDS]
+    friendly_columns = {field: label for label, field in DATASET_FIELDS}
+    st.dataframe(data[display].rename(columns=friendly_columns), use_container_width=True, hide_index=True)
+
+
+def render_missing(data, guidance_mode):
+    st.header("Missing data")
+    st.write("A blank value means that property has not been recorded for that planet. It does not mean zero or that the property does not exist.")
+    display = [field for _, field in DATASET_FIELDS]
+    missing = pd.DataFrame({"Variable": [label for label, _ in DATASET_FIELDS], "Missing records": [int(data[col].isna().sum()) for col in display], "Complete records (%)": [round(100 * data[col].notna().mean(), 1) for col in display]}).sort_values("Complete records (%)")
+    st.dataframe(missing, use_container_width=True, hide_index=True)
+    if guidance_mode != "Minimal":
+        st.info("Missing values limit which questions can be answered reliably.")
 
 DISCOVERY_GUIDANCE = {
     "summary": "Use this graph to compare categories over time. Look for changes in dominant discovery methods, sudden increases and periods with sparse data.",

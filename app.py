@@ -626,26 +626,30 @@ def render_data_lab(data: pd.DataFrame, guidance_mode: str) -> None:
     scroll_to_top_if_requested("lab_scroll_to_top")
     if current_tab == 0:
         with tabs[0]:
-            data_laboratory.render_dataset(
-                data,
-                guidance_mode,
-                FIELD_OPTIONS,
-                VARIABLES,
-                guidance_box,
-                variable_card,
-                shared_scale_guidance,
-            )
+            data_laboratory.render_intro(data, guidance_mode, guidance_box)
     elif current_tab == 1:
         with tabs[1]:
-            data_laboratory.render_discoveries(data, guidance_mode, discovery_chart, guidance_box)
+            data_laboratory.render_summary(data, guidance_mode)
     elif current_tab == 2:
         with tabs[2]:
-            render_relationship_lab(data, guidance_mode)
+            data_laboratory.render_variables(data, guidance_mode, FIELD_OPTIONS, VARIABLES, variable_card, shared_scale_guidance)
     elif current_tab == 3:
         with tabs[3]:
+            data_laboratory.render_dataset_table(data)
+    elif current_tab == 4:
+        with tabs[4]:
+            data_laboratory.render_missing(data, guidance_mode)
+    elif current_tab == 5:
+        with tabs[5]:
+            data_laboratory.render_discoveries(data, guidance_mode, discovery_chart, guidance_box)
+    elif current_tab == 6:
+        with tabs[6]:
+            render_relationship_lab(data, guidance_mode)
+    elif current_tab == 7:
+        with tabs[7]:
             data_laboratory.render_filters(data, guidance_mode, guidance_box, custom_candidates)
     else:
-        with tabs[4]:
+        with tabs[8]:
             data_laboratory.render_map(data, guidance_mode, sky_map)
     step_buttons(
         tab_labels,
