@@ -13,6 +13,17 @@ def reset_navigation() -> None:
     st.session_state["curious_scroll_to_top"] = True
 
 
+def select_experience(name: str) -> None:
+    st.session_state["experience"] = name
+
+
+def select_demographics_pathway(pathway: str) -> None:
+    st.session_state["demographics_pathway"] = pathway
+    reset_navigation()
+    st.session_state["demographics_started"] = True
+    st.session_state["experience"] = "Exoplanet Demographics"
+
+
 def normalise_pathway(pathway, facilitated_pathway, stage4_pathway, stage5_pathway):
     """Return a current pathway name for current or legacy session values."""
     migrations = {

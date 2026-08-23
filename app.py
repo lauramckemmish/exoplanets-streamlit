@@ -2248,26 +2248,14 @@ def render_demographics(data: pd.DataFrame) -> None:
     )
 
 
-def select_experience(name: str) -> None:
-    st.session_state["experience"] = name
-
-
-def select_demographics_pathway(pathway: str) -> None:
-    """Open one named pathway with independent step navigation."""
-    st.session_state["demographics_pathway"] = pathway
-    router.reset_navigation()
-    st.session_state["demographics_started"] = True
-    st.session_state["experience"] = "Exoplanet Demographics"
-
-
 def open_experience(name: str) -> None:
     """Launch an experience from the Introduction overview card."""
     if name in {FACILITATED_PATHWAY, STAGE4_PATHWAY, STAGE5_PATHWAY}:
-        select_demographics_pathway(name)
+        router.select_demographics_pathway(name)
     elif name == "Find Tatooine":
-        select_experience("Guided Tatooine Mission")
+        router.select_experience("Guided Tatooine Mission")
     else:
-        select_experience(name)
+        router.select_experience(name)
 
 
 if "experience" not in st.session_state:
@@ -2281,7 +2269,7 @@ with st.sidebar:
         type="primary" if st.session_state["experience"] == "Introduction" else "secondary",
         use_container_width=True,
         disabled=st.session_state["experience"] == "Introduction",
-        on_click=select_experience,
+        on_click=router.select_experience,
         args=("Introduction",),
     )
     st.markdown("#### Learning experiences")
@@ -2290,7 +2278,7 @@ with st.sidebar:
         type="primary" if st.session_state.get("demographics_pathway") == FACILITATED_PATHWAY and st.session_state["experience"] == "Exoplanet Demographics" else "secondary",
         use_container_width=True,
         disabled=st.session_state.get("demographics_pathway") == FACILITATED_PATHWAY and st.session_state["experience"] == "Exoplanet Demographics",
-        on_click=select_demographics_pathway,
+        on_click=router.select_demographics_pathway,
         args=(FACILITATED_PATHWAY,),
     )
     st.button(
@@ -2298,7 +2286,7 @@ with st.sidebar:
         type="primary" if st.session_state.get("demographics_pathway") == STAGE4_PATHWAY and st.session_state["experience"] == "Exoplanet Demographics" else "secondary",
         use_container_width=True,
         disabled=st.session_state.get("demographics_pathway") == STAGE4_PATHWAY and st.session_state["experience"] == "Exoplanet Demographics",
-        on_click=select_demographics_pathway,
+        on_click=router.select_demographics_pathway,
         args=(STAGE4_PATHWAY,),
     )
     st.button(
@@ -2306,7 +2294,7 @@ with st.sidebar:
         type="primary" if st.session_state.get("demographics_pathway") == STAGE5_PATHWAY and st.session_state["experience"] == "Exoplanet Demographics" else "secondary",
         use_container_width=True,
         disabled=st.session_state.get("demographics_pathway") == STAGE5_PATHWAY and st.session_state["experience"] == "Exoplanet Demographics",
-        on_click=select_demographics_pathway,
+        on_click=router.select_demographics_pathway,
         args=(STAGE5_PATHWAY,),
     )
     st.button(
@@ -2314,7 +2302,7 @@ with st.sidebar:
         type="primary" if st.session_state["experience"] == "Exoplanet Data Laboratory" else "secondary",
         use_container_width=True,
         disabled=st.session_state["experience"] == "Exoplanet Data Laboratory",
-        on_click=select_experience,
+        on_click=router.select_experience,
         args=("Exoplanet Data Laboratory",),
     )
     st.button(
@@ -2322,7 +2310,7 @@ with st.sidebar:
         type="primary" if st.session_state["experience"] == "Guided Tatooine Mission" else "secondary",
         use_container_width=True,
         disabled=st.session_state["experience"] == "Guided Tatooine Mission",
-        on_click=select_experience,
+        on_click=router.select_experience,
         args=("Guided Tatooine Mission",),
     )
     experience = st.session_state["experience"]
