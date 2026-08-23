@@ -9,6 +9,8 @@ STEP_LABELS = [
     "Earth-sized", "Compare", "Report",
 ]
 STEP_COUNT = len(STEP_LABELS)
+TITLE = "Find Tatooine: Guided Mission"
+SUBTITLE = "A facilitator-led investigation using real exoplanet data"
 
 
 def render(data, presenter_mode, implementation):
