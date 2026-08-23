@@ -57,7 +57,7 @@ from ui_helpers import (
 )
 from experiences import (
     curious,
-    classroom_navigation,
+    classroom_shell,
     data_laboratory,
     planets_we_have_not_found,
     catalog,
@@ -242,26 +242,29 @@ st.set_page_config(
 # ============================================================================
 
 def render_demographics_classroom(data: pd.DataFrame, teacher_note_renderer=None) -> None:
-    """Render the Year 8 and Year 10 lessons, one selected step at a time."""
-    pathway = st.session_state.get("demographics_pathway")
-    year_level = {
-        STAGE4_PATHWAY: strange_new_worlds.YEAR_LEVEL,
-        STAGE5_PATHWAY: planets_we_have_not_found.YEAR_LEVEL,
-    }.get(pathway)
-    if year_level is None:
-        return
-    part_count = (
-        strange_new_worlds.PART_COUNT
-        if year_level == strange_new_worlds.YEAR_LEVEL
-        else planets_we_have_not_found.PART_COUNT
+    """Render a classroom pathway through the shared shell and lesson body."""
+    classroom_shell.render(
+        data,
+        st.session_state.get("demographics_pathway"),
+        STAGE4_PATHWAY,
+        STAGE5_PATHWAY,
+        strange_new_worlds.STEP_LABELS,
+        planets_we_have_not_found.STEP_LABELS,
+        strange_new_worlds.PART_COUNT,
+        planets_we_have_not_found.PART_COUNT,
+        teacher_note_renderer,
+        render_demographics_classroom_body,
     )
-    if year_level == "Year 8":
-        step_labels = strange_new_worlds.STEP_LABELS
-    else:
-        step_labels = planets_we_have_not_found.STEP_LABELS
-    part = classroom_navigation.select_step(step_labels, part_count)
-    if teacher_note_renderer is not None:
-        teacher_note_renderer(part)
+
+
+def render_demographics_classroom_body(
+    data: pd.DataFrame,
+    pathway: str,
+    year_level: str,
+    part: int,
+    step_labels: list[str],
+) -> None:
+    """Render the existing Year 8 and Year 10 lesson-step bodies."""
     # CLASSROOM STEP 0 — Welcome
     if part == 0:
         st.header(pathway)
