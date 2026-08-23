@@ -64,6 +64,51 @@ TEACHER_BACKGROUNDS = {
         "rotating discs of gas and dust; grains collide and accumulate into larger bodies, and those bodies evolve "
         "into planetary systems. No senior physics is required here."
     ),
+    3: (
+        "**Why change the axes?**\n\n"
+        "- A **scatter plot** places one marker for each planet using two measured variables. Horizontal position "
+        "shows orbital distance; vertical position shows mass.\n"
+        "- **Orbital distance** here means the typical size of the planet's orbit around its star. One "
+        "**astronomical unit (AU)** is the average Earth–Sun distance, about 150 million kilometres.\n"
+        "- On a **linear axis**, equal spaces mean equal additions: 0, 1, 2, 3. This works poorly when values span "
+        "from much less than 1 to hundreds. Large values set the scale and small values bunch together.\n"
+        "- On a **logarithmic axis**, equal spaces mean equal multiplication: 0.1→1, 1→10 and 10→100 occupy "
+        "equal distances. The printed labels remain ordinary numbers.\n"
+        "- A **log–log graph** simply uses this spacing on both axes. It does not change the planets, variables or "
+        "units, and students do not need to calculate logarithms.\n\n"
+        "The teaching goal is representation choice: **the linear graph reveals a visibility problem, and the "
+        "log–log graph helps solve it**. This is intentionally accessible below senior mathematics."
+    ),
+    4: (
+        "**Interpreting the combined planet graph**\n\n"
+        "- Each blue point is a detected exoplanet with both a recorded mass and orbital distance. The labelled "
+        "Solar System planets are overlaid as a familiar comparison.\n"
+        "- Moving right means a planet orbits farther from its star. Moving up means it is more massive. The four "
+        "broad possibilities are therefore close/small, close/massive, far/small and far/massive.\n"
+        "- This step compares **individual planets**, not complete planetary systems. Students should ask whether "
+        "detected planets appear near Solar System planets in mass and orbital distance.\n"
+        "- The graph displays the **known sample**, not a census of the Universe. Some planets are absent because "
+        "they have not been detected; others may be known but lack one of the plotted measurements.\n"
+        "- At this stage students do not yet need the answer. A scientifically strong response can be tentative "
+        "and identify the additional evidence needed.\n\n"
+        "Avoid treating apparent empty regions as proof that those planets cannot exist. Lesson 2 gives students "
+        "the information needed to reconsider those gaps."
+    ),
+    5: (
+        "**Direct imaging without specialist optics**\n\n"
+        "- **Direct imaging** means detecting light coming from the planet itself. The light may be reflected "
+        "starlight or heat emitted by the planet; it is usually recorded as a point of light, not a surface picture.\n"
+        "- A host star can be millions or billions of times brighter than its planets. Its glare can overwhelm "
+        "the faint planet signal, much as a firefly would be difficult to see beside a bright spotlight.\n"
+        "- A **coronagraph** is an instrument that blocks or suppresses much of the star's light. Astronomers also "
+        "process repeated images to separate a possible planet signal from glare and background objects.\n"
+        "- Planets farther from their stars are more separated in the telescope image. Young, massive planets "
+        "can also be hotter and brighter. These features make them more accessible to current direct imaging.\n"
+        "- The plotted pattern is a tendency produced by the method and available instruments, not a rule saying "
+        "that all distant planets are massive.\n\n"
+        "Students only need to connect **star glare and separation** to the observed graph. Details of diffraction, "
+        "adaptive optics and infrared detectors are optional senior extensions."
+    ),
 }
 
 
