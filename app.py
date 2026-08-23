@@ -265,37 +265,30 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
         st.info("Choose a template as a starting point, or invent your own planet profile. Every filter involves an assumption, and a close match is not a confirmed identity.")
 
     elif step == 1:
-        st.header("Inspect the exoplanet dataset")
-        a, b, c, d = st.columns(4)
-        a.metric("Planet records", f"{len(data):,}")
-        b.metric("Host systems", f"{data['hostname'].nunique(dropna=True):,}")
-        c.metric("Discovery methods", f"{data['discoverymethod'].nunique(dropna=True):,}")
-        d.metric("Fields used", f"{len(COLUMNS):,}")
-        display = ["pl_name", "hostname", "disc_year", "discoverymethod", "pl_rade", "pl_bmasse", "pl_eqt", "sy_snum", "sy_pnum", "sy_dist"]
-        st.dataframe(data[display].head(30), use_container_width=True, hide_index=True)
-        missing = pd.DataFrame({
-            "Variable": display,
-            "Missing records": [int(data[col].isna().sum()) for col in display],
-            "Complete records (%)": [round(100 * data[col].notna().mean(), 1) for col in display],
-        }).sort_values("Complete records (%)")
-        st.subheader("What information is missing?")
-        st.dataframe(missing, use_container_width=True, hide_index=True)
-        st.info("Missing means unknown. It does not mean zero, unsuitable, or a possible match.")
+        st.header("Worked example: a Tatooine-like world")
+        st.write("Start with a story idea, turn it into measurable criteria, and see what the dataset can and cannot tell us.")
+        st.dataframe(pd.DataFrame([
+            {"Clue": "Two suns", "Variable": "Known stars", "Example rule": "Exactly 2"},
+            {"Clue": "A planetary system", "Variable": "Known planets", "Example rule": "At least 3"},
+            {"Clue": "A roughly Earth-sized world", "Variable": "Planet radius", "Example rule": "0.8–1.5 Earth radii"},
+        ]), use_container_width=True, hide_index=True)
+        st.info("This is a worked example, not a claim that any candidate is literally Tatooine. Unknown values remain unknown.")
+        tatooine.render_custom_filters(data, "Teacher" if st.session_state.get("tatooine_teacher_view", False) else "Student", guidance_box, custom_candidates)
 
     elif step == 2:
-        st.header("Decode the evidence")
-        st.write("Translate each story observation into a variable and a decision rule.")
-        operational = pd.DataFrame([
-            {"Story evidence": "Two suns", "Dataset variable": "Stars in system (`sy_snum`)", "Initial rule": "Exactly 2"},
-            {"Story evidence": "Part of a planetary system", "Dataset variable": "Planets in system (`sy_pnum`)", "Initial rule": "Exactly 3"},
-            {"Story evidence": "Approximately Earth-like scale", "Dataset variable": "Planet radius (`pl_rade`)", "Initial rule": "0.8 to 1.5 Earth radii"},
-            {"Story evidence": "Warm and dry", "Dataset variable": "Equilibrium temperature (`pl_eqt`)", "Initial rule": "Inspect, but do not treat as surface climate"},
-            {"Story evidence": "Find the destination", "Dataset variable": "Right ascension and declination", "Initial rule": "Map the final candidates"},
-        ])
-        st.dataframe(operational, use_container_width=True, hide_index=True)
-        st.warning("These are analytical choices. A different definition of the planet you are looking for could produce a different result.")
+        st.header("Worked example: an Earth-like candidate")
+        st.write("Now use a different question: where might we look for a world with a similar size and a temperature worth investigating?")
+        st.dataframe(pd.DataFrame([
+            {"Clue": "Similar size to Earth", "Variable": "Planet radius", "Example rule": "0.8–1.5 Earth radii"},
+            {"Clue": "Temperature worth investigating", "Variable": "Equilibrium temperature", "Example rule": "Choose a range"},
+            {"Clue": "A known planetary system", "Variable": "Known planets", "Example rule": "At least 1"},
+        ]), use_container_width=True, hide_index=True)
+        st.warning("Earth-sized or temperate does not prove that a planet is habitable. These are screening rules for a first search.")
+        earth_like, _ = custom_candidates(data, 1, "At least", 1, (0.8, 1.5), (250, 350), None)
+        st.metric("Candidates under this example", f"{len(earth_like):,}")
+        st.dataframe(earth_like[["pl_name", "hostname", "pl_rade", "pl_eqt", "sy_snum", "sy_pnum"]].head(30), use_container_width=True, hide_index=True)
 
-    elif step == 3:
+    elif step == 98:
         st.header("Apply filter 1: number of stars")
         row = steps.iloc[0]
         a, b, c = st.columns(3)
@@ -305,20 +298,20 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
         st.dataframe(stages[1][["pl_name", "hostname", "sy_snum", "sy_pnum", "pl_rade"]].head(50), use_container_width=True, hide_index=True)
         st.info("Records with unknown star counts are not confirmed matches. They are incomplete evidence.")
 
-    elif step == 4:
+    elif step == 99:
         st.header("Apply filter 2: number of planets")
         st.dataframe(steps.iloc[:2], use_container_width=True, hide_index=True)
         st.metric("Records remaining", f"{len(stages[2]):,}")
         st.dataframe(stages[2][["pl_name", "hostname", "sy_snum", "sy_pnum", "pl_rade", "pl_eqt"]], use_container_width=True, hide_index=True)
         st.warning("The rule 'exactly three' comes from the original activity. It is a modelling choice, not certain evidence from the story.")
 
-    elif step == 5:
+    elif step == 3:
         st.header("Try your own planet criteria")
         st.write("The original rules were only one possible definition. Change the criteria below and see how the candidate list responds.")
         guidance_mode = "Teacher" if st.session_state.get("tatooine_teacher_view", False) else "Student"
         tatooine.render_custom_filters(data, guidance_mode, guidance_box, custom_candidates)
 
-    elif step == 6:
+    elif step == 4:
         st.header("Compare candidate systems")
         candidate_columns = ["pl_name", "hostname", "disc_year", "pl_rade", "pl_bmasse", "pl_eqt", "sy_dist", "sy_snum", "sy_pnum"]
         if candidates.empty:
@@ -346,7 +339,7 @@ def render_guided_mission(data: pd.DataFrame, presenter_mode: bool | None = None
                 "The evidence remains uncertain because ______. Our conclusion depends on the assumption that ______."
             )
 
-    elif step == 7:
+    elif step == 5:
         st.header("Map and report your candidate")
         names = candidates.sort_values("pl_name")["pl_name"].tolist() if not candidates.empty else []
         selected = st.session_state.get("selected_candidate")
