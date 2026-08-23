@@ -1823,15 +1823,7 @@ def render_demographics_curious(data: pd.DataFrame) -> None:
     if "curious_part" not in st.session_state:
         st.session_state["curious_part"] = 0
     part = max(0, min(int(st.session_state["curious_part"]), 6))
-    step_labels = [
-        "Welcome",
-        "1 · Our Solar System",
-        "2 · Meet exoplanets",
-        "3 · Mass and distance",
-        "4 · Are we normal?",
-        "5 · How we find planets",
-        "Conclusion",
-    ]
+    step_labels = curious.STEP_LABELS
     _, selected_part = step_tabs(step_labels, "curious_step_selector", part)
     if selected_part != part:
         part = selected_part
