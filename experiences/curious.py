@@ -16,7 +16,7 @@ from ui_helpers import (
     graph_guide,
     key_idea,
     learn_more_prompt,
-    log_scale_reveal,
+    persistent_reveal,
     scroll_to_top_if_requested,
     step_buttons,
     step_tabs,
@@ -122,7 +122,13 @@ def render(data: pd.DataFrame) -> None:
         st.subheader("First: ordinary linear axes")
         graph_guide("The bottom axis shows orbital distance; the side axis shows mass.", "Farther right means farther from the Sun. Higher means more massive.")
         st.plotly_chart(solar_system_demographics_chart(False), use_container_width=True)
-        if log_scale_reveal("Jupiter and the distant outer planets set the scale, so the small inner planets bunch together near the bottom-left corner. How could we spread them out without losing the giant planets?", "curious_log_scale_revealed"):
+        if persistent_reveal(
+            "Jupiter and the distant outer planets set the scale, so the small inner planets bunch together near the bottom-left corner. How could we spread them out without losing the giant planets?",
+            "curious_log_scale_revealed",
+            reveal_label="Reveal a new way to view the same data →",
+            revealed_message="**Same planets. Same variables. Different spacing.** A log scale spreads out the small values while keeping the giant planets on the same graph.",
+            explanation="The variables do not change: the graph still shows planet mass and orbital distance. On a log scale, equal spaces represent multiplication. For example, the gap from **0.1 to 1** is the same size as the gap from **1 to 10**. You do not need to calculate logarithms to read the graph.",
+        ):
             st.subheader("Now compare the log–log view")
             graph_guide("The axes show the same values, but the new spacing spreads out the small planets.", "Find Earth at 1 AU and 1 Earth mass, then compare the positions of the four inner planets.")
             st.plotly_chart(solar_system_demographics_chart(True), use_container_width=True)
