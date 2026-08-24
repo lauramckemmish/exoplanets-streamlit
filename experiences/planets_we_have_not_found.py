@@ -304,7 +304,7 @@ class LessonDependencies:
     graph_questions: object
     response_box: object
     key_idea: object
-    log_scale_reveal: object
+    persistent_reveal: object
     data_detective_challenge: object
     learn_more_prompt: object
 
@@ -360,10 +360,13 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             d.solar_system_demographics_chart(False),
             use_container_width=True,
         )
-        if d.log_scale_reveal(
+        if d.persistent_reveal(
             "Jupiter and the distant outer planets set the scale, so Mercury, Venus, Earth and Mars bunch together "
             "near the bottom-left corner. How could we spread them out without losing the giant planets?",
             "year10_log_scale_revealed",
+            reveal_label="Reveal a new way to view the same data →",
+            revealed_message="**Same planets. Same variables. Different spacing.** A log scale spreads out the small values while keeping the giant planets on the same graph.",
+            explanation="The variables do not change: the graph still shows planet mass and orbital distance. On a log scale, equal spaces represent multiplication. For example, the gap from **0.1 to 1** is the same size as the gap from **1 to 10**. You do not need to calculate logarithms to read the graph.",
         ):
             st.subheader("Now compare the log–log view")
             d.graph_guide(

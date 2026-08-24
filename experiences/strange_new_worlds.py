@@ -192,7 +192,7 @@ class LessonDependencies:
     graph_questions: object
     response_box: object
     key_idea: object
-    log_scale_reveal: object
+    persistent_reveal: object
     data_detective_challenge: object
     learn_more_prompt: object
 
@@ -350,7 +350,13 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
         d.graph_guide("The horizontal axis shows orbital distance in AU. The vertical axis shows planet mass in Earth masses.", "Each labelled point is one Solar System planet. Farther right means farther from the Sun; higher means more massive.")
         st.plotly_chart(d.solar_system_demographics_chart(False), use_container_width=True)
         st.markdown("### Before you change the graph")
-        if d.log_scale_reveal("Jupiter and the distant outer planets set the scale, so the small inner planets bunch together near the bottom-left corner. How could we spread them out without losing the giant planets? Make a prediction, then reveal a second view of the **same data**.", "year8_log_scale_revealed"):
+        if d.persistent_reveal(
+            "Jupiter and the distant outer planets set the scale, so the small inner planets bunch together near the bottom-left corner. How could we spread them out without losing the giant planets? Make a prediction, then reveal a second view of the **same data**.",
+            "year8_log_scale_revealed",
+            reveal_label="Reveal a new way to view the same data →",
+            revealed_message="**Same planets. Same variables. Different spacing.** A log scale spreads out the small values while keeping the giant planets on the same graph.",
+            explanation="The variables do not change: the graph still shows planet mass and orbital distance. On a log scale, equal spaces represent multiplication. For example, the gap from **0.1 to 1** is the same size as the gap from **1 to 10**. You do not need to calculate logarithms to read the graph.",
+        ):
             st.subheader("Now compare the log–log view")
             d.graph_guide("The variables are the same, but equal spaces now represent multiplication rather than addition.", "Compare the positions of the inner planets and the outer giants.")
             st.plotly_chart(d.solar_system_demographics_chart(True), use_container_width=True)

@@ -24,7 +24,7 @@ from ui_helpers import (
     graph_questions,
     key_idea,
     learn_more_prompt,
-    log_scale_reveal,
+    persistent_reveal,
     response_box,
     scroll_to_top_if_requested,
     teacher_note,
@@ -171,7 +171,7 @@ CLASSROOM_RESOURCES = {
     "graph_questions": graph_questions,
     "response_box": response_box,
     "key_idea": key_idea,
-    "log_scale_reveal": log_scale_reveal,
+    "persistent_reveal": persistent_reveal,
     "data_detective_challenge": data_detective_challenge,
     "learn_more_prompt": learn_more_prompt,
 }

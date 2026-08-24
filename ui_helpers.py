@@ -68,14 +68,36 @@ def step_tabs(labels: list[str], key: str, current_step: int):
     return tabs, labels.index(st.session_state.get(key, labels[current_step]))
 
 
-def step_buttons(labels: list[str], tab_key: str, step_key: str, scroll_key: str, step: int, button_prefix: str) -> None:
-    back, spacer, next_step = st.columns([1, 4, 1])
+def step_buttons(
+    labels: list[str],
+    tab_key: str,
+    step_key: str,
+    scroll_key: str,
+    step: int,
+    button_prefix: str,
+    allow_next: bool = True,
+) -> None:
+    """Render Back/Continue controls, optionally withholding Continue."""
+    back, _, next_step = st.columns([1, 4, 1])
     with back:
         if step > 0:
-            st.button("← Back", use_container_width=True, key=f"{button_prefix}_back", on_click=select_tab_step, args=(tab_key, labels, step_key, scroll_key, step - 1))
+            st.button(
+                "← Back",
+                use_container_width=True,
+                key=f"{button_prefix}_back",
+                on_click=select_tab_step,
+                args=(tab_key, labels, step_key, scroll_key, step - 1),
+            )
     with next_step:
-        if step < len(labels) - 1:
-            st.button("Continue →", type="primary", use_container_width=True, key=f"{button_prefix}_continue", on_click=select_tab_step, args=(tab_key, labels, step_key, scroll_key, step + 1))
+        if allow_next and step < len(labels) - 1:
+            st.button(
+                "Continue →",
+                type="primary",
+                use_container_width=True,
+                key=f"{button_prefix}_continue",
+                on_click=select_tab_step,
+                args=(tab_key, labels, step_key, scroll_key, step + 1),
+            )
 
 
 def scroll_to_top_if_requested(key: str) -> None:
@@ -84,9 +106,9 @@ def scroll_to_top_if_requested(key: str) -> None:
     components.html(
         """
         <script>
-            const parentDocument = window.parent.document;
-            const scrollContainer = parentDocument.querySelector('[data-testid="stAppViewContainer"]') || parentDocument.querySelector('section.main');
-            if (scrollContainer) scrollContainer.scrollTo({top: 0, left: 0, behavior: 'instant'});
+            const doc = window.parent.document;
+            const container = doc.querySelector('[data-testid="stAppViewContainer"]') || doc.querySelector('section.main');
+            if (container) container.scrollTo({top: 0, left: 0, behavior: 'instant'});
             window.parent.scrollTo({top: 0, left: 0, behavior: 'instant'});
         </script>
         """,
@@ -94,28 +116,30 @@ def scroll_to_top_if_requested(key: str) -> None:
     )
 
 
-def log_scale_reveal(prompt: str, key: str) -> bool:
-    """Create a deliberate, persistent reveal before showing a log–log graph."""
+def persistent_reveal(
+    prompt: str,
+    key: str,
+    *,
+    reveal_label: str,
+    revealed_message: str | None = None,
+    explanation: str | None = None,
+) -> bool:
+    """Persistently reveal optional content after a student prediction."""
     st.markdown(f"### Pause and predict\n{prompt}")
     if key not in st.session_state:
         st.session_state[key] = False
     if not st.session_state[key]:
         st.button(
-            "Reveal a new way to view the same data →",
+            reveal_label,
             type="primary",
             key=f"{key}_button",
             on_click=lambda: st.session_state.__setitem__(key, True),
         )
         return False
-    st.success(
-        "**Same planets. Same variables. Different spacing.** A log scale spreads out the small values "
-        "while keeping the giant planets on the same graph."
-    )
-    st.write(
-        "The variables do not change: the graph still shows planet mass and orbital distance. On a log scale, "
-        "equal spaces represent multiplication. For example, the gap from **0.1 to 1** is the same size as "
-        "the gap from **1 to 10**. You do not need to calculate logarithms to read the graph."
-    )
+    if revealed_message:
+        st.success(revealed_message)
+    if explanation:
+        st.write(explanation)
     return True
 
 
@@ -178,8 +202,21 @@ def sample_note(data, required: list[str], label: str = "records") -> int:
     return complete
 
 
-def teacher_note(title: str, purpose: str, facilitation: str, alignment: str = "", *, timing: str = "", evidence: str = "", listen_for: str = "", background: str = "", misconceptions: str = "", resources: tuple[tuple[str, str], ...] = ()) -> None:
-    if not st.session_state.get("demographics_teacher_view", False):
+def teacher_note(
+    title: str,
+    purpose: str,
+    facilitation: str,
+    alignment: str = "",
+    *,
+    timing: str = "",
+    evidence: str = "",
+    listen_for: str = "",
+    background: str = "",
+    misconceptions: str = "",
+    resources: tuple[tuple[str, str], ...] = (),
+    teacher_state_key: str = "demographics_teacher_view",
+) -> None:
+    if not st.session_state.get(teacher_state_key, False):
         return
     with st.container(border=True):
         st.markdown(f"### 👩‍🏫 Teacher view: {title}")

@@ -22,7 +22,7 @@ def render_lesson(data, pathway, part, stage4_pathway, stage5_pathway, resources
             graph_questions=resources["graph_questions"],
             response_box=resources["response_box"],
             key_idea=resources["key_idea"],
-            log_scale_reveal=resources["log_scale_reveal"],
+            persistent_reveal=resources["persistent_reveal"],
             data_detective_challenge=resources["data_detective_challenge"],
             learn_more_prompt=resources["learn_more_prompt"],
         )
@@ -45,7 +45,7 @@ def render_lesson(data, pathway, part, stage4_pathway, stage5_pathway, resources
             graph_questions=resources["graph_questions"],
             response_box=resources["response_box"],
             key_idea=resources["key_idea"],
-            log_scale_reveal=resources["log_scale_reveal"],
+            persistent_reveal=resources["persistent_reveal"],
             data_detective_challenge=resources["data_detective_challenge"],
             learn_more_prompt=resources["learn_more_prompt"],
         )
