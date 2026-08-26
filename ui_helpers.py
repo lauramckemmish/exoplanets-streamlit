@@ -143,6 +143,25 @@ def persistent_reveal(
     return True
 
 
+def log_scale_reveal(prompt: str, key: str) -> bool:
+    """Backward-compatible log-scale reveal used by older deployed modules."""
+    return persistent_reveal(
+        prompt,
+        key,
+        reveal_label="Reveal a new way to view the same data →",
+        revealed_message=(
+            "**Same planets. Same variables. Different spacing.** A log scale "
+            "spreads out the small values while keeping the giant planets on the same graph."
+        ),
+        explanation=(
+            "The variables do not change: the graph still shows planet mass and orbital distance. "
+            "On a log scale, equal spaces represent multiplication. For example, the gap from "
+            "**0.1 to 1** is the same size as the gap from **1 to 10**. You do not need to "
+            "calculate logarithms to read the graph."
+        ),
+    )
+
+
 def response_box(step: int, prompt: str, sentence_starters: str) -> None:
     pathway = st.session_state.get("demographics_pathway", "classroom")
     st.markdown(f"### Discuss your conclusion\n{prompt}")
