@@ -43,6 +43,20 @@ def open_experience(name: str) -> None:
     select_catalog_experience(name)
 
 
+def select_explore_resource(name: str) -> None:
+    """Open an enabled independent Explore resource from the shared catalogue."""
+    resource = catalog.get_explore_resource(name)
+    if resource is None:
+        select_experience("Introduction")
+        return
+    select_experience(resource["app_experience"])
+
+
+def open_explore_resource(name: str) -> None:
+    """Open an Explore resource from the Introduction catalogue."""
+    select_explore_resource(name)
+
+
 def is_catalog_experience_selected(name: str) -> bool:
     """Return whether a public catalogue entry is the current route."""
     experience = catalog.get_experience(name)
@@ -54,6 +68,12 @@ def is_catalog_experience_selected(name: str) -> bool:
             and st.session_state.get("demographics_pathway") == experience["pathway"]
         )
     return st.session_state.get("experience") == experience["app_experience"]
+
+
+def is_explore_resource_selected(name: str) -> bool:
+    """Return whether a public Explore resource is the current route."""
+    resource = catalog.get_explore_resource(name)
+    return resource is not None and st.session_state.get("experience") == resource["app_experience"]
 
 
 def normalise_pathway(pathway, facilitated_pathway, stage4_pathway, stage5_pathway):

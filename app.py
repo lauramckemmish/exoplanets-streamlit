@@ -36,6 +36,7 @@ from experiences import (
     curious,
     classroom_shell,
     data_laboratory,
+    explore,
     planets_we_have_not_found,
     catalog,
     landing,
@@ -234,7 +235,15 @@ def render_demographics(data: pd.DataFrame) -> None:
         FACILITATED_PATHWAY,
         STAGE4_PATHWAY,
         STAGE5_PATHWAY,
-        lambda frame: landing.render(frame, EXOPLANET_IMAGE_PATH, TEACHER_FEEDBACK_URL, GRANT_RECIPIENTS_URL, catalog, router.open_experience),
+        lambda frame: landing.render(
+            frame,
+            EXOPLANET_IMAGE_PATH,
+            TEACHER_FEEDBACK_URL,
+            GRANT_RECIPIENTS_URL,
+            catalog,
+            router.open_experience,
+            router.open_explore_resource,
+        ),
         curious.render,
         strange_new_worlds.render,
         planets_we_have_not_found.render,
@@ -245,10 +254,7 @@ def render_demographics(data: pd.DataFrame) -> None:
 if "experience" not in st.session_state:
     st.session_state["experience"] = "Introduction"
 
-enabled_app_experiences = {
-    experience_entry["app_experience"]
-    for experience_entry in catalog.experience_catalog()
-}
+enabled_app_experiences = set(catalog.enabled_app_experience_names())
 if (
     st.session_state["experience"]
     not in {"Introduction", "Exoplanet Demographics", *enabled_app_experiences}
@@ -266,7 +272,7 @@ with st.sidebar:
         on_click=router.select_experience,
         args=("Introduction",),
     )
-    st.markdown("#### Learning experiences")
+    st.markdown("#### Experiences")
     for experience_entry in catalog.experience_catalog():
         selected = router.is_catalog_experience_selected(experience_entry["name"])
         st.button(
@@ -276,6 +282,17 @@ with st.sidebar:
             disabled=selected,
             on_click=router.select_catalog_experience,
             args=(experience_entry["name"],),
+        )
+    st.markdown("#### Explore")
+    for resource in catalog.explore_catalog():
+        selected = router.is_explore_resource_selected(resource["name"])
+        st.button(
+            f"{resource['icon']} {resource['name']}",
+            type="primary" if selected else "secondary",
+            use_container_width=True,
+            disabled=selected,
+            on_click=router.select_explore_resource,
+            args=(resource["name"],),
         )
     experience = st.session_state["experience"]
     st.divider()
@@ -293,6 +310,7 @@ if experience == "Introduction":
         GRANT_RECIPIENTS_URL,
         catalog,
         router.open_experience,
+        router.open_explore_resource,
     )
     st.stop()
 
@@ -308,7 +326,7 @@ elif experience == planet_shopping.TITLE:
     planet_shopping.render(data)
 elif experience == "Exoplanet Demographics":
     render_demographics(data)
-else:
+elif experience == "Exoplanet Data Laboratory":
     data_laboratory.render(
         data,
         guidance_mode,
@@ -323,6 +341,12 @@ else:
         scale_guidance=shared_scale_guidance,
         sky_map=sky_map,
     )
+else:
+    explore_resource = catalog.get_explore_resource_for_route(experience)
+    if explore_resource is None:
+        st.session_state["experience"] = "Introduction"
+        st.rerun()
+    explore.render_placeholder(explore_resource)
 
 st.divider()
 st.caption(

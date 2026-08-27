@@ -1,7 +1,7 @@
-"""Authoritative catalogue for the learning experiences.
+"""Authoritative catalogue for public Experiences and Explore resources.
 
-Change an experience's ``enabled`` value here to show or hide it throughout
-the app. The landing page, sidebar and router all use this catalogue.
+Change a destination's ``enabled`` value here to show or hide it throughout
+the app. The landing page, sidebar and router all use these catalogues.
 """
 
 EXPERIENCES = (
@@ -30,14 +30,6 @@ EXPERIENCES = (
         "pathway": "The Planets We Haven't Found",
     },
     {
-        "name": "Exoplanet Data Laboratory",
-        "summary": "An open exploration space for inspecting the NASA dataset, choosing variables, building graphs and testing your own questions.",
-        "enabled": True,
-        "icon": "🔬",
-        "app_experience": "Exoplanet Data Laboratory",
-        "pathway": None,
-    },
-    {
         "name": "Find Your Perfect Planet",
         "summary": "A guided data-science mission: turn a planet idea into testable criteria, inspect candidate worlds and communicate uncertainty in your conclusion.",
         "enabled": True,
@@ -56,6 +48,31 @@ EXPERIENCES = (
 )
 
 
+EXPLORE_RESOURCES = (
+    {
+        "name": "How We Found Other Worlds",
+        "summary": "Explore how we went from knowing one planetary system to discovering thousands of worlds.",
+        "enabled": True,
+        "icon": "🛰️",
+        "app_experience": "Explore: How We Found Other Worlds",
+    },
+    {
+        "name": "How Do We Find a Planet We Can't See?",
+        "summary": "Explore the techniques astronomers use to detect planets around other stars.",
+        "enabled": True,
+        "icon": "🔭",
+        "app_experience": "Explore: How Do We Find a Planet We Can't See?",
+    },
+    {
+        "name": "Exoplanet Data Lab",
+        "summary": "Explore the exoplanet catalogue yourself.",
+        "enabled": True,
+        "icon": "🔬",
+        "app_experience": "Exoplanet Data Laboratory",
+    },
+)
+
+
 def experience_catalog(*, enabled_only: bool = True):
     """Return experience metadata, optionally including disabled experiences."""
     return tuple(
@@ -65,9 +82,23 @@ def experience_catalog(*, enabled_only: bool = True):
     )
 
 
+def explore_catalog(*, enabled_only: bool = True):
+    """Return Explore resource metadata, optionally including disabled entries."""
+    return tuple(
+        dict(resource)
+        for resource in EXPLORE_RESOURCES
+        if not enabled_only or resource["enabled"]
+    )
+
+
 def enabled_experience_names() -> tuple[str, ...]:
     """Return the public names shown in normal navigation."""
     return tuple(experience["name"] for experience in experience_catalog())
+
+
+def enabled_explore_resource_names() -> tuple[str, ...]:
+    """Return the public Explore names shown in normal navigation."""
+    return tuple(resource["name"] for resource in explore_catalog())
 
 
 def get_experience(name: str, *, enabled_only: bool = True):
@@ -76,6 +107,32 @@ def get_experience(name: str, *, enabled_only: bool = True):
         if experience["name"] == name:
             return experience
     return None
+
+
+def get_explore_resource(name: str, *, enabled_only: bool = True):
+    """Return one Explore resource by its public name, if it is available."""
+    for resource in explore_catalog(enabled_only=enabled_only):
+        if resource["name"] == name:
+            return resource
+    return None
+
+
+def get_explore_resource_for_route(app_experience: str, *, enabled_only: bool = True):
+    """Return the enabled Explore resource associated with an internal route."""
+    for resource in explore_catalog(enabled_only=enabled_only):
+        if resource["app_experience"] == app_experience:
+            return resource
+    return None
+
+
+def enabled_app_experience_names() -> tuple[str, ...]:
+    """Return all enabled internal routes from guided and Explore collections."""
+    return tuple(
+        dict.fromkeys(
+            entry["app_experience"]
+            for entry in (*experience_catalog(), *explore_catalog())
+        )
+    )
 
 
 def enabled_pathway_names() -> tuple[str, ...]:
@@ -89,7 +146,4 @@ def enabled_pathway_names() -> tuple[str, ...]:
 
 def is_enabled_app_experience(app_experience: str) -> bool:
     """Return whether an internal app route has an enabled public experience."""
-    return any(
-        experience["app_experience"] == app_experience
-        for experience in experience_catalog()
-    )
+    return app_experience in enabled_app_experience_names()

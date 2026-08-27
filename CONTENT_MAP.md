@@ -13,6 +13,7 @@ Each experience has its own module in `experiences/`. Student-facing wording, le
 | **The Planets We Haven't Found** (Year 10) | `experiences/planets_we_have_not_found.py` | Year 10 student steps, Teacher-view notes and background information. |
 | **Exoplanet Data Laboratory** | `experiences/data_laboratory.py` | Data visualisation and representation investigation. |
 | **Find Your Perfect Planet** | `experiences/tatooine.py` | Filtering investigation; Tatooine is a compact worked example. |
+| **Explore resources** | `experiences/explore.py` | Independent resources; the catalogue decides which resources appear in Explore. |
 | **Introduction** | `experiences/landing.py` | Landing-page text, experience cards and acknowledgements. |
 
 ## Classroom pathways
