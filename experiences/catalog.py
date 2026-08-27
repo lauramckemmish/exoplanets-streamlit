@@ -45,6 +45,14 @@ EXPERIENCES = (
         "app_experience": "Guided Tatooine Mission",
         "pathway": None,
     },
+    {
+        "name": "Planet Shopping Outside Our Solar System",
+        "summary": "Use real exoplanet data to find your perfect planet.",
+        "enabled": True,
+        "icon": "🛒",
+        "app_experience": "Planet Shopping Outside Our Solar System",
+        "pathway": None,
+    },
 )
 
 

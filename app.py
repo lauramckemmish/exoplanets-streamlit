@@ -39,6 +39,7 @@ from experiences import (
     planets_we_have_not_found,
     catalog,
     landing,
+    planet_shopping,
     router,
     strange_new_worlds,
     tatooine,
@@ -303,6 +304,8 @@ with st.sidebar:
 
 if experience == "Guided Tatooine Mission":
     tatooine.render(data)
+elif experience == planet_shopping.TITLE:
+    planet_shopping.render(data)
 elif experience == "Exoplanet Demographics":
     render_demographics(data)
 else:
