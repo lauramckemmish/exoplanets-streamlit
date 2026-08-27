@@ -4,6 +4,10 @@ This document is the pedagogical source of truth for
 `experiences/planet_shopping.py`. It records the agreed direction before
 detailed lesson content is implemented.
 
+For shared student-facing writing and interface defaults, also read
+[`docs/curious_online_style.md`](../docs/curious_online_style.md). This design
+brief remains authoritative for Planet Shopping's local learning sequence.
+
 ## Established decisions
 
 ### Context and framing
