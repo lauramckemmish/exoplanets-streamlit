@@ -3,6 +3,9 @@
 See ``planet_shopping.md`` for the established pedagogical design.
 """
 
+from datetime import date
+from pathlib import Path
+
 import pandas as pd
 import streamlit as st
 
@@ -11,6 +14,7 @@ from ui_helpers import scroll_to_top_if_requested, step_buttons, step_tabs
 
 TITLE = "Planet Shopping Outside Our Solar System"
 SUBTITLE = "Use real exoplanet data to find your perfect planet."
+SOLAR_SYSTEM_IMAGE_PATH = Path(__file__).resolve().parent.parent / "assets" / "solar-system-nasa.jpeg"
 
 STAGE_LABELS = [
     "🚀 Launch — Where can we go?",
@@ -27,22 +31,82 @@ _TAB_KEY = "planet_shopping_tab"
 _SCROLL_KEY = "planet_shopping_scroll_to_top"
 
 
+def _catalogue_counts(data: pd.DataFrame, current_year: int | None = None) -> dict[str, int]:
+    """Count unique catalogue records available at three recent points in time."""
+    current_year = current_year or date.today().year
+    catalogue = data.dropna(subset=["pl_name"]).drop_duplicates("pl_name")
+    discovery_year = pd.to_numeric(catalogue["disc_year"], errors="coerce")
+    return {
+        "today": len(catalogue),
+        "one_year_ago": int((discovery_year <= current_year - 1).sum()),
+        "ten_years_ago": int((discovery_year <= current_year - 10).sum()),
+    }
+
+
+def _reveal_button(state_key: str, label: str) -> bool:
+    """Show the next compact part of the facilitated launch story on request."""
+    if state_key not in st.session_state:
+        st.session_state[state_key] = False
+    if not st.session_state[state_key]:
+        st.button(
+            label,
+            type="primary",
+            key=f"{state_key}_button",
+            on_click=lambda: st.session_state.__setitem__(state_key, True),
+        )
+    return bool(st.session_state[state_key])
+
+
 def _value_or_unknown(value, formatter) -> str:
     """Format a catalogue value without treating a missing value as zero."""
     return "Unknown" if pd.isna(value) else formatter(value)
 
 
-def _render_launch() -> None:
+def _render_launch(data: pd.DataFrame) -> None:
     st.subheader("🚀 Launch")
-    st.info("**Mission placeholder:** Earth is unavailable. Use real exoplanet data to choose another world.")
-    st.markdown(
-        "1. Our **Solar System** has eight known planets.\n"
-        "2. Other **stars** can have their own planetary systems.\n"
-        "3. A planet orbiting another star is an **exoplanet**.\n"
-        "4. Astronomers collect discoveries in a **catalogue**.\n"
-        "5. We will use that catalogue to go planet shopping."
-    )
-    st.caption("Prototype note: this is the intended opening sequence, not the final student-facing wording.")
+    st.info("**MISSION: Find a new home**\n\nEarth is no longer an option. Your mission is to use real exoplanet data to decide where we could go instead.")
+
+    question, image = st.columns([2, 1])
+    with question:
+        st.markdown("### Where can we go?")
+        st.write("Earth is one planet orbiting the Sun. Could we just move somewhere else in our Solar System?")
+        if _reveal_button("planet_shopping_launch_solar_system", "Reveal our first problem →"):
+            st.write("The other planets in our Solar System are not obvious replacements for Earth.")
+            st.markdown("**Maybe we need to look further away.**")
+    with image:
+        st.image(
+            SOLAR_SYSTEM_IMAGE_PATH,
+            caption="Our Solar System: real images, enlarged and placed close together. Credit: NASA",
+            use_container_width=True,
+        )
+
+    if not st.session_state.get("planet_shopping_launch_solar_system", False):
+        return
+
+    st.markdown("### Look beyond the Sun")
+    st.write("The Sun is our star. The stars we see in the night sky are other stars — and other stars can have planets too.")
+    if not _reveal_button("planet_shopping_launch_exoplanets", "What do we call those planets? →"):
+        return
+
+    st.success("A **Solar System** is the planetary system around our Sun. An **exoplanet** is a planet outside our Solar System.")
+    st.write("Astronomers have discovered thousands of exoplanets. They organise what they find in a catalogue: one planet, one record, with different pieces of information about it.")
+
+    if not _reveal_button("planet_shopping_launch_catalogue", "Open the catalogue →"):
+        return
+
+    current_year = date.today().year
+    counts = _catalogue_counts(data, current_year)
+    st.markdown("### A catalogue that keeps growing")
+    today, one_year, ten_years = st.columns(3)
+    with today:
+        st.metric("Today", f"{counts['today']:,}", "planets in this catalogue")
+    with one_year:
+        st.metric(f"A year ago ({current_year - 1})", f"{counts['one_year_ago']:,}")
+    with ten_years:
+        st.metric(f"Ten years ago ({current_year - 10})", f"{counts['ten_years_ago']:,}")
+    st.caption("These counts come from the discovery years recorded in the currently selected catalogue. Some planet records contain more information than others.")
+    st.markdown("### We have thousands of possible worlds. But what does one planet actually look like in the data?")
+    st.info("**Next: Meet Your Planet**")
 
 
 def _render_meet_your_planet(data: pd.DataFrame) -> None:
@@ -139,7 +203,7 @@ def render(data: pd.DataFrame) -> None:
     scroll_to_top_if_requested(_SCROLL_KEY)
 
     if stage == 0:
-        _render_launch()
+        _render_launch(data)
     elif stage == 1:
         _render_meet_your_planet(data)
     elif stage == 2:
