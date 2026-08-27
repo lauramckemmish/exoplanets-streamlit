@@ -1,5 +1,8 @@
 # Experience authoring
 
+Repository-wide development and deployment rules are defined in the root
+[`AGENTS.md`](../AGENTS.md).
+
 Before modifying a student-facing experience implementation in this folder:
 
 1. Read [`docs/curious_online_style.md`](../docs/curious_online_style.md).
