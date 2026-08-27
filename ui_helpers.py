@@ -1,5 +1,8 @@
 """Small, reusable presentation helpers shared by the teaching experiences."""
 
+from collections.abc import Iterator, Mapping
+from contextlib import contextmanager
+
 import streamlit as st
 import streamlit.components.v1 as components
 
@@ -124,8 +127,32 @@ def persistent_reveal(
     revealed_message: str | None = None,
     explanation: str | None = None,
 ) -> bool:
-    """Persistently reveal optional content after a student prediction."""
-    st.markdown(f"### Pause and predict\n{prompt}")
+    """Backward-compatible alias for a persistent hard reveal."""
+    return hard_reveal(
+        prompt,
+        key,
+        reveal_label=reveal_label,
+        revealed_message=revealed_message,
+        explanation=explanation,
+    )
+
+
+def pause_cue(prompt: str, *, title: str = "Pause and discuss") -> None:
+    """Mark a visible, non-blocking moment for learner reasoning."""
+    st.info(f"**{title}**\n\n{prompt}")
+
+
+def hard_reveal(
+    prompt: str,
+    key: str,
+    *,
+    reveal_label: str,
+    revealed_message: str | None = None,
+    explanation: str | None = None,
+    title: str = "Pause and predict",
+) -> bool:
+    """Persistently reveal essential material only after a deliberate prompt."""
+    st.markdown(f"### {title}\n{prompt}")
     if key not in st.session_state:
         st.session_state[key] = False
     if not st.session_state[key]:
@@ -141,6 +168,53 @@ def persistent_reveal(
     if explanation:
         st.write(explanation)
     return True
+
+
+@contextmanager
+def soft_reveal(label: str, *, expanded: bool = False) -> Iterator[None]:
+    """Provide optional supporting material without gating progression."""
+    with st.expander(label, expanded=expanded):
+        yield
+
+
+def choice_reveal(
+    prompt: str,
+    choices: Mapping[str, str],
+    key: str,
+    *,
+    label: str = "Choose one or more to explore",
+) -> list[str]:
+    """Offer optional explanations that learners can choose for themselves."""
+    st.markdown(f"#### {prompt}")
+    selected = st.multiselect(label, list(choices), key=key)
+    for choice in selected:
+        st.markdown(f"**{choice}**")
+        st.write(choices[choice])
+    return selected
+
+
+def role_image(image, *, role: str, caption: str | None = None) -> None:
+    """Render an image responsively according to its pedagogical role.
+
+    ``context`` images are centred at about half width; ``support`` images are
+    compact; ``evidence``, ``graph`` and ``hero`` images use the useful width.
+    Captions should retain credits and accessibility context supplied by the
+    calling experience.
+    """
+    if role not in {"context", "evidence", "graph", "support", "hero"}:
+        raise ValueError(f"Unknown image role: {role}")
+
+    if role == "context":
+        _, image_column, _ = st.columns([1, 2, 1])
+        with image_column:
+            st.image(image, caption=caption, use_container_width=True)
+        return
+    if role == "support":
+        image_column, _ = st.columns([1, 3])
+        with image_column:
+            st.image(image, caption=caption, use_container_width=True)
+        return
+    st.image(image, caption=caption, use_container_width=True)
 
 
 def log_scale_reveal(prompt: str, key: str) -> bool:

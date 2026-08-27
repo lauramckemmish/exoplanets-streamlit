@@ -29,7 +29,8 @@ Do not edit these files to change a lesson’s student-facing text or Teacher gu
 
 - `data.py` — NASA Exoplanet Archive loading, bundled sample loading and data preparation.
 - `charts.py` — reusable Plotly chart builders, including the Solar System/exoplanet comparison graphs.
-- `ui_helpers.py` — reusable visual scaffolds such as graph-reading guidance, response boxes, key ideas, reveals, Teacher notes and navigation controls.
+- `ui_helpers.py` — reusable visual scaffolds such as graph-reading guidance, response boxes, key ideas, reveal patterns, image-role rendering, Teacher notes and navigation controls.
+- `docs/curious_online_style.md` — shared CURIOUS writing, interaction and visual-hierarchy defaults. Individual experiences decide which shared patterns to use.
 - `app.py` — Streamlit setup, sidebar, dataset choice, shared asset configuration and top-level experience routing. It should not normally be the place to edit lesson text.
 
 ## Editing wording safely
