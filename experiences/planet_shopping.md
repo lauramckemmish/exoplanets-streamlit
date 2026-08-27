@@ -61,6 +61,13 @@ planet has failed a criterion.
   → other stars can have planets → exoplanets → a growing catalogue.
 - It uses a natural teaching and scrolling sequence. Interaction is retained
   only where it performs a useful cognitive job.
+- It includes three visible, non-blocking pause cues: considering the other
+  Solar System planets, considering whether other stars have planets, and
+  predicting the catalogue count.
+- Its only required content reveal is the catalogue-count prediction: students
+  choose **Show the catalogue** before the current, one-year-ago and
+  ten-years-ago counts appear. No core definition or navigation is hidden
+  behind a reveal.
 - The Solar System image is a small supporting visual beside the initial
   question; it is not a hero image or a separate Solar System lesson.
 - Catalogue counts are calculated dynamically from unique `pl_name` records

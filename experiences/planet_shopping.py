@@ -29,6 +29,7 @@ STAGE_LABELS = [
 _STAGE_KEY = "planet_shopping_stage"
 _TAB_KEY = "planet_shopping_tab"
 _SCROLL_KEY = "planet_shopping_scroll_to_top"
+_CATALOGUE_REVEAL_KEY = "planet_shopping_launch_catalogue_revealed"
 
 
 def _catalogue_counts(data: pd.DataFrame, current_year: int | None = None) -> dict[str, int]:
@@ -55,7 +56,9 @@ def _render_launch(data: pd.DataFrame) -> None:
     question, image = st.columns([2, 1])
     with question:
         st.markdown("### Where can we go?")
-        st.write("Earth is one planet orbiting the Sun. Could we just move somewhere else in our Solar System?")
+        st.write("Earth is one planet in our Solar System.")
+        st.markdown("#### Pause and discuss")
+        st.markdown("**Could we just move somewhere else in our Solar System?**")
         st.write("The other planets in our Solar System are not obvious replacements for Earth.")
         st.markdown("**Maybe we need to look further away.**")
     with image:
@@ -66,22 +69,36 @@ def _render_launch(data: pd.DataFrame) -> None:
         )
 
     st.markdown("### Look beyond the Sun")
-    st.write("The Sun is our star. The stars we see in the night sky are other stars — and other stars can have planets too.")
-    st.success("A **Solar System** is the planetary system around our Sun. An **exoplanet** is a planet outside our Solar System.")
-    st.write("Astronomers have discovered thousands of exoplanets. They organise what they find in a catalogue: one planet, one record, with different pieces of information about it.")
+    st.write("The Sun is our star.")
+    st.markdown("#### Pause and discuss")
+    st.markdown("**The Sun is our star. Could other stars have planets too?**")
+    st.write("Other stars can have their own planetary systems.")
+    st.write("An **exoplanet** is a planet outside our Solar System.")
+
+    st.markdown("### A catalogue that keeps growing")
+    st.markdown("#### Pause and predict")
+    st.markdown("**How many exoplanets do you think are in our catalogue today?**")
+    if _CATALOGUE_REVEAL_KEY not in st.session_state:
+        st.session_state[_CATALOGUE_REVEAL_KEY] = False
+    if not st.session_state[_CATALOGUE_REVEAL_KEY]:
+        if st.button("Show the catalogue", type="primary", key="planet_shopping_show_catalogue"):
+            st.session_state[_CATALOGUE_REVEAL_KEY] = True
+
+    if not st.session_state[_CATALOGUE_REVEAL_KEY]:
+        return
 
     current_year = date.today().year
     counts = _catalogue_counts(data, current_year)
-    st.markdown("### A catalogue that keeps growing")
     today, one_year, ten_years = st.columns(3)
     with today:
-        st.metric("Today", f"{counts['today']:,}", "planets in this catalogue")
+        st.metric(f"Today ({current_year})", f"{counts['today']:,}")
     with one_year:
         st.metric(f"A year ago ({current_year - 1})", f"{counts['one_year_ago']:,}")
     with ten_years:
         st.metric(f"Ten years ago ({current_year - 10})", f"{counts['ten_years_ago']:,}")
-    st.caption("These counts come from the discovery years recorded in the currently selected catalogue. Some planet records contain more information than others.")
-    st.markdown("### We have thousands of possible worlds. But what does one planet actually look like in the data?")
+    st.write("This catalogue is data: **one planet → one record → different pieces of information about that planet.**")
+    st.caption("Scientists have recorded more information for some planets than for others.")
+    st.markdown("### We have thousands of planets. But what does one planet actually look like in the data?")
     st.info("**Next: Meet Your Planet**")
 
 
