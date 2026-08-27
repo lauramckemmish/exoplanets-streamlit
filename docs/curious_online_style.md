@@ -30,6 +30,19 @@ pedagogical design recorded in each experience's matching `.md` file.
   sparingly, only where it supports rather than interrupts the idea.
 - Do not invent a first-person scientist narrator or personal research story.
 
+## Named scientist voices and stories
+
+- A guided Experience's scientific and learning spine must stand without an
+  individual scientist. Genuine, approved or attributable scientist stories
+  may appear as optional callouts or reveals within it.
+- Explore resources may use a genuine scientist story more substantially when
+  it helps explain the scientific history.
+- The landing page may use a genuine named scientist's first-person voice to
+  establish provenance, trust and an invitation into the science. Keep it
+  brief and learner-facing, rather than biographical.
+- Never fabricate a person's story, quotation or perspective. Other
+  identifiable people need supplied, approved or attributable material.
+
 ## Facilitated experiences
 
 The resource should carry the scientific journey, stable instructions,
