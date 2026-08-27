@@ -57,9 +57,9 @@ planet has failed a criterion.
   of scaffolding within each stage.
 - The exact interface for student choices, candidate comparison and the final
   decision should be designed only after the core filtering sequence is tested.
-- Current four-stage labels in `planet_shopping.py` are a temporary shell;
-  replace them with the established five-stage progression when detailed
-  content implementation begins.
+- `planet_shopping.py` now contains a deliberately rough five-stage live
+  prototype. Refine its local wording and interaction design through delivery
+  testing before treating it as finished lesson content.
 
 ## Implementation guardrails
 
