@@ -15,7 +15,6 @@ from ui_helpers import (
     data_detective_challenge,
     graph_guide,
     key_idea,
-    learn_more_prompt,
     persistent_reveal,
     scroll_to_top_if_requested,
     step_buttons,
@@ -51,9 +50,9 @@ def render_teacher_note(part: int) -> None:
         1: dict(title="Our Solar System", purpose="Use planet mass as the first measurable property for comparing planetary systems.", timing="5 minutes", facilitation="Keep responses spoken and move on once students can read the bar and recognise that mass is being compared. This is a familiar reference point, not yet evidence of what is normal.", evidence="Students identify at least one qualitative mass group.", listen_for="Mass comparisons and the idea that one planetary system is a starting reference, not a population estimate.", misconceptions="The Solar System image is not to scale; the planets are enlarged and placed close together."),
         2: dict(title="Meet exoplanets", purpose="Expand students’ scale model from our Solar System to planets orbiting other stars, so a comparison becomes possible.", timing="7 minutes", facilitation="Secure ‘Sun/star’, ‘Solar System/planetary system’ and ‘planet/exoplanet’. Emphasise that the recent catalogue of thousands of exoplanets makes a population comparison possible; do not spend time on detailed discovery chronology.", evidence="Students can define an exoplanet in their own words and identify the comparison between our eight planets and detected exoplanets.", listen_for="Other stars can host planetary systems that need not resemble ours.", background="For quick questions: Proxima Centauri b is about 4 light-years away; many Kepler targets are 500–3,000 light-years away; the Milky Way is about 100,000 light-years across and contains roughly 100–400 billion stars. Exoplanets discussed here are within our galaxy. Redirect Big Bang questions towards planet formation from discs of gas and dust.", resources=(("NASA Eyes on Exoplanets", "https://eyes.nasa.gov/apps/exo/"), ("NASA: How do planets form?", "https://science.nasa.gov/exoplanets/how-do-planets-form/"))),
         3: dict(title="Mass and distance", purpose="Understand why changing from linear to log–log axes makes a wide range of values easier to see.", timing="10 minutes", facilitation="Treat this as the major conceptual transition. Let students experience what is hidden on the linear graph, then use the hard reveal to show the log–log view. Ask what became visible before explaining that only the axis spacing changed. Do not teach logarithm calculations.", evidence="Students can say what became easier to see.", listen_for="The inner planets separate while the outer giants remain visible.", misconceptions="The planets and measurements have not changed, and ‘log’ does not refer to discovery records over time."),
-        4: dict(title="Are we normal?", purpose="Use a shared Earth challenge and one chosen graph challenge to make a cautious evidence-based claim.", timing="7 minutes", facilitation="Have everyone locate Earth first, then let groups choose one further data-detective challenge. Accept different meanings of ‘normal’ when supported by the graph. Leave sparse regions unresolved so the methods section has a genuine question to answer.", evidence="Students use the Earth comparison or another visible graph feature to support a claim.", listen_for="‘Near Earth does not prove Earth-like’, uncertainty and requests for more evidence—not a single correct verdict."),
-        5: dict(title="How we find planets", purpose="Infer that different measurement methods reveal different parts of the planet population.", timing="14 minutes", facilitation="Move briskly through predict → direct imaging → transit → both → all methods. Ask what could be difficult to find, but let students articulate the detection-bias conclusion themselves.", evidence="Students describe how the point pattern changes when the method changes.", listen_for="‘Not detected’ is not the same as ‘does not exist’; future technology may reveal currently difficult-to-detect planets.", background="Radial velocity can be introduced as the **Doppler method**: a planet makes its star wobble, producing small red and blue shifts. Microlensing uses the gravity of a foreground star-system to briefly magnify a background star; a planet adds a short extra feature. Treat other methods as optional research.", resources=(("NASA: transit method", "https://science.nasa.gov/resource/exoplanet-detection-transit-method/"), ("NASA: microlensing method", "https://science.nasa.gov/resource/exoplanet-detection-microlensing-method/"))),
-        6: dict(title="Conclusion", purpose="Consolidate planet diversity, incomplete evidence and the role of future technology.", timing="4 minutes", facilitation="Elicit students’ conclusion before showing the synthesis. Prioritise one memorable idea and one student-generated question over adding more content.", evidence="Students explain why known exoplanets may not represent every planet that exists.", listen_for="Future instruments may reveal small or distant planets, while some patterns may also reflect real planet formation."),
+        4: dict(title="Are we normal?", purpose="Use a shared Earth challenge and one chosen graph challenge to make a cautious evidence-based claim.", timing="7 minutes", facilitation="Name the blue points as detected exoplanets before students inspect the graph. Have everyone locate Earth first, then let groups choose one further data-detective challenge. Accept different meanings of ‘normal’ when supported by the graph. Preserve the distinction between a nearby point and another Earth.", evidence="Students use the Earth comparison or another visible graph feature to support a claim.", listen_for="‘Near Earth does not prove Earth-like’, uncertainty and requests for more evidence—not a single correct verdict."),
+        5: dict(title="How we find planets", purpose="Infer that different measurement methods reveal different parts of the planet population.", timing="14 minutes", facilitation="Show the two methods, pause for a spoken prediction, then let students inspect each method-specific graph. Use the optional explanation after they have looked at the evidence. Ask what could be difficult to find, but let students articulate the detection-bias conclusion themselves.", evidence="Students predict a likely pattern, then describe how the plotted points differ between methods.", listen_for="‘Not detected’ is not the same as ‘does not exist’; future technology may reveal currently difficult-to-detect planets.", background="Radial velocity can be introduced as the **Doppler method**: a planet makes its star wobble, producing small red and blue shifts. Microlensing uses a rare gravitational magnification alignment. Treat other methods as optional research.", resources=(("NASA: transit method", "https://science.nasa.gov/resource/exoplanet-detection-transit-method/"), ("NASA: microlensing method", "https://science.nasa.gov/resource/exoplanet-detection-microlensing-method/"))),
+        6: dict(title="Conclusion", purpose="Consolidate planet diversity, incomplete evidence and the role of future technology.", timing="4 minutes", facilitation="Pause for students to state what the evidence allows them to conclude before showing the common synthesis. Keep the conclusion cautious: the detected catalogue contains real patterns, but it is not a complete census. Invite interest-led next questions; students do not need to pursue every option.", evidence="Students give a cautious conclusion that distinguishes detected patterns from a complete inventory of planetary systems.", listen_for="Future instruments may reveal small or distant planets, while some patterns may also reflect real planet formation."),
     }
     backgrounds = {
         0: "**Core idea:** exoplanet discoveries changed the question astronomers can ask. A catalogue of thousands of planets around other stars allows comparisons between planetary systems, but ‘normal’ first needs to be defined using properties that can be measured. Students begin with planet mass and add other properties later.",
@@ -133,13 +132,13 @@ def render(data: pd.DataFrame) -> None:
             key_idea("A log scale helps us see small and large planets on the same graph.", "The four inner planets are easier to separate without losing Jupiter and the outer planets.")
     elif part == 4:
         st.header("Step 4: Is our planetary system normal?")
-        st.write("Now we move from the eight Solar System planets to thousands of individual exoplanets. Each exoplanet can have a different mass and a different distance from its star.")
+        st.write("This graph compares our eight Solar System planets with **detected exoplanets**. Each blue point is a detected exoplanet; each pink diamond is a planet in our Solar System.")
         st.image(EXOPLANET_QUADRANTS_IMAGE_PATH, caption="Four possible combinations of planet mass and orbital distance. The example systems are simplified and are not to scale.", use_container_width=True)
-        graph_guide("The bottom axis shows orbital distance and the side axis shows planet mass. Both use a log scale.", "Blue circles are detected exoplanets; pink labelled diamonds are Solar System planets.")
+        graph_guide("The bottom axis shows orbital distance and the side axis shows planet mass. Both use a log scale.", "Hover over a blue point to inspect one detected exoplanet. Compare its position with the pink Solar System planets.")
         st.plotly_chart(current_demographics_chart(data), use_container_width=True)
         data_detective_challenge()
         st.markdown("### Discuss\nWhat did the Earth challenge show? What did your chosen challenge show? Does this evidence make our planetary system seem typical—or unusual?")
-        key_idea("We need to understand how the data were collected before drawing a conclusion.", "Earth and your chosen planet give clues, but the graph alone cannot show every kind of planet that exists.")
+        key_idea("This graph gives us clues about how our planets compare with detected exoplanets.", "A blue point near Earth is not automatically another Earth: this graph shows mass and orbital distance, not every planetary property.")
     elif part == 5:
         st.header("Step 5: How do we find exoplanets?")
         st.write("Astronomers use different ways to find exoplanets. Here are two important examples.")
@@ -147,24 +146,35 @@ def render(data: pd.DataFrame) -> None:
         with direct_imaging_column:
             with st.container(border=True):
                 st.image(DIRECT_IMAGING_IMAGE_PATH, use_container_width=True)
-                st.markdown("### Direct imaging\nAstronomers take a picture of light from a planet.\n\n**Often finds:** bright, massive planets far from their stars.")
+                st.markdown("### Direct imaging\nAstronomers take a picture of light from a planet.")
         with transit_column:
             with st.container(border=True):
                 st.image(TRANSIT_DETECTION_IMAGE_PATH, use_container_width=True)
-                st.markdown("### Transit detection\nA planet passes in front of its star, causing a tiny dip in starlight.\n\n**Often finds:** planets close to their stars—especially larger planets.")
+                st.markdown("### Transit detection\nA planet passes in front of its star, causing a tiny dip in starlight.")
+        st.info("**Pause and predict:** Before looking at the graphs, which planets might each method find more easily? Think about planet size and distance from the star.")
         with st.expander("Watch transit detection in motion"):
             st.video("https://www.youtube.com/watch?v=BFi4HBUdWkk")
             st.caption("NASA animation: a transit produces a small, repeating dip in a star's light. Credit: NASA/JPL-Caltech")
-        method_view = st.radio("Reveal the data", ["Direct Imaging", "Transit", "Transit + Direct Imaging", "All methods"], horizontal=True, key="curious_method_view")
-        graph_guide("Use the buttons to reveal how the pattern changes.", "Compare where each method's points appear on the mass and orbital-distance axes.")
+        method_view = st.radio("Choose a data view", ["Direct Imaging", "Transit", "Transit + Direct Imaging", "All methods"], horizontal=True, key="curious_method_view")
+        graph_guide("Choose a method, then compare where its points appear on the graph.", "Look for patterns in planet mass and orbital distance before opening the explanation.")
         st.plotly_chart(demographics_methods_chart(data, method_view), use_container_width=True)
+        with st.expander("What pattern does the evidence support?"):
+            st.write("Direct imaging most often finds bright, massive planets far from their stars. Transit detection most often finds planets close to their stars, especially larger planets. These are real patterns in the detected data, shaped by what each method can measure.")
         st.markdown("### Discuss\nWhat changed when we changed the way we searched?")
         key_idea("Different discovery methods find different kinds of planets.", "Toggle the method views and compare where their points appear on the graph.")
     elif part == 6:
         st.header("Conclusion: Our view is still changing")
-        st.info("The exoplanets we know are not necessarily a perfect picture of all the planets that exist. New technology should help us find smaller and more distant planets—including more worlds like Earth.")
-        st.markdown("### Three ideas to take away\n- Planetary systems contain planets with very different masses and orbital distances.\n- Graph choices help us see different patterns in data.\n- The way we search affects the planets we find.")
-        st.markdown("### Discuss\nWhat do you now wonder about planets or planetary systems? Try turning your idea into a **why** question.")
-        learn_more_prompt("facilitated")
+        st.info("**Pause and discuss:** What does the evidence allow us to conclude about planetary systems and whether ours is normal?")
+        st.markdown("### A cautious conclusion\nThe detected catalogue contains real patterns: planetary systems contain worlds with many different masses and orbital distances, and different graph scales can help us see them. But the catalogue is shaped by how astronomers find planets, so it is not a complete census of every planetary system that exists.\n\nWe can compare our Solar System with the detected planets, but mass and orbital distance alone cannot decide whether a whole planetary system is ‘normal’.")
+        st.markdown("### Choose a direction to explore next\nPick any option that interests you. You do not need to explore them all.")
+        next_directions = {
+            "How planetary systems form": "What processes might make one planetary system look very different from another?",
+            "How astronomers search for life": "What extra evidence, beyond mass and orbital distance, would scientists need to investigate a planet’s atmosphere or possible conditions for life?",
+            "Future telescopes and missions": "Which new observations could help find planets that are currently difficult to detect?",
+            "Other worlds in culture and imagination": "How have people imagined worlds beyond our Solar System in stories, art or film?",
+        }
+        selected_directions = st.multiselect("Choose one or more directions", list(next_directions), key="curious_next_directions")
+        for direction in selected_directions:
+            st.markdown(f"**{direction}**\n\n{next_directions[direction]}")
 
     step_buttons(STEP_LABELS, "curious_step_selector", "curious_part", "curious_scroll_to_top", part, "curious")
