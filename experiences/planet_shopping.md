@@ -59,8 +59,8 @@ planet has failed a criterion.
   cause of Earth being unavailable is deliberately unspecified.
 - Its facilitated sequence is: Earth and the Solar System → the Sun is a star
   → other stars can have planets → exoplanets → a growing catalogue.
-- It uses small, student-triggered reveals rather than presenting the full
-  explanation at once.
+- It uses a natural teaching and scrolling sequence. Interaction is retained
+  only where it performs a useful cognitive job.
 - The Solar System image is a small supporting visual beside the initial
   question; it is not a hero image or a separate Solar System lesson.
 - Catalogue counts are calculated dynamically from unique `pl_name` records
@@ -70,10 +70,35 @@ planet has failed a criterion.
 - Stage 1 ends with the question: *What does one planet actually look like in
   the data?* This leads directly into Stage 2.
 
+### Implemented Stage 2: Meet Your Planet
+
+- A selected real catalogue planet is shown primarily as a compact
+  planet-centred data profile, not as a spreadsheet row.
+- The profile foregrounds its name, estimated temperature, size relative to
+  Earth, distance from Earth, number of stars, number of known planets and
+  year length. Missing values are shown as **Unknown**.
+- Raw tabular data may be used later as secondary detail, but should not carry
+  the main learning experience.
+
+### Current review observations
+
+- **OBSERVATION:** Repeated click-to-reveal interactions in Stage 1 created
+  excessive interaction friction during review.
+- **DECISION:** Stage 1 should generally use a natural teaching/scroll
+  sequence. Interaction should be retained only where the interaction itself
+  performs a useful cognitive job.
+- **OBSERVATION:** The Stage 2 prototype presented a planet mainly as a table
+  of values. This did not create a meaningful conception of the planet as a
+  real world.
+- **DECISION:** Stage 2 should present the selected planet primarily through
+  a planet-centred visual/profile/infographic representation. Raw tabular data
+  may be retained as secondary detail, but should not carry the main learning
+  experience.
+
 ### Interface principles for this experience
 
 - Keep one main cognitive job per screen section.
-- Use short, conversational, question-led text and compact reveals.
+- Use short, conversational, question-led text and a natural scroll sequence.
 - Put essential explanation next to its visual or data.
 - Prefer a small supporting visual beside text over a large decorative image.
 - Use panels/cards only when they create a meaningful grouping.

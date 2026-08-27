@@ -43,20 +43,6 @@ def _catalogue_counts(data: pd.DataFrame, current_year: int | None = None) -> di
     }
 
 
-def _reveal_button(state_key: str, label: str) -> bool:
-    """Show the next compact part of the facilitated launch story on request."""
-    if state_key not in st.session_state:
-        st.session_state[state_key] = False
-    if not st.session_state[state_key]:
-        st.button(
-            label,
-            type="primary",
-            key=f"{state_key}_button",
-            on_click=lambda: st.session_state.__setitem__(state_key, True),
-        )
-    return bool(st.session_state[state_key])
-
-
 def _value_or_unknown(value, formatter) -> str:
     """Format a catalogue value without treating a missing value as zero."""
     return "Unknown" if pd.isna(value) else formatter(value)
@@ -70,9 +56,8 @@ def _render_launch(data: pd.DataFrame) -> None:
     with question:
         st.markdown("### Where can we go?")
         st.write("Earth is one planet orbiting the Sun. Could we just move somewhere else in our Solar System?")
-        if _reveal_button("planet_shopping_launch_solar_system", "Reveal our first problem →"):
-            st.write("The other planets in our Solar System are not obvious replacements for Earth.")
-            st.markdown("**Maybe we need to look further away.**")
+        st.write("The other planets in our Solar System are not obvious replacements for Earth.")
+        st.markdown("**Maybe we need to look further away.**")
     with image:
         st.image(
             SOLAR_SYSTEM_IMAGE_PATH,
@@ -80,19 +65,10 @@ def _render_launch(data: pd.DataFrame) -> None:
             use_container_width=True,
         )
 
-    if not st.session_state.get("planet_shopping_launch_solar_system", False):
-        return
-
     st.markdown("### Look beyond the Sun")
     st.write("The Sun is our star. The stars we see in the night sky are other stars — and other stars can have planets too.")
-    if not _reveal_button("planet_shopping_launch_exoplanets", "What do we call those planets? →"):
-        return
-
     st.success("A **Solar System** is the planetary system around our Sun. An **exoplanet** is a planet outside our Solar System.")
     st.write("Astronomers have discovered thousands of exoplanets. They organise what they find in a catalogue: one planet, one record, with different pieces of information about it.")
-
-    if not _reveal_button("planet_shopping_launch_catalogue", "Open the catalogue →"):
-        return
 
     current_year = date.today().year
     counts = _catalogue_counts(data, current_year)
@@ -109,9 +85,23 @@ def _render_launch(data: pd.DataFrame) -> None:
     st.info("**Next: Meet Your Planet**")
 
 
+def _planet_visual_style(planet: pd.Series) -> tuple[int, str, str]:
+    """Return a compact symbolic visual based on recorded size and temperature."""
+    radius = pd.to_numeric(pd.Series([planet["pl_rade"]]), errors="coerce").iloc[0]
+    temperature = pd.to_numeric(pd.Series([planet["pl_eqt"]]), errors="coerce").iloc[0]
+    diameter = 84 if pd.isna(radius) else int(max(64, min(150, 60 + float(radius) * 28)))
+    if pd.isna(temperature):
+        return diameter, "#5B7DB1", "No recorded temperature"
+    if temperature < 250:
+        return diameter, "#4C9BE8", "Cooler colour"
+    if temperature > 700:
+        return diameter, "#E8753F", "Warmer colour"
+    return diameter, "#B570C9", "Middle-range colour"
+
+
 def _render_meet_your_planet(data: pd.DataFrame) -> None:
     st.subheader("🛰️ Meet Your Planet")
-    st.write("A catalogue represents each known planet using recorded variables. Choose one real planet to inspect.")
+    st.write("A catalogue records measurements, but each row still describes a real world. Choose one planet to inspect.")
     names = sorted(data["pl_name"].dropna().astype(str).unique())
     planet_name = st.selectbox(
         "Choose or search for a planet",
@@ -128,27 +118,43 @@ def _render_meet_your_planet(data: pd.DataFrame) -> None:
         planet["sy_dist"],
         lambda value: f"{value * PARSEC_TO_LIGHT_YEARS:.0f} light-years",
     )
-    values = pd.DataFrame(
-        {
-            "Variable": [
-                "Estimated temperature",
-                "Planet size",
-                "Distance from Earth",
-                "Stars in the system",
-                "Known planets in the system",
-                "Year length",
-            ],
-            "Value": [
-                temperature,
-                _value_or_unknown(planet["pl_rade"], lambda value: f"{value:.2f} Earth radii"),
-                distance,
-                _value_or_unknown(planet["sy_snum"], lambda value: f"{int(value)}"),
-                _value_or_unknown(planet["sy_pnum"], lambda value: f"{int(value)}"),
-                _value_or_unknown(planet["pl_orbper"], lambda value: f"{value:.1f} days"),
-            ],
-        }
-    )
-    st.dataframe(values, hide_index=True, use_container_width=True)
+    radius = _value_or_unknown(planet["pl_rade"], lambda value: f"{value:.2f} Earth radii")
+    stars = _value_or_unknown(planet["sy_snum"], lambda value: f"{int(value)}")
+    known_planets = _value_or_unknown(planet["sy_pnum"], lambda value: f"{int(value)}")
+    year_length = _value_or_unknown(planet["pl_orbper"], lambda value: f"{value:.1f} days")
+    planet_size, planet_colour, colour_description = _planet_visual_style(planet)
+
+    portrait, details = st.columns([1, 2])
+    with portrait:
+        with st.container(border=True):
+            st.markdown("### Planet portrait")
+            st.subheader(planet_name)
+            st.markdown(
+                f"<div style='height: 170px; display: grid; place-items: center;'>"
+                f"<div role='img' aria-label='Symbolic planet portrait' title='{colour_description}; not to scale' "
+                f"style='width: {planet_size}px; height: {planet_size}px; border-radius: 50%; "
+                f"background: radial-gradient(circle at 32% 28%, #fff9, {planet_colour} 45%, #1e2a44); "
+                f"box-shadow: 0 0 22px {planet_colour}88;'></div></div>",
+                unsafe_allow_html=True,
+            )
+            st.caption("Symbolic data portrait — colour and size are not to scale.")
+    with details:
+        st.markdown("### Planet profile")
+        top_left, top_right, top_far = st.columns(3)
+        with top_left:
+            st.metric("Estimated temperature", temperature)
+        with top_right:
+            st.metric("Size relative to Earth", radius)
+        with top_far:
+            st.metric("Distance from Earth", distance)
+        st.markdown("#### Its planetary system")
+        system_left, system_middle, system_right = st.columns(3)
+        with system_left:
+            st.metric("Stars in the system", stars)
+        with system_middle:
+            st.metric("Known planets", known_planets)
+        with system_right:
+            st.metric("Year length", year_length)
     st.caption("Unknown means this value has not been recorded in the catalogue. It does not mean zero or a failed planet.")
 
 
