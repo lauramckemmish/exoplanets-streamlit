@@ -27,6 +27,14 @@ class UNSWVisualSystemTests(unittest.TestCase):
         self.assertIn('primaryColor = "#FFDC00"', theme)
         self.assertIn('blueColor = "#3F61C4"', theme)
 
+    def test_staged_navigation_uses_a_compact_yellow_location_cue(self):
+        styles = Path("visual_system.py").read_text()
+        self.assertIn('[role="tablist"]', styles)
+        self.assertIn('[data-testid="stTab"] hr {{ display: none; }}', styles)
+        self.assertIn('border-left: 4px solid var(--unsw-active-emphasis)', styles)
+        self.assertIn('[role="tab"] {{\n            min-height: 2rem;', styles)
+        self.assertIn('border-radius: 0.3rem;\n            color: inherit;', styles)
+
 
 if __name__ == "__main__":
     unittest.main()

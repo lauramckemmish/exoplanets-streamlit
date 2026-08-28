@@ -79,6 +79,7 @@ def select_tab_step(tab_key: str, labels: list[str], step_key: str, scroll_key: 
 
 
 def step_tabs(labels: list[str], key: str, current_step: int):
+    """Render shared compact, keyboard-accessible staged navigation."""
     current_step = max(0, min(current_step, len(labels) - 1))
     if st.session_state.get(key) not in labels:
         st.session_state[key] = labels[current_step]

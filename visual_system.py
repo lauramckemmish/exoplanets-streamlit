@@ -93,7 +93,8 @@ def apply_visual_system() -> None:
         }}
         [data-testid="stButton"] > button:focus-visible,
         [data-testid="stFormSubmitButton"] > button:focus-visible,
-        [data-testid="stTabs"] button:focus-visible {{
+        [data-testid="stTabs"] button:focus-visible,
+        [data-testid="stTabs"] [role="tab"]:focus-visible {{
             outline: 3px solid currentColor;
             outline-offset: 2px;
             box-shadow: 0 0 0 5px var(--unsw-brand);
@@ -113,12 +114,33 @@ def apply_visual_system() -> None:
             color: inherit;
         }}
 
-        [data-testid="stTabs"] button[aria-selected="true"] {{
-            background: rgba(255, 220, 0, 0.10);
-            border-bottom: 3px solid var(--unsw-active-emphasis);
-            border-radius: 0.3rem 0.3rem 0 0;
+        /* Shared staged navigation: compact location controls, not browser tabs. */
+        [data-testid="stTabs"] [role="tablist"] {{
+            gap: 0.25rem;
+            flex-wrap: wrap;
+            border-bottom: 0;
         }}
-        [data-testid="stTabs"] button[aria-selected="true"] p {{
+        [data-testid="stTabs"] [data-testid="stTab"] hr {{ display: none; }}
+        [data-testid="stTabs"] [role="tab"] {{
+            min-height: 2rem;
+            padding: 0.3rem 0.55rem;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 0.3rem;
+            color: inherit;
+        }}
+        [data-testid="stTabs"] [role="tab"]:hover {{
+            background: rgba(255, 220, 0, 0.08);
+        }}
+        [data-testid="stTabs"] [role="tab"][aria-selected="true"],
+        [data-testid="stTabs"] [role="tab"][data-selected="true"] {{
+            background: rgba(255, 220, 0, 0.12);
+            border: 1px solid transparent;
+            border-left: 4px solid var(--unsw-active-emphasis);
+            padding-left: calc(0.55rem - 3px);
+        }}
+        [data-testid="stTabs"] [role="tab"][aria-selected="true"] p,
+        [data-testid="stTabs"] [role="tab"][data-selected="true"] p {{
             color: inherit;
             font-weight: 650;
         }}

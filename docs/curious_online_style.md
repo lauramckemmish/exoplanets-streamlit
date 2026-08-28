@@ -175,6 +175,10 @@ a rainbow.
   sliders, their active track/thumb/value and focus), and indigo is the native
   information colour (for `st.info`, including pause cues and hard reveals).
   Do not replace these shared settings with experience-specific CSS.
+- Shared staged navigation is rendered by `step_tabs()`. It uses compact,
+  wrapped controls rather than a browser-tab strip: stage text remains
+  theme-aware, while a small yellow left rule and restrained surface mark the
+  current location. Never use yellow for stage text.
 - Custom ordinary text/background combinations must meet at least 4.5:1
   contrast. Whenever a rare high-value control deliberately uses a filled
   UNSW-yellow background, its text is black; keep keyboard focus visible and
