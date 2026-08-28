@@ -114,4 +114,29 @@ def render(data, image_path, feedback_url, grant_url, catalog, open_experience, 
         st.info("**Currently in development**\n\nThis resource is being actively developed. Please expect some content and features to change while it is refined.")
         if feedback_url:
             st.link_button("Give teacher feedback", feedback_url)
-        st.markdown(f"Feedback is very welcome—especially detailed suggestions from teachers and facilitators. Please email [l.mckemmish@unsw.edu.au](mailto:l.mckemmish@unsw.edu.au).\n\nCreated by **Maria Pettyjohn, Dr Lauren McKnight, James Cleaver and Dr Laura McKemmish**.\n\nThis resource has also been shaped by the ideas, observations and feedback of many CURIOUS facilitators, teachers and student participants. We gratefully acknowledge everyone who has helped test and improve it over time.\n\nDevelopment was supported through the Australian Government's [Maker Projects: Community STEM Engagement Grants 2024 program]({grant_url}).")
+        st.markdown(
+            "Feedback is very welcome—especially detailed suggestions from teachers and "
+            "facilitators. Please email [l.mckemmish@unsw.edu.au](mailto:l.mckemmish@unsw.edu.au)."
+        )
+        st.markdown(
+            f"### Funding\n\n"
+            f"[Australian Government Maker Projects – Community STEM Engagement Grant]({grant_url})"
+        )
+        st.markdown(
+            "### Partners\n\n"
+            "This work has been developed with contributions from CSIRO through the "
+            "STEM-INSIGHTS program and the UNSW Student Equity Team."
+        )
+        st.markdown(
+            "### Contributors to this resource\n\n"
+            "- Isabella Bustos-McNeil\n"
+            "- James Cleaver\n"
+            "- Laura McKemmish\n"
+            "- Lauren McKnight\n"
+            "- Maria Pettyjohn\n"
+            "- Charlotte Regan\n"
+            "- Laura Smith\n\n"
+            "We also gratefully acknowledge the CURIOUS facilitators, teachers and students "
+            "whose ideas, observations, feedback and experience have helped test and improve "
+            "this resource."
+        )
