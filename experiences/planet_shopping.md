@@ -25,18 +25,58 @@ brief remains authoritative for Planet Shopping's local learning sequence.
 
 The completed experience will have five stages:
 
-1. **Launch — exoplanets and the catalogue**
-2. **Meet Your Planet — understand how a real planet is represented through variables**
-3. **Filter One Variable — understand a single criterion, matches/non-matches/unknowns**
-4. **Build Your Search — combine criteria and reason about their intersection**
-5. **Choose Your Destination — make an evidence-based choice from incomplete information**
+1. **Launch — Where can we go?**
+2. **Meet Your Planet — What does a planet look like as data?**
+3. **Start Your Search — How do filters narrow the catalogue?**
+4. **Build Your Search — Where would you actually go?**
+5. **What did you just do? — Make the data-science transfer explicit**
 
-The distinction between the middle stages is critical:
+### Stage 3: Start Your Search
 
-- **Stage 3 teaches filtering:** one criterion at a time, including which
-  records match, do not match, or are unknown.
-- **Stage 4 teaches combining filters:** applying several chosen criteria and
-  reasoning about their intersection.
+Stage 3 deliberately contains two teaching episodes. Students first learn the
+mechanism of filtering, then encounter the complication of incomplete real
+data.
+
+1. Start with **distance from Earth** (`sy_dist`) as the clean introduction to
+   filtering. Students choose how far away they are willing to consider, apply
+   that criterion and see the candidate population shrink. Because `sy_dist`
+   is overwhelmingly complete, records without a distance should be quietly
+   omitted from this introductory filtering population. This is a deliberate
+   pedagogical simplification, not an assumption that a missing distance means
+   failure.
+2. Introduce **estimated equilibrium temperature** (`pl_eqt`) as the second
+   filter. This is where missing information becomes an explicit learning
+   problem: students distinguish known matches, known non-matches and unknowns,
+   then decide whether planets with unknown temperature remain possible
+   candidates or are set aside. Unknown always means unknown, never zero or a
+   failed criterion.
+
+### Stage 4: Build Your Search
+
+- Carry the distance and temperature criteria forward and add **planet size**
+  (`pl_rade`) as the third core criterion.
+- Students combine distance, temperature and size, reason about their
+  intersection, and adjust the criteria to see the candidate population
+  change.
+- Once a manageable shortlist exists, stop introducing core filters and
+  inspect the surviving real planets. Reveal richer comparison information at
+  this point, including number of stars in the system, number of known planets,
+  year length and relevant unknown values.
+- Students compare the surviving candidates and choose a destination here.
+  That decision is the payoff of Stage 4, not a separate navigation stage.
+
+### Stage 5: What did you just do?
+
+- Stage 5 is the workshop landing, not another exoplanet-analysis task.
+- Explicitly reconstruct the data-science sequence: inspect a dataset →
+  understand variables → apply a filter → combine filters → deal with missing
+  information → make a decision from evidence.
+- Connect this to familiar online shopping: narrowing many products with
+  several criteria, deciding what to do when a specification is missing, and
+  choosing from the survivors.
+- Generalise the same reasoning to animals, medicines, molecules and other
+  scientific datasets. Exoplanets provide the motivating problem; the
+  transferable learning is how to search, filter and reason with data.
 
 ### Data ideas to make intuitive
 
@@ -101,6 +141,9 @@ planet has failed a criterion.
   a planet-centred visual/profile/infographic representation. Raw tabular data
   may be retained as secondary detail, but should not carry the main learning
   experience.
+- **OBSERVATION:** Planet Shopping's major headings are currently visually too
+  large. The experience should use a more compact heading hierarchy appropriate
+  to a multi-stage workshop rather than landing-page-sized headings.
 
 ### Interface principles for this experience
 
