@@ -312,6 +312,7 @@ class LessonDependencies:
 def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencies) -> None:
     """Render the existing Year 10 lesson text and interactions for one step."""
     d = dependencies
+    allow_next = True
     # CLASSROOM STEP 0 — Welcome
     if part == 0:
         st.header(d.pathway_name)
@@ -360,14 +361,16 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             d.solar_system_demographics_chart(False),
             use_container_width=True,
         )
-        if d.persistent_reveal(
+        log_scale_revealed = d.persistent_reveal(
             "Jupiter and the distant outer planets set the scale, so Mercury, Venus, Earth and Mars bunch together "
             "near the bottom-left corner. How could we spread them out without losing the giant planets?",
             "year10_log_scale_revealed",
             reveal_label="Reveal a new way to view the same data →",
             revealed_message="**Same planets. Same variables. Different spacing.** A log scale spreads out the small values while keeping the giant planets on the same graph.",
             explanation="The variables do not change: the graph still shows planet mass and orbital distance. On a log scale, equal spaces represent multiplication. For example, the gap from **0.1 to 1** is the same size as the gap from **1 to 10**. You do not need to calculate logarithms to read the graph.",
-        ):
+        )
+        allow_next = log_scale_revealed
+        if log_scale_revealed:
             st.subheader("Now compare the log–log view")
             d.graph_guide(
                 "The axes show the same variables as the first graph, but the spacing now represents multiplication.",
@@ -652,3 +655,5 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             placeholder="Why…?",
         )
         d.learn_more_prompt("classroom")
+
+    return allow_next

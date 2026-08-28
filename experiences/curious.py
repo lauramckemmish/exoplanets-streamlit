@@ -86,6 +86,7 @@ def render(data: pd.DataFrame) -> None:
         st.session_state["curious_scroll_to_top"] = True
     scroll_to_top_if_requested("curious_scroll_to_top")
     render_teacher_note(part)
+    allow_next = True
 
     if part == 0:
         st.header("Welcome")
@@ -123,15 +124,19 @@ def render(data: pd.DataFrame) -> None:
         st.subheader("First: ordinary linear axes")
         graph_guide("The bottom axis shows orbital distance; the side axis shows mass.", "Farther right means farther from the Sun. Higher means more massive.")
         st.plotly_chart(solar_system_demographics_chart(False), use_container_width=True)
-        if hard_reveal(
+        log_scale_revealed = hard_reveal(
             "Jupiter and the distant outer planets set the scale, so the small inner planets bunch together near the bottom-left corner. How could we spread them out without losing the giant planets?",
             "curious_log_scale_revealed",
             reveal_label="Reveal a new way to view the same data →",
-        ):
+        )
+        allow_next = log_scale_revealed
+        if log_scale_revealed:
             st.subheader("Now compare the log–log view")
             graph_guide("The axes show the same values, but the new spacing spreads out the small planets.", "Find Earth at 1 AU and 1 Earth mass, then compare the positions of the four inner planets.")
             st.plotly_chart(solar_system_demographics_chart(True), use_container_width=True)
-            st.markdown("### Pause and discuss\nWhat can you see now that was difficult to see before? Where are the small inner planets and the giant outer planets?")
+            pause_cue(
+                "What can you see now that was difficult to see before? Where are the small inner planets and the giant outer planets?"
+            )
             st.info("**What changed?** These are the same planets, variables and values. A log scale changes the spacing so small and large values can be seen on the same graph. You do not need to calculate logarithms to use it.")
             key_idea("A log scale helps us see small and large planets on the same graph.", "The four inner planets are easier to separate without losing Jupiter and the outer planets.")
     elif part == 4:
@@ -192,4 +197,12 @@ def render(data: pd.DataFrame) -> None:
             label="Choose one or more directions",
         )
 
-    step_buttons(STEP_LABELS, "curious_step_selector", "curious_part", "curious_scroll_to_top", part, "curious")
+    step_buttons(
+        STEP_LABELS,
+        "curious_step_selector",
+        "curious_part",
+        "curious_scroll_to_top",
+        part,
+        "curious",
+        allow_next=allow_next,
+    )

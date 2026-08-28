@@ -153,8 +153,8 @@ def persistent_reveal(
 
 
 def pause_cue(prompt: str, *, title: str = "Pause and discuss") -> None:
-    """Mark a visible, non-blocking moment for learner reasoning."""
-    st.info(f"**{title}**\n\n{prompt}")
+    """Mark a visible, discreet and non-blocking moment for learner reasoning."""
+    st.info(f"_{title}_\n\n{prompt}")
 
 
 def hard_reveal(
@@ -166,8 +166,13 @@ def hard_reveal(
     explanation: str | None = None,
     title: str = "Pause and predict",
 ) -> bool:
-    """Persistently reveal essential material only after a deliberate prompt."""
-    st.markdown(f"### {title}\n{prompt}")
+    """Persistently reveal essential material after a compact reasoning prompt.
+
+    The calling stage is responsible for passing this return value to
+    ``step_buttons(..., allow_next=...)`` when the reveal is required before
+    its next stage.
+    """
+    st.info(f"_{title}_\n\n{prompt}")
     if key not in st.session_state:
         st.session_state[key] = False
     if not st.session_state[key]:

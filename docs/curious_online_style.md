@@ -78,12 +78,18 @@ a clear reason: deliberate withholding, optionality or learner choice.
 ### Pause cue
 
 - Visibly marks a moment to think, predict, compare, decide or discuss.
-- Does not block navigation and does not require an answer submission.
+- Uses a compact info-style box: the prompt is the visual focus, while any cue
+  label is small and subordinate inside the box rather than a page heading.
+- Does not block navigation or require an answer submission.
 - This is the normal/default reasoning prompt.
 
 ### Hard reveal
 
 - Genuinely withholds information or a representation.
+- Blocks **Continue** until the learner deliberately reveals the required
+  content. Use its returned completion state with
+  `step_buttons(..., allow_next=...)`; where a stage has multiple required hard
+  reveals, Continue becomes available only after all are complete.
 - Use it only when seeing the material too early would damage an important
   inference.
 - Keep it scarce. For example, students may first encounter an inadequate
@@ -93,18 +99,21 @@ a clear reason: deliberate withholding, optionality or learner choice.
 
 - Makes optional explanation or evidence available behind an expander or
   button.
-- The order can matter, but learners are not gated from progressing.
+- The order can matter, but it never blocks progression.
 - It is often useful after a pause or prediction.
 
 ### Choice reveal
 
 - Offers several optional directions or explanations.
-- Learners choose one or more; they are not expected to open everything.
+- Learners choose one or more; they are not expected to open everything and it
+  never blocks progression.
 - Use it for extensions and interest-led exploration.
 
 ### General rules
 
-- Do not require a click merely to prove progression.
+- Do not require a click merely to prove progression. A required hard reveal
+  is the deliberate exception: it withholds essential evidence before the next
+  stage.
 - Prefer a pause cue to a reveal unless withholding information has a clear
   pedagogical purpose.
 - Hard reveals are scarce.
