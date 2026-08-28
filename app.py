@@ -273,12 +273,13 @@ data = catalogue_load.data
 source = catalogue_load.source
 
 with st.sidebar:
-    logo_plate(UNSW_LOGO_PATH, width=125, alt="UNSW Sydney")
-    st.markdown("### Explore exoplanets")
-    if source.is_live:
-        st.caption(f"**{len(data):,} confirmed exoplanets**  \n{source.provenance}")
-    else:
-        st.caption(f"**Offline catalogue sample · {len(data):,} records**  \n{source.provenance}")
+    with st.container(key="sidebar_brand"):
+        logo_plate(UNSW_LOGO_PATH, width=125, alt="UNSW Sydney")
+        st.markdown("### Explore exoplanets")
+        if source.is_live:
+            st.caption(f"**{len(data):,} confirmed exoplanets**  \n{source.provenance}")
+        else:
+            st.caption(f"**Offline catalogue sample · {len(data):,} records**  \n{source.provenance}")
     st.button(
         "🏠 Introduction",
         type="primary" if st.session_state["experience"] == "Introduction" else "secondary",

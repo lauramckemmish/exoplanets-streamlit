@@ -48,6 +48,21 @@ def apply_visual_system() -> None:
 
         [data-testid="stSidebar"] [data-testid="stVerticalBlock"] {{ gap: 0.35rem; }}
         [data-testid="stSidebar"] {{ border-right: 1px solid rgba(255, 220, 0, 0.35); }}
+        [data-testid="stSidebar"] .st-key-sidebar_brand {{
+            background: var(--unsw-brand);
+            color: var(--unsw-filled-yellow-text);
+            padding: 0.65rem 0.7rem 0.6rem;
+            margin: -0.15rem -0.35rem 0.6rem;
+            border-radius: 0 0 0.3rem 0.3rem;
+        }}
+        [data-testid="stSidebar"] .st-key-sidebar_brand h3,
+        [data-testid="stSidebar"] .st-key-sidebar_brand p,
+        [data-testid="stSidebar"] .st-key-sidebar_brand [data-testid="stCaptionContainer"] {{
+            color: var(--unsw-filled-yellow-text) !important;
+        }}
+        [data-testid="stSidebar"] .st-key-sidebar_brand [data-testid="stCaptionContainer"] p {{
+            color: var(--unsw-filled-yellow-text) !important;
+        }}
         [data-testid="stSidebar"] [data-testid="stButton"] > button {{
             min-height: 2rem;
             padding: 0.2rem 0.45rem;
