@@ -142,9 +142,13 @@ hex values through experience modules.
 
 ### Palette and semantic roles
 
-- **Brand and primary action:** UNSW yellow `#FFDC00`, with black `#000000`
-  text. Use it for high-value actions, selected navigation and focus/selection
-  cues; do not flood a page with yellow.
+- **Brand and active emphasis:** UNSW yellow `#FFDC00`, with black `#000000`
+  text whenever it is used as a filled background. Use yellow for high-value
+  actions, selected-navigation cues, metric rules and keyboard focus; do not
+  flood a page with yellow. Routine primary controls, including Continue,
+  Back and navigation, use a theme-aware surface with a yellow border or
+  selection rule rather than a solid yellow fill. Reserve a solid yellow fill
+  for a rare action or reveal whose prominence is pedagogically useful.
 - **Information:** indigo `#3F61C4`; use restrained surfaces, borders and
   secondary interaction rather than coloured body text.
 - **Exploration:** purple `#8A68C8`; use sparingly for optional discovery or
@@ -153,8 +157,8 @@ hex values through experience modules.
   genuinely useful. Pink `#FA91B6` is an occasional warm highlight, not a
   default component colour.
 - **Functional states:** green `#1AC987` for success; red `#FF635D` for error,
-  warning or genuinely negative states. Routine Continue navigation is a
-  yellow primary action, never an alert-red action.
+  warning or genuinely negative states. Routine Continue navigation is not an
+  alert-red action and does not need a solid yellow fill.
 
 Use accents selectively: a component or section normally needs yellow plus at
 most one dominant cool accent. The palette is not a reason to make each screen
@@ -163,12 +167,13 @@ a rainbow.
 ### Theme, accessibility and visualisation
 
 - Light and dark mode are first-class. Keep the active Streamlit surface and
-  text colours; use transparent tints and borders rather than forcing page
-  backgrounds. Approved UNSW logos use the shared white logo plate.
+  text colours; use transparent overlays of the official yellow and borders
+  rather than inventing a muted substitute or forcing page backgrounds.
+  Approved UNSW logos use the shared white logo plate.
 - Custom ordinary text/background combinations must meet at least 4.5:1
-  contrast. Black on UNSW yellow is the standard primary-action treatment;
-  keep keyboard focus visible and do not communicate essential learning by
-  colour alone.
+  contrast. Whenever a rare high-value control deliberately uses a filled
+  UNSW-yellow background, its text is black; keep keyboard focus visible and
+  do not communicate essential learning by colour alone.
 - Scientific charts may use several distinguishable colours where the data
   require them. Do not mechanically recolour a chart to match the brand if it
   weakens scientific meaning or accessibility.

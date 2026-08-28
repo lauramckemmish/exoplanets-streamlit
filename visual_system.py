@@ -17,8 +17,9 @@ UNSW_PALETTE = {
 
 SEMANTIC_TOKENS = {
     "brand": UNSW_PALETTE["yellow"],
-    "primary_action": UNSW_PALETTE["yellow"],
-    "primary_action_text": UNSW_PALETTE["black"],
+    "active_emphasis": UNSW_PALETTE["yellow"],
+    "high_value_action": UNSW_PALETTE["yellow"],
+    "filled_yellow_text": UNSW_PALETTE["black"],
     "information": UNSW_PALETTE["indigo"],
     "exploration": UNSW_PALETTE["purple"],
     "secondary_accent": UNSW_PALETTE["teal"],
@@ -36,8 +37,8 @@ def apply_visual_system() -> None:
         <style>
         :root {{
             --unsw-brand: {SEMANTIC_TOKENS['brand']};
-            --unsw-primary-action: {SEMANTIC_TOKENS['primary_action']};
-            --unsw-primary-action-text: {SEMANTIC_TOKENS['primary_action_text']};
+            --unsw-active-emphasis: {SEMANTIC_TOKENS['active_emphasis']};
+            --unsw-filled-yellow-text: {SEMANTIC_TOKENS['filled_yellow_text']};
             --unsw-information: {SEMANTIC_TOKENS['information']};
             --unsw-exploration: {SEMANTIC_TOKENS['exploration']};
             --unsw-secondary-accent: {SEMANTIC_TOKENS['secondary_accent']};
@@ -53,18 +54,19 @@ def apply_visual_system() -> None:
             font-size: 0.88rem;
         }}
 
+        /* Primary is a clear action, not automatically a yellow surface. */
         [data-testid="stButton"] > button[kind="primary"],
         [data-testid="stFormSubmitButton"] > button[kind="primary"] {{
-            background: var(--unsw-primary-action);
-            border-color: var(--unsw-primary-action);
-            color: var(--unsw-primary-action-text);
+            background: transparent;
+            border: 2px solid var(--unsw-active-emphasis);
+            color: inherit;
             font-weight: 650;
         }}
         [data-testid="stButton"] > button[kind="primary"]:hover,
         [data-testid="stFormSubmitButton"] > button[kind="primary"]:hover {{
-            background: #FFE54D;
-            border-color: #FFE54D;
-            color: var(--unsw-primary-action-text);
+            background: rgba(255, 220, 0, 0.10);
+            border-color: var(--unsw-active-emphasis);
+            color: inherit;
         }}
         [data-testid="stButton"] > button[kind="secondary"] {{
             background: rgba(63, 97, 196, 0.08);
@@ -73,18 +75,32 @@ def apply_visual_system() -> None:
         [data-testid="stButton"] > button:focus-visible,
         [data-testid="stFormSubmitButton"] > button:focus-visible,
         [data-testid="stTabs"] button:focus-visible {{
-            outline: 3px solid var(--unsw-primary-action-text);
+            outline: 3px solid currentColor;
             outline-offset: 2px;
             box-shadow: 0 0 0 5px var(--unsw-brand);
         }}
 
+        [data-testid="stSidebar"] [data-testid="stButton"] > button[kind="primary"] {{
+            background: rgba(255, 220, 0, 0.10);
+            border-color: transparent;
+            border-left: 4px solid var(--unsw-active-emphasis);
+            color: inherit;
+            padding-left: calc(0.45rem - 2px);
+        }}
+        [data-testid="stSidebar"] [data-testid="stButton"] > button[kind="primary"]:hover {{
+            background: rgba(255, 220, 0, 0.16);
+            border-color: transparent;
+            border-left-color: var(--unsw-active-emphasis);
+            color: inherit;
+        }}
+
         [data-testid="stTabs"] button[aria-selected="true"] {{
-            background: var(--unsw-brand);
-            color: var(--unsw-primary-action-text);
+            background: rgba(255, 220, 0, 0.10);
+            border-bottom: 3px solid var(--unsw-active-emphasis);
             border-radius: 0.3rem 0.3rem 0 0;
         }}
         [data-testid="stTabs"] button[aria-selected="true"] p {{
-            color: var(--unsw-primary-action-text);
+            color: inherit;
             font-weight: 650;
         }}
         [data-testid="stExpander"] {{ border-left: 3px solid rgba(63, 97, 196, 0.7); }}

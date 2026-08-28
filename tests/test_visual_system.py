@@ -11,9 +11,10 @@ class UNSWVisualSystemTests(unittest.TestCase):
         self.assertEqual(UNSW_PALETTE["black"], "#000000")
         self.assertEqual(UNSW_PALETTE["white"], "#FFFFFF")
 
-    def test_primary_actions_use_black_on_unsw_yellow(self):
-        self.assertEqual(SEMANTIC_TOKENS["primary_action"], UNSW_PALETTE["yellow"])
-        self.assertEqual(SEMANTIC_TOKENS["primary_action_text"], UNSW_PALETTE["black"])
+    def test_yellow_is_reserved_for_active_and_high_value_emphasis(self):
+        self.assertEqual(SEMANTIC_TOKENS["active_emphasis"], UNSW_PALETTE["yellow"])
+        self.assertEqual(SEMANTIC_TOKENS["high_value_action"], UNSW_PALETTE["yellow"])
+        self.assertEqual(SEMANTIC_TOKENS["filled_yellow_text"], UNSW_PALETTE["black"])
 
     def test_functional_roles_use_the_official_accents(self):
         self.assertEqual(SEMANTIC_TOKENS["information"], UNSW_PALETTE["indigo"])
