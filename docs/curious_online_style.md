@@ -37,9 +37,9 @@ pedagogical design recorded in each experience's matching `.md` file.
   may appear as optional callouts or reveals within it.
 - Explore resources may use a genuine scientist story more substantially when
   it helps explain the scientific history.
-- The landing page may use a genuine named scientist's first-person voice to
-  establish provenance, trust and an invitation into the science. Keep it
-  brief and learner-facing, rather than biographical.
+- The landing page may use a genuine named scientist's story as optional human
+  context after its core orientation and learner choices. It must not establish
+  institutional provenance or imply individual ownership of the resource.
 - Never fabricate a person's story, quotation or perspective. Other
   identifiable people need supplied, approved or attributable material.
 

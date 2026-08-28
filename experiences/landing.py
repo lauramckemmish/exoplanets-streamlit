@@ -55,27 +55,9 @@ def render(data, image_path, feedback_url, grant_url, catalog, open_experience, 
             caption="Artist's concept of the variety of known exoplanets. Credit: NASA/JPL-Caltech",
             use_container_width=True,
         )
+    st.caption("A UNSW CURIOUS educational resource using real NASA exoplanet data.")
 
-    st.markdown("## Why I made this")
-    st.markdown(
-        "I’m Dr Laura McKemmish, a UNSW scientist working with molecules, spectroscopy "
-        "and exoplanet science. I’ve been able to watch this field change while working in it."
-    )
-    st.markdown(
-        "One of the things I love about this science is that you don’t have to wait until "
-        "you are a professional astronomer to start asking real questions. The tools and "
-        "depth change, but the important moves are recognisable: look at the evidence, "
-        "understand how it was measured, notice what is surprising, and ask what the data "
-        "can and cannot tell us. Come and investigate this with me."
-    )
-    with st.expander("Laura’s exoplanet story"):
-        st.write(
-            "I first became involved in exoplanet research in 2014. Since then, I’ve watched "
-            "the catalogue and the questions astronomers can ask change quickly. I’ve explored "
-            "related questions with high-school and university students, and with PhD researchers."
-        )
-
-    st.markdown("## Experiences")
+    st.markdown("## Experience something")
     st.write("Follow a guided investigation. These experiences carry a question, story or dataset through a classroom or workshop sequence.")
     experiences = catalog.experience_catalog()
     _render_cards(
@@ -84,7 +66,7 @@ def render(data, image_path, feedback_url, grant_url, catalog, open_experience, 
         button_key_prefix="open_experience",
         open_item=open_experience,
     )
-    st.markdown("## Explore")
+    st.markdown("## Explore something")
     st.write("Follow a question, story or dataset that interests you.")
     _render_cards(
         catalog.explore_catalog(),
@@ -92,8 +74,22 @@ def render(data, image_path, feedback_url, grant_url, catalog, open_experience, 
         button_key_prefix="open_explore",
         open_item=open_explore_resource,
     )
+    st.markdown("## About this resource")
+    st.write(
+        "Developed at UNSW as part of CURIOUS, drawing on research, teaching and outreach "
+        "work to help learners investigate real exoplanet evidence."
+    )
+    with st.expander("A scientist’s story"):
+        st.markdown("**Dr Laura McKemmish, UNSW**")
+        st.write(
+            "Laura works with molecules, spectroscopy and exoplanet science. She first became "
+            "involved in exoplanet research in 2014 and has watched the field—and the questions "
+            "the available evidence can support—change quickly. She has explored related questions "
+            "across school, university and research contexts."
+        )
     with st.expander("Development, feedback and acknowledgements"):
         st.info("**Currently in development**\n\nThis resource is being actively developed. Please expect some content and features to change while it is refined.")
         if feedback_url:
             st.link_button("Give teacher feedback", feedback_url)
-        st.markdown(f"Feedback is very welcome—especially detailed suggestions from teachers and facilitators. Please email [l.mckemmish@unsw.edu.au](mailto:l.mckemmish@unsw.edu.au).\n\n**Developed for UNSW CURIOUS**\n\nCreated by **Maria Pettyjohn, Dr Lauren McKnight, James Cleaver and Dr Laura McKemmish**.\n\nThis resource has also been shaped by the ideas, observations and feedback of many CURIOUS facilitators, teachers and student participants. We gratefully acknowledge everyone who has helped test and improve it over time.\n\nDevelopment was supported through the Australian Government's [Maker Projects: Community STEM Engagement Grants 2024 program]({grant_url}).")
+        # TODO: Add the formal name of the earlier Google grant once it is verified.
+        st.markdown(f"Feedback is very welcome—especially detailed suggestions from teachers and facilitators. Please email [l.mckemmish@unsw.edu.au](mailto:l.mckemmish@unsw.edu.au).\n\nCreated by **Maria Pettyjohn, Dr Lauren McKnight, James Cleaver and Dr Laura McKemmish**.\n\nThis resource has also been shaped by the ideas, observations and feedback of many CURIOUS facilitators, teachers and student participants. We gratefully acknowledge everyone who has helped test and improve it over time.\n\nDevelopment was supported through the Australian Government's [Maker Projects: Community STEM Engagement Grants 2024 program]({grant_url}).")
