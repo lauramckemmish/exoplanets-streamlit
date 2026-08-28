@@ -2,6 +2,8 @@
 
 import streamlit as st
 
+from ui_helpers import logo_plate
+
 
 def _render_cards(entries, *, button_label, button_key_prefix, open_item):
     """Render a compact two-column collection of landing-page destinations."""
@@ -84,7 +86,7 @@ def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalo
     )
     logo_column, stewardship_column = st.columns([1, 4])
     with logo_column:
-        st.image(portrait_logo_path, width=60)
+        logo_plate(portrait_logo_path, width=60, alt="UNSW Sydney")
     with stewardship_column:
         st.markdown(
             "**Resource stewardship and scientific review**  \n"

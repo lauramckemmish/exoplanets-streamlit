@@ -24,6 +24,7 @@ from ui_helpers import (
     graph_questions,
     key_idea,
     learn_more_prompt,
+    logo_plate,
     persistent_reveal,
     response_box,
     scroll_to_top_if_requested,
@@ -284,7 +285,7 @@ data = catalogue_load.data
 source = catalogue_load.source
 
 with st.sidebar:
-    st.image(UNSW_LOGO_PATH, width=125)
+    logo_plate(UNSW_LOGO_PATH, width=125, alt="UNSW Sydney")
     st.markdown("### Explore exoplanets")
     if source.is_live:
         st.caption(f"**{len(data):,} confirmed exoplanets**  \n{source.provenance}")

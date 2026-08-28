@@ -1,10 +1,25 @@
 """Small, reusable presentation helpers shared by the teaching experiences."""
 
+import base64
 from collections.abc import Iterator, Mapping
 from contextlib import contextmanager
+from pathlib import Path
 
 import streamlit as st
 import streamlit.components.v1 as components
+
+
+def logo_plate(image_path: Path, *, width: int, alt: str) -> None:
+    """Render approved logo artwork on a small, theme-independent white plate."""
+
+    encoded_image = base64.b64encode(image_path.read_bytes()).decode("ascii")
+    st.markdown(
+        f"<div style='display: inline-block; background: white; padding: 6px; "
+        f"border-radius: 2px; line-height: 0;'>"
+        f"<img src='data:image/png;base64,{encoded_image}' alt='{alt}' "
+        f"style='display: block; width: {width}px; height: auto;'></div>",
+        unsafe_allow_html=True,
+    )
 
 
 def key_idea(text: str, evidence: str) -> None:
