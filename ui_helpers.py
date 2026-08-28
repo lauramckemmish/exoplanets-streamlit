@@ -306,6 +306,7 @@ def teacher_note(
     listen_for: str = "",
     background: str = "",
     misconceptions: str = "",
+    facilitator_moment: str = "",
     resources: tuple[tuple[str, str], ...] = (),
     teacher_state_key: str = "demographics_teacher_view",
 ) -> None:
@@ -324,6 +325,8 @@ def teacher_note(
             st.markdown(f"**Suggested approach:** {facilitation}")
             if listen_for:
                 st.markdown(f"**Listen for:** {listen_for}")
+            if facilitator_moment:
+                st.markdown(f"**Facilitator-owned moment:** {facilitator_moment}")
         if background or misconceptions:
             with st.expander("Teacher background and possible misconceptions"):
                 if background:

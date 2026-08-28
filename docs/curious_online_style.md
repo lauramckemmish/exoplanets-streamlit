@@ -50,6 +50,26 @@ evidence and enough scaffolding to stand up. Preserve space for the real
 facilitator to supply human connection, authentic stories, responsive
 explanation, humour and judgement about pacing.
 
+### Facilitator-owned moments
+
+A facilitator-owned moment is a deliberately protected point where the screen
+provides enough context for a conversation but does not immediately supply
+every interesting explanation. A facilitator may add an authentic
+research/scientist story, example, question or live explanation. The
+experience must remain scientifically coherent when no personal story is
+available.
+
+Use these selectively, not on every screen. Flag them in Teacher view with a
+`facilitator_moment` note rather than adding another student-facing callout.
+Never invent or script a personal scientist story, require a facilitator to
+disclose personal experience, or make essential science depend only on an
+optional anecdote. A genuine named or approved scientist story may still be
+used deliberately where it is appropriate.
+
+This is not a reveal type: pause, hard, soft and choice reveals describe a
+learner's interaction with the digital resource; facilitator-owned moments
+describe who owns communication at that point.
+
 ## Reasoning and reveal patterns
 
 Use the pattern that matches the learning purpose. Hidden content should have
