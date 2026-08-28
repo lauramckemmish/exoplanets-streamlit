@@ -4,6 +4,7 @@ See ``planet_shopping.md`` for the established pedagogical design.
 """
 
 from datetime import date
+from math import ceil, floor
 from pathlib import Path
 
 import pandas as pd
@@ -31,6 +32,8 @@ _STAGE_KEY = "planet_shopping_stage"
 _TAB_KEY = "planet_shopping_tab"
 _SCROLL_KEY = "planet_shopping_scroll_to_top"
 _CATALOGUE_REVEAL_KEY = "planet_shopping_launch_catalogue_revealed"
+_TEMPERATURE_RANGE_KEY = "planet_shopping_temperature_range_c"
+_UNKNOWN_TEMPERATURE_DECISION_KEY = "planet_shopping_unknown_temperature_decision"
 
 
 def _catalogue_counts(data: pd.DataFrame, current_year: int | None = None) -> dict[str, int]:
@@ -48,6 +51,22 @@ def _catalogue_counts(data: pd.DataFrame, current_year: int | None = None) -> di
 def _value_or_unknown(value, formatter) -> str:
     """Format a catalogue value without treating a missing value as zero."""
     return "Unknown" if pd.isna(value) else formatter(value)
+
+
+def _split_temperature_groups(
+    data: pd.DataFrame, temperature_range_c: tuple[int, int]
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Split every record into known matches, known non-matches, or unknowns."""
+
+    lower_k, upper_k = (temperature + 273.15 for temperature in temperature_range_c)
+    recorded_temperature = pd.to_numeric(data["pl_eqt"], errors="coerce")
+    unknown = data.loc[recorded_temperature.isna()].copy()
+    matches = data.loc[recorded_temperature.between(lower_k, upper_k, inclusive="both")].copy()
+    does_not_match = data.loc[
+        recorded_temperature.notna()
+        & ~recorded_temperature.between(lower_k, upper_k, inclusive="both")
+    ].copy()
+    return matches, does_not_match, unknown
 
 
 def _render_launch(data: pd.DataFrame) -> None:
@@ -176,16 +195,81 @@ def _render_meet_your_planet(data: pd.DataFrame) -> None:
     st.caption("Unknown means this value has not been recorded in the catalogue. It does not mean zero or a failed planet.")
 
 
-def _render_filter_one_variable() -> None:
+def _render_filter_one_variable(data: pd.DataFrame) -> None:
     st.subheader("🌡️ Filter One Variable")
-    st.warning("**Rough filtering prototype — no final controls yet.**")
-    st.write("Imagine that one thing matters: for example, a planet's estimated temperature.")
-    st.markdown(
-        "- **Matches:** planets with a recorded temperature inside the chosen range.\n"
-        "- **Does not match:** planets with a recorded temperature outside the range.\n"
-        "- **Unknown:** planets whose temperature has not been recorded."
+    st.write("Start with one thing that matters: a planet's estimated temperature.")
+    st.caption(
+        "The catalogue records an **estimated equilibrium temperature**. It is useful for comparing "
+        "planets, but it is not necessarily the planet's surface temperature."
     )
-    st.info("This stage teaches one criterion only. It is not yet about combining several choices.")
+
+    recorded_temperatures_c = pd.to_numeric(data["pl_eqt"], errors="coerce").dropna() - 273.15
+    if recorded_temperatures_c.empty:
+        st.info("This catalogue has no recorded estimated equilibrium temperatures to filter yet.")
+        return
+
+    minimum_temperature = floor(recorded_temperatures_c.min())
+    maximum_temperature = ceil(recorded_temperatures_c.max())
+    default_range = (
+        max(minimum_temperature, 0),
+        min(maximum_temperature, 30),
+    )
+    if default_range[0] >= default_range[1]:
+        default_range = (minimum_temperature, maximum_temperature)
+
+    temperature_range_c = st.slider(
+        "Choose an estimated equilibrium temperature range (°C)",
+        min_value=minimum_temperature,
+        max_value=maximum_temperature,
+        value=default_range,
+        step=1,
+        key=_TEMPERATURE_RANGE_KEY,
+    )
+    matches, does_not_match, unknown = _split_temperature_groups(data, temperature_range_c)
+
+    st.markdown("### What the catalogue says")
+    match_column, non_match_column, unknown_column = st.columns(3)
+    with match_column:
+        with st.container(border=True):
+            st.metric("Matches", len(matches))
+            st.caption("Recorded temperature is inside your range.")
+    with non_match_column:
+        with st.container(border=True):
+            st.metric("Does not match", len(does_not_match))
+            st.caption("Recorded temperature is outside your range.")
+    with unknown_column:
+        with st.container(border=True):
+            st.metric("Unknown", len(unknown))
+            st.caption("No estimated temperature is recorded.")
+
+    st.info(
+        "**Unknown is not a failure.** In online shopping, a missing product specification does not prove "
+        "that the product fails your requirement. It only means you do not have that information yet."
+    )
+    unknown_decision = st.radio(
+        "What should we do with planets whose temperature is unknown?",
+        (
+            "Keep unknowns as possible candidates",
+            "Set unknowns aside until we have a temperature",
+        ),
+        key=_UNKNOWN_TEMPERATURE_DECISION_KEY,
+    )
+    retained_unknowns = unknown if unknown_decision.startswith("Keep") else unknown.iloc[0:0]
+
+    st.markdown("### Your candidate pool")
+    candidates_column, known_matches_column, unknowns_column = st.columns(3)
+    with candidates_column:
+        st.metric("Planets remaining", len(matches) + len(retained_unknowns))
+    with known_matches_column:
+        st.metric("Known matches", len(matches))
+    with unknowns_column:
+        st.metric("Retained unknowns", len(retained_unknowns))
+
+    st.write(
+        "Changing the missing-data decision changes the candidate pool **without changing any "
+        "measurements**. The recorded data stay the same; only your decision about unknown values changes."
+    )
+    st.info("**Next: Build Your Search**\n\nNext you will combine several criteria.")
 
 
 def _render_build_your_search() -> None:
@@ -231,7 +315,7 @@ def render(data: pd.DataFrame) -> None:
     elif stage == 1:
         _render_meet_your_planet(data)
     elif stage == 2:
-        _render_filter_one_variable()
+        _render_filter_one_variable(data)
     elif stage == 3:
         _render_build_your_search()
     else:
