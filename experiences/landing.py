@@ -33,7 +33,7 @@ def _render_cards(entries, *, button_label, button_key_prefix, open_item):
             )
 
 
-def render(data, image_path, feedback_url, grant_url, catalog, open_experience, open_explore_resource, source_label):
+def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalog, open_experience, open_explore_resource, source_label):
     st.title("Other worlds are becoming data")
     introduction_column, image_column = st.columns([3, 2])
     with introduction_column:
@@ -87,6 +87,7 @@ def render(data, image_path, feedback_url, grant_url, catalog, open_experience, 
         "Developed at UNSW as part of CURIOUS, drawing on research, teaching and outreach "
         "work to help learners investigate real exoplanet evidence."
     )
+    st.image(portrait_logo_path, width=100)
     with st.expander("Program history"):
         st.markdown("### Earlier development")
         st.write(
