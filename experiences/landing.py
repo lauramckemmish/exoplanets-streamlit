@@ -33,7 +33,8 @@ def _render_cards(entries, *, button_label, button_key_prefix, open_item):
             )
 
 
-def render(data, image_path, feedback_url, grant_url, catalog, open_experience, open_explore_resource, source_label):
+def render(data, image_path, logo_path, feedback_url, grant_url, catalog, open_experience, open_explore_resource, source_label):
+    st.image(logo_path, width=220)
     st.title("Other worlds are becoming data")
     introduction_column, image_column = st.columns([3, 2])
     with introduction_column:

@@ -55,6 +55,7 @@ APP_DIR = Path(__file__).resolve().parent
 # ---------------------------------------------------------------------------
 SOLAR_SYSTEM_IMAGE_PATH = APP_DIR / "assets" / "solar-system-nasa.jpeg"
 EXOPLANET_IMAGE_PATH = APP_DIR / "assets" / "exoplanets-artists-concept-nasa.jpeg"
+UNSW_LOGO_PATH = APP_DIR / "assets" / "unsw-sydney-logo-landscape.png"
 DIRECT_IMAGING_IMAGE_PATH = APP_DIR / "assets" / "DirectImaging.png"
 TRANSIT_DETECTION_IMAGE_PATH = APP_DIR / "assets" / "Transit.png"
 PLANETARY_SYSTEMS_IMAGE_PATH = APP_DIR / "assets" / "planetary-systems.svg"
@@ -238,6 +239,7 @@ def render_demographics(data: pd.DataFrame, source_label: str) -> None:
         lambda frame: landing.render(
             frame,
             EXOPLANET_IMAGE_PATH,
+            UNSW_LOGO_PATH,
             TEACHER_FEEDBACK_URL,
             GRANT_RECIPIENTS_URL,
             catalog,
@@ -307,6 +309,7 @@ if experience == "Introduction":
     landing.render(
         data,
         EXOPLANET_IMAGE_PATH,
+        UNSW_LOGO_PATH,
         TEACHER_FEEDBACK_URL,
         GRANT_RECIPIENTS_URL,
         catalog,
