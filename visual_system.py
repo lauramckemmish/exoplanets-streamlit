@@ -139,7 +139,7 @@ def apply_visual_system() -> None:
         }}
         [data-testid="stTabs"] [role="tab"][aria-selected="true"],
         [data-testid="stTabs"] [role="tab"][data-selected="true"] {{
-            background: rgba(255, 220, 0, 0.12);
+            background: transparent;
             border: 1px solid transparent;
             border-left: 4px solid var(--unsw-active-emphasis);
             padding-left: calc(0.55rem - 3px);
