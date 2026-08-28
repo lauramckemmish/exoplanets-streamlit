@@ -160,7 +160,7 @@ def render(data: pd.DataFrame) -> None:
             "Think about planet size and distance from the star.",
             title="Pause and predict:",
         )
-        with st.expander("Watch transit detection in motion"):
+        with soft_reveal("Watch transit detection in motion"):
             st.video("https://www.youtube.com/watch?v=BFi4HBUdWkk")
             st.caption("NASA animation: a transit produces a small, repeating dip in a star's light. Credit: NASA/JPL-Caltech")
         method_view = st.radio("Choose a data view", ["Direct Imaging", "Transit", "Transit + Direct Imaging", "All methods"], horizontal=True, key="curious_method_view")
