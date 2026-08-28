@@ -61,10 +61,11 @@ def step_navigation_bar(labels: list[str], key: str) -> str:
     st.markdown(
         """
         <style>
-        div[data-testid="stRadio"] div[role="radiogroup"] {gap: 0.2rem; border-bottom: 1px solid rgba(128, 128, 128, 0.35); flex-wrap: wrap;}
-        div[data-testid="stRadio"] div[role="radio"] {border-radius: 0; border: 0; border-bottom: 3px solid transparent; padding: 0.35rem 0.55rem 0.45rem; margin-bottom: -1px;}
+        div[data-testid="stRadio"] div[role="radiogroup"] {gap: 0.25rem; border-bottom: 0; flex-wrap: wrap;}
+        div[data-testid="stRadio"] div[role="radio"] {border-radius: 0.3rem; border: 1px solid transparent; border-left: 4px solid transparent; padding: 0.3rem 0.55rem; margin: 0; color: inherit;}
         div[data-testid="stRadio"] div[role="radio"] > div:first-child {display: none;}
-        div[data-testid="stRadio"] div[role="radio"][aria-checked="true"] {border-bottom-color: #FFDC00; color: inherit;}
+        div[data-testid="stRadio"] div[role="radio"]:hover {background: rgba(255, 220, 0, 0.08);}
+        div[data-testid="stRadio"] div[role="radio"][aria-checked="true"] {border-left-color: #FFDC00; color: inherit; font-weight: 650;}
         </style>
         """,
         unsafe_allow_html=True,
