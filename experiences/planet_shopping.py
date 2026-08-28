@@ -144,7 +144,6 @@ def _render_launch(data: pd.DataFrame) -> None:
     st.write("This catalogue is data: **one planet → one record → different pieces of information about that planet.**")
     st.caption("Scientists have recorded more information for some planets than for others.")
     st.markdown("#### We have thousands of planets. But what does one planet actually look like in the data?")
-    st.info("**Next: Meet Your Planet**")
 
 
 def _planet_visual_style(planet: pd.Series) -> tuple[int, str, str]:
@@ -325,9 +324,7 @@ def _render_filter(data: pd.DataFrame) -> None:
         "Changing this decision changes the candidate list **without changing the measurements**. "
         "The recorded data stay the same; only your decision about unknown values changes."
     )
-    st.info(
-        "**Next: Build Search**\n\nNext you will add planet size and combine the filters."
-    )
+    st.write("Adding planet size will let you combine the filters.")
 
 
 def _render_build_your_search() -> None:
