@@ -226,7 +226,7 @@ def render_demographics_classroom(data: pd.DataFrame, teacher_note_renderer=None
     )
 
 
-def render_demographics(data: pd.DataFrame) -> None:
+def render_demographics(data: pd.DataFrame, source_label: str) -> None:
     router.render_demographics_shell(
         data,
         st.session_state.get("demographics_started", False),
@@ -243,6 +243,7 @@ def render_demographics(data: pd.DataFrame) -> None:
             catalog,
             router.open_experience,
             router.open_explore_resource,
+            source_label,
         ),
         curious.render,
         strange_new_worlds.render,
@@ -311,6 +312,7 @@ if experience == "Introduction":
         catalog,
         router.open_experience,
         router.open_explore_resource,
+        source_label,
     )
     st.stop()
 
@@ -325,7 +327,7 @@ if experience == "Guided Tatooine Mission":
 elif experience == planet_shopping.TITLE:
     planet_shopping.render(data)
 elif experience == "Exoplanet Demographics":
-    render_demographics(data)
+    render_demographics(data, source_label)
 elif experience == "Exoplanet Data Laboratory":
     data_laboratory.render(
         data,

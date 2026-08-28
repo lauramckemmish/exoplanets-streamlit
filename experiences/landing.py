@@ -33,7 +33,7 @@ def _render_cards(entries, *, button_label, button_key_prefix, open_item):
             )
 
 
-def render(data, image_path, feedback_url, grant_url, catalog, open_experience, open_explore_resource):
+def render(data, image_path, feedback_url, grant_url, catalog, open_experience, open_explore_resource, source_label):
     st.title("Other worlds are becoming data")
     introduction_column, image_column = st.columns([3, 2])
     with introduction_column:
@@ -47,8 +47,12 @@ def render(data, image_path, feedback_url, grant_url, catalog, open_experience, 
             "analysed in new ways, and new telescopes are opening questions that could not "
             "previously be asked."
         )
-        st.metric("Confirmed exoplanets in the NASA archive", f"{len(data):,}")
-        st.caption("This is live catalogue evidence, not a fixed fact. Come back later and that number may be different.")
+        if source_label == "Live NASA Exoplanet Archive":
+            st.metric("Confirmed exoplanets in the NASA archive", f"{len(data):,}")
+            st.caption("This is live catalogue evidence, not a fixed fact. Come back later and that number may be different.")
+        else:
+            st.metric("Planets in the bundled notebook sample", f"{len(data):,}")
+            st.caption("This bundled sample supports offline use. Its row count is not the current confirmed-planet total.")
     with image_column:
         st.image(
             image_path,
@@ -110,5 +114,4 @@ def render(data, image_path, feedback_url, grant_url, catalog, open_experience, 
         st.info("**Currently in development**\n\nThis resource is being actively developed. Please expect some content and features to change while it is refined.")
         if feedback_url:
             st.link_button("Give teacher feedback", feedback_url)
-        # TODO: Add the formal name of the earlier Google grant once it is verified.
         st.markdown(f"Feedback is very welcome—especially detailed suggestions from teachers and facilitators. Please email [l.mckemmish@unsw.edu.au](mailto:l.mckemmish@unsw.edu.au).\n\nCreated by **Maria Pettyjohn, Dr Lauren McKnight, James Cleaver and Dr Laura McKemmish**.\n\nThis resource has also been shaped by the ideas, observations and feedback of many CURIOUS facilitators, teachers and student participants. We gratefully acknowledge everyone who has helped test and improve it over time.\n\nDevelopment was supported through the Australian Government's [Maker Projects: Community STEM Engagement Grants 2024 program]({grant_url}).")
