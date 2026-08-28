@@ -14,7 +14,7 @@ def logo_plate(image_path: Path, *, width: int, alt: str) -> None:
 
     encoded_image = base64.b64encode(image_path.read_bytes()).decode("ascii")
     st.markdown(
-        f"<div style='display: inline-block; background: white; padding: 6px; "
+        f"<div class='unsw-logo-plate' style='display: inline-block; background: white; padding: 6px; "
         f"border-radius: 2px; line-height: 0;'>"
         f"<img src='data:image/png;base64,{encoded_image}' alt='{alt}' "
         f"style='display: block; width: {width}px; height: auto;'></div>",

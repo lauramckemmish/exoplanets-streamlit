@@ -68,6 +68,10 @@ def apply_visual_system() -> None:
         [data-testid="stSidebar"] .st-key-sidebar_brand [data-testid="stCaptionContainer"] p {{
             color: var(--unsw-filled-yellow-text) !important;
         }}
+        [data-testid="stSidebar"] .st-key-sidebar_brand .unsw-logo-plate {{
+            background: transparent !important;
+            padding: 0 !important;
+        }}
         [data-testid="stSidebar"] [data-testid="stButton"] > button {{
             min-height: 2rem;
             padding: 0.2rem 0.45rem;
