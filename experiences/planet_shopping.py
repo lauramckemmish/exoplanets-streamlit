@@ -233,98 +233,22 @@ def _render_filter(data: pd.DataFrame) -> None:
         "What do you think will happen to our list if we only keep planets this close?",
         title="Pause and predict",
     )
-    with st.form("planet_shopping_distance_filter_form"):
-        distance_limit_ly = st.slider(
-            "How far away are you willing to go? (light-years)",
-            min_value=10,
-            max_value=2_000,
-            value=500,
-            step=10,
-            key=_DISTANCE_CONTROL_KEY,
-        )
-        apply_distance = st.form_submit_button("Apply distance filter", type="primary")
-    if apply_distance:
-        previous_distance = st.session_state.get(_APPLIED_DISTANCE_KEY)
-        st.session_state[_APPLIED_DISTANCE_KEY] = distance_limit_ly
-        if previous_distance != distance_limit_ly:
-            st.session_state.pop(_APPLIED_TEMPERATURE_KEY, None)
-
-    if _APPLIED_DISTANCE_KEY not in st.session_state:
-        return
-
-    applied_distance_ly = st.session_state[_APPLIED_DISTANCE_KEY]
-    distance_filtered = _filter_distance_light_years(distance_population, applied_distance_ly)
+    distance_limit_ly = st.slider(
+        "How far away are you willing to go? (light-years)",
+        min_value=10,
+        max_value=2_000,
+        value=500,
+        step=10,
+        key=_DISTANCE_CONTROL_KEY,
+    )
+    st.session_state[_APPLIED_DISTANCE_KEY] = distance_limit_ly
+    distance_filtered = _filter_distance_light_years(distance_population, distance_limit_ly)
     before_distance, after_distance = st.columns(2)
     with before_distance:
         st.metric("Planets with recorded distances", f"{len(distance_population):,}")
     with after_distance:
-        st.metric(f"Possible planets within {applied_distance_ly:,} light-years", f"{len(distance_filtered):,}")
+        st.metric(f"Possible planets within {distance_limit_ly:,} light-years", f"{len(distance_filtered):,}")
     st.write("The planet data did not change. The filter changed which records remain in the search.")
-
-    st.markdown("#### How hot?")
-    st.write("Distance is not the only thing that matters. You probably care what it might be like when you arrive.")
-    st.caption(
-        "The catalogue records an **estimated equilibrium temperature**. It is useful for comparing planets, "
-        "but it is not necessarily a planet's surface temperature. Earth's estimated equilibrium temperature is about −18°C."
-    )
-    with st.form("planet_shopping_temperature_filter_form"):
-        temperature_range_c = st.slider(
-            "Choose an estimated equilibrium temperature range (°C)",
-            min_value=-200,
-            max_value=1_000,
-            value=(-20, 30),
-            step=5,
-            key=_TEMPERATURE_CONTROL_KEY,
-        )
-        apply_temperature = st.form_submit_button("Apply temperature filter", type="primary")
-    if apply_temperature:
-        st.session_state[_APPLIED_TEMPERATURE_KEY] = temperature_range_c
-
-    if _APPLIED_TEMPERATURE_KEY not in st.session_state:
-        return
-
-    applied_temperature_range = st.session_state[_APPLIED_TEMPERATURE_KEY]
-    matches, does_not_match, unknown = _split_temperature_groups(
-        distance_filtered, applied_temperature_range
-    )
-    st.markdown("**What happened to the distance-filtered list?**")
-    known_match_column, non_match_column, unknown_column = st.columns(3)
-    with known_match_column:
-        st.metric("Known match", len(matches))
-    with non_match_column:
-        st.metric("Known non-match", len(does_not_match))
-    with unknown_column:
-        st.metric("Unknown", len(unknown))
-    st.caption("Unknown means no estimated equilibrium temperature is recorded.")
-    st.info(
-        "**Unknown is not the same as ‘doesn't match’.** We simply do not know. A product with a missing "
-        "specification has not proved that it fails your requirement."
-    )
-    unknown_decision = st.radio(
-        "What should we do with planets whose temperature is unknown?",
-        (
-            "Keep them as possible candidates",
-            "Set them aside until we know their temperature",
-        ),
-        key=_UNKNOWN_TEMPERATURE_DECISION_KEY,
-    )
-    keep_unknowns = unknown_decision.startswith("Keep")
-    candidates = _temperature_candidates(matches, unknown, keep_unknowns)
-    retained_unknowns = unknown if keep_unknowns else unknown.iloc[0:0]
-
-    st.markdown("**Your candidate pool**")
-    total_column, match_column, retained_column = st.columns(3)
-    with total_column:
-        st.metric("Planets remaining", len(candidates))
-    with match_column:
-        st.metric("Known matches", len(matches))
-    with retained_column:
-        st.metric("Retained unknowns", len(retained_unknowns))
-    st.write(
-        "Changing this decision changes the candidate list **without changing the measurements**. "
-        "The recorded data stay the same; only your decision about unknown values changes."
-    )
-    st.write("Adding planet size will let you combine the filters.")
 
 
 def _render_build_your_search() -> None:
