@@ -366,9 +366,3 @@ else:
         st.session_state["experience"] = "Introduction"
         st.rerun()
     explore.render_placeholder(explore_resource)
-
-st.divider()
-st.caption(
-    "Data fields come from the NASA Exoplanet Archive Planetary Systems Composite Parameters table. "
-    "The Tatooine comparison is a fictional framing for practising data-science reasoning."
-)
