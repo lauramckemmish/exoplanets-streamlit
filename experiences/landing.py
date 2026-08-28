@@ -60,6 +60,10 @@ def render(data, image_path, feedback_url, grant_url, catalog, open_experience, 
             use_container_width=True,
         )
     st.caption("A UNSW CURIOUS educational resource using real NASA exoplanet data.")
+    st.markdown(
+        "**Resource stewardship and scientific review:** Dr Laura McKemmish, UNSW Chemistry  \n"
+        "*Research in molecular spectroscopy and exoplanet atmospheres.*"
+    )
 
     st.markdown("## Experience something")
     st.write("Follow a guided investigation. These experiences carry a question, story or dataset through a classroom or workshop sequence.")
@@ -101,14 +105,6 @@ def render(data, image_path, feedback_url, grant_url, catalog, open_experience, 
             "These online resources are part of CURIOUS's continuing development: capturing "
             "what is learned through real delivery and turning it into reusable resources for "
             "students, teachers and facilitators."
-        )
-    with st.expander("A scientist’s story"):
-        st.markdown("**Dr Laura McKemmish, UNSW**")
-        st.write(
-            "Laura works with molecules, spectroscopy and exoplanet science. She first became "
-            "involved in exoplanet research in 2014 and has watched the field—and the questions "
-            "the available evidence can support—change quickly. She has explored related questions "
-            "across school, university and research contexts."
         )
     with st.expander("Development, feedback and acknowledgements"):
         st.info("**Currently in development**\n\nThis resource is being actively developed. Please expect some content and features to change while it is refined.")
