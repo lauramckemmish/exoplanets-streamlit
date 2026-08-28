@@ -19,4 +19,7 @@ python -m pip install -r requirements.txt
 python -m streamlit run app.py
 ```
 
-The app automatically uses live NASA data when available and falls back to the bundled notebook sample when a network request is unavailable.
+The data layer automatically uses live NASA data when available and falls back
+to the bundled NASA-derived notebook sample when live acquisition fails. Live
+catalogue requests are cached for six hours; the app receives the prepared data
+with explicit source metadata so it can describe either state accurately.

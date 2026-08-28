@@ -5,7 +5,10 @@ receive a prepared dataframe and decide how it should be taught or displayed.
 """
 
 import io
+import logging
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Literal
 
 import numpy as np
 import pandas as pd
@@ -13,6 +16,8 @@ import pandas as pd
 PARSEC_TO_LIGHT_YEARS = 3.26156
 import requests
 import streamlit as st
+
+logger = logging.getLogger(__name__)
 
 APP_DIR = Path(__file__).resolve().parent
 SAMPLE_PATH = APP_DIR / "data" / "notebook_sample.csv"
@@ -27,6 +32,35 @@ NUMERIC = [
     "disc_year", "ra", "dec", "pl_orbper", "pl_orbsmax", "pl_rade",
     "pl_bmasse", "pl_bmassj", "pl_eqt", "sy_dist", "sy_snum", "sy_pnum",
 ]
+
+
+@dataclass(frozen=True)
+class CatalogueSource:
+    """Learner-facing provenance state for a loaded catalogue."""
+
+    kind: Literal["live", "bundled"]
+    label: str
+    provenance: str = "NASA Exoplanet Archive"
+
+    @property
+    def is_live(self) -> bool:
+        return self.kind == "live"
+
+
+@dataclass(frozen=True)
+class CatalogueLoad:
+    """Prepared catalogue data together with its provenance state."""
+
+    data: pd.DataFrame
+    source: CatalogueSource
+
+
+LIVE_NASA_SOURCE = CatalogueSource("live", "Live NASA Exoplanet Archive")
+BUNDLED_SAMPLE_SOURCE = CatalogueSource("bundled", "Bundled notebook sample")
+
+
+class LiveCatalogueError(RuntimeError):
+    """The live archive could not provide a usable catalogue."""
 
 SOLAR_SYSTEM_PLANETS = pd.DataFrame([
     {"Planet": "Mercury", "Orbital distance (AU)": 0.387, "Planet mass (Earth masses)": 0.0553},
@@ -43,9 +77,19 @@ SOLAR_SYSTEM_PLANETS = pd.DataFrame([
 @st.cache_data(ttl=21_600, show_spinner=False)
 def load_live() -> pd.DataFrame:
     query = "select " + ",".join(COLUMNS) + " from pscomppars"
-    response = requests.get(NASA_TAP_URL, params={"query": query, "format": "csv"}, timeout=45)
-    response.raise_for_status()
-    return pd.read_csv(io.StringIO(response.text))
+    try:
+        response = requests.get(
+            NASA_TAP_URL,
+            params={"query": query, "format": "csv"},
+            timeout=45,
+        )
+        response.raise_for_status()
+    except requests.RequestException as error:
+        raise LiveCatalogueError("NASA Exoplanet Archive request failed") from error
+    try:
+        return pd.read_csv(io.StringIO(response.text))
+    except (pd.errors.EmptyDataError, pd.errors.ParserError, UnicodeDecodeError) as error:
+        raise LiveCatalogueError("NASA Exoplanet Archive returned unreadable CSV") from error
 
 
 @st.cache_data(show_spinner=False)
@@ -75,12 +119,35 @@ def prepare(raw: pd.DataFrame) -> pd.DataFrame:
     return data.reset_index(drop=True)
 
 
-def load_data() -> tuple[pd.DataFrame, str]:
+def _prepare_live_catalogue() -> pd.DataFrame:
+    """Prepare live data and reject a response with no usable planet records."""
+
     try:
-        return prepare(load_live()), "Live NASA Exoplanet Archive"
-    except Exception:
-        pass
-    return prepare(load_sample()), "Bundled notebook sample"
+        prepared = prepare(load_live())
+    except (AttributeError, TypeError, ValueError) as error:
+        raise LiveCatalogueError("NASA Exoplanet Archive returned unexpected data") from error
+    if prepared.empty:
+        raise LiveCatalogueError("NASA Exoplanet Archive returned no usable planet records")
+    return prepared
+
+
+def load_catalogue() -> CatalogueLoad:
+    """Load the live archive when possible, otherwise use the bundled sample.
+
+    The fallback is deliberately limited to expected acquisition or data-format
+    failures. A failure reading the bundled sample remains visible to maintainers
+    because there is no further safe source to use.
+    """
+
+    try:
+        return CatalogueLoad(_prepare_live_catalogue(), LIVE_NASA_SOURCE)
+    except LiveCatalogueError as error:
+        logger.warning(
+            "Using bundled NASA-derived catalogue sample because live acquisition failed: %s",
+            error,
+            exc_info=True,
+        )
+        return CatalogueLoad(prepare(load_sample()), BUNDLED_SAMPLE_SOURCE)
 
 
 def apply_filter(frame: pd.DataFrame, column: str, mask: pd.Series, label: str) -> tuple[pd.DataFrame, dict[str, int | str]]:

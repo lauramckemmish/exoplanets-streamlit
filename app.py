@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 from data import (
-    load_data as load_selected_data,
+    load_catalogue,
 )
 from charts import (
     discoveries_by_year_chart,
@@ -242,7 +242,7 @@ def render_demographics_classroom(data: pd.DataFrame, teacher_note_renderer=None
     )
 
 
-def render_demographics(data: pd.DataFrame, source_label: str) -> None:
+def render_demographics(data: pd.DataFrame, source) -> None:
     router.render_demographics_shell(
         data,
         st.session_state.get("demographics_started", False),
@@ -260,7 +260,7 @@ def render_demographics(data: pd.DataFrame, source_label: str) -> None:
             catalog,
             router.open_experience,
             router.open_explore_resource,
-            source_label,
+            source,
         ),
         curious.render,
         strange_new_worlds.render,
@@ -279,15 +279,17 @@ if (
 ):
     st.session_state["experience"] = "Introduction"
 
-data, source_label = load_selected_data()
+catalogue_load = load_catalogue()
+data = catalogue_load.data
+source = catalogue_load.source
 
 with st.sidebar:
     st.image(UNSW_LOGO_PATH, width=125)
     st.markdown("### Explore exoplanets")
-    if source_label == "Live NASA Exoplanet Archive":
-        st.caption(f"**{len(data):,} confirmed exoplanets**  \nNASA Exoplanet Archive")
+    if source.is_live:
+        st.caption(f"**{len(data):,} confirmed exoplanets**  \n{source.provenance}")
     else:
-        st.caption(f"**Offline catalogue sample · {len(data):,} records**  \nNASA Exoplanet Archive")
+        st.caption(f"**Offline catalogue sample · {len(data):,} records**  \n{source.provenance}")
     st.button(
         "🏠 Introduction",
         type="primary" if st.session_state["experience"] == "Introduction" else "secondary",
@@ -330,7 +332,7 @@ if experience == "Introduction":
         catalog,
         router.open_experience,
         router.open_explore_resource,
-        source_label,
+        source,
     )
     st.stop()
 
@@ -342,7 +344,7 @@ if experience == "Guided Tatooine Mission":
 elif experience == planet_shopping.TITLE:
     planet_shopping.render(data)
 elif experience == "Exoplanet Demographics":
-    render_demographics(data, source_label)
+    render_demographics(data, source)
 elif experience == "Exoplanet Data Laboratory":
     data_laboratory.render(
         data,

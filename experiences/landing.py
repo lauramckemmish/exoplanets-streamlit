@@ -33,7 +33,7 @@ def _render_cards(entries, *, button_label, button_key_prefix, open_item):
             )
 
 
-def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalog, open_experience, open_explore_resource, source_label):
+def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalog, open_experience, open_explore_resource, source):
     st.title("Other worlds are becoming data")
     introduction_column, image_column = st.columns([3, 2])
     with introduction_column:
@@ -47,7 +47,7 @@ def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalo
             "analysed in new ways, and new telescopes are opening questions that could not "
             "previously be asked."
         )
-        if source_label == "Live NASA Exoplanet Archive":
+        if source.is_live:
             st.metric("Confirmed exoplanets in the NASA archive", f"{len(data):,}")
             st.caption("**Live NASA catalogue** · count changes as new planets are confirmed")
         else:
