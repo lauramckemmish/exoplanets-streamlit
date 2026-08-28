@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 import streamlit as st
+from visual_system import apply_visual_system
 from data import (
     load_catalogue,
 )
@@ -187,20 +188,7 @@ st.set_page_config(
     page_icon="🪐",
     layout="wide",
 )
-
-st.markdown(
-    """
-    <style>
-    [data-testid="stSidebar"] [data-testid="stVerticalBlock"] {gap: 0.35rem;}
-    [data-testid="stSidebar"] [data-testid="stButton"] > button {
-        min-height: 2rem;
-        padding: 0.2rem 0.45rem;
-        font-size: 0.88rem;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+apply_visual_system()
 
 
 
