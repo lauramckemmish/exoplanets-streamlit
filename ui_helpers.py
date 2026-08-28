@@ -63,9 +63,11 @@ def step_navigation_bar(labels: list[str], key: str) -> str:
         <style>
         div[data-testid="stRadio"] div[role="radiogroup"] {gap: 0.25rem; border-bottom: 0; flex-wrap: wrap;}
         div[data-testid="stRadio"] div[role="radio"] {border-radius: 0.3rem; border: 1px solid transparent; border-left: 4px solid transparent; padding: 0.3rem 0.55rem; margin: 0; color: inherit;}
+        div[data-testid="stRadio"] div[role="radio"] p {color: inherit;}
         div[data-testid="stRadio"] div[role="radio"] > div:first-child {display: none;}
         div[data-testid="stRadio"] div[role="radio"]:hover {background: rgba(255, 220, 0, 0.08);}
         div[data-testid="stRadio"] div[role="radio"][aria-checked="true"] {border-left-color: #FFDC00; color: inherit; font-weight: 650;}
+        div[data-testid="stRadio"] div[role="radio"]:focus-visible {outline: 3px solid currentColor; outline-offset: 2px;}
         </style>
         """,
         unsafe_allow_html=True,
