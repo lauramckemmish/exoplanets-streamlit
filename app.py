@@ -239,7 +239,6 @@ def render_demographics(data: pd.DataFrame, source_label: str) -> None:
         lambda frame: landing.render(
             frame,
             EXOPLANET_IMAGE_PATH,
-            UNSW_LOGO_PATH,
             TEACHER_FEEDBACK_URL,
             GRANT_RECIPIENTS_URL,
             catalog,
@@ -302,6 +301,7 @@ with st.sidebar:
     st.header("Data source")
     source = st.radio("Choose a dataset", ["Live NASA data", "Bundled notebook sample"])
     st.caption("Live data are cached for six hours. The bundled sample keeps the activity usable offline.")
+    st.image(UNSW_LOGO_PATH, width=160)
 
 data, source_label = load_selected_data(source)
 
@@ -309,7 +309,6 @@ if experience == "Introduction":
     landing.render(
         data,
         EXOPLANET_IMAGE_PATH,
-        UNSW_LOGO_PATH,
         TEACHER_FEEDBACK_URL,
         GRANT_RECIPIENTS_URL,
         catalog,
