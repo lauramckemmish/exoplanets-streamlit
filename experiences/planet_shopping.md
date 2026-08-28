@@ -1,176 +1,174 @@
-# Planet Shopping Outside Our Solar System — design brief
+# Planet Shopping Outside Our Solar System — implementation contract
 
-This document is the pedagogical source of truth for
-`experiences/planet_shopping.py`. It records the agreed direction before
-detailed lesson content is implemented.
+This file is the implementation-facing contract for
+`experiences/planet_shopping.py`.
 
-For shared student-facing writing and interface defaults, also read
-[`docs/curious_online_style.md`](../docs/curious_online_style.md). This design
-brief remains authoritative for Planet Shopping's local learning sequence.
+The detailed pedagogical design is maintained in the canonical
+**Planet Shopping Outside Our Solar System — Screen Specification**.
 
-## Established decisions
+For shared student-facing writing and interface conventions, also read
+[`docs/curious_online_style.md`](../docs/curious_online_style.md).
 
-### Context and framing
+If implementation exposes a pedagogical ambiguity, do not redesign the
+experience in code. Return the question for design review.
 
-- This is a **facilitated UNSW CURIOUS workshop** intended to run for roughly
-  **50 minutes**.
-- **Title:** *Planet Shopping Outside Our Solar System*
-- **Subtitle:** *Use real exoplanet data to find your perfect planet.*
-- Mission framing: **Earth is unavailable**. Students use real exoplanet data
-  to choose another world to visit or live on.
-- It is fundamentally a **filtering and decision-making data-science
-  experience**, not a graphing experience.
+## Experience
 
-### Intended learning progression
+- Facilitated UNSW CURIOUS workshop, approximately 50 minutes.
+- Title: **Planet Shopping Outside Our Solar System**
+- Subtitle: **Use real exoplanet data to find your perfect planet.**
+- Earth is unavailable; students use real exoplanet data to choose another world.
+- The transferable data-science learning is filtering, missing-data reasoning,
+  combining criteria and making a decision from evidence.
+- This is not primarily a graphing experience.
 
-The completed experience will have five stages:
+## Screen sequence
 
-1. **Launch — Where can we go?**
-2. **Meet Your Planet — What does a planet look like as data?**
-3. **Start Your Search — How do filters narrow the catalogue?**
-4. **Build Your Search — Where would you actually go?**
-5. **What did you just do? — Make the data-science transfer explicit**
+### 1. Launch — Where can we go?
 
-### Stage 3: Start Your Search
+Establish:
 
-Stage 3 deliberately contains two teaching episodes. Students first learn the
-mechanism of filtering, then encounter the complication of incomplete real
-data.
+Earth → Solar System → Sun is a star → other stars can have planets →
+exoplanets → astronomers have organised thousands of discovered worlds into data.
 
-1. Start with **distance from Earth** (`sy_dist`) as the clean introduction to
-   filtering. Students choose how far away they are willing to consider, apply
-   that criterion and see the candidate population shrink. Because `sy_dist`
-   is overwhelmingly complete, records without a distance should be quietly
-   omitted from this introductory filtering population. This is a deliberate
-   pedagogical simplification, not an assumption that a missing distance means
-   failure.
-2. Introduce **estimated equilibrium temperature** (`pl_eqt`) as the second
-   filter. This is where missing information becomes an explicit learning
-   problem: students distinguish known matches, known non-matches and unknowns,
-   then decide whether planets with unknown temperature remain possible
-   candidates or are set aside. Unknown always means unknown, never zero or a
-   failed criterion.
+Preserve the existing implemented Launch unless separately asked to change it.
 
-### Stage 4: Build Your Search
+### 2. Meet Your Planet — What does a planet look like as data?
 
-- Carry the distance and temperature criteria forward and add **planet size**
-  (`pl_rade`) as the third core criterion.
-- Students combine distance, temperature and size, reason about their
-  intersection, and adjust the criteria to see the candidate population
-  change.
-- Once a manageable shortlist exists, stop introducing core filters and
-  inspect the surviving real planets. Reveal richer comparison information at
-  this point, including number of stars in the system, number of known planets,
-  year length and relevant unknown values.
-- Students compare the surviving candidates and choose a destination here.
-  That decision is the payoff of Stage 4, not a separate navigation stage.
+Students inspect one real exoplanet as a planet-centred data profile.
 
-### Stage 5: What did you just do?
+Preserve the existing implemented Meet Your Planet screen unless separately
+asked to change it.
 
-- Stage 5 is the workshop landing, not another exoplanet-analysis task.
-- Explicitly reconstruct the data-science sequence: inspect a dataset →
-  understand variables → apply a filter → combine filters → deal with missing
-  information → make a decision from evidence.
-- Connect this to familiar online shopping: narrowing many products with
-  several criteria, deciding what to do when a specification is missing, and
-  choosing from the survivors.
-- Generalise the same reasoning to animals, medicines, molecules and other
-  scientific datasets. Exoplanets provide the motivating problem; the
-  transferable learning is how to search, filter and reason with data.
+### 3. Distance — How far are you willing to go?
 
-### Data ideas to make intuitive
+Main cognitive job: understand a simple filter.
 
-The initial variables should be introduced in intuitive, student-friendly
-language:
+- Use distance from Earth / planetary-system distance (`sy_dist`).
+- Learner-facing units are light-years.
+- Moving the distance control updates the number of matching exoplanets live.
+- There is no Apply button required to see the effect.
+- Records with missing distance may be quietly omitted from this introductory
+  filtering population.
+- The learner settles on a maximum distance.
+- Persist that choice for later screens.
+- Do not apply the learner's temperature criterion on this screen.
 
-- estimated temperature;
-- planet size;
-- distance from Earth;
-- number of stars in the system;
-- number of known planets in the system;
-- year length (orbital period).
+### 4. Temperature — How hot?
 
-Missing data means **unknown**. It does not mean zero, and it does not mean a
-planet has failed a criterion.
+Main cognitive job: make a second independent criterion and reason about
+missing information.
 
-### Implemented Stage 1: Launch
+- Use estimated equilibrium temperature (`pl_eqt`).
+- Learner-facing values are in degrees Celsius, while wording must remain
+  scientifically accurate that this is estimated equilibrium temperature.
+- This choice is made independently of the distance choice.
+- Learners choose an acceptable temperature range.
+- Explicitly distinguish:
+  - known match;
+  - known non-match;
+  - unknown temperature.
+- Learners make a third decision:
+  - **take the risk** — retain planets whose temperature is unknown; or
+  - **play it safe** — retain only planets known to meet the temperature range.
+- Persist the temperature range and unknown-temperature decision for Screen 5.
+- Unknown never means zero or failed criterion.
 
-- Stage 1 begins with the compact **MISSION: Find a new home** framing. The
-  cause of Earth being unavailable is deliberately unspecified.
-- Its facilitated sequence is: Earth and the Solar System → the Sun is a star
-  → other stars can have planets → exoplanets → a growing catalogue.
-- It uses a natural teaching and scrolling sequence. Interaction is retained
-  only where it performs a useful cognitive job.
-- It includes three visible, non-blocking pause cues: considering the other
-  Solar System planets, considering whether other stars have planets, and
-  predicting the catalogue count.
-- Its only required content reveal is the catalogue-count prediction: students
-  choose **Show the catalogue** before the current, one-year-ago and
-  ten-years-ago counts appear. No core definition or navigation is hidden
-  behind a reveal.
-- The Solar System image is a small supporting visual beside the initial
-  question; it is not a hero image or a separate Solar System lesson.
-- Catalogue counts are calculated dynamically from unique `pl_name` records
-  and available `disc_year` values in the selected dataframe: today, one year
-  ago, and ten years ago. No externally sourced historical milestone numbers
-  are used.
-- Stage 1 ends with the question: *What does one planet actually look like in
-  the data?* This leads directly into Stage 2.
+### 5. Combine — What happens when your choices have to work together?
 
-### Implemented Stage 2: Meet Your Planet
+Main cognitive job: understand intersection and use several decisions together.
 
-- A selected real catalogue planet is shown primarily as a compact
-  planet-centred data profile, not as a spreadsheet row.
-- The profile foregrounds its name, estimated temperature, size relative to
-  Earth, distance from Earth, number of stars, number of known planets and
-  year length. Missing values are shown as **Unknown**.
-- Raw tabular data may be used later as secondary detail, but should not carry
-  the main learning experience.
+Import automatically from Screens 3 and 4:
 
-### Current review observations
+1. maximum distance;
+2. acceptable temperature range;
+3. unknown-temperature risk decision.
 
-- **OBSERVATION:** Repeated click-to-reveal interactions in Stage 1 created
-  excessive interaction friction during review.
-- **DECISION:** Stage 1 should generally use a natural teaching/scroll
-  sequence. Interaction should be retained only where the interaction itself
-  performs a useful cognitive job.
-- **OBSERVATION:** The Stage 2 prototype presented a planet mainly as a table
-  of values. This did not create a meaningful conception of the planet as a
-  real world.
-- **DECISION:** Stage 2 should present the selected planet primarily through
-  a planet-centred visual/profile/infographic representation. Raw tabular data
-  may be retained as secondary detail, but should not carry the main learning
+All three choices remain editable on this screen.
+
+Before combining them:
+
+- show how many exoplanets satisfy the distance criterion alone;
+- show how many exoplanets with known temperatures satisfy the temperature
+  criterion alone;
+- make the impact of changing each choice visible.
+
+Then ask learners to reason about how many planets will satisfy the criteria
+together.
+
+Use a hard reveal for the first combined result.
+
+The overlap representation should distinguish:
+
+- planets known to meet both distance AND temperature criteria;
+- planets meeting the distance criterion whose temperature is unknown.
+
+The unknown-temperature decision determines whether the second group remains
+in the possible shortlist.
+
+A Venn-style overlap representation is the preferred current design. Exact
+responsive presentation may be refined through implementation testing, but it
+must not imply that unknown temperature means non-match.
+
+After the first reveal, learners may change the three controls and see the
+combined result update live.
+
+Then inspect the surviving real planets and choose a destination.
+
+**Planet size is not a required core filter in the current pathway.**
+Additional planet properties may appear when comparing shortlisted planets.
+
+### 6. Data Science — What did you just do?
+
+Make the transferable process explicit:
+
+inspect data → understand variables → choose criteria → filter →
+deal with missing information → combine criteria → make a decision from evidence.
+
+Connect this reasoning to familiar filtering/search tasks such as online
+shopping and to other scientific datasets.
+
+## State that must persist
+
+Planet Shopping owns its own session state.
+
+Persist at least:
+
+- selected planet from Screen 2 where required;
+- distance threshold from Screen 3;
+- temperature range from Screen 4;
+- unknown-temperature decision from Screen 4;
+- Screen 5 reveal state as needed.
+
+Do not couple this experience to Tatooine session state.
+
+## Data guardrails
+
+- Reuse the shared prepared NASA dataframe supplied by the app.
+- Do not add a second NASA query.
+- `sy_dist` is stored in parsecs; convert appropriately for learner-facing
+  light-years.
+- `pl_eqt` is estimated equilibrium temperature in Kelvin; convert appropriately
+  for learner-facing Celsius.
+- Missing values remain unknown.
+- Do not globally change shared filtering semantics merely to implement this
   experience.
-- **OBSERVATION:** Planet Shopping's major headings are currently visually too
-  large. The experience should use a more compact heading hierarchy appropriate
-  to a multi-stage workshop rather than landing-page-sized headings.
 
-### Interface principles for this experience
+## Implementation boundary
 
-- Keep one main cognitive job per screen section.
-- Use short, conversational, question-led text and a natural scroll sequence.
-- Put essential explanation next to its visual or data.
-- Prefer a small supporting visual beside text over a large decorative image.
-- Use panels/cards only when they create a meaningful grouping.
-- Design for a projector and student laptops: attractive and space-themed, but
-  restrained enough to keep attention on the scientific question.
+The pedagogical sequence above is established.
 
-## Still to test and refine
+Codex may make ordinary engineering decisions about state, functions, testing,
+responsive layout and reuse of shared components.
 
-- Isabella's delivery preferences may refine local wording, examples, pacing
-  and facilitation moves.
-- Further classroom testing may refine the order, time allocation and amount
-  of scaffolding within each stage.
-- The exact interface for student choices, candidate comparison and the final
-  decision should be designed only after the core filtering sequence is tested.
-- `planet_shopping.py` now contains a deliberately rough five-stage live
-  prototype. Refine its local wording and interaction design through delivery
-  testing before treating it as finished lesson content.
+Codex should not independently:
 
-## Implementation guardrails
+- add or remove learning screens;
+- add new core filtering variables;
+- reorder the reasoning sequence;
+- reinterpret missing values;
+- replace independent Screens 3 and 4 choices with sequential filtering;
+- remove the prediction/reveal step from Screen 5.
 
-- Keep this experience independent of `tatooine.py` and its session state.
-- Reuse the shared prepared NASA dataframe supplied by `app.py`; do not add a
-  separate NASA query or duplicate data preparation.
-- Preserve the focus on filtering, evidence, unknown values and decisions
-  rather than expanding this into a general graphing lesson.
+If implementation exposes a conflict or ambiguity, report it rather than
+redesigning the learning experience.
