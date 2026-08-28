@@ -49,7 +49,7 @@ def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalo
         )
         if source_label == "Live NASA Exoplanet Archive":
             st.metric("Confirmed exoplanets in the NASA archive", f"{len(data):,}")
-            st.caption("This is live catalogue evidence, not a fixed fact. Come back later and that number may be different.")
+            st.caption("**Live NASA catalogue** · count changes as new planets are confirmed")
         else:
             st.metric("Planets in the bundled notebook sample", f"{len(data):,}")
             st.caption("This bundled sample supports offline use. Its row count is not the current confirmed-planet total.")
@@ -59,12 +59,6 @@ def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalo
             caption="Artist's concept of the variety of known exoplanets. Credit: NASA/JPL-Caltech",
             use_container_width=True,
         )
-    st.caption("A UNSW CURIOUS educational resource using real NASA exoplanet data.")
-    st.markdown(
-        "**Resource stewardship and scientific review:** Dr Laura McKemmish, UNSW Chemistry  \n"
-        "*Research in molecular spectroscopy and exoplanet atmospheres.*"
-    )
-
     st.markdown("## Experience something")
     st.write("Follow a guided investigation. These experiences carry a question, story or dataset through a classroom or workshop sequence.")
     experiences = catalog.experience_catalog()
@@ -84,10 +78,19 @@ def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalo
     )
     st.markdown("## About this resource")
     st.write(
-        "Developed at UNSW as part of CURIOUS, drawing on research, teaching and outreach "
-        "work to help learners investigate real exoplanet evidence."
+        "Developed at UNSW as part of CURIOUS, a regional science outreach program connecting "
+        "school students with university science. This resource draws on research, teaching and "
+        "outreach to help learners investigate real exoplanet evidence."
     )
-    st.image(portrait_logo_path, width=100)
+    logo_column, stewardship_column = st.columns([1, 4])
+    with logo_column:
+        st.image(portrait_logo_path, width=60)
+    with stewardship_column:
+        st.markdown(
+            "**Resource stewardship and scientific review**  \n"
+            "**Dr Laura McKemmish, UNSW Chemistry**  \n"
+            "*Research in molecular spectroscopy and exoplanet atmospheres.*"
+        )
     with st.expander("Program history"):
         st.markdown("### Earlier development")
         st.write(
