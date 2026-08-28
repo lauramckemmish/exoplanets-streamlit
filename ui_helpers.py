@@ -8,6 +8,8 @@ from pathlib import Path
 import streamlit as st
 import streamlit.components.v1 as components
 
+_HARD_REVEAL_PENDING_KEY = "_ui_helpers_hard_reveal_pending"
+
 
 def logo_plate(image_path: Path, *, width: int, alt: str) -> None:
     """Render approved logo artwork on a small, theme-independent white plate."""
@@ -100,6 +102,7 @@ def step_buttons(
     allow_next: bool = True,
 ) -> None:
     """Render Back/Continue controls, optionally withholding Continue."""
+    hard_reveal_pending = st.session_state.pop(_HARD_REVEAL_PENDING_KEY, False)
     back, _, next_step = st.columns([1, 4, 1])
     with back:
         if step > 0:
@@ -111,7 +114,7 @@ def step_buttons(
                 args=(tab_key, labels, step_key, scroll_key, step - 1),
             )
     with next_step:
-        if allow_next and step < len(labels) - 1:
+        if allow_next and not hard_reveal_pending and step < len(labels) - 1:
             st.button(
                 "Continue →",
                 type="primary",
@@ -180,6 +183,7 @@ def hard_reveal(
     if key not in st.session_state:
         st.session_state[key] = False
     if not st.session_state[key]:
+        st.session_state[_HARD_REVEAL_PENDING_KEY] = True
         st.button(
             reveal_label,
             type="primary",
