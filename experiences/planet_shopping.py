@@ -4,14 +4,13 @@ See ``planet_shopping.md`` for the established pedagogical design.
 """
 
 from datetime import date
-from math import ceil, floor
 from pathlib import Path
 
 import pandas as pd
 import streamlit as st
 
 from data import PARSEC_TO_LIGHT_YEARS
-from ui_helpers import scroll_to_top_if_requested, step_buttons, step_tabs
+from ui_helpers import pause_cue, scroll_to_top_if_requested, step_buttons, step_tabs
 
 TITLE = "Planet Shopping Outside Our Solar System"
 SUBTITLE = "Use real exoplanet data to find your perfect planet."
@@ -19,11 +18,11 @@ ASSETS_DIR = Path(__file__).resolve().parent.parent / "assets"
 SOLAR_SYSTEM_IMAGE_PATH = ASSETS_DIR / "solar-system-nasa.jpeg"
 
 STAGE_LABELS = [
-    "🚀 Launch — Where can we go?",
-    "🛰️ Meet Your Planet — What does a planet look like as data?",
-    "🌡️ Filter One Variable — What happens when one thing matters?",
-    "🛒 Build Your Search — What happens when everything matters at once?",
-    "🪐 Choose Your Destination — Where are you going?",
+    "🚀 Launch",
+    "🛰️ Meet a Planet",
+    "🔎 Filter",
+    "🛒 Build Search",
+    "💡 Data Science",
 ]
 
 # These keys belong only to this experience. Do not reuse the mission or
@@ -32,7 +31,10 @@ _STAGE_KEY = "planet_shopping_stage"
 _TAB_KEY = "planet_shopping_tab"
 _SCROLL_KEY = "planet_shopping_scroll_to_top"
 _CATALOGUE_REVEAL_KEY = "planet_shopping_launch_catalogue_revealed"
-_TEMPERATURE_RANGE_KEY = "planet_shopping_temperature_range_c"
+_DISTANCE_CONTROL_KEY = "planet_shopping_distance_control_ly"
+_APPLIED_DISTANCE_KEY = "planet_shopping_applied_distance_ly"
+_TEMPERATURE_CONTROL_KEY = "planet_shopping_temperature_control_c"
+_APPLIED_TEMPERATURE_KEY = "planet_shopping_applied_temperature_range_c"
 _UNKNOWN_TEMPERATURE_DECISION_KEY = "planet_shopping_unknown_temperature_decision"
 
 
@@ -69,15 +71,38 @@ def _split_temperature_groups(
     return matches, does_not_match, unknown
 
 
+def _known_distance_population(data: pd.DataFrame) -> pd.DataFrame:
+    """Return the local Stage 3 population with recorded system distances."""
+
+    distance = pd.to_numeric(data["sy_dist"], errors="coerce")
+    return data.loc[distance.notna()].copy()
+
+
+def _filter_distance_light_years(data: pd.DataFrame, maximum_distance_ly: int) -> pd.DataFrame:
+    """Keep planets whose recorded system distance is within a light-year limit."""
+
+    maximum_distance_parsecs = maximum_distance_ly / PARSEC_TO_LIGHT_YEARS
+    distance = pd.to_numeric(data["sy_dist"], errors="coerce")
+    return data.loc[distance <= maximum_distance_parsecs].copy()
+
+
+def _temperature_candidates(
+    matches: pd.DataFrame, unknown: pd.DataFrame, keep_unknowns: bool
+) -> pd.DataFrame:
+    """Build the Stage 3 candidate pool without treating unknowns as failures."""
+
+    return pd.concat([matches, unknown], ignore_index=True) if keep_unknowns else matches.copy()
+
+
 def _render_launch(data: pd.DataFrame) -> None:
     st.subheader("🚀 Launch")
     st.info("**MISSION: Find a new home**\n\nEarth is no longer an option. Your mission is to use real exoplanet data to decide where we could go instead.")
 
     question, image = st.columns([2, 1])
     with question:
-        st.markdown("### Where can we go?")
+        st.markdown("#### Where can we go?")
         st.write("Earth is one planet in our Solar System.")
-        st.markdown("#### Pause and discuss")
+        st.markdown("**Pause and discuss**")
         st.markdown("**Could we just move somewhere else in our Solar System?**")
         st.write("The other planets in our Solar System are not obvious replacements for Earth.")
         st.markdown("**Maybe we need to look further away.**")
@@ -88,15 +113,15 @@ def _render_launch(data: pd.DataFrame) -> None:
             use_container_width=True,
         )
 
-    st.markdown("### Look beyond the Sun")
+    st.markdown("#### Look beyond the Sun")
     st.write("The Sun is our star.")
-    st.markdown("#### Pause and discuss")
+    st.markdown("**Pause and discuss**")
     st.markdown("**The Sun is our star. Could other stars have planets too?**")
     st.write("Other stars can have their own planetary systems.")
     st.write("An **exoplanet** is a planet outside our Solar System.")
 
-    st.markdown("### A catalogue that keeps growing")
-    st.markdown("#### Pause and predict")
+    st.markdown("#### A catalogue that keeps growing")
+    st.markdown("**Pause and predict**")
     st.markdown("**How many exoplanets do you think are in our catalogue today?**")
     if _CATALOGUE_REVEAL_KEY not in st.session_state:
         st.session_state[_CATALOGUE_REVEAL_KEY] = False
@@ -118,7 +143,7 @@ def _render_launch(data: pd.DataFrame) -> None:
         st.metric(f"Ten years ago ({current_year - 10})", f"{counts['ten_years_ago']:,}")
     st.write("This catalogue is data: **one planet → one record → different pieces of information about that planet.**")
     st.caption("Scientists have recorded more information for some planets than for others.")
-    st.markdown("### We have thousands of planets. But what does one planet actually look like in the data?")
+    st.markdown("#### We have thousands of planets. But what does one planet actually look like in the data?")
     st.info("**Next: Meet Your Planet**")
 
 
@@ -164,8 +189,8 @@ def _render_meet_your_planet(data: pd.DataFrame) -> None:
     portrait, details = st.columns([1, 2])
     with portrait:
         with st.container(border=True):
-            st.markdown("### Planet portrait")
-            st.subheader(planet_name)
+            st.markdown("#### Planet portrait")
+            st.markdown(f"**{planet_name}**")
             st.markdown(
                 f"<div style='height: 170px; display: grid; place-items: center;'>"
                 f"<div role='img' aria-label='Symbolic planet portrait' title='{colour_description}; not to scale' "
@@ -176,7 +201,7 @@ def _render_meet_your_planet(data: pd.DataFrame) -> None:
             )
             st.caption("Symbolic data portrait — colour and size are not to scale.")
     with details:
-        st.markdown("### Planet profile")
+        st.markdown("#### Planet profile")
         top_left, top_right, top_far = st.columns(3)
         with top_left:
             st.metric("Estimated temperature", temperature)
@@ -184,7 +209,7 @@ def _render_meet_your_planet(data: pd.DataFrame) -> None:
             st.metric("Size relative to Earth", radius)
         with top_far:
             st.metric("Distance from Earth", distance)
-        st.markdown("#### Its planetary system")
+        st.markdown("**Its planetary system**")
         system_left, system_middle, system_right = st.columns(3)
         with system_left:
             st.metric("Stars in the system", stars)
@@ -195,81 +220,114 @@ def _render_meet_your_planet(data: pd.DataFrame) -> None:
     st.caption("Unknown means this value has not been recorded in the catalogue. It does not mean zero or a failed planet.")
 
 
-def _render_filter_one_variable(data: pd.DataFrame) -> None:
-    st.subheader("🌡️ Filter One Variable")
-    st.write("Start with one thing that matters: a planet's estimated temperature.")
-    st.caption(
-        "The catalogue records an **estimated equilibrium temperature**. It is useful for comparing "
-        "planets, but it is not necessarily the planet's surface temperature."
-    )
+def _render_filter(data: pd.DataFrame) -> None:
+    st.subheader("🔎 Filter")
+    st.write("**Start simple.** We have thousands of possible planets. First, choose one thing that matters and use it to narrow the list.")
 
-    recorded_temperatures_c = pd.to_numeric(data["pl_eqt"], errors="coerce").dropna() - 273.15
-    if recorded_temperatures_c.empty:
-        st.info("This catalogue has no recorded estimated equilibrium temperatures to filter yet.")
+    distance_population = _known_distance_population(data)
+    st.markdown("#### How far away?")
+    st.caption(
+        "This is the distance from Earth to the planetary system, not the distance of a planet from its own star. "
+        "Even the nearest stars are several light-years away."
+    )
+    pause_cue(
+        "What do you think will happen to our list if we only keep planets this close?",
+        title="Pause and predict",
+    )
+    with st.form("planet_shopping_distance_filter_form"):
+        distance_limit_ly = st.slider(
+            "How far away are you willing to go? (light-years)",
+            min_value=10,
+            max_value=2_000,
+            value=500,
+            step=10,
+            key=_DISTANCE_CONTROL_KEY,
+        )
+        apply_distance = st.form_submit_button("Apply distance filter", type="primary")
+    if apply_distance:
+        previous_distance = st.session_state.get(_APPLIED_DISTANCE_KEY)
+        st.session_state[_APPLIED_DISTANCE_KEY] = distance_limit_ly
+        if previous_distance != distance_limit_ly:
+            st.session_state.pop(_APPLIED_TEMPERATURE_KEY, None)
+
+    if _APPLIED_DISTANCE_KEY not in st.session_state:
         return
 
-    minimum_temperature = floor(recorded_temperatures_c.min())
-    maximum_temperature = ceil(recorded_temperatures_c.max())
-    default_range = (
-        max(minimum_temperature, 0),
-        min(maximum_temperature, 30),
-    )
-    if default_range[0] >= default_range[1]:
-        default_range = (minimum_temperature, maximum_temperature)
+    applied_distance_ly = st.session_state[_APPLIED_DISTANCE_KEY]
+    distance_filtered = _filter_distance_light_years(distance_population, applied_distance_ly)
+    before_distance, after_distance = st.columns(2)
+    with before_distance:
+        st.metric("Planets with recorded distances", f"{len(distance_population):,}")
+    with after_distance:
+        st.metric(f"Possible planets within {applied_distance_ly:,} light-years", f"{len(distance_filtered):,}")
+    st.write("The planet data did not change. The filter changed which records remain in the search.")
 
-    temperature_range_c = st.slider(
-        "Choose an estimated equilibrium temperature range (°C)",
-        min_value=minimum_temperature,
-        max_value=maximum_temperature,
-        value=default_range,
-        step=1,
-        key=_TEMPERATURE_RANGE_KEY,
+    st.markdown("#### How hot?")
+    st.write("Distance is not the only thing that matters. You probably care what it might be like when you arrive.")
+    st.caption(
+        "The catalogue records an **estimated equilibrium temperature**. It is useful for comparing planets, "
+        "but it is not necessarily a planet's surface temperature. Earth's estimated equilibrium temperature is about −18°C."
     )
-    matches, does_not_match, unknown = _split_temperature_groups(data, temperature_range_c)
+    with st.form("planet_shopping_temperature_filter_form"):
+        temperature_range_c = st.slider(
+            "Choose an estimated equilibrium temperature range (°C)",
+            min_value=-200,
+            max_value=1_000,
+            value=(-20, 30),
+            step=5,
+            key=_TEMPERATURE_CONTROL_KEY,
+        )
+        apply_temperature = st.form_submit_button("Apply temperature filter", type="primary")
+    if apply_temperature:
+        st.session_state[_APPLIED_TEMPERATURE_KEY] = temperature_range_c
 
-    st.markdown("### What the catalogue says")
-    match_column, non_match_column, unknown_column = st.columns(3)
-    with match_column:
-        with st.container(border=True):
-            st.metric("Matches", len(matches))
-            st.caption("Recorded temperature is inside your range.")
+    if _APPLIED_TEMPERATURE_KEY not in st.session_state:
+        return
+
+    applied_temperature_range = st.session_state[_APPLIED_TEMPERATURE_KEY]
+    matches, does_not_match, unknown = _split_temperature_groups(
+        distance_filtered, applied_temperature_range
+    )
+    st.markdown("**What happened to the distance-filtered list?**")
+    known_match_column, non_match_column, unknown_column = st.columns(3)
+    with known_match_column:
+        st.metric("Known match", len(matches))
     with non_match_column:
-        with st.container(border=True):
-            st.metric("Does not match", len(does_not_match))
-            st.caption("Recorded temperature is outside your range.")
+        st.metric("Known non-match", len(does_not_match))
     with unknown_column:
-        with st.container(border=True):
-            st.metric("Unknown", len(unknown))
-            st.caption("No estimated temperature is recorded.")
-
+        st.metric("Unknown", len(unknown))
+    st.caption("Unknown means no estimated equilibrium temperature is recorded.")
     st.info(
-        "**Unknown is not a failure.** In online shopping, a missing product specification does not prove "
-        "that the product fails your requirement. It only means you do not have that information yet."
+        "**Unknown is not the same as ‘doesn't match’.** We simply do not know. A product with a missing "
+        "specification has not proved that it fails your requirement."
     )
     unknown_decision = st.radio(
         "What should we do with planets whose temperature is unknown?",
         (
-            "Keep unknowns as possible candidates",
-            "Set unknowns aside until we have a temperature",
+            "Keep them as possible candidates",
+            "Set them aside until we know their temperature",
         ),
         key=_UNKNOWN_TEMPERATURE_DECISION_KEY,
     )
-    retained_unknowns = unknown if unknown_decision.startswith("Keep") else unknown.iloc[0:0]
+    keep_unknowns = unknown_decision.startswith("Keep")
+    candidates = _temperature_candidates(matches, unknown, keep_unknowns)
+    retained_unknowns = unknown if keep_unknowns else unknown.iloc[0:0]
 
-    st.markdown("### Your candidate pool")
-    candidates_column, known_matches_column, unknowns_column = st.columns(3)
-    with candidates_column:
-        st.metric("Planets remaining", len(matches) + len(retained_unknowns))
-    with known_matches_column:
+    st.markdown("**Your candidate pool**")
+    total_column, match_column, retained_column = st.columns(3)
+    with total_column:
+        st.metric("Planets remaining", len(candidates))
+    with match_column:
         st.metric("Known matches", len(matches))
-    with unknowns_column:
+    with retained_column:
         st.metric("Retained unknowns", len(retained_unknowns))
-
     st.write(
-        "Changing the missing-data decision changes the candidate pool **without changing any "
-        "measurements**. The recorded data stay the same; only your decision about unknown values changes."
+        "Changing this decision changes the candidate list **without changing the measurements**. "
+        "The recorded data stay the same; only your decision about unknown values changes."
     )
-    st.info("**Next: Build Your Search**\n\nNext you will combine several criteria.")
+    st.info(
+        "**Next: Build Search**\n\nNext you will add planet size and combine the filters."
+    )
 
 
 def _render_build_your_search() -> None:
@@ -300,7 +358,7 @@ def render(data: pd.DataFrame) -> None:
         st.session_state[_STAGE_KEY] = 0
 
     stage = max(0, min(int(st.session_state[_STAGE_KEY]), len(STAGE_LABELS) - 1))
-    st.title(TITLE)
+    st.header(TITLE)
     st.caption(SUBTITLE)
     st.caption(f"This experience is using the currently selected NASA exoplanet dataset ({len(data):,} planet records).")
 
@@ -315,7 +373,7 @@ def render(data: pd.DataFrame) -> None:
     elif stage == 1:
         _render_meet_your_planet(data)
     elif stage == 2:
-        _render_filter_one_variable(data)
+        _render_filter(data)
     elif stage == 3:
         _render_build_your_search()
     else:
