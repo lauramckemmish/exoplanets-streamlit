@@ -12,12 +12,15 @@ from charts import (
     solar_system_demographics_chart,
 )
 from ui_helpers import (
+    choice_reveal,
     data_detective_challenge,
     graph_guide,
+    hard_reveal,
     key_idea,
-    persistent_reveal,
+    pause_cue,
     role_image,
     scroll_to_top_if_requested,
+    soft_reveal,
     step_buttons,
     step_tabs,
     teacher_note,
@@ -120,7 +123,7 @@ def render(data: pd.DataFrame) -> None:
         st.subheader("First: ordinary linear axes")
         graph_guide("The bottom axis shows orbital distance; the side axis shows mass.", "Farther right means farther from the Sun. Higher means more massive.")
         st.plotly_chart(solar_system_demographics_chart(False), use_container_width=True)
-        if persistent_reveal(
+        if hard_reveal(
             "Jupiter and the distant outer planets set the scale, so the small inner planets bunch together near the bottom-left corner. How could we spread them out without losing the giant planets?",
             "curious_log_scale_revealed",
             reveal_label="Reveal a new way to view the same data →",
@@ -152,30 +155,41 @@ def render(data: pd.DataFrame) -> None:
             with st.container(border=True):
                 st.image(TRANSIT_DETECTION_IMAGE_PATH, use_container_width=True)
                 st.markdown("### Transit detection\nA planet passes in front of its star, causing a tiny dip in starlight.")
-        st.info("**Pause and predict:** Before looking at the graphs, which planets might each method find more easily? Think about planet size and distance from the star.")
+        pause_cue(
+            "Before looking at the graphs, which planets might each method find more easily? "
+            "Think about planet size and distance from the star.",
+            title="Pause and predict:",
+        )
         with st.expander("Watch transit detection in motion"):
             st.video("https://www.youtube.com/watch?v=BFi4HBUdWkk")
             st.caption("NASA animation: a transit produces a small, repeating dip in a star's light. Credit: NASA/JPL-Caltech")
         method_view = st.radio("Choose a data view", ["Direct Imaging", "Transit", "Transit + Direct Imaging", "All methods"], horizontal=True, key="curious_method_view")
         graph_guide("Choose a method, then compare where its points appear on the graph.", "Look for patterns in planet mass and orbital distance before opening the explanation.")
         st.plotly_chart(demographics_methods_chart(data, method_view), use_container_width=True)
-        with st.expander("What pattern does the evidence support?"):
+        with soft_reveal("What pattern does the evidence support?"):
             st.write("Direct imaging most often finds bright, massive planets far from their stars. Transit detection most often finds planets close to their stars, especially larger planets. These are real patterns in the detected data, shaped by what each method can measure.")
         st.markdown("### Discuss\nWhat changed when we changed the way we searched?")
         key_idea("Different discovery methods find different kinds of planets.", "Toggle the method views and compare where their points appear on the graph.")
     elif part == 6:
         st.header("Conclusion: Our view is still changing")
-        st.info("**Pause and discuss:** What does the evidence allow us to conclude about planetary systems and whether ours is normal?")
+        pause_cue(
+            "What does the evidence allow us to conclude about planetary systems and whether "
+            "ours is normal?",
+            title="Pause and discuss:",
+        )
         st.markdown("### A cautious conclusion\nThe detected catalogue contains real patterns: planetary systems contain worlds with many different masses and orbital distances, and different graph scales can help us see them. But the catalogue is shaped by how astronomers find planets, so it is not a complete census of every planetary system that exists.\n\nWe can compare our Solar System with the detected planets, but mass and orbital distance alone cannot decide whether a whole planetary system is ‘normal’.")
-        st.markdown("### Choose a direction to explore next\nPick any option that interests you. You do not need to explore them all.")
         next_directions = {
             "How planetary systems form": "What processes might make one planetary system look very different from another?",
             "How astronomers search for life": "What extra evidence, beyond mass and orbital distance, would scientists need to investigate a planet’s atmosphere or possible conditions for life?",
             "Future telescopes and missions": "Which new observations could help find planets that are currently difficult to detect?",
             "Other worlds in culture and imagination": "How have people imagined worlds beyond our Solar System in stories, art or film?",
         }
-        selected_directions = st.multiselect("Choose one or more directions", list(next_directions), key="curious_next_directions")
-        for direction in selected_directions:
-            st.markdown(f"**{direction}**\n\n{next_directions[direction]}")
+        choice_reveal(
+            "Choose a direction to explore next\nPick any option that interests you. You do not "
+            "need to explore them all.",
+            next_directions,
+            "curious_next_directions",
+            label="Choose one or more directions",
+        )
 
     step_buttons(STEP_LABELS, "curious_step_selector", "curious_part", "curious_scroll_to_top", part, "curious")
