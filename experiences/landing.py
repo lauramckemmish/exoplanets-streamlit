@@ -79,6 +79,25 @@ def render(data, image_path, feedback_url, grant_url, catalog, open_experience, 
         "Developed at UNSW as part of CURIOUS, drawing on research, teaching and outreach "
         "work to help learners investigate real exoplanet evidence."
     )
+    with st.expander("Program history"):
+        st.markdown("### Earlier development")
+        st.write(
+            "This work builds on earlier UNSW work supporting teachers and students to use "
+            "data science in school science, helping establish reusable learning resources "
+            "and approaches."
+        )
+        st.markdown("### CURIOUS regional program")
+        st.write(
+            "CURIOUS extended this work through research-connected STEM workshops with "
+            "regional schools in 2025–26. The program was enabled by a $100,000 Australian "
+            "Government Maker Projects – Community STEM Engagement Grant and a partnership "
+            "with Passionately Curious."
+        )
+        st.write(
+            "These online resources are part of CURIOUS's continuing development: capturing "
+            "what is learned through real delivery and turning it into reusable resources for "
+            "students, teachers and facilitators."
+        )
     with st.expander("A scientist’s story"):
         st.markdown("**Dr Laura McKemmish, UNSW**")
         st.write(
