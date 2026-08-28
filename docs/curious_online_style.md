@@ -170,6 +170,11 @@ a rainbow.
   text colours; use transparent overlays of the official yellow and borders
   rather than inventing a muted substitute or forcing page backgrounds.
   Approved UNSW logos use the shared white logo plate.
+- Native Streamlit widgets inherit the shared baseline through
+  `.streamlit/config.toml`: UNSW yellow is the primary widget colour (for
+  sliders, their active track/thumb/value and focus), and indigo is the native
+  information colour (for `st.info`, including pause cues and hard reveals).
+  Do not replace these shared settings with experience-specific CSS.
 - Custom ordinary text/background combinations must meet at least 4.5:1
   contrast. Whenever a rare high-value control deliberately uses a filled
   UNSW-yellow background, its text is black; keep keyboard focus visible and

@@ -71,14 +71,18 @@ def apply_visual_system() -> None:
 
         /* Primary is a clear action, not automatically a yellow surface. */
         [data-testid="stButton"] > button[kind="primary"],
-        [data-testid="stFormSubmitButton"] > button[kind="primary"] {{
+        [data-testid="stFormSubmitButton"] > button[kind="primary"],
+        [data-testid="stBaseButton-primary"],
+        [data-testid="stBaseButton-primaryFormSubmit"] {{
             background: transparent;
             border: 2px solid var(--unsw-active-emphasis);
             color: inherit;
             font-weight: 650;
         }}
         [data-testid="stButton"] > button[kind="primary"]:hover,
-        [data-testid="stFormSubmitButton"] > button[kind="primary"]:hover {{
+        [data-testid="stFormSubmitButton"] > button[kind="primary"]:hover,
+        [data-testid="stBaseButton-primary"]:hover,
+        [data-testid="stBaseButton-primaryFormSubmit"]:hover {{
             background: rgba(255, 220, 0, 0.10);
             border-color: var(--unsw-active-emphasis);
             color: inherit;

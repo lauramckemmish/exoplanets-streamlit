@@ -1,6 +1,7 @@
 """Shared UNSW visual-token checks."""
 
 import unittest
+from pathlib import Path
 
 from visual_system import SEMANTIC_TOKENS, UNSW_PALETTE
 
@@ -20,6 +21,11 @@ class UNSWVisualSystemTests(unittest.TestCase):
         self.assertEqual(SEMANTIC_TOKENS["information"], UNSW_PALETTE["indigo"])
         self.assertEqual(SEMANTIC_TOKENS["success"], UNSW_PALETTE["green"])
         self.assertEqual(SEMANTIC_TOKENS["warning_error"], UNSW_PALETTE["red"])
+
+    def test_native_streamlit_theme_uses_shared_primary_and_info_colours(self):
+        theme = Path(".streamlit/config.toml").read_text()
+        self.assertIn('primaryColor = "#FFDC00"', theme)
+        self.assertIn('blueColor = "#3F61C4"', theme)
 
 
 if __name__ == "__main__":

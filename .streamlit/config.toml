@@ -1,0 +1,5 @@
+[theme]
+# Keep Streamlit's active light/dark surfaces while applying the shared
+# semantic colours to its native interactive widgets and info callouts.
+primaryColor = "#FFDC00"
+blueColor = "#3F61C4"
