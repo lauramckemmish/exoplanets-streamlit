@@ -1,7 +1,9 @@
 """Find Your Perfect Planet experience."""
 
-import streamlit as st
+from pathlib import Path
+
 import pandas as pd
+import streamlit as st
 
 from charts import sky_map
 from data import PARSEC_TO_LIGHT_YEARS, mission_candidates
@@ -19,6 +21,8 @@ STEP_LABELS = [
 STEP_COUNT = len(STEP_LABELS)
 TITLE = "Find Your Perfect Planet"
 SUBTITLE = "Turn a planet idea into filters and investigate real exoplanet data"
+ASSETS_DIR = Path(__file__).resolve().parent.parent / "assets"
+KEPLER_16B_POSTER_PATH = ASSETS_DIR / "nasa-kepler-16b-travel-poster.jpg"
 
 # Editable facilitator guidance for each stage of the mission.  Keeping this
 # alongside the experience makes wording changes possible without navigating
@@ -340,7 +344,7 @@ def render(data: pd.DataFrame) -> None:
 
     elif step == 1:
         st.header("Worked example: a Tatooine-like world")
-        st.image("assets/nasa-kepler-16b-travel-poster.jpg", width=300, caption="NASA/JPL artist's impression of Kepler-16 b, a real planet orbiting two stars")
+        st.image(KEPLER_16B_POSTER_PATH, width=300, caption="NASA/JPL artist's impression of Kepler-16 b, a real planet orbiting two stars")
         st.markdown(
             "**On a galaxy far, far away, there was once a Jedi called Luke Skywalker.** "
             "His home planet, Tatooine, had two suns. We cannot search for a fictional planet directly, "

@@ -19,4 +19,4 @@ python -m pip install -r requirements.txt
 python -m streamlit run app.py
 ```
 
-The app offers live NASA data and a bundled notebook sample from the sidebar. Live data are cached; the bundled sample keeps the activities usable when a network request is unavailable.
+The app automatically uses live NASA data when available and falls back to the bundled notebook sample when a network request is unavailable.

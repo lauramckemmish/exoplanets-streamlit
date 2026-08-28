@@ -33,8 +33,8 @@ SOLAR_SYSTEM_IMAGE_PATH = ASSETS_DIR / "solar-system-nasa.jpeg"
 PLANETARY_SYSTEMS_IMAGE_PATH = ASSETS_DIR / "planetary-systems.svg"
 INNER_OUTER_PLANETS_IMAGE_PATH = ASSETS_DIR / "inner-outer-planets.svg"
 EXOPLANET_QUADRANTS_IMAGE_PATH = ASSETS_DIR / "exoplanet-mass-distance-quadrants.svg"
-DIRECT_IMAGING_IMAGE_PATH = ASSETS_DIR / "DirectImaging.png"
-TRANSIT_DETECTION_IMAGE_PATH = ASSETS_DIR / "Transit.png"
+DIRECT_IMAGING_IMAGE_PATH = ASSETS_DIR / "direct-imaging.png"
+TRANSIT_DETECTION_IMAGE_PATH = ASSETS_DIR / "transit-detection.png"
 
 STEP_LABELS = [
     "Welcome",

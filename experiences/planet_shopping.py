@@ -14,7 +14,8 @@ from ui_helpers import scroll_to_top_if_requested, step_buttons, step_tabs
 
 TITLE = "Planet Shopping Outside Our Solar System"
 SUBTITLE = "Use real exoplanet data to find your perfect planet."
-SOLAR_SYSTEM_IMAGE_PATH = Path(__file__).resolve().parent.parent / "assets" / "solar-system-nasa.jpeg"
+ASSETS_DIR = Path(__file__).resolve().parent.parent / "assets"
+SOLAR_SYSTEM_IMAGE_PATH = ASSETS_DIR / "solar-system-nasa.jpeg"
 
 STAGE_LABELS = [
     "🚀 Launch — Where can we go?",

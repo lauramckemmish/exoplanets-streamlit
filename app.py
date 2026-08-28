@@ -47,23 +47,24 @@ from experiences import (
 )
 
 APP_DIR = Path(__file__).resolve().parent
+ASSETS_DIR = APP_DIR / "assets"
 
 # ---------------------------------------------------------------------------
 # SHARED DATA AND ASSET CONFIGURATION
 # These constants keep reusable data paths and images in one easy-to-find
 # place. Edit lesson wording in the relevant module under `experiences/`.
 # ---------------------------------------------------------------------------
-SOLAR_SYSTEM_IMAGE_PATH = APP_DIR / "assets" / "solar-system-nasa.jpeg"
-EXOPLANET_IMAGE_PATH = APP_DIR / "assets" / "exoplanets-artists-concept-nasa.jpeg"
-UNSW_LOGO_PATH = APP_DIR / "assets" / "unsw-sydney-logo-landscape.png"
-UNSW_PORTRAIT_LOGO_PATH = APP_DIR / "assets" / "unsw-sydney-logo-portrait.png"
-DIRECT_IMAGING_IMAGE_PATH = APP_DIR / "assets" / "DirectImaging.png"
-TRANSIT_DETECTION_IMAGE_PATH = APP_DIR / "assets" / "Transit.png"
-PLANETARY_SYSTEMS_IMAGE_PATH = APP_DIR / "assets" / "planetary-systems.svg"
-EXOPLANET_QUADRANTS_IMAGE_PATH = APP_DIR / "assets" / "exoplanet-mass-distance-quadrants.svg"
-NASA_KEPLER_16B_POSTER_PATH = APP_DIR / "assets" / "nasa-kepler-16b-travel-poster.jpg"
-NASA_51_PEGASI_B_POSTER_PATH = APP_DIR / "assets" / "nasa-51-pegasi-b-travel-poster.jpg"
-NASA_KEPLER_186F_POSTER_PATH = APP_DIR / "assets" / "nasa-kepler-186f-travel-poster.jpg"
+SOLAR_SYSTEM_IMAGE_PATH = ASSETS_DIR / "solar-system-nasa.jpeg"
+EXOPLANET_IMAGE_PATH = ASSETS_DIR / "exoplanets-artists-concept-nasa.jpeg"
+UNSW_LOGO_PATH = ASSETS_DIR / "unsw-sydney-logo-landscape.png"
+UNSW_PORTRAIT_LOGO_PATH = ASSETS_DIR / "unsw-sydney-logo-portrait.png"
+DIRECT_IMAGING_IMAGE_PATH = ASSETS_DIR / "direct-imaging.png"
+TRANSIT_DETECTION_IMAGE_PATH = ASSETS_DIR / "transit-detection.png"
+PLANETARY_SYSTEMS_IMAGE_PATH = ASSETS_DIR / "planetary-systems.svg"
+EXOPLANET_QUADRANTS_IMAGE_PATH = ASSETS_DIR / "exoplanet-mass-distance-quadrants.svg"
+NASA_KEPLER_16B_POSTER_PATH = ASSETS_DIR / "nasa-kepler-16b-travel-poster.jpg"
+NASA_51_PEGASI_B_POSTER_PATH = ASSETS_DIR / "nasa-51-pegasi-b-travel-poster.jpg"
+NASA_KEPLER_186F_POSTER_PATH = ASSETS_DIR / "nasa-kepler-186f-travel-poster.jpg"
 # Add the public teacher-feedback form URL here when it is ready.
 TEACHER_FEEDBACK_URL = ""
 DEMOGRAPHICS_TITLE = "Exoplanet Discovery with NASA Data"
