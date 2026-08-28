@@ -186,6 +186,19 @@ st.set_page_config(
     layout="wide",
 )
 
+st.markdown(
+    """
+    <style>
+    [data-testid="stSidebar"] [data-testid="stVerticalBlock"] {gap: 0.35rem;}
+    [data-testid="stSidebar"] [data-testid="stButton"] > button {
+        min-height: 2rem;
+        padding: 0.2rem 0.45rem;
+        font-size: 0.88rem;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 
 
@@ -265,9 +278,14 @@ if (
 ):
     st.session_state["experience"] = "Introduction"
 
+data, source_label = load_selected_data()
+
 with st.sidebar:
-    st.header("Explore exoplanets")
-    st.caption("Experiences using real NASA data")
+    st.markdown("### Explore exoplanets")
+    if source_label == "Live NASA Exoplanet Archive":
+        st.caption(f"**{len(data):,} confirmed exoplanets**  \nNASA Exoplanet Archive")
+    else:
+        st.caption(f"**Offline catalogue sample · {len(data):,} records**  \nNASA Exoplanet Archive")
     st.button(
         "🏠 Introduction",
         type="primary" if st.session_state["experience"] == "Introduction" else "secondary",
@@ -299,13 +317,11 @@ with st.sidebar:
             args=(resource["name"],),
         )
     experience = st.session_state["experience"]
-    st.image(UNSW_LOGO_PATH, width=180)
     st.divider()
-    st.header("Data source")
-    source = st.radio("Choose a dataset", ["Live NASA data", "Bundled notebook sample"])
-    st.caption("Live data are cached for six hours. The bundled sample keeps the activity usable offline.")
-
-data, source_label = load_selected_data(source)
+    st.caption("Developed at UNSW")
+    _, logo_column, _ = st.columns([1, 3, 1])
+    with logo_column:
+        st.image(UNSW_LOGO_PATH, width=150)
 
 if experience == "Introduction":
     landing.render(
@@ -321,11 +337,8 @@ if experience == "Introduction":
     )
     st.stop()
 
-with st.sidebar:
-    st.success(source_label)
-    st.metric("Confirmed exoplanets", f"{len(data):,}")
-    if experience == "Exoplanet Data Laboratory":
-        guidance_mode = "Teacher" if st.session_state.get("lab_teacher_view", False) else "Student"
+if experience == "Exoplanet Data Laboratory":
+    guidance_mode = "Teacher" if st.session_state.get("lab_teacher_view", False) else "Student"
 
 if experience == "Guided Tatooine Mission":
     tatooine.render(data)

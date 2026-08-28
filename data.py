@@ -75,13 +75,11 @@ def prepare(raw: pd.DataFrame) -> pd.DataFrame:
     return data.reset_index(drop=True)
 
 
-def load_data(source: str) -> tuple[pd.DataFrame, str]:
-    if source == "Live NASA data":
-        try:
-            return prepare(load_live()), "Live NASA Exoplanet Archive"
-        except Exception as exc:
-            st.warning(f"Live NASA data could not be loaded: {exc}")
-            st.info("The bundled notebook sample is being used instead.")
+def load_data() -> tuple[pd.DataFrame, str]:
+    try:
+        return prepare(load_live()), "Live NASA Exoplanet Archive"
+    except Exception:
+        pass
     return prepare(load_sample()), "Bundled notebook sample"
 
 
