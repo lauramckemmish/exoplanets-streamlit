@@ -214,28 +214,42 @@ def choice_reveal(
     return selected
 
 
-def role_image(image, *, role: str, caption: str | None = None) -> None:
-    """Render an image responsively according to its pedagogical role.
-
-    ``context`` images are centred at about half width; ``support`` images are
-    compact; ``evidence``, ``graph`` and ``hero`` images use the useful width.
-    Captions should retain credits and accessibility context supplied by the
-    calling experience.
-    """
+def _validate_image_role(role: str) -> None:
     if role not in {"context", "evidence", "graph", "support", "hero"}:
         raise ValueError(f"Unknown image role: {role}")
 
-    if role == "context":
-        _, image_column, _ = st.columns([1, 2, 1])
-        with image_column:
-            st.image(image, caption=caption, use_container_width=True)
+
+def _render_role_image(image, caption: str | None) -> None:
+    st.image(image, caption=caption, width="stretch")
+
+
+def role_image(image, *, role: str, caption: str | None = None, key: str | None = None) -> None:
+    """Render an image responsively according to its pedagogical role.
+
+    Context images are about half width and support images are compact on wide
+    screens; both use the available width on narrow screens. Evidence, graph
+    and hero images use the useful width. Captions retain supplied context.
+    """
+    _validate_image_role(role)
+    if key is None:
+        _render_role_image(image, caption)
         return
-    if role == "support":
-        image_column, _ = st.columns([1, 3])
+    with st.container(key=f"role_image_{role}_{key}"):
+        _render_role_image(image, caption)
+
+
+@contextmanager
+def media_text_pair(image, *, role: str, caption: str | None = None, key: str) -> Iterator[None]:
+    """Pair context/support media with text, stacking at narrow widths."""
+    if role not in {"context", "support"}:
+        raise ValueError("A media/text pair must use the context or support role")
+    ratios = [1, 1] if role == "context" else [1, 2]
+    with st.container(key=f"media_text_{key}"):
+        image_column, text_column = st.columns(ratios, gap="medium")
         with image_column:
-            st.image(image, caption=caption, use_container_width=True)
-        return
-    st.image(image, caption=caption, use_container_width=True)
+            _render_role_image(image, caption)
+        with text_column:
+            yield
 
 
 def log_scale_reveal(prompt: str, key: str) -> bool:

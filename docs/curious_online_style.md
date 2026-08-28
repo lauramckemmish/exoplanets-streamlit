@@ -195,20 +195,22 @@ live review in both themes; preserve the semantic roles while testing it.
 Choose an image role before choosing its size. Visual prominence should match
 pedagogical importance. These are practical defaults, not rigid pixel rules.
 
-- **Context / wonder image:** establishes reality, setting or interest. On
-  desktop, it is normally medium and centred at roughly half the useful content
-  width. It should not usually push its associated question or task entirely
-  below the viewport.
+- **Context / wonder image:** establishes reality, setting or interest. On a
+  wide screen, it is normally paired with its relevant explanation or question
+  at about half the useful content width. It should not usually push its
+  associated question or task entirely below the viewport.
 - **Evidence / inspection image:** learners need to inspect details in it. Use
   a larger presentation, typically 70–100% of useful content width.
 - **Graph / interactive visualisation:** when the visualisation is the
   cognitive job, use the full useful width.
-- **Supporting image:** a secondary illustration or cue; keep it small and
-  compact.
+- **Supporting image:** a secondary illustration or cue; keep it compact on a
+  wide screen.
 - **Hero image:** use large/full-width only when the image itself genuinely
   deserves the opening visual attention. Do not use full width merely because
   the source asset is high resolution.
 
 Where practical, use responsive container-based sizing rather than manually
-tuned pixel widths. Preserve image captions, credits and other supplied
-accessibility context.
+tuned pixel widths. **Wide screen: pair when useful; narrow screen: stack
+rather than shrink.** On narrow screens, context and support images should use
+the available content width rather than becoming thin columns. Preserve image
+aspect ratio, captions, credits and other supplied accessibility context.

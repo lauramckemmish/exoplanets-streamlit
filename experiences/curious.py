@@ -17,8 +17,8 @@ from ui_helpers import (
     graph_guide,
     hard_reveal,
     key_idea,
+    media_text_pair,
     pause_cue,
-    role_image,
     scroll_to_top_if_requested,
     soft_reveal,
     step_buttons,
@@ -90,14 +90,14 @@ def render(data: pd.DataFrame) -> None:
 
     if part == 0:
         st.header("Welcome")
-        role_image(EXOPLANET_IMAGE_PATH, role="context", caption="Artist's concepts of exoplanets. Credit: NASA/JPL-Caltech")
-        st.write("**Are we alone in the Universe?** For most of human history, we knew only one planetary system: ours. In the past few decades, astronomers have detected thousands of planets around other stars.")
-        st.markdown("### A new question\nWhat do planetary systems normally look like? Is our Solar System normal?")
+        with media_text_pair(EXOPLANET_IMAGE_PATH, role="context", caption="Artist's concepts of exoplanets. Credit: NASA/JPL-Caltech", key="curious_welcome"):
+            st.write("**Are we alone in the Universe?** For most of human history, we knew only one planetary system: ours. In the past few decades, astronomers have detected thousands of planets around other stars.")
+            st.markdown("### A new question\nWhat do planetary systems normally look like? Is our Solar System normal?")
         st.info("**To investigate this, we need properties we can measure and compare. We will begin with planet mass.**")
     if part == 1:
         st.header("Step 1: Meet our Solar System")
-        role_image(SOLAR_SYSTEM_IMAGE_PATH, role="context", caption="An illustration of our Solar System. Credit: NASA")
-        st.write("One planetary system cannot tell us what is normal. It can give us a familiar starting point. First, choose one measurable property: **planet mass**.")
+        with media_text_pair(SOLAR_SYSTEM_IMAGE_PATH, role="context", caption="An illustration of our Solar System. Credit: NASA", key="curious_solar_system"):
+            st.write("One planetary system cannot tell us what is normal. It can give us a familiar starting point. First, choose one measurable property: **planet mass**.")
         st.write("The eight planets have very different masses. We will group them as **Very small**, **Small**, **Medium**, **Large**, or **Very large**.")
         graph_guide("The whole bar represents all eight planets.", "A wider labelled section contains a larger share of the planets.")
         figure = planet_mass_distribution_chart(data, include_exoplanets=False)
@@ -108,9 +108,9 @@ def render(data: pd.DataFrame) -> None:
     elif part == 2:
         st.header("Step 2: Meet exoplanets")
         st.info("An **exoplanet** is a planet that orbits a star other than the Sun. The first confirmed exoplanets were discovered in 1992; now astronomers have a catalogue containing thousands.")
-        role_image(PLANETARY_SYSTEMS_IMAGE_PATH, role="context", caption="The Sun is a star, and our Solar System is one planetary system. Exoplanets belong to other planetary systems.")
-        st.markdown("### Imagine\nWhat might another planetary system look like? Could it have more planets, fewer planets, or even two stars?")
-        st.write("A few decades ago, astronomers had almost no planets around other stars to compare. Now we can start to ask what the detected population looks like.")
+        with media_text_pair(PLANETARY_SYSTEMS_IMAGE_PATH, role="context", caption="The Sun is a star, and our Solar System is one planetary system. Exoplanets belong to other planetary systems.", key="curious_planetary_systems"):
+            st.markdown("### Imagine\nWhat might another planetary system look like? Could it have more planets, fewer planets, or even two stars?")
+            st.write("A few decades ago, astronomers had almost no planets around other stars to compare. Now we can start to ask what the detected population looks like.")
         graph_guide("The top bar is our Solar System; the bottom bar is detected exoplanets.", "Compare sections with the same label. Each complete bar represents 100% of its group.")
         figure = planet_mass_distribution_chart(data)
         if figure is not None:
@@ -119,8 +119,8 @@ def render(data: pd.DataFrame) -> None:
         key_idea("Detected exoplanets give us a population to compare with our Solar System.", "Compare the widest labelled section in the top bar with the widest section in the bottom bar.")
     elif part == 3:
         st.header("Step 3: Mass and orbital distance")
-        st.write("Mass is only one way to describe a planet. We can also plot its **orbital distance**—how far it is from its star. One astronomical unit (AU) is the average distance from Earth to the Sun.")
-        role_image(INNER_OUTER_PLANETS_IMAGE_PATH, role="support", caption="A simplified pattern to look for before reading the graphs.")
+        with media_text_pair(INNER_OUTER_PLANETS_IMAGE_PATH, role="support", caption="A simplified pattern to look for before reading the graphs.", key="curious_inner_outer"):
+            st.write("Mass is only one way to describe a planet. We can also plot its **orbital distance**—how far it is from its star. One astronomical unit (AU) is the average distance from Earth to the Sun.")
         st.subheader("First: ordinary linear axes")
         graph_guide("The bottom axis shows orbital distance; the side axis shows mass.", "Farther right means farther from the Sun. Higher means more massive.")
         st.plotly_chart(solar_system_demographics_chart(False), use_container_width=True)
@@ -141,8 +141,8 @@ def render(data: pd.DataFrame) -> None:
             key_idea("A log scale helps us see small and large planets on the same graph.", "The four inner planets are easier to separate without losing Jupiter and the outer planets.")
     elif part == 4:
         st.header("Step 4: Is our planetary system normal?")
-        st.write("This graph compares our eight Solar System planets with **detected exoplanets**. Each blue point is a detected exoplanet; each pink diamond is a planet in our Solar System.")
-        role_image(EXOPLANET_QUADRANTS_IMAGE_PATH, role="support", caption="Four possible combinations of planet mass and orbital distance. The example systems are simplified and are not to scale.")
+        with media_text_pair(EXOPLANET_QUADRANTS_IMAGE_PATH, role="support", caption="Four possible combinations of planet mass and orbital distance. The example systems are simplified and are not to scale.", key="curious_exoplanet_quadrants"):
+            st.write("This graph compares our eight Solar System planets with **detected exoplanets**. Each blue point is a detected exoplanet; each pink diamond is a planet in our Solar System.")
         graph_guide("The bottom axis shows orbital distance and the side axis shows planet mass. Both use a log scale.", "Hover over a blue point to inspect one detected exoplanet. Compare its position with the pink Solar System planets.")
         st.plotly_chart(current_demographics_chart(data), use_container_width=True)
         data_detective_challenge()

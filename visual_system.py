@@ -48,6 +48,11 @@ def apply_visual_system() -> None:
 
         [data-testid="stSidebar"] [data-testid="stVerticalBlock"] {{ gap: 0.35rem; }}
         [data-testid="stSidebar"] {{ border-right: 1px solid rgba(255, 220, 0, 0.35); }}
+        [class*="st-key-media_text_"] [data-testid="stHorizontalBlock"] {{ align-items: center; }}
+        @media (max-width: 700px) {{
+            [class*="st-key-media_text_"] [data-testid="stHorizontalBlock"] {{ flex-direction: column; gap: 0.65rem; }}
+            [class*="st-key-media_text_"] [data-testid="column"] {{ width: 100% !important; flex: 1 1 100% !important; }}
+        }}
         [data-testid="stSidebar"] .st-key-sidebar_brand {{
             background: var(--unsw-brand);
             color: var(--unsw-filled-yellow-text);
