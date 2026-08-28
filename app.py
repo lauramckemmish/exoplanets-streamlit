@@ -281,6 +281,7 @@ if (
 data, source_label = load_selected_data()
 
 with st.sidebar:
+    st.image(UNSW_LOGO_PATH, width=125)
     st.markdown("### Explore exoplanets")
     if source_label == "Live NASA Exoplanet Archive":
         st.caption(f"**{len(data):,} confirmed exoplanets**  \nNASA Exoplanet Archive")
@@ -298,7 +299,7 @@ with st.sidebar:
     for experience_entry in catalog.experience_catalog():
         selected = router.is_catalog_experience_selected(experience_entry["name"])
         st.button(
-            f"{experience_entry['icon']} {experience_entry['name']}",
+            f"{experience_entry['icon']} {experience_entry['nav_label']}",
             type="primary" if selected else "secondary",
             use_container_width=True,
             disabled=selected,
@@ -309,7 +310,7 @@ with st.sidebar:
     for resource in catalog.explore_catalog():
         selected = router.is_explore_resource_selected(resource["name"])
         st.button(
-            f"{resource['icon']} {resource['name']}",
+            f"{resource['icon']} {resource['nav_label']}",
             type="primary" if selected else "secondary",
             use_container_width=True,
             disabled=selected,
@@ -317,11 +318,6 @@ with st.sidebar:
             args=(resource["name"],),
         )
     experience = st.session_state["experience"]
-    st.divider()
-    st.caption("Developed at UNSW")
-    _, logo_column, _ = st.columns([1, 3, 1])
-    with logo_column:
-        st.image(UNSW_LOGO_PATH, width=150)
 
 if experience == "Introduction":
     landing.render(

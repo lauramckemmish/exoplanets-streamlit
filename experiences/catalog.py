@@ -7,6 +7,7 @@ the app. The landing page, sidebar and router all use these catalogues.
 EXPERIENCES = (
     {
         "name": "Is Our Solar System Normal?",
+        "nav_label": "Is Our Solar System Normal?",
         "summary": "A fast-paced, facilitator-led CURIOUS experience. Compare planets, change graph scales and discuss why the planets we detect may not tell the whole story.",
         "enabled": True,
         "icon": "🪐",
@@ -15,6 +16,7 @@ EXPERIENCES = (
     },
     {
         "name": "Strange New Worlds",
+        "nav_label": "Strange New Worlds",
         "summary": "A two-lesson classroom experience for exploring individual discoveries, growing datasets and the wonderfully varied planetary systems beyond our own.",
         "enabled": True,
         "icon": "✨",
@@ -23,6 +25,7 @@ EXPERIENCES = (
     },
     {
         "name": "The Planets We Haven't Found",
+        "nav_label": "Planets We Haven't Found",
         "summary": "A two-lesson classroom experience that investigates how different ways of finding planets shape the evidence we have—and the planets we have not yet found.",
         "enabled": True,
         "icon": "🔭",
@@ -31,6 +34,7 @@ EXPERIENCES = (
     },
     {
         "name": "Find Your Perfect Planet",
+        "nav_label": "Find Your Perfect Planet",
         "summary": "A guided data-science mission: turn a planet idea into testable criteria, inspect candidate worlds and communicate uncertainty in your conclusion.",
         "enabled": True,
         "icon": "🌅",
@@ -39,6 +43,7 @@ EXPERIENCES = (
     },
     {
         "name": "Planet Shopping Outside Our Solar System",
+        "nav_label": "Planet Shopping",
         "summary": "Use real exoplanet data to find your perfect planet.",
         "enabled": True,
         "icon": "🛒",
@@ -51,6 +56,7 @@ EXPERIENCES = (
 EXPLORE_RESOURCES = (
     {
         "name": "How We Found Other Worlds",
+        "nav_label": "Finding Other Worlds",
         "summary": "Explore how we went from knowing one planetary system to discovering thousands of worlds.",
         "enabled": True,
         "icon": "🛰️",
@@ -58,6 +64,7 @@ EXPLORE_RESOURCES = (
     },
     {
         "name": "How Do We Find a Planet We Can't See?",
+        "nav_label": "Finding Planets We Can't See",
         "summary": "Explore the techniques astronomers use to detect planets around other stars.",
         "enabled": True,
         "icon": "🔭",
@@ -65,6 +72,7 @@ EXPLORE_RESOURCES = (
     },
     {
         "name": "Exoplanet Data Lab",
+        "nav_label": "Exoplanet Data Lab",
         "summary": "Explore the exoplanet catalogue yourself.",
         "enabled": True,
         "icon": "🔬",
