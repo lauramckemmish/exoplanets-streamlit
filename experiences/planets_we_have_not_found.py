@@ -304,7 +304,7 @@ class LessonDependencies:
     graph_questions: object
     response_box: object
     key_idea: object
-    persistent_reveal: object
+    hard_reveal: object
     data_detective_challenge: object
     learn_more_prompt: object
 
@@ -312,7 +312,6 @@ class LessonDependencies:
 def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencies) -> None:
     """Render the existing Year 10 lesson text and interactions for one step."""
     d = dependencies
-    allow_next = True
     # CLASSROOM STEP 0 — Welcome
     if part == 0:
         st.header(d.pathway_name)
@@ -361,7 +360,7 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             d.solar_system_demographics_chart(False),
             use_container_width=True,
         )
-        log_scale_revealed = d.persistent_reveal(
+        log_scale_revealed = d.hard_reveal(
             "Jupiter and the distant outer planets set the scale, so Mercury, Venus, Earth and Mars bunch together "
             "near the bottom-left corner. How could we spread them out without losing the giant planets?",
             "year10_log_scale_revealed",
@@ -369,7 +368,6 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             revealed_message="**Same planets. Same variables. Different spacing.** A log scale spreads out the small values while keeping the giant planets on the same graph.",
             explanation="The variables do not change: the graph still shows planet mass and orbital distance. On a log scale, equal spaces represent multiplication. For example, the gap from **0.1 to 1** is the same size as the gap from **1 to 10**. You do not need to calculate logarithms to read the graph.",
         )
-        allow_next = log_scale_revealed
         if log_scale_revealed:
             st.subheader("Now compare the log–log view")
             d.graph_guide(
@@ -471,10 +469,6 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             use_container_width=True,
         )
         st.markdown("### Make a prediction")
-        st.write(
-            "If planets in other systems are like the planets in our Solar System, what pattern would you expect "
-            "when the detected exoplanets are added to this graph?"
-        )
         st.text_area(
             "Write your hypothesis",
             key="year10_planet_typicality_hypothesis",
@@ -482,16 +476,13 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             placeholder="If planets in other systems are like ours, then I predict…",
             label_visibility="collapsed",
         )
-        if "year10_step4_data_revealed" not in st.session_state:
-            st.session_state["year10_step4_data_revealed"] = False
-        if not st.session_state["year10_step4_data_revealed"]:
-            st.button(
-                "Reveal the detected planets →",
-                type="primary",
-                key="year10_step4_data_reveal_button",
-                on_click=lambda: st.session_state.__setitem__("year10_step4_data_revealed", True),
-            )
-        else:
+        data_revealed = d.hard_reveal(
+            "If planets in other systems are like the planets in our Solar System, what pattern would you expect "
+            "when the detected exoplanets are added to this graph?",
+            "year10_step4_data_revealed",
+            reveal_label="Reveal the detected planets →",
+        )
+        if data_revealed:
             st.subheader("Now add the detected exoplanets")
             d.graph_guide(
                 "The bottom axis is orbital distance. The side axis is planet mass. Both use the log scale from Step 3.",
@@ -656,4 +647,4 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
         )
         d.learn_more_prompt("classroom")
 
-    return allow_next
+    return None
