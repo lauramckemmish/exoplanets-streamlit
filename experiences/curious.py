@@ -18,12 +18,12 @@ from ui_helpers import (
     hard_reveal,
     key_idea,
     media_text_pair,
-    pause_cue,
     scroll_to_top_if_requested,
     soft_reveal,
     step_buttons,
     step_tabs,
     teacher_note,
+    think_q,
 )
 
 PATHWAY_TITLE = "Is Our Solar System Normal?"
@@ -134,7 +134,7 @@ def render(data: pd.DataFrame) -> None:
             st.subheader("Now compare the log–log view")
             graph_guide("The axes show the same values, but the new spacing spreads out the small planets.", "Find Earth at 1 AU and 1 Earth mass, then compare the positions of the four inner planets.")
             st.plotly_chart(solar_system_demographics_chart(True), use_container_width=True)
-            pause_cue(
+            think_q(
                 "What can you see now that was difficult to see before? Where are the small inner planets and the giant outer planets?"
             )
             st.info("**What changed?** These are the same planets, variables and values. A log scale changes the spacing so small and large values can be seen on the same graph. You do not need to calculate logarithms to use it.")
@@ -160,7 +160,7 @@ def render(data: pd.DataFrame) -> None:
             with st.container(border=True):
                 st.image(TRANSIT_DETECTION_IMAGE_PATH, use_container_width=True)
                 st.markdown("### Transit detection\nA planet passes in front of its star, causing a tiny dip in starlight.")
-        pause_cue(
+        think_q(
             "Before looking at the graphs, which planets might each method find more easily? "
             "Think about planet size and distance from the star.",
             title="Pause and predict:",
@@ -177,7 +177,7 @@ def render(data: pd.DataFrame) -> None:
         key_idea("Different discovery methods find different kinds of planets.", "Toggle the method views and compare where their points appear on the graph.")
     elif part == 6:
         st.header("Conclusion: Our view is still changing")
-        pause_cue(
+        think_q(
             "What does the evidence allow us to conclude about planetary systems and whether "
             "ours is normal?",
             title="Pause and discuss:",

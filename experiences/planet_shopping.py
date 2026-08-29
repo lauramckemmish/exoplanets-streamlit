@@ -10,7 +10,7 @@ import pandas as pd
 import streamlit as st
 
 from data import PARSEC_TO_LIGHT_YEARS
-from ui_helpers import hard_reveal, pause_cue, role_image, scroll_to_top_if_requested, step_buttons, step_tabs
+from ui_helpers import hard_reveal, role_image, scroll_to_top_if_requested, step_buttons, step_tabs, think_q
 
 TITLE = "Planet Shopping Outside Our Solar System"
 SUBTITLE = "Use real exoplanet data to find your perfect planet."
@@ -233,7 +233,7 @@ def _render_filter(data: pd.DataFrame) -> None:
         "This is the distance from Earth to the planetary system, not the distance of a planet from its own star. "
         "Even the nearest stars are several light-years away."
     )
-    pause_cue(
+    think_q(
         "What do you think will happen to our list if we only keep planets this close?",
         title="Pause and predict",
     )
