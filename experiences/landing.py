@@ -107,7 +107,7 @@ def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalo
             st.markdown(
                 "**Resource stewardship and scientific review**  \n"
                 "**Dr Laura McKemmish · UNSW Chemistry**  \n"
-                "*Molecular spectroscopy and exoplanet atmospheres*"
+                "*Computational astrochemist · 10+ years creating research-connected science experiences and data-rich investigations for school students*"
             )
         st.write(
             "Interactive learning experiences and an open data lab for investigating real data from the NASA "
