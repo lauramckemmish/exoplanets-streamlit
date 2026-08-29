@@ -75,6 +75,12 @@ class SharedInteractionContractTests(unittest.TestCase):
             ui_helpers.choice_reveal("Explore", {"A": "Detail"}, "choice")
             self.assertTrue(self._navigation(stub))
 
+    def test_graph_reading_support_is_nonblocking_and_state_free(self):
+        stub = _StreamlitStub()
+        with patch.object(ui_helpers, "st", stub):
+            ui_helpers.graph_reading_support("Read the axis", heading="Decode it")
+        self.assertEqual(stub.session_state, {})
+
     def test_multiple_blockers_remain_blocking(self):
         stub = _StreamlitStub()
         with patch.object(ui_helpers, "st", stub):

@@ -113,6 +113,13 @@ def apply_visual_system() -> None:
             padding: 0.4rem 0.65rem;
         }}
         .st-key-landing_stewardship p {{ margin-bottom: 0.15rem; }}
+        .st-key-graph_reading_support {{
+            border-left: 2px solid var(--unsw-secondary-accent);
+            background: rgba(0, 120, 130, 0.06);
+            padding: 0.45rem 0.65rem;
+            margin: 0.35rem 0 0.55rem;
+        }}
+        .st-key-graph_reading_support p {{ margin-bottom: 0.2rem; }}
         /* Shared interaction grammar: quiet information surfaces with clear semantic markers. */
         [data-testid="stAlert"][data-baseweb="notification"] {{
             border-left: 3px solid var(--unsw-information);

@@ -39,6 +39,8 @@ class UNSWVisualSystemTests(unittest.TestCase):
         styles = Path("visual_system.py").read_text()
         helpers = Path("ui_helpers.py").read_text()
         self.assertIn('[data-testid="stAlert"][data-baseweb="notification"]', styles)
+        self.assertIn('st-key-graph_reading_support', styles)
+        self.assertIn('graph_reading_support', helpers)
         self.assertIn('st-key-hard_reveal_', styles)
         self.assertIn('💭', helpers)
         self.assertIn('🧩 {label}', helpers)

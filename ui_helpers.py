@@ -41,6 +41,17 @@ def graph_guide(*instructions: str) -> None:
     )
 
 
+def graph_reading_support(
+    *instructions: str, heading: str = "How to read this graph"
+) -> None:
+    """Explain how to decode a graph without adding interaction or gating."""
+    with st.container(key="graph_reading_support"):
+        st.markdown(
+            f"👀 **{heading}**\n\n"
+            + "\n".join(f"- {instruction}" for instruction in instructions)
+        )
+
+
 def graph_questions(find: str, compare: str) -> None:
     st.markdown("### Find and explore")
     st.markdown(f"1. **Find:** {find}\n2. **Compare:** {compare}")

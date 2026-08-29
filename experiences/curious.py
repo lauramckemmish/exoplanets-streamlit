@@ -15,6 +15,7 @@ from ui_helpers import (
     choice_reveal,
     data_detective_challenge,
     graph_guide,
+    graph_reading_support,
     hard_reveal,
     key_idea,
     media_text_pair,
@@ -99,7 +100,7 @@ def render(data: pd.DataFrame) -> None:
         with media_text_pair(SOLAR_SYSTEM_IMAGE_PATH, role="context", caption="An illustration of our Solar System. Credit: NASA", key="curious_solar_system"):
             st.write("One planetary system cannot tell us what is normal. It can give us a familiar starting point. First, choose one measurable property: **planet mass**.")
         st.write("The eight planets have very different masses. We will group them as **Very small**, **Small**, **Medium**, **Large**, or **Very large**.")
-        graph_guide("The whole bar represents all eight planets.", "A wider labelled section contains a larger share of the planets.")
+        graph_reading_support("The whole bar represents all eight planets.", "A wider labelled section contains a larger share of the planets.")
         figure = planet_mass_distribution_chart(data, include_exoplanets=False)
         if figure is not None:
             st.plotly_chart(figure, use_container_width=True)
