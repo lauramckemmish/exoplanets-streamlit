@@ -16,6 +16,7 @@ TITLE = "Planet Shopping Outside Our Solar System"
 SUBTITLE = "Use real exoplanet data to find your perfect planet."
 ASSETS_DIR = Path(__file__).resolve().parent.parent / "assets"
 WELCOME_HOOK_IMAGE_PATH = ASSETS_DIR / "planet-shopping-welcome-hook.png"
+TRANSFER_IMAGE_PATH = ASSETS_DIR / "planet-shopping-transfer.png"
 
 STAGE_LABELS = [
     "🚀 Launch",
@@ -267,6 +268,12 @@ def _render_choose_your_destination() -> None:
         st.markdown("**Unknowns:** [which values are not recorded]")
         st.markdown("**Decision:** [why this is your best available destination]")
     st.caption("The final stage will ask students to make an evidence-based choice despite incomplete information.")
+    with st.container(width=1050):
+        role_image(
+            TRANSFER_IMAGE_PATH,
+            role="hero",
+            key="planet_shopping_transfer",
+        )
 
 
 def render(data: pd.DataFrame) -> None:
