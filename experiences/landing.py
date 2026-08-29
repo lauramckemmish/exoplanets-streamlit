@@ -132,6 +132,7 @@ def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalo
                 "learning · University data-science teaching · Scientific research"
             )
         with st.expander("Development, feedback and acknowledgements"):
+            st.markdown("### Development and feedback")
             st.info("**Currently in development**\n\nThis resource is being actively developed. Please expect some content and features to change while it is refined.")
             if feedback_url:
                 st.link_button("Give teacher feedback", feedback_url)
@@ -139,25 +140,30 @@ def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalo
                 "Feedback is very welcome—especially detailed suggestions from teachers and "
                 "facilitators. Please email [l.mckemmish@unsw.edu.au](mailto:l.mckemmish@unsw.edu.au)."
             )
+            st.markdown("### People and perspectives behind this resource")
             st.markdown(
-                f"### Funding\n\n"
-                f"[Australian Government Maker Projects – Community STEM Engagement Grant]({grant_url})"
+                "Planets Beyond has been shaped by people bringing different kinds of expertise and experience. "
+                "These credits recognise the perspectives and intellectual contributions that have influenced "
+                "the resource and the approach behind it."
             )
             st.markdown(
-                "### Partners\n\n"
+                "**Isabella Bustos-McNeil** — *near-peer perspective*\n\n"
+                "**James Cleaver** — *data-science perspective*\n\n"
+                "**Laura McKemmish** — *research translation · pedagogical expertise*\n\n"
+                "**Lauren McKnight** — *pedagogical expertise*\n\n"
+                "**Maria Pettyjohn** — *research translation*\n\n"
+                "**Charlotte Regan** — *teacher perspective*\n\n"
+                "**Laura Smith** — *teacher perspective*\n\n"
+                "**Anna-Maree Syme** — *research translation*\n\n"
+                "**Juan Camilo Zapata Trujillo** — *research translation*"
+            )
+            st.markdown(
+                "We also acknowledge the facilitators, teachers and students whose observations and feedback "
+                "continue to inform the resource."
+            )
+            st.markdown("### Support and partnerships")
+            st.markdown(
+                f"[Australian Government Maker Projects – Community STEM Engagement Grant]({grant_url})\n\n"
                 "This work has been developed with contributions from CSIRO through the "
                 "STEM-INSIGHTS program and the UNSW Student Equity Team."
-            )
-            st.markdown(
-                "### Contributors to this resource\n\n"
-                "- Isabella Bustos-McNeil\n"
-                "- James Cleaver\n"
-                "- Laura McKemmish\n"
-                "- Lauren McKnight\n"
-                "- Maria Pettyjohn\n"
-                "- Charlotte Regan\n"
-                "- Laura Smith\n\n"
-                "We also gratefully acknowledge the CURIOUS facilitators, teachers and students "
-                "whose ideas, observations, feedback and experience have helped test and improve "
-                "this resource."
             )
