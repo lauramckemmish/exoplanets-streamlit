@@ -46,7 +46,9 @@ def _render_cards(entries, *, button_label, button_key_prefix, open_item):
             with column:
                 render_card(entry)
     if len(entries) % 2:
-        render_card(entries[-1])
+        _, card_column, _ = st.columns([1, 2, 1])
+        with card_column:
+            render_card(entries[-1])
 
 
 def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalog, open_experience, open_explore_resource, source):
