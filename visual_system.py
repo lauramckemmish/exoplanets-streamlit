@@ -96,6 +96,9 @@ def apply_visual_system() -> None:
             border-color: rgba(255, 255, 255, 0.22);
         }}
         .st-key-landing_about_label {{
+            display: flex;
+            align-items: center;
+            min-height: 2.1rem;
             background: #111827;
             color: #FFFFFF;
             padding: 0.35rem 0.65rem;
@@ -105,6 +108,7 @@ def apply_visual_system() -> None:
         .st-key-landing_about_label p {{
             color: #FFFFFF !important;
             font-weight: 650;
+            line-height: 1.2;
             margin: 0;
         }}
         .st-key-landing_stewardship {{

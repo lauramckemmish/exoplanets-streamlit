@@ -95,71 +95,72 @@ def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalo
         open_item=open_explore_resource,
     )
     st.divider()
-    with st.container(key="landing_about_label"):
-        st.markdown("About this resource")
-    logo_column, stewardship_column = st.columns([1, 4])
-    with logo_column:
-        logo_plate(portrait_logo_path, width=60, alt="UNSW Sydney")
-    with stewardship_column:
-        st.markdown("### Data Science with Planets Beyond Our Solar System")
-    with st.container(key="landing_stewardship", border=True):
-        st.markdown(
-            "**Resource stewardship and scientific review**  \n"
-            "**Dr Laura McKemmish · UNSW Chemistry**  \n"
-            "*Molecular spectroscopy and exoplanet atmospheres*"
-        )
-    st.write(
-        "Interactive learning experiences and an open data lab for investigating real data from the NASA "
-        "Exoplanet Archive.\n\n"
-        "Developed at UNSW through CURIOUS, a regional science outreach program connecting school students "
-        "with university science."
-    )
-    with st.expander("Program history"):
-        st.markdown("### Earlier development")
+    with st.container(width=1080):
+        with st.container(key="landing_about_label"):
+            st.markdown("About this resource")
+        logo_column, stewardship_column = st.columns([1, 4])
+        with logo_column:
+            logo_plate(portrait_logo_path, width=60, alt="UNSW Sydney")
+        with stewardship_column:
+            st.markdown("### Data Science with Planets Beyond Our Solar System")
+        with st.container(key="landing_stewardship", border=True):
+            st.markdown(
+                "**Resource stewardship and scientific review**  \n"
+                "**Dr Laura McKemmish · UNSW Chemistry**  \n"
+                "*Molecular spectroscopy and exoplanet atmospheres*"
+            )
         st.write(
-            "This work builds on earlier UNSW work supporting teachers and students to use "
-            "data science in school science, helping establish reusable learning resources "
-            "and approaches."
+            "Interactive learning experiences and an open data lab for investigating real data from the NASA "
+            "Exoplanet Archive.\n\n"
+            "Developed at UNSW through CURIOUS, a regional science outreach program connecting school students "
+            "with university science."
         )
-        st.markdown("### CURIOUS regional program")
-        st.write(
-            "CURIOUS extended this work through research-connected STEM workshops with "
-            "regional schools in 2025–26. The program was enabled by a $100,000 Australian "
-            "Government Maker Projects – Community STEM Engagement Grant and a partnership "
-            "with Passionately Curious."
-        )
-        st.write(
-            "These online resources are part of CURIOUS's continuing development: capturing "
-            "what is learned through real delivery and turning it into reusable resources for "
-            "students, teachers and facilitators."
-        )
-    with st.expander("Development, feedback and acknowledgements"):
-        st.info("**Currently in development**\n\nThis resource is being actively developed. Please expect some content and features to change while it is refined.")
-        if feedback_url:
-            st.link_button("Give teacher feedback", feedback_url)
-        st.markdown(
-            "Feedback is very welcome—especially detailed suggestions from teachers and "
-            "facilitators. Please email [l.mckemmish@unsw.edu.au](mailto:l.mckemmish@unsw.edu.au)."
-        )
-        st.markdown(
-            f"### Funding\n\n"
-            f"[Australian Government Maker Projects – Community STEM Engagement Grant]({grant_url})"
-        )
-        st.markdown(
-            "### Partners\n\n"
-            "This work has been developed with contributions from CSIRO through the "
-            "STEM-INSIGHTS program and the UNSW Student Equity Team."
-        )
-        st.markdown(
-            "### Contributors to this resource\n\n"
-            "- Isabella Bustos-McNeil\n"
-            "- James Cleaver\n"
-            "- Laura McKemmish\n"
-            "- Lauren McKnight\n"
-            "- Maria Pettyjohn\n"
-            "- Charlotte Regan\n"
-            "- Laura Smith\n\n"
-            "We also gratefully acknowledge the CURIOUS facilitators, teachers and students "
-            "whose ideas, observations, feedback and experience have helped test and improve "
-            "this resource."
-        )
+        with st.expander("Program history"):
+            st.markdown("### Earlier development")
+            st.write(
+                "This work builds on earlier UNSW work supporting teachers and students to use "
+                "data science in school science, helping establish reusable learning resources "
+                "and approaches."
+            )
+            st.markdown("### CURIOUS regional program")
+            st.write(
+                "CURIOUS extended this work through research-connected STEM workshops with "
+                "regional schools in 2025–26. The program was enabled by a $100,000 Australian "
+                "Government Maker Projects – Community STEM Engagement Grant and a partnership "
+                "with Passionately Curious."
+            )
+            st.write(
+                "These online resources are part of CURIOUS's continuing development: capturing "
+                "what is learned through real delivery and turning it into reusable resources for "
+                "students, teachers and facilitators."
+            )
+        with st.expander("Development, feedback and acknowledgements"):
+            st.info("**Currently in development**\n\nThis resource is being actively developed. Please expect some content and features to change while it is refined.")
+            if feedback_url:
+                st.link_button("Give teacher feedback", feedback_url)
+            st.markdown(
+                "Feedback is very welcome—especially detailed suggestions from teachers and "
+                "facilitators. Please email [l.mckemmish@unsw.edu.au](mailto:l.mckemmish@unsw.edu.au)."
+            )
+            st.markdown(
+                f"### Funding\n\n"
+                f"[Australian Government Maker Projects – Community STEM Engagement Grant]({grant_url})"
+            )
+            st.markdown(
+                "### Partners\n\n"
+                "This work has been developed with contributions from CSIRO through the "
+                "STEM-INSIGHTS program and the UNSW Student Equity Team."
+            )
+            st.markdown(
+                "### Contributors to this resource\n\n"
+                "- Isabella Bustos-McNeil\n"
+                "- James Cleaver\n"
+                "- Laura McKemmish\n"
+                "- Lauren McKnight\n"
+                "- Maria Pettyjohn\n"
+                "- Charlotte Regan\n"
+                "- Laura Smith\n\n"
+                "We also gratefully acknowledge the CURIOUS facilitators, teachers and students "
+                "whose ideas, observations, feedback and experience have helped test and improve "
+                "this resource."
+            )
