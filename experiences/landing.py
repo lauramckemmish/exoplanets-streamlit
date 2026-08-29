@@ -114,24 +114,22 @@ def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalo
             "Developed at UNSW through CURIOUS, a regional science outreach program connecting school students "
             "with university science."
         )
-        with st.expander("Program history"):
-            st.markdown("### Earlier development")
+        with st.expander("Why we developed this resource"):
             st.write(
-                "This work builds on earlier UNSW work supporting teachers and students to use "
-                "data science in school science, helping establish reusable learning resources "
-                "and approaches."
+                "Planets Beyond grows from more than a decade of developing research-connected science "
+                "experiences and computational learning for school and university students.\n\n"
+                "At UNSW, this work has included large-scale school research programs, university teaching "
+                "in Python and computational science, and professional development helping science teachers "
+                "prepare for data science in the school curriculum. Teacher data-science work was supported "
+                "by Google and philanthropic funding.\n\n"
+                "Across these settings, the same challenge kept appearing: the important skill is not simply "
+                "learning to code. It is learning how to ask questions of data, make evidence-based choices, "
+                "recognise uncertainty and decide what the evidence supports.\n\n"
+                "Planets Beyond brings that experience into accessible investigations using real exoplanet data."
             )
-            st.markdown("### CURIOUS regional program")
-            st.write(
-                "CURIOUS extended this work through research-connected STEM workshops with "
-                "regional schools in 2025–26. The program was enabled by a $100,000 Australian "
-                "Government Maker Projects – Community STEM Engagement Grant and a partnership "
-                "with Passionately Curious."
-            )
-            st.write(
-                "These online resources are part of CURIOUS's continuing development: capturing "
-                "what is learned through real delivery and turning it into reusable resources for "
-                "students, teachers and facilitators."
+            st.markdown(
+                "**Built from experience across:** School research experiences · Teacher professional "
+                "learning · University data-science teaching · Scientific research"
             )
         with st.expander("Development, feedback and acknowledgements"):
             st.info("**Currently in development**\n\nThis resource is being actively developed. Please expect some content and features to change while it is refined.")
