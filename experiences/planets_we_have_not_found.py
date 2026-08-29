@@ -5,7 +5,7 @@ from dataclasses import dataclass
 import pandas as pd
 import streamlit as st
 
-from ui_helpers import teacher_note
+from ui_helpers import soft_reveal, teacher_note
 
 STEP_LABELS = [
     "Welcome", "1 · Our Solar System", "2 · Meet exoplanets", "3 · Mass and distance",
@@ -579,7 +579,7 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
                 st.image(d.transit_detection_image_path, use_container_width=True)
                 st.markdown("**Transit detection**  \n\n**Often finds:** planets close to their stars—especially larger planets.")
         st.caption("These are patterns in the planets we have detected, not a list of every planet that exists.")
-        with st.expander("Explore other ways astronomers find exoplanets"):
+        with soft_reveal("Explore other ways astronomers find exoplanets"):
             st.markdown(
                 "Direct imaging and transit detection are two important methods. Astronomers also use:\n\n"
                 "- **Radial velocity (the Doppler method):** A planet's gravity makes its star wobble. The star's "
