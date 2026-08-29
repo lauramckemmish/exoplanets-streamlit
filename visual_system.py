@@ -114,9 +114,12 @@ def apply_visual_system() -> None:
         .st-key-landing_stewardship {{
             border-left: 3px solid var(--unsw-active-emphasis);
             background: rgba(63, 97, 196, 0.06);
-            padding: 0.4rem 0.65rem;
+            padding: 0.4rem 0.65rem 0.6rem;
         }}
-        .st-key-landing_stewardship p {{ margin-bottom: 0.15rem; }}
+        .st-key-landing_stewardship p {{
+            line-height: 1.35;
+            margin-bottom: 0.15rem;
+        }}
         .st-key-graph_reading_support {{
             border-left: 2px solid var(--unsw-secondary-accent);
             background: rgba(0, 120, 130, 0.06);
