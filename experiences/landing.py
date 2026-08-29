@@ -15,10 +15,9 @@ def _render_cards(entries, *, button_label, button_key_prefix, open_item):
             if thumbnail:
                 st.markdown(f"### {entry['name']}")
                 st.write(entry["summary"])
-                st.image(
-                    Path(__file__).resolve().parent.parent / thumbnail,
-                    use_container_width=True,
-                )
+                _, thumbnail_column, _ = st.columns([1, 2, 1])
+                with thumbnail_column:
+                    st.image(Path(__file__).resolve().parent.parent / thumbnail, use_container_width=True)
                 st.button(
                     button_label,
                     key=f"{button_key_prefix}_{entry['name']}",
