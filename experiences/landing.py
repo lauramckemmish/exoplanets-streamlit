@@ -15,8 +15,13 @@ def _render_cards(entries, *, button_label, button_key_prefix, open_item):
             if thumbnail:
                 st.markdown(f"### {entry['name']}")
                 st.write(entry["summary"])
-                _, thumbnail_column, _ = st.columns([1, 2, 1])
-                with thumbnail_column:
+                st.markdown(
+                    "<style>"
+                    ".st-key-planet-shopping-thumbnail { max-width: 30rem; width: 100%; margin: 0 auto; }"
+                    "</style>",
+                    unsafe_allow_html=True,
+                )
+                with st.container(key="planet-shopping-thumbnail"):
                     st.image(Path(__file__).resolve().parent.parent / thumbnail, use_container_width=True)
                 st.button(
                     button_label,
