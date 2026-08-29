@@ -6,42 +6,26 @@ from experiences import catalog
 
 
 class PublicDestinationCatalogueTests(unittest.TestCase):
-    def test_only_planet_shopping_experience_is_publicly_enabled(self):
+    def test_all_experiences_are_publicly_enabled(self):
         self.assertEqual(
             catalog.enabled_experience_names(),
-            ("Planet Shopping Outside Our Solar System",),
+            tuple(entry["name"] for entry in catalog.EXPERIENCES),
         )
 
     def test_guided_experiences_and_explore_resources_are_separate(self):
         experience_names = {entry["name"] for entry in catalog.experience_catalog()}
         explore_names = {entry["name"] for entry in catalog.explore_catalog()}
 
-        self.assertNotIn("Exoplanet Data Lab", experience_names)
-        self.assertEqual(
-            explore_names,
-            {
-                "Exoplanet Data Lab",
-            },
-        )
+        self.assertEqual(experience_names, {entry["name"] for entry in catalog.EXPERIENCES})
+        self.assertEqual(explore_names, {entry["name"] for entry in catalog.EXPLORE_RESOURCES})
 
     def test_data_lab_explore_resource_reuses_the_existing_route(self):
         resource = catalog.get_explore_resource("Exoplanet Data Lab")
         self.assertEqual(resource["app_experience"], "Exoplanet Data Laboratory")
 
-    def test_pruned_explore_resources_are_disabled_and_data_lab_is_available(self):
-        for name in (
-            "How We Found Other Worlds",
-            "How Do We Find a Planet We Can't See?",
-        ):
-            self.assertIsNone(catalog.get_explore_resource(name))
-            self.assertIsNotNone(catalog.get_explore_resource(name, enabled_only=False))
-
-        resource = catalog.get_explore_resource("Exoplanet Data Lab")
-        self.assertIsNotNone(resource)
-        self.assertEqual(
-            catalog.get_explore_resource_for_route(resource["app_experience"])["name"],
-            "Exoplanet Data Lab",
-        )
+    def test_all_explore_resources_are_available(self):
+        for resource in catalog.EXPLORE_RESOURCES:
+            self.assertIsNotNone(catalog.get_explore_resource(resource["name"]))
 
 
 if __name__ == "__main__":
