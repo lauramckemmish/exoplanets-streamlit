@@ -5,7 +5,7 @@ from dataclasses import dataclass
 import pandas as pd
 import streamlit as st
 
-from ui_helpers import soft_reveal, teacher_note
+from ui_helpers import graph_reading_support, soft_reveal, teacher_note
 
 STEP_LABELS = [
     "Welcome", "1 · Our Solar System", "2 · Meet exoplanets", "3 · Mass and distance",
@@ -352,7 +352,7 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
         )
         st.caption("**1 astronomical unit (AU)** is approximately the average distance from Earth to the Sun.")
         st.subheader("First, try ordinary linear axes")
-        d.graph_guide(
+        graph_reading_support(
             "The bottom axis shows distance from the Sun in AU. The side axis shows mass in Earth masses.",
             "Each labelled point is one planet. Farther right means farther from the Sun; higher means more massive.",
         )
@@ -431,7 +431,7 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             "### Our question\n"
             "How do the sizes of detected exoplanets compare with planets in our Solar System?"
         )
-        d.graph_guide(
+        graph_reading_support(
             "The top bar is our Solar System. The bottom bar is the detected exoplanets that can be placed in these mass groups.",
             "Each bar is one whole group, from 0% to 100%. Compare sections with the same colour.",
         )
@@ -484,7 +484,7 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
         )
         if data_revealed:
             st.subheader("Now add the detected exoplanets")
-            d.graph_guide(
+            graph_reading_support(
                 "The bottom axis is orbital distance. The side axis is planet mass. Both use the log scale from Step 3.",
                 "Blue circles are detected exoplanets. Pink labelled diamonds are our Solar System planets.",
                 "Some number labels have been removed so the many planet points are easier to see.",
@@ -515,7 +515,7 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             use_container_width=True,
         )
         st.markdown("### Our question\nWhich kinds of planets are easiest to find using direct imaging?")
-        d.graph_guide(
+        graph_reading_support(
             "The bottom axis shows orbital distance and the side axis shows planet mass. Both use a log scale.",
             "Blue circles are planets found using direct imaging. Pink labelled diamonds are Solar System planets.",
         )
@@ -543,7 +543,7 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
         st.video("https://www.youtube.com/watch?v=BFi4HBUdWkk")
         st.caption("NASA animation of an exoplanet transiting its star. Credit: NASA/JPL-Caltech")
         st.markdown("### Our question\nWhich kinds of planets are easiest to find using transit detection?")
-        d.graph_guide(
+        graph_reading_support(
             "The bottom axis shows orbital distance and the side axis shows planet mass. Both use a log scale.",
             "Blue circles are planets found using transits. Pink labelled diamonds are Solar System planets.",
         )

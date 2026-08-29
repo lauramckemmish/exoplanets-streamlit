@@ -123,7 +123,7 @@ def render(data: pd.DataFrame) -> None:
         with media_text_pair(INNER_OUTER_PLANETS_IMAGE_PATH, role="support", caption="A simplified pattern to look for before reading the graphs.", key="curious_inner_outer"):
             st.write("Mass is only one way to describe a planet. We can also plot its **orbital distance**—how far it is from its star. One astronomical unit (AU) is the average distance from Earth to the Sun.")
         st.subheader("First: ordinary linear axes")
-        graph_guide("The bottom axis shows orbital distance; the side axis shows mass.", "Farther right means farther from the Sun. Higher means more massive.")
+        graph_reading_support("The bottom axis shows orbital distance; the side axis shows mass.", "Farther right means farther from the Sun. Higher means more massive.")
         st.plotly_chart(solar_system_demographics_chart(False), use_container_width=True)
         log_scale_revealed = hard_reveal(
             "Jupiter and the distant outer planets set the scale, so the small inner planets bunch together near the bottom-left corner. How could we spread them out without losing the giant planets?",

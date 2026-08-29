@@ -5,7 +5,7 @@ from dataclasses import dataclass
 import pandas as pd
 import streamlit as st
 
-from ui_helpers import teacher_note
+from ui_helpers import graph_reading_support, teacher_note
 
 STEP_LABELS = [
     "Welcome", "1 · Meet our Solar System", "2 · Planets around other stars",
@@ -241,7 +241,7 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             "(more than 1,000 Earth masses). For example, Earth is **Small**, Neptune is **Medium**, and Jupiter is "
             "**Large**."
         )
-        d.graph_guide(
+        graph_reading_support(
             "The whole bar represents all eight Solar System planets, from 0% to 100%.",
             "Each coloured section is one planet-size group. A wider section contains a larger share of the planets.",
         )
@@ -295,7 +295,7 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             "grown rapidly. A tall bar can mean that a large observing project released or confirmed many results at "
             "once; it does not mean all those planets were first noticed in that single year."
         )
-        d.graph_guide(
+        graph_reading_support(
             "The horizontal axis shows the year a planet was recorded as discovered or confirmed.",
             "The vertical axis shows how many confirmed planets were recorded in that year.",
         )
@@ -311,7 +311,7 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
     elif part == 4:
         st.header("Step 4: Compare planet masses")
         st.write("We have met a few individual planetary systems. Now we can use the larger NASA dataset to ask whether the detected exoplanets have the same mix of planet masses as our Solar System.")
-        d.graph_guide(
+        graph_reading_support(
             "The top bar is our Solar System. The bottom bar is the detected exoplanets that can be placed in these mass groups.",
             "Each bar represents 100% of its group. Compare sections carrying the same label.",
         )
@@ -347,7 +347,7 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
         st.header("Step 6: Add orbital distance")
         st.write("Mass is not the only way to describe a planet. We can also ask how far it is from the star it orbits. One astronomical unit (AU) is the average distance from Earth to the Sun.")
         st.subheader("First, try ordinary linear axes")
-        d.graph_guide("The horizontal axis shows orbital distance in AU. The vertical axis shows planet mass in Earth masses.", "Each labelled point is one Solar System planet. Farther right means farther from the Sun; higher means more massive.")
+        graph_reading_support("The horizontal axis shows orbital distance in AU. The vertical axis shows planet mass in Earth masses.", "Each labelled point is one Solar System planet. Farther right means farther from the Sun; higher means more massive.")
         st.plotly_chart(d.solar_system_demographics_chart(False), use_container_width=True)
         st.markdown("### Before you change the graph")
         log_scale_revealed = d.hard_reveal(
