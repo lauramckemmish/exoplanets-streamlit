@@ -95,25 +95,23 @@ def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalo
         open_item=open_explore_resource,
     )
     st.markdown("## About this resource")
-    st.markdown("### Data Science with Planets Beyond Our Solar System")
-    st.write(
-        "A collection of interactive data-science learning experiences and an open data laboratory "
-        "using data from the NASA Exoplanet Archive."
-    )
-    st.write(
-        "Developed at UNSW as part of CURIOUS, a regional science outreach program connecting "
-        "school students with university science. This resource draws on research, teaching and "
-        "outreach to help learners investigate real exoplanet evidence."
-    )
     logo_column, stewardship_column = st.columns([1, 4])
     with logo_column:
         logo_plate(portrait_logo_path, width=60, alt="UNSW Sydney")
     with stewardship_column:
+        st.markdown("### Data Science with Planets Beyond Our Solar System")
+    with st.container(border=True):
         st.markdown(
             "**Resource stewardship and scientific review**  \n"
-            "**Dr Laura McKemmish, UNSW Chemistry**  \n"
-            "*Research in molecular spectroscopy and exoplanet atmospheres.*"
+            "**Dr Laura McKemmish · UNSW Chemistry**  \n"
+            "*Molecular spectroscopy and exoplanet atmospheres*"
         )
+    st.write(
+        "Interactive learning experiences and an open data lab for investigating real data from the NASA "
+        "Exoplanet Archive.\n\n"
+        "Developed at UNSW through CURIOUS, a regional science outreach program connecting school students "
+        "with university science."
+    )
     with st.expander("Program history"):
         st.markdown("### Earlier development")
         st.write(
