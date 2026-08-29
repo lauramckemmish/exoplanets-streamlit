@@ -6,6 +6,12 @@ from experiences import catalog
 
 
 class PublicDestinationCatalogueTests(unittest.TestCase):
+    def test_only_planet_shopping_experience_is_publicly_enabled(self):
+        self.assertEqual(
+            catalog.enabled_experience_names(),
+            ("Planet Shopping Outside Our Solar System",),
+        )
+
     def test_guided_experiences_and_explore_resources_are_separate(self):
         experience_names = {entry["name"] for entry in catalog.experience_catalog()}
         explore_names = {entry["name"] for entry in catalog.explore_catalog()}
