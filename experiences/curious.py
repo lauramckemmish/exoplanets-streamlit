@@ -103,19 +103,19 @@ def render(data: pd.DataFrame) -> None:
         figure = planet_mass_distribution_chart(data, include_exoplanets=False)
         if figure is not None:
             st.plotly_chart(figure, use_container_width=True)
-        st.markdown("### Discuss\nWhich size groups contain the Solar System planets?")
+        think_q("Which size groups contain the Solar System planets?")
         key_idea("Planet mass gives us one measurable way to compare planets.", "Which labelled mass groups contain our eight planets, and which group contains the most?")
     elif part == 2:
         st.header("Step 2: Meet exoplanets")
         st.info("An **exoplanet** is a planet that orbits a star other than the Sun. The first confirmed exoplanets were discovered in 1992; now astronomers have a catalogue containing thousands.")
         with media_text_pair(PLANETARY_SYSTEMS_IMAGE_PATH, role="context", caption="The Sun is a star, and our Solar System is one planetary system. Exoplanets belong to other planetary systems.", key="curious_planetary_systems"):
-            st.markdown("### Imagine\nWhat might another planetary system look like? Could it have more planets, fewer planets, or even two stars?")
+            think_q("What might another planetary system look like? Could it have more planets, fewer planets, or even two stars?")
             st.write("A few decades ago, astronomers had almost no planets around other stars to compare. Now we can start to ask what the detected population looks like.")
         graph_guide("The top bar is our Solar System; the bottom bar is detected exoplanets.", "Compare sections with the same label. Each complete bar represents 100% of its group.")
         figure = planet_mass_distribution_chart(data)
         if figure is not None:
             st.plotly_chart(figure, use_container_width=True)
-        st.markdown("### Discuss\nWhich planet-size group looks most different between the two bars?")
+        think_q("Which planet-size group looks most different between the two bars?")
         key_idea("Detected exoplanets give us a population to compare with our Solar System.", "Compare the widest labelled section in the top bar with the widest section in the bottom bar.")
     elif part == 3:
         st.header("Step 3: Mass and orbital distance")
@@ -146,7 +146,7 @@ def render(data: pd.DataFrame) -> None:
         graph_guide("The bottom axis shows orbital distance and the side axis shows planet mass. Both use a log scale.", "Hover over a blue point to inspect one detected exoplanet. Compare its position with the pink Solar System planets.")
         st.plotly_chart(current_demographics_chart(data), use_container_width=True)
         data_detective_challenge()
-        st.markdown("### Discuss\nWhat did the Earth challenge show? What did your chosen challenge show? Does this evidence make our planetary system seem typical—or unusual?")
+        think_q("What did the Earth challenge show? What did your chosen challenge show? Does this evidence make our planetary system seem typical—or unusual?")
         key_idea("This graph gives us clues about how our planets compare with detected exoplanets.", "A blue point near Earth is not automatically another Earth: this graph shows mass and orbital distance, not every planetary property.")
     elif part == 5:
         st.header("Step 5: How do we find exoplanets?")
