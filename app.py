@@ -281,6 +281,8 @@ with st.sidebar:
             st.markdown(f"**{len(data):,} confirmed exoplanets**")
         else:
             st.markdown(f"**Offline catalogue sample · {len(data):,} records**")
+        st.divider()
+        st.caption("Data source")
         st.caption(source.provenance)
     st.button(
         "🏠 Start here",
