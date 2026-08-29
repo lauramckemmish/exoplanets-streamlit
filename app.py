@@ -278,9 +278,10 @@ with st.sidebar:
         st.markdown("### Explore exoplanets")
     with st.container(key="sidebar_data_source"):
         if source.is_live:
-            st.caption(f"**{len(data):,} confirmed exoplanets**  \n{source.provenance}")
+            st.markdown(f"**{len(data):,} confirmed exoplanets**")
         else:
-            st.caption(f"**Offline catalogue sample · {len(data):,} records**  \n{source.provenance}")
+            st.markdown(f"**Offline catalogue sample · {len(data):,} records**")
+        st.caption(source.provenance)
     st.button(
         "🏠 Start here",
         type="primary" if st.session_state["experience"] == "Introduction" else "secondary",

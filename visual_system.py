@@ -72,6 +72,24 @@ def apply_visual_system() -> None:
             background: transparent !important;
             padding: 0 !important;
         }}
+        [data-testid="stSidebar"] .st-key-sidebar_data_source {{
+            background: #111827;
+            color: #FFFFFF;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 0.3rem;
+            padding: 0.55rem 0.65rem 0.5rem;
+            margin: 0 0 0.55rem;
+        }}
+        [data-testid="stSidebar"] .st-key-sidebar_data_source p,
+        [data-testid="stSidebar"] .st-key-sidebar_data_source [data-testid="stCaptionContainer"] {{
+            color: #FFFFFF !important;
+        }}
+        [data-testid="stSidebar"] .st-key-sidebar_data_source [data-testid="stMarkdownContainer"] p {{
+            font-size: 1rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 0.2rem;
+        }}
         /* Shared interaction grammar: quiet information surfaces with clear semantic markers. */
         [data-testid="stAlert"][data-baseweb="notification"] {{
             border-left: 3px solid var(--unsw-information);
