@@ -15,7 +15,6 @@ from ui_helpers import hard_reveal, role_image, scroll_to_top_if_requested, step
 TITLE = "Planet Shopping Outside Our Solar System"
 SUBTITLE = "Use real exoplanet data to find your perfect planet."
 ASSETS_DIR = Path(__file__).resolve().parent.parent / "assets"
-SOLAR_SYSTEM_IMAGE_PATH = ASSETS_DIR / "solar-system-nasa.jpeg"
 WELCOME_HOOK_IMAGE_PATH = ASSETS_DIR / "planet-shopping-welcome-hook.png"
 
 STAGE_LABELS = [
@@ -105,20 +104,12 @@ def _render_launch(data: pd.DataFrame) -> None:
             key="planet_shopping_welcome_hook",
         )
 
-    question, image = st.columns([2, 1])
-    with question:
-        st.markdown("#### Where can we go?")
-        st.write("Earth is one planet in our Solar System.")
-        st.markdown("**Pause and discuss**")
-        st.markdown("**Could we just move somewhere else in our Solar System?**")
-        st.write("The other planets in our Solar System are not obvious replacements for Earth.")
-        st.markdown("**Maybe we need to look further away.**")
-    with image:
-        st.image(
-            SOLAR_SYSTEM_IMAGE_PATH,
-            caption="Our Solar System: real images, enlarged and placed close together. Credit: NASA",
-            use_container_width=True,
-        )
+    st.markdown("#### Where can we go?")
+    st.write("Earth is one planet in our Solar System.")
+    st.markdown("**Pause and discuss**")
+    st.markdown("**Could we just move somewhere else in our Solar System?**")
+    st.write("The other planets in our Solar System are not obvious replacements for Earth.")
+    st.markdown("**Maybe we need to look further away.**")
 
     st.markdown("#### Look beyond the Sun")
     st.write("The Sun is our star.")
