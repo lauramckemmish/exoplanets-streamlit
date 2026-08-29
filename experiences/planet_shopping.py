@@ -10,7 +10,7 @@ import pandas as pd
 import streamlit as st
 
 from data import PARSEC_TO_LIGHT_YEARS
-from ui_helpers import pause_cue, scroll_to_top_if_requested, step_buttons, step_tabs
+from ui_helpers import hard_reveal, pause_cue, scroll_to_top_if_requested, step_buttons, step_tabs
 
 TITLE = "Planet Shopping Outside Our Solar System"
 SUBTITLE = "Use real exoplanet data to find your perfect planet."
@@ -121,15 +121,12 @@ def _render_launch(data: pd.DataFrame) -> None:
     st.write("An **exoplanet** is a planet outside our Solar System.")
 
     st.markdown("#### A catalogue that keeps growing")
-    st.markdown("**Pause and predict**")
-    st.markdown("**How many exoplanets do you think are in our catalogue today?**")
-    if _CATALOGUE_REVEAL_KEY not in st.session_state:
-        st.session_state[_CATALOGUE_REVEAL_KEY] = False
-    if not st.session_state[_CATALOGUE_REVEAL_KEY]:
-        if st.button("Show the catalogue", type="primary", key="planet_shopping_show_catalogue"):
-            st.session_state[_CATALOGUE_REVEAL_KEY] = True
-
-    if not st.session_state[_CATALOGUE_REVEAL_KEY]:
+    catalogue_revealed = hard_reveal(
+        "**How many exoplanets do you think are in our catalogue today?**",
+        _CATALOGUE_REVEAL_KEY,
+        reveal_label="Show the catalogue",
+    )
+    if not catalogue_revealed:
         return
 
     current_year = date.today().year
