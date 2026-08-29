@@ -95,6 +95,11 @@ def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalo
         open_item=open_explore_resource,
     )
     st.markdown("## About this resource")
+    st.markdown("### Data Science with Planets Beyond Our Solar System")
+    st.write(
+        "A collection of interactive data-science learning experiences and an open data laboratory "
+        "using data from the NASA Exoplanet Archive."
+    )
     st.write(
         "Developed at UNSW as part of CURIOUS, a regional science outreach program connecting "
         "school students with university science. This resource draws on research, teaching and "

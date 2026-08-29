@@ -184,7 +184,7 @@ CLASSROOM_RESOURCES = {
 }
 
 st.set_page_config(
-    page_title="Find Your Perfect Planet | Exoplanet Data Investigation",
+    page_title="Planets Beyond | UNSW Sydney",
     page_icon="🪐",
     layout="wide",
 )
@@ -275,7 +275,7 @@ source = catalogue_load.source
 with st.sidebar:
     with st.container(key="sidebar_brand"):
         logo_plate(UNSW_LOGO_PATH, width=125, alt="UNSW Sydney")
-        st.markdown("### Explore exoplanets")
+        st.markdown("### Planets Beyond")
     with st.container(key="sidebar_data_source"):
         if source.is_live:
             st.markdown(f"**{len(data):,} confirmed exoplanets**")
