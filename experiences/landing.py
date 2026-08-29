@@ -94,13 +94,15 @@ def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalo
         button_key_prefix="open_explore",
         open_item=open_explore_resource,
     )
-    st.markdown("## About this resource")
+    st.divider()
+    with st.container(key="landing_about_label"):
+        st.markdown("About this resource")
     logo_column, stewardship_column = st.columns([1, 4])
     with logo_column:
         logo_plate(portrait_logo_path, width=60, alt="UNSW Sydney")
     with stewardship_column:
         st.markdown("### Data Science with Planets Beyond Our Solar System")
-    with st.container(border=True):
+    with st.container(key="landing_stewardship", border=True):
         st.markdown(
             "**Resource stewardship and scientific review**  \n"
             "**Dr Laura McKemmish · UNSW Chemistry**  \n"

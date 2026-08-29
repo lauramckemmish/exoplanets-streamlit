@@ -94,6 +94,24 @@ def apply_visual_system() -> None:
             margin: 0.25rem 0 !important;
             border-color: rgba(255, 255, 255, 0.22);
         }}
+        .st-key-landing_about_label {{
+            background: #111827;
+            color: #FFFFFF;
+            padding: 0.35rem 0.65rem;
+            margin: 0.15rem 0 0.7rem;
+            border-radius: 0.25rem;
+        }}
+        .st-key-landing_about_label p {{
+            color: #FFFFFF !important;
+            font-weight: 650;
+            margin: 0;
+        }}
+        .st-key-landing_stewardship {{
+            border-left: 3px solid var(--unsw-active-emphasis);
+            background: rgba(63, 97, 196, 0.06);
+            padding: 0.4rem 0.65rem;
+        }}
+        .st-key-landing_stewardship p {{ margin-bottom: 0.15rem; }}
         /* Shared interaction grammar: quiet information surfaces with clear semantic markers. */
         [data-testid="stAlert"][data-baseweb="notification"] {{
             border-left: 3px solid var(--unsw-information);
