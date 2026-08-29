@@ -1,5 +1,7 @@
 """Introduction page for the exoplanet learning experiences."""
 
+from pathlib import Path
+
 import streamlit as st
 
 from ui_helpers import logo_plate
@@ -7,12 +9,13 @@ from ui_helpers import logo_plate
 
 def _render_cards(entries, *, button_label, button_key_prefix, open_item):
     """Render a compact two-column collection of landing-page destinations."""
-    for left, right in zip(entries[::2], entries[1::2]):
-        first, second = st.columns(2)
-        for column, entry in zip((first, second), (left, right)):
-            with column:
-                with st.container(border=True):
-                    st.markdown(f"### {entry['icon']} {entry['name']}")
+    def render_card(entry):
+        with st.container(border=True):
+            thumbnail = entry.get("thumbnail")
+            if thumbnail:
+                text_column, image_column = st.columns([3, 2])
+                with text_column:
+                    st.markdown(f"### {entry['name']}")
                     st.write(entry["summary"])
                     st.button(
                         button_label,
@@ -21,9 +24,12 @@ def _render_cards(entries, *, button_label, button_key_prefix, open_item):
                         on_click=open_item,
                         args=(entry["name"],),
                     )
-    if len(entries) % 2:
-        with st.container(border=True):
-            entry = entries[-1]
+                with image_column:
+                    st.image(
+                        Path(__file__).resolve().parent.parent / thumbnail,
+                        use_container_width=True,
+                    )
+                return
             st.markdown(f"### {entry['icon']} {entry['name']}")
             st.write(entry["summary"])
             st.button(
@@ -33,6 +39,14 @@ def _render_cards(entries, *, button_label, button_key_prefix, open_item):
                 on_click=open_item,
                 args=(entry["name"],),
             )
+
+    for left, right in zip(entries[::2], entries[1::2]):
+        first, second = st.columns(2)
+        for column, entry in zip((first, second), (left, right)):
+            with column:
+                render_card(entry)
+    if len(entries) % 2:
+        render_card(entries[-1])
 
 
 def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalog, open_experience, open_explore_resource, source):

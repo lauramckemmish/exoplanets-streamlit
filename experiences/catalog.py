@@ -47,6 +47,7 @@ EXPERIENCES = (
         "summary": "Use real exoplanet data to find your perfect planet.",
         "enabled": True,
         "icon": "🛒",
+        "thumbnail": "assets/planet-shopping-thumbnail.png",
         "app_experience": "Planet Shopping Outside Our Solar System",
         "pathway": None,
     },
