@@ -8,7 +8,12 @@ from pathlib import Path
 import streamlit as st
 import streamlit.components.v1 as components
 
-_HARD_REVEAL_PENDING_KEY = "_ui_helpers_hard_reveal_pending"
+_CONTINUE_BLOCKED_KEY = "_ui_helpers_continue_blocked"
+
+
+def _block_continue() -> None:
+    """Mark Continue as blocked for the current rendered stage."""
+    st.session_state[_CONTINUE_BLOCKED_KEY] = True
 
 
 def logo_plate(image_path: Path, *, width: int, alt: str) -> None:
@@ -101,8 +106,8 @@ def step_buttons(
     button_prefix: str,
     allow_next: bool = True,
 ) -> None:
-    """Render navigation, withholding Continue while a hard reveal is pending."""
-    hard_reveal_pending = st.session_state.pop(_HARD_REVEAL_PENDING_KEY, False)
+    """Render navigation, withholding Continue while shared gating is active."""
+    continue_blocked = st.session_state.pop(_CONTINUE_BLOCKED_KEY, False)
     back, _, next_step = st.columns([1, 4, 1])
     with back:
         if step > 0:
@@ -114,7 +119,7 @@ def step_buttons(
                 args=(tab_key, labels, step_key, scroll_key, step - 1),
             )
     with next_step:
-        if allow_next and not hard_reveal_pending and step < len(labels) - 1:
+        if allow_next and not continue_blocked and step < len(labels) - 1:
             st.button(
                 "Continue →",
                 type="primary",
@@ -159,9 +164,21 @@ def persistent_reveal(
     )
 
 
-def pause_cue(prompt: str, *, title: str = "Pause and discuss") -> None:
-    """Mark a visible, discreet and non-blocking moment for learner reasoning."""
+def think_q(prompt: str, *, title: str = "Pause and discuss") -> None:
+    """Render a visible, non-blocking reasoning prompt."""
     st.info(f"_{title}_\n\n{prompt}")
+
+
+def pause_cue(prompt: str, *, title: str = "Pause and discuss") -> None:
+    """Backward-compatible wrapper for :func:`think_q`."""
+    think_q(prompt, title=title)
+
+
+def completion_gate(is_complete: bool) -> bool:
+    """Block Continue until an essential learner task is complete."""
+    if not is_complete:
+        _block_continue()
+    return is_complete
 
 
 def hard_reveal(
@@ -184,7 +201,7 @@ def hard_reveal(
     if key not in st.session_state:
         st.session_state[key] = False
     if not st.session_state[key]:
-        st.session_state[_HARD_REVEAL_PENDING_KEY] = True
+        _block_continue()
         st.button(
             reveal_label,
             type="primary",
