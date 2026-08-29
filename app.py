@@ -276,6 +276,7 @@ with st.sidebar:
     with st.container(key="sidebar_brand"):
         logo_plate(UNSW_LOGO_PATH, width=125, alt="UNSW Sydney")
         st.markdown("### Explore exoplanets")
+    with st.container(key="sidebar_data_source"):
         if source.is_live:
             st.caption(f"**{len(data):,} confirmed exoplanets**  \n{source.provenance}")
         else:
