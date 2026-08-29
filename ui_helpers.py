@@ -101,7 +101,7 @@ def step_buttons(
     button_prefix: str,
     allow_next: bool = True,
 ) -> None:
-    """Render Back/Continue controls, optionally withholding Continue."""
+    """Render navigation, withholding Continue while a hard reveal is pending."""
     hard_reveal_pending = st.session_state.pop(_HARD_REVEAL_PENDING_KEY, False)
     back, _, next_step = st.columns([1, 4, 1])
     with back:
@@ -173,11 +173,12 @@ def hard_reveal(
     explanation: str | None = None,
     title: str = "Pause and predict",
 ) -> bool:
-    """Persistently reveal essential material after a compact reasoning prompt.
+    """Reveal essential material and register shared progression gating.
 
-    The calling stage is responsible for passing this return value to
-    ``step_buttons(..., allow_next=...)`` when the reveal is required before
-    its next stage.
+    An unrevealed hard reveal marks the current render as pending. The shared
+    ``step_buttons()`` helper consumes that state and withholds Continue;
+    callers do not need to pass this return value into navigation. Multiple
+    hard reveals on one screen remain blocking until each is revealed.
     """
     st.info(f"_{title}_\n\n{prompt}")
     if key not in st.session_state:
