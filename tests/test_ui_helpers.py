@@ -29,6 +29,9 @@ class _StreamlitStub:
     def columns(self, *_args, **_kwargs):
         return [_Column(), _Column(), _Column()]
 
+    def container(self, **_kwargs):
+        return _Column()
+
     def expander(self, *_args, **_kwargs):
         return _Column()
 

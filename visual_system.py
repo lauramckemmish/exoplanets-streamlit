@@ -72,6 +72,19 @@ def apply_visual_system() -> None:
             background: transparent !important;
             padding: 0 !important;
         }}
+        /* Shared interaction grammar: quiet information surfaces with clear semantic markers. */
+        [data-testid="stAlert"][data-baseweb="notification"] {{
+            border-left: 3px solid var(--unsw-information);
+            background: rgba(63, 97, 196, 0.08);
+        }}
+        [class*="st-key-hard_reveal_"] {{
+            border-left: 3px solid var(--unsw-active-emphasis);
+            padding-left: 0.65rem;
+        }}
+        [class*="st-key-hard_reveal_"] [data-testid="stAlert"] {{
+            border-left-color: var(--unsw-active-emphasis);
+        }}
+        [data-testid="stExpander"] {{ border-left: 3px solid var(--unsw-exploration); }}
         [data-testid="stSidebar"] [data-testid="stButton"] > button {{
             min-height: 2rem;
             padding: 0.2rem 0.45rem;
@@ -153,7 +166,6 @@ def apply_visual_system() -> None:
             color: inherit;
             font-weight: 650;
         }}
-        [data-testid="stExpander"] {{ border-left: 3px solid rgba(63, 97, 196, 0.7); }}
         [data-testid="stMetric"] {{ border-left: 3px solid var(--unsw-brand); padding-left: 0.55rem; }}
         </style>
         """,

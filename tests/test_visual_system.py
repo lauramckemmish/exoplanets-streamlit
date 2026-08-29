@@ -35,6 +35,15 @@ class UNSWVisualSystemTests(unittest.TestCase):
         self.assertIn('[role="tab"] {{\n            min-height: 2rem;', styles)
         self.assertIn('border-radius: 0.3rem;\n            color: inherit;', styles)
 
+    def test_shared_interaction_grammar_has_semantic_surfaces(self):
+        styles = Path("visual_system.py").read_text()
+        helpers = Path("ui_helpers.py").read_text()
+        self.assertIn('[data-testid="stAlert"][data-baseweb="notification"]', styles)
+        self.assertIn('st-key-hard_reveal_', styles)
+        self.assertIn('💭', helpers)
+        self.assertIn('🧩 {label}', helpers)
+        self.assertIn('#### 🧭 {prompt}', helpers)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -166,7 +166,8 @@ def persistent_reveal(
 
 def think_q(prompt: str, *, title: str = "Pause and discuss") -> None:
     """Render a visible, non-blocking reasoning prompt."""
-    st.info(f"_{title}_\n\n{prompt}")
+    del title  # Retained for compatibility; the prompt, not a generic title, leads.
+    st.info(f"💭\n\n{prompt}")
 
 
 def pause_cue(prompt: str, *, title: str = "Pause and discuss") -> None:
@@ -197,29 +198,30 @@ def hard_reveal(
     callers do not need to pass this return value into navigation. Multiple
     hard reveals on one screen remain blocking until each is revealed.
     """
-    st.info(f"_{title}_\n\n{prompt}")
-    if key not in st.session_state:
-        st.session_state[key] = False
-    if not st.session_state[key]:
-        _block_continue()
-        st.button(
-            reveal_label,
-            type="primary",
-            key=f"{key}_button",
-            on_click=lambda: st.session_state.__setitem__(key, True),
-        )
-        return False
-    if revealed_message:
-        st.success(revealed_message)
-    if explanation:
-        st.write(explanation)
+    with st.container(key=f"hard_reveal_{key}"):
+        st.info(f"💭\n\n{prompt}")
+        if key not in st.session_state:
+            st.session_state[key] = False
+        if not st.session_state[key]:
+            _block_continue()
+            st.button(
+                reveal_label,
+                type="primary",
+                key=f"{key}_button",
+                on_click=lambda: st.session_state.__setitem__(key, True),
+            )
+            return False
+        if revealed_message:
+            st.success(revealed_message)
+        if explanation:
+            st.write(explanation)
     return True
 
 
 @contextmanager
 def soft_reveal(label: str, *, expanded: bool = False) -> Iterator[None]:
     """Provide optional supporting material without gating progression."""
-    with st.expander(label, expanded=expanded):
+    with st.expander(f"🧩 {label}", expanded=expanded):
         yield
 
 
@@ -231,7 +233,7 @@ def choice_reveal(
     label: str = "Choose one or more to explore",
 ) -> list[str]:
     """Offer optional explanations that learners can choose for themselves."""
-    st.markdown(f"#### {prompt}")
+    st.markdown(f"#### 🧭 {prompt}")
     selected = st.multiselect(label, list(choices), key=key)
     for choice in selected:
         st.markdown(f"**{choice}**")
