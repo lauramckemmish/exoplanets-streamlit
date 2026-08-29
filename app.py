@@ -285,8 +285,7 @@ with st.sidebar:
         else:
             st.markdown(f"**Offline catalogue sample · {len(data):,} records**")
         st.divider()
-        st.caption("Data source")
-        st.caption(source.provenance)
+        st.caption(f"*Data source:* {source.provenance}")
     st.button(
         "🏠 Start here",
         type="primary" if st.session_state["experience"] == "Introduction" else "secondary",
