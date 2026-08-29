@@ -278,7 +278,10 @@ with st.sidebar:
         st.markdown("### Planets Beyond")
     with st.container(key="sidebar_data_source"):
         if source.is_live:
-            st.markdown(f"**{len(data):,} confirmed exoplanets**")
+            st.markdown(
+                f"**<span style='color: var(--unsw-brand)'>{len(data):,}</span> confirmed exoplanets**",
+                unsafe_allow_html=True,
+            )
         else:
             st.markdown(f"**Offline catalogue sample · {len(data):,} records**")
         st.divider()

@@ -90,6 +90,10 @@ def apply_visual_system() -> None:
             line-height: 1.2;
             margin-bottom: 0.2rem;
         }}
+        [data-testid="stSidebar"] .st-key-sidebar_data_source hr {{
+            margin: 0.25rem 0 !important;
+            border-color: rgba(255, 255, 255, 0.22);
+        }}
         /* Shared interaction grammar: quiet information surfaces with clear semantic markers. */
         [data-testid="stAlert"][data-baseweb="notification"] {{
             border-left: 3px solid var(--unsw-information);
