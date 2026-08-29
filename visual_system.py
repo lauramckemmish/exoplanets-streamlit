@@ -111,6 +111,37 @@ def apply_visual_system() -> None:
             line-height: 1.2;
             margin: 0;
         }}
+        /* Intentional landing roles: content sections lead; institutional identity stays quiet. */
+        .type-major-section {{
+            font-size: clamp(1.35rem, 2.2vw, 1.65rem);
+            line-height: 1.2;
+        }}
+        .type-subsection {{
+            font-size: 1.25rem;
+            line-height: 1.25;
+        }}
+        .type-resource-identity {{
+            font-size: clamp(1rem, 1.5vw, 1.2rem);
+            line-height: 1.25;
+        }}
+        .st-key-unsw_identity_row .unsw-logo-plate {{
+            box-sizing: content-box;
+            min-width: 60px;
+        }}
+        .st-key-unsw_identity_row [data-testid="column"]:has(.unsw-logo-plate) {{
+            min-width: 72px;
+            flex-shrink: 0;
+        }}
+        @media (max-width: 700px) {{
+            .st-key-unsw_identity_row [data-testid="stHorizontalBlock"] {{
+                flex-direction: column;
+                gap: 0.65rem;
+            }}
+            .st-key-unsw_identity_row [data-testid="column"] {{
+                width: 100% !important;
+                flex: 1 1 100% !important;
+            }}
+        }}
         .st-key-landing_stewardship {{
             border-left: 3px solid var(--unsw-active-emphasis);
             background: rgba(63, 97, 196, 0.06);

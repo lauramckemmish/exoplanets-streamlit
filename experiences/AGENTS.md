@@ -13,3 +13,17 @@ Before modifying a student-facing experience implementation in this folder:
 The matching experience design file remains authoritative for that
 experience's local pedagogical sequence. Preserve established decisions unless
 the user explicitly asks to reconsider them.
+
+## Semantic heading convention
+
+- `st.title()` is the experience or page title.
+- `st.header()` introduces a major stage or learning transition.
+- `st.subheader()` introduces a genuine subsection within that stage.
+- Use ordinary prose for learner instructions and explanations.
+- Use the existing learning helpers and components for reasoning prompts,
+  reveals, graph-reading support and teacher guidance.
+- Use raw Markdown `###` and `####` headings only when they genuinely
+  represent that document level, not merely to make text larger.
+
+Visual emphasis should follow the learning or information job. A justified
+exception is fine; an unexplained font-size or heading hack is not.

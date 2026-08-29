@@ -244,7 +244,7 @@ def choice_reveal(
     label: str = "Choose one or more to explore",
 ) -> list[str]:
     """Offer optional explanations that learners can choose for themselves."""
-    st.markdown(f"#### 🧭 {prompt}")
+    st.markdown(f"**🧭 {prompt}**")
     selected = st.multiselect(label, list(choices), key=key)
     for choice in selected:
         st.markdown(f"**{choice}**")
@@ -311,7 +311,8 @@ def log_scale_reveal(prompt: str, key: str) -> bool:
 
 def response_box(step: int, prompt: str, sentence_starters: str) -> None:
     pathway = st.session_state.get("demographics_pathway", "classroom")
-    st.markdown(f"### Discuss your conclusion\n{prompt}")
+    st.markdown("### Discuss your conclusion")
+    st.write(prompt)
     st.caption(f"**Sentence starters:** {sentence_starters}")
     st.text_area(
         "Write your explanation",

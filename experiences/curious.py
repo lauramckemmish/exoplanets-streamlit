@@ -93,7 +93,8 @@ def render(data: pd.DataFrame) -> None:
         st.header("Welcome")
         with media_text_pair(EXOPLANET_IMAGE_PATH, role="context", caption="Artist's concepts of exoplanets. Credit: NASA/JPL-Caltech", key="curious_welcome"):
             st.write("**Are we alone in the Universe?** For most of human history, we knew only one planetary system: ours. In the past few decades, astronomers have detected thousands of planets around other stars.")
-            st.markdown("### A new question\nWhat do planetary systems normally look like? Is our Solar System normal?")
+            st.markdown("### A new question")
+            st.write("What do planetary systems normally look like? Is our Solar System normal?")
         st.info("**To investigate this, we need properties we can measure and compare. We will begin with planet mass.**")
     if part == 1:
         st.header("Step 1: Meet our Solar System")
@@ -156,11 +157,13 @@ def render(data: pd.DataFrame) -> None:
         with direct_imaging_column:
             with st.container(border=True):
                 st.image(DIRECT_IMAGING_IMAGE_PATH, use_container_width=True)
-                st.markdown("### Direct imaging\nAstronomers take a picture of light from a planet.")
+                st.markdown("### Direct imaging")
+                st.write("Astronomers take a picture of light from a planet.")
         with transit_column:
             with st.container(border=True):
                 st.image(TRANSIT_DETECTION_IMAGE_PATH, use_container_width=True)
-                st.markdown("### Transit detection\nA planet passes in front of its star, causing a tiny dip in starlight.")
+                st.markdown("### Transit detection")
+                st.write("A planet passes in front of its star, causing a tiny dip in starlight.")
         think_q(
             "Before looking at the graphs, which planets might each method find more easily? "
             "Think about planet size and distance from the star.",
@@ -174,7 +177,8 @@ def render(data: pd.DataFrame) -> None:
         st.plotly_chart(demographics_methods_chart(data, method_view), use_container_width=True)
         with soft_reveal("What pattern does the evidence support?"):
             st.write("Direct imaging most often finds bright, massive planets far from their stars. Transit detection most often finds planets close to their stars, especially larger planets. These are real patterns in the detected data, shaped by what each method can measure.")
-        st.markdown("### Discuss\nWhat changed when we changed the way we searched?")
+        st.markdown("### Discuss")
+        st.write("What changed when we changed the way we searched?")
         key_idea("Different discovery methods find different kinds of planets.", "Toggle the method views and compare where their points appear on the graph.")
     elif part == 6:
         st.header("Conclusion: Our view is still changing")

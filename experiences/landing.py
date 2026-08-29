@@ -1,10 +1,17 @@
 """Introduction page for the exoplanet learning experiences."""
 
+from html import escape
 from pathlib import Path
 
 import streamlit as st
 
 from ui_helpers import logo_plate
+
+
+def _heading(text, role):
+    """Render a semantic heading with an intentional shared visual role."""
+    level = {"major-section": 2, "subsection": 3, "resource-identity": 3}[role]
+    st.markdown(f'<h{level} class="type-{role}">{escape(text)}</h{level}>', unsafe_allow_html=True)
 
 
 def _render_cards(entries, *, button_label, button_key_prefix, open_item):
@@ -13,7 +20,7 @@ def _render_cards(entries, *, button_label, button_key_prefix, open_item):
         with st.container(border=True):
             thumbnail = entry.get("thumbnail")
             if thumbnail:
-                st.markdown(f"### {entry['name']}")
+                _heading(entry["name"], "subsection")
                 st.write(entry["summary"])
                 st.markdown(
                     "<style>"
@@ -30,7 +37,7 @@ def _render_cards(entries, *, button_label, button_key_prefix, open_item):
                     args=(entry["name"],),
                 )
                 return
-            st.markdown(f"### {entry['icon']} {entry['name']}")
+            _heading(f"{entry['icon']} {entry['name']}", "subsection")
             st.write(entry["summary"])
             st.button(
                 button_label,
@@ -77,8 +84,8 @@ def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalo
             caption="Artist's concept of the variety of known exoplanets. Credit: NASA/JPL-Caltech",
             use_container_width=True,
         )
-    st.markdown("## Experience something")
-    st.write("Follow a guided investigation. These experiences carry a question, story or dataset through a classroom or workshop sequence.")
+    _heading("Choose an investigation", "major-section")
+    st.write("Follow a guided investigation designed for a classroom or workshop.")
     experiences = catalog.experience_catalog()
     _render_cards(
         experiences,
@@ -86,8 +93,8 @@ def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalo
         button_key_prefix="open_experience",
         open_item=open_experience,
     )
-    st.markdown("## Explore something")
-    st.write("Follow a question, story or dataset that interests you.")
+    _heading("Explore the data", "major-section")
+    st.write("Follow a question or dataset that interests you.")
     _render_cards(
         catalog.explore_catalog(),
         button_label="Explore resource →",
@@ -98,11 +105,12 @@ def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalo
     with st.container(width=1080):
         with st.container(key="landing_about_label"):
             st.markdown("About this resource")
-        logo_column, stewardship_column = st.columns([0.5, 4.5], gap="small")
-        with logo_column:
-            logo_plate(portrait_logo_path, width=60, alt="UNSW Sydney")
-        with stewardship_column:
-            st.markdown("### Data Science with Planets Beyond Our Solar System")
+        with st.container(key="unsw_identity_row"):
+            logo_column, stewardship_column = st.columns([0.5, 4.5], gap="small")
+            with logo_column:
+                logo_plate(portrait_logo_path, width=60, alt="UNSW Sydney")
+            with stewardship_column:
+                _heading("Data Science with Planets Beyond Our Solar System", "resource-identity")
         with st.container(key="landing_stewardship", border=True):
             st.markdown(
                 "**Resource stewardship and scientific review · Dr Laura McKemmish, UNSW Chemistry**  \n"
@@ -132,7 +140,7 @@ def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalo
                 "learning · University data-science teaching · Scientific research"
             )
         with st.expander("Development, feedback and acknowledgements"):
-            st.markdown("### Development and feedback")
+            _heading("Development and feedback", "subsection")
             st.info("**Currently in development**\n\nThis resource is being actively developed. Please expect some content and features to change while it is refined.")
             if feedback_url:
                 st.link_button("Give teacher feedback", feedback_url)
@@ -140,7 +148,7 @@ def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalo
                 "Feedback is very welcome—especially detailed suggestions from teachers and "
                 "facilitators. Please email [l.mckemmish@unsw.edu.au](mailto:l.mckemmish@unsw.edu.au)."
             )
-            st.markdown("### People and perspectives behind this resource")
+            _heading("People and perspectives behind this resource", "subsection")
             st.markdown(
                 "Planets Beyond has been shaped by people bringing different kinds of expertise and experience. "
                 "These credits recognise the perspectives and intellectual contributions that have influenced "
@@ -161,7 +169,7 @@ def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalo
                 "We also acknowledge the facilitators, teachers and students whose observations and feedback "
                 "continue to inform the resource."
             )
-            st.markdown("### Support and partnerships")
+            _heading("Support and partnerships", "subsection")
             st.markdown(
                 f"[Australian Government Maker Projects – Community STEM Engagement Grant]({grant_url})\n\n"
                 "This work has been developed with contributions from CSIRO through the "
