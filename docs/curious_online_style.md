@@ -70,54 +70,83 @@ This is not a reveal type: pause, hard, soft and choice reveals describe a
 learner's interaction with the digital resource; facilitator-owned moments
 describe who owns communication at that point.
 
-## Reasoning and reveal patterns
+## Learner-interaction grammar
 
 Use the pattern that matches the learning purpose. Hidden content should have
-a clear reason: deliberate withholding, optionality or learner choice.
+a clear reason: deliberate withholding, optionality or learner choice. The shared
+API lives in `ui_helpers.py`; shared presentation belongs in
+`visual_system.py`.
 
-### Pause cue
+### Think Q
 
-- Visibly marks a moment to think, predict, compare, decide or discuss.
-- Uses a compact info-style box: the prompt is the visual focus, while any cue
-  label is small and subordinate inside the box rather than a page heading.
-- Does not block navigation or require an answer submission.
-- This is the normal/default reasoning prompt.
+Use when learners should stop mentally to notice, predict, compare, decide,
+wonder or reason.
+
+- Use the shared `think_q()` helper and its visually distinctive reasoning cue.
+- It hides nothing, requires no answer submission and never suppresses
+  **Continue**.
+- It works for individual thinking, partner discussion or facilitator-led
+  discussion. Do not prescribe “Pause and discuss” as the generic learner
+  behaviour; `pause_cue()` is retained in code as a compatibility wrapper.
 
 ### Hard reveal
 
-- Genuinely withholds information or a representation.
-- Blocks **Continue** until the learner deliberately reveals the required
-  content. Use its returned completion state with
-  `step_buttons(..., allow_next=...)`; where a stage has multiple required hard
-  reveals, Continue becomes available only after all are complete.
-- Use it only when seeing the material too early would damage an important
-  inference.
-- Keep it scarce. For example, students may first encounter an inadequate
-  linear graph before revealing the log-scale version.
+Use only when seeing subsequent evidence too early would damage an important
+inference.
+
+- `hard_reveal()` deliberately withholds evidence or content and requires a
+  learner reveal action.
+- An unrevealed hard reveal suppresses the shared bottom **Continue →** control;
+  once revealed, it no longer gates progression. Multiple required hard reveals
+  on one rendered stage all need to be complete.
+- Keep hard reveals scarce.
+
+### Completion gate
+
+Use when an essential learner task must actually be performed before normal
+progression, such as making a required selection or completing a required
+interaction.
+
+- The shared completion-gating mechanism suppresses the bottom **Continue →**
+  while incomplete and releases it when complete.
+- It does not hide evidence or create a fake reveal interaction.
+- **Hard reveal** means “You should not see this evidence yet”; **completion
+  gate** means “You need to do this essential task before Continue.”
 
 ### Soft reveal
 
-- Makes optional explanation or evidence available behind an expander or
-  button.
-- The order can matter, but it never blocks progression.
-- It is often useful after a pause or prediction.
+Use `soft_reveal()` for optional supporting explanation, evidence or detail.
+Only the optional material is hidden; it never suppresses **Continue** or
+prevents subsequent main-path content from rendering. Learners may ignore it
+and keep scrolling. If opening something is required to reach the rest of the
+screen, it is not a soft reveal.
 
 ### Choice reveal
 
-- Offers several optional directions or explanations.
-- Learners choose one or more; they are not expected to open everything and it
-  never blocks progression.
-- Use it for extensions and interest-led exploration.
+Use `choice_reveal()` when learners may optionally explore one or more
+directions, explanations or extensions. They may choose one, several or none;
+the main path remains available and **Continue** is never suppressed.
 
-### General rules
+### None / ordinary interaction
 
-- Do not require a click merely to prove progression. A required hard reveal
-  is the deliberate exception: it withholds essential evidence before the next
-  stage.
-- Prefer a pause cue to a reveal unless withholding information has a clear
-  pedagogical purpose.
-- Hard reveals are scarce.
-- Do not hide core definitions, instructions or navigation without a reason.
+Not every control, question, graph or piece of content belongs to the reveal
+system. Use ordinary interaction/content when no special reasoning,
+withholding, completion or optional-exploration function is needed. Do not
+classify interactions merely from widget type: an `st.button` is not
+automatically a hard reveal, and an `st.expander` is not automatically a soft
+reveal.
+
+### Navigation and architecture contracts
+
+Interaction gating applies only to the shared bottom **Continue →** control.
+Top stage tabs remain freely navigable, so learners may jump to another stage
+even when Continue is suppressed.
+
+Experiences decide which pedagogical interaction type is appropriate. Shared
+`ui_helpers.py` owns interaction behaviour, and shared `visual_system.py` owns
+the common visual language. Individual experiences should not reproduce shared
+reveal/gating behaviour with bespoke buttons, session-state logic or local CSS
+unless there is a documented reason.
 
 ## Interface defaults
 
