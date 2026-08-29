@@ -97,13 +97,13 @@ def _temperature_candidates(
 
 def _render_launch(data: pd.DataFrame) -> None:
     st.subheader("🚀 Launch")
-    role_image(
-        WELCOME_HOOK_IMAGE_PATH,
-        role="context",
-        caption="Wonder mission: Where could we end up?",
-        key="planet_shopping_welcome_hook",
-    )
-    st.info("**MISSION: Find a new home**\n\nEarth is no longer an option. Your mission is to use real exoplanet data to decide where we could go instead.")
+    with st.container(width="content"):
+        role_image(
+            WELCOME_HOOK_IMAGE_PATH,
+            role="hero",
+            caption="Wonder mission: Where could we end up?",
+            key="planet_shopping_welcome_hook",
+        )
 
     question, image = st.columns([2, 1])
     with question:
