@@ -10,12 +10,13 @@ import pandas as pd
 import streamlit as st
 
 from data import PARSEC_TO_LIGHT_YEARS
-from ui_helpers import hard_reveal, pause_cue, scroll_to_top_if_requested, step_buttons, step_tabs
+from ui_helpers import hard_reveal, pause_cue, role_image, scroll_to_top_if_requested, step_buttons, step_tabs
 
 TITLE = "Planet Shopping Outside Our Solar System"
 SUBTITLE = "Use real exoplanet data to find your perfect planet."
 ASSETS_DIR = Path(__file__).resolve().parent.parent / "assets"
 SOLAR_SYSTEM_IMAGE_PATH = ASSETS_DIR / "solar-system-nasa.jpeg"
+WELCOME_HOOK_IMAGE_PATH = ASSETS_DIR / "planet-shopping-welcome-hook.png"
 
 STAGE_LABELS = [
     "🚀 Launch",
@@ -96,6 +97,12 @@ def _temperature_candidates(
 
 def _render_launch(data: pd.DataFrame) -> None:
     st.subheader("🚀 Launch")
+    role_image(
+        WELCOME_HOOK_IMAGE_PATH,
+        role="context",
+        caption="Wonder mission: Where could we end up?",
+        key="planet_shopping_welcome_hook",
+    )
     st.info("**MISSION: Find a new home**\n\nEarth is no longer an option. Your mission is to use real exoplanet data to decide where we could go instead.")
 
     question, image = st.columns([2, 1])
