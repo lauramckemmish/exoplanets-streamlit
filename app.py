@@ -277,13 +277,14 @@ with st.sidebar:
         logo_plate(UNSW_LOGO_PATH, width=125, alt="UNSW Sydney")
         st.markdown("### Planets Beyond")
     with st.container(key="sidebar_data_source"):
-        if source.is_live:
-            st.markdown(
-                f"**<span style='color: var(--unsw-brand)'>{len(data):,}</span> confirmed exoplanets**",
-                unsafe_allow_html=True,
-            )
-        else:
-            st.markdown(f"**Offline catalogue sample · {len(data):,} records**")
+        with st.container(key="sidebar_data_count"):
+            if source.is_live:
+                st.markdown(
+                    f"**<span style='color: var(--unsw-brand)'>{len(data):,}</span> confirmed exoplanets**",
+                    unsafe_allow_html=True,
+                )
+            else:
+                st.markdown(f"**Offline catalogue sample · {len(data):,} records**")
         st.divider()
         st.caption(f"*Data source:* {source.provenance}")
     st.button(
