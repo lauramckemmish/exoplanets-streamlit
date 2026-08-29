@@ -104,12 +104,13 @@ def _render_launch(data: pd.DataFrame) -> None:
             key="planet_shopping_welcome_hook",
         )
 
-    st.markdown("#### Where can we go?")
-    st.write("Earth is one planet in our Solar System.")
-    st.markdown("**Pause and discuss**")
-    st.markdown("**Could we just move somewhere else in our Solar System?**")
-    st.write("The other planets in our Solar System are not obvious replacements for Earth.")
-    st.markdown("**Maybe we need to look further away.**")
+    with st.container(width="content"):
+        st.markdown("#### Where can we go?")
+        st.write("Earth is one planet in our Solar System.")
+        st.markdown("**Pause and discuss**")
+        st.markdown("**Could we just move somewhere else in our Solar System?**")
+        st.write("The other planets in our Solar System are not obvious replacements for Earth.")
+        st.markdown("**Maybe we need to look further away.**")
 
     st.markdown("#### Look beyond the Sun")
     st.write("The Sun is our star.")
