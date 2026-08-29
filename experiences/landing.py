@@ -13,22 +13,18 @@ def _render_cards(entries, *, button_label, button_key_prefix, open_item):
         with st.container(border=True):
             thumbnail = entry.get("thumbnail")
             if thumbnail:
-                text_column, image_column = st.columns([3, 2])
-                with text_column:
-                    st.markdown(f"### {entry['name']}")
-                    st.write(entry["summary"])
-                    st.button(
-                        button_label,
-                        key=f"{button_key_prefix}_{entry['name']}",
-                        use_container_width=True,
-                        on_click=open_item,
-                        args=(entry["name"],),
-                    )
-                with image_column:
-                    st.image(
-                        Path(__file__).resolve().parent.parent / thumbnail,
-                        use_container_width=True,
-                    )
+                st.markdown(f"### {entry['name']}")
+                st.write(entry["summary"])
+                st.image(
+                    Path(__file__).resolve().parent.parent / thumbnail,
+                    use_container_width=True,
+                )
+                st.button(
+                    button_label,
+                    key=f"{button_key_prefix}_{entry['name']}",
+                    on_click=open_item,
+                    args=(entry["name"],),
+                )
                 return
             st.markdown(f"### {entry['icon']} {entry['name']}")
             st.write(entry["summary"])
