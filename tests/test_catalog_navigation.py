@@ -14,8 +14,6 @@ class PublicDestinationCatalogueTests(unittest.TestCase):
         self.assertEqual(
             explore_names,
             {
-                "How We Found Other Worlds",
-                "How Do We Find a Planet We Can't See?",
                 "Exoplanet Data Lab",
             },
         )
@@ -24,17 +22,20 @@ class PublicDestinationCatalogueTests(unittest.TestCase):
         resource = catalog.get_explore_resource("Exoplanet Data Lab")
         self.assertEqual(resource["app_experience"], "Exoplanet Data Laboratory")
 
-    def test_placeholder_explore_routes_are_enabled_and_resolvable(self):
+    def test_pruned_explore_resources_are_disabled_and_data_lab_is_available(self):
         for name in (
             "How We Found Other Worlds",
             "How Do We Find a Planet We Can't See?",
         ):
-            resource = catalog.get_explore_resource(name)
-            self.assertIsNotNone(resource)
-            self.assertEqual(
-                catalog.get_explore_resource_for_route(resource["app_experience"])["name"],
-                name,
-            )
+            self.assertIsNone(catalog.get_explore_resource(name))
+            self.assertIsNotNone(catalog.get_explore_resource(name, enabled_only=False))
+
+        resource = catalog.get_explore_resource("Exoplanet Data Lab")
+        self.assertIsNotNone(resource)
+        self.assertEqual(
+            catalog.get_explore_resource_for_route(resource["app_experience"])["name"],
+            "Exoplanet Data Lab",
+        )
 
 
 if __name__ == "__main__":
