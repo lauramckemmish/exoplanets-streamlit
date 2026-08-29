@@ -96,7 +96,7 @@ def _temperature_candidates(
 
 def _render_launch(data: pd.DataFrame) -> None:
     st.subheader("🚀 Launch")
-    with st.container(width="content"):
+    with st.container(width=960):
         role_image(
             WELCOME_HOOK_IMAGE_PATH,
             role="hero",
