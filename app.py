@@ -281,7 +281,7 @@ with st.sidebar:
         else:
             st.caption(f"**Offline catalogue sample · {len(data):,} records**  \n{source.provenance}")
     st.button(
-        "🏠 Introduction",
+        "🏠 Start here",
         type="primary" if st.session_state["experience"] == "Introduction" else "secondary",
         use_container_width=True,
         disabled=st.session_state["experience"] == "Introduction",
