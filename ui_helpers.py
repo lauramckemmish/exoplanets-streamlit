@@ -42,12 +42,12 @@ def graph_guide(*instructions: str) -> None:
 
 
 def graph_reading_support(
-    *instructions: str, heading: str = "How to read this graph"
+    *instructions: str, heading: str = "👀 Read the graph"
 ) -> None:
     """Explain how to decode a graph without adding interaction or gating."""
     with st.container(key="graph_reading_support"):
         st.markdown(
-            f"👀 **{heading}**\n\n"
+            f"**{heading}**\n\n"
             + "\n".join(f"- {instruction}" for instruction in instructions)
         )
 

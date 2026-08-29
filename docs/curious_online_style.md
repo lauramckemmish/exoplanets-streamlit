@@ -89,6 +89,17 @@ wonder or reason.
   discussion. Do not prescribe “Pause and discuss” as the generic learner
   behaviour; `pause_cue()` is retained in code as a compatibility wrapper.
 
+### Graph-reading support
+
+Graph-reading support is a representation scaffold, not a reveal or gating
+interaction type. Use the shared `graph_reading_support()` helper when learners
+need concise, explicit help decoding a graph: what an axis, point, bar, colour,
+position or scale represents. It should appear directly with the relevant graph
+and normally contain only one to three useful cues. Use the standard
+student-facing signal **👀 Read the graph**. Do not use it to supply the
+interpretation or conclusion; when learners should reason from the graph, use a
+separate `think_q()` prompt.
+
 ### Hard reveal
 
 Use only when seeing subsequent evidence too early would damage an important
