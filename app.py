@@ -242,7 +242,7 @@ def render_demographics(data: pd.DataFrame, source) -> None:
         lambda frame: landing.render(
             frame,
             EXOPLANET_IMAGE_PATH,
-            UNSW_PORTRAIT_LOGO_PATH,
+            UNSW_LOGO_PATH,
             TEACHER_FEEDBACK_URL,
             GRANT_RECIPIENTS_URL,
             catalog,
@@ -322,7 +322,7 @@ if experience == "Introduction":
     landing.render(
         data,
         EXOPLANET_IMAGE_PATH,
-        UNSW_PORTRAIT_LOGO_PATH,
+        UNSW_LOGO_PATH,
         TEACHER_FEEDBACK_URL,
         GRANT_RECIPIENTS_URL,
         catalog,

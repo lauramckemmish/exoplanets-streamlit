@@ -4,7 +4,7 @@ from pathlib import Path
 
 import streamlit as st
 
-from visual_system import logo_plate, semantic_heading
+from visual_system import resource_identity, semantic_heading
 
 
 def _render_cards(entries, *, button_label, button_key_prefix, open_item):
@@ -98,12 +98,11 @@ def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalo
     with st.container(width=1080):
         with st.container(key="landing_about_label"):
             st.markdown("About this resource")
-        with st.container(key="unsw_identity_row"):
-            logo_column, stewardship_column = st.columns([0.5, 4.5], gap="small")
-            with logo_column:
-                logo_plate(portrait_logo_path, width=60, alt="UNSW Sydney")
-            with stewardship_column:
-                semantic_heading("Data Science with Planets Beyond Our Solar System", "resource-identity")
+        resource_identity(
+            "Data Science with Planets Beyond Our Solar System",
+            portrait_logo_path,
+            logo_width=125,
+        )
         with st.container(key="landing_stewardship", border=True):
             st.markdown(
                 "**Resource stewardship and scientific review · Dr Laura McKemmish, UNSW Chemistry**  \n"

@@ -60,6 +60,35 @@ def logo_plate(
     )
 
 
+def resource_identity(title: str, logo_path: Path | None = None, *, logo_width: int = 125) -> None:
+    """Render the About identity as one self-contained, responsive HTML component."""
+    title_html = escape(title)
+    logo_html = ""
+    if logo_path:
+        encoded = base64.b64encode(logo_path.read_bytes()).decode("ascii")
+        logo_html = (
+            "<div class='resource-identity__logo'>"
+            f"<img src='data:image/png;base64,{encoded}' alt='UNSW Sydney' "
+            f"style='width:{logo_width}px;max-width:100%;height:auto;display:block'>"
+            "</div>"
+        )
+    st.html(f"""
+        <style>
+        .resource-identity-container {{ container-type: inline-size; width: 100%; }}
+        .resource-identity {{ display: grid; grid-template-columns: max-content minmax(0, 1fr); align-items: center; gap: 1rem; }}
+        .resource-identity__logo {{ box-sizing: content-box; width: {logo_width}px; max-width: 100%; padding: 6px; background: #fff; border-radius: 2px; line-height: 0; }}
+        .resource-identity__title {{ min-width: 0; margin: 0; overflow-wrap: anywhere; }}
+        @container (max-width: 560px) {{ .resource-identity {{ grid-template-columns: minmax(0, 1fr); }} }}
+        </style>
+        <div class='resource-identity-container'>
+            <div class='resource-identity' role='group' aria-label='Resource identity'>
+                {logo_html}
+                <h3 class='resource-identity__title type-resource-identity'>{title_html}</h3>
+            </div>
+        </div>
+        """)
+
+
 def apply_visual_system() -> None:
     """Apply the shared visual treatment without overriding the active theme."""
 
@@ -152,8 +181,8 @@ def apply_visual_system() -> None:
             line-height: 1.25;
         }}
         .type-resource-identity {{
-            font-size: clamp(1rem, 1.5vw, 1.2rem);
-            line-height: 1.25;
+            font-size: clamp(1.25rem, 2.1vw, 1.55rem);
+            line-height: 1.2;
         }}
         .st-key-unsw_identity_row .unsw-logo-plate {{
             box-sizing: content-box;
