@@ -1,5 +1,11 @@
 """Shared UNSW-derived visual tokens and restrained Streamlit component styles."""
 
+from __future__ import annotations
+
+import base64
+from html import escape
+from pathlib import Path
+
 import streamlit as st
 
 
@@ -27,6 +33,31 @@ SEMANTIC_TOKENS = {
     "warning_error": UNSW_PALETTE["red"],
     "focus_selected": UNSW_PALETTE["yellow"],
 }
+
+
+def semantic_heading(text: str, role: str) -> None:
+    """Render a semantic heading with an intentional shared visual role."""
+    level = {"major-section": 2, "subsection": 3, "resource-identity": 3}[role]
+    st.markdown(
+        f'<h{level} class="type-{role}">{escape(text)}</h{level}>',
+        unsafe_allow_html=True,
+    )
+
+
+def logo_plate(
+    image_path: Path,
+    *,
+    width: int = 125,
+    alt: str = "UNSW Sydney",
+    plate_background: str = "#FFFFFF",
+) -> None:
+    """Render approved logo artwork on a compact theme-safe plate."""
+    encoded = base64.b64encode(image_path.read_bytes()).decode("ascii")
+    st.markdown(
+        f"<div class='unsw-logo-plate' style='display:inline-block;background:{plate_background};padding:6px;border-radius:2px;line-height:0'>"
+        f"<img src='data:image/png;base64,{encoded}' alt='{alt}' style='display:block;width:{width}px;height:auto'></div>",
+        unsafe_allow_html=True,
+    )
 
 
 def apply_visual_system() -> None:

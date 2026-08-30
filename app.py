@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 import streamlit as st
-from visual_system import apply_visual_system
+from visual_system import apply_visual_system, logo_plate
 from data import (
     load_catalogue,
 )
@@ -25,7 +25,6 @@ from ui_helpers import (
     graph_questions,
     key_idea,
     learn_more_prompt,
-    logo_plate,
     hard_reveal,
     response_box,
     scroll_to_top_if_requested,

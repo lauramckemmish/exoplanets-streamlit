@@ -44,7 +44,7 @@ class UNSWVisualSystemTests(unittest.TestCase):
         self.assertIn('st-key-hard_reveal_', styles)
         self.assertIn('💭', helpers)
         self.assertIn('🧩 {label}', helpers)
-        self.assertIn('#### 🧭 {prompt}', helpers)
+        self.assertIn('**🧭 {prompt}**', helpers)
 
 
 if __name__ == "__main__":
