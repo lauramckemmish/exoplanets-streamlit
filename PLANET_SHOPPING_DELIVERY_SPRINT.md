@@ -54,7 +54,7 @@ One screen should have one obvious main cognitive job.
 
 ## Current pointer
 
-> **CURRENT: PS-04 — Distance choreography alignment**
+> **CURRENT: PS-04 — Distance + Temperature choreography**
 
 Everything else in this document is context, not permission to modify it.
 
@@ -138,10 +138,10 @@ Acceptance criteria:
 - reuse the existing transfer visual where it helps;
 - keep the screen concise enough for a facilitated 50-minute workshop.
 
-### PS-04 — Distance choreography alignment
+### PS-04 — Distance + Temperature choreography
 **Status: CURRENT**
 
-Bring the existing Distance screen into alignment with the facilitator brief and canonical sequence.
+Bring the Distance and Temperature screens into alignment with the facilitator brief and canonical sequence.
 
 Acceptance criteria:
 
@@ -153,8 +153,19 @@ Acceptance criteria:
 - persist the chosen maximum distance;
 - do not apply temperature filtering on this screen.
 
+Package B follow-up also owns the rehearsed Temperature choreography:
+
+- show known temperature matches before introducing missing temperatures;
+- use a hard reveal for the unknown-temperature complication;
+- require the risk/safe decision before normal progression into Combine;
+- keep known non-matches subordinate to the main learning job.
+
 ### PS-05 — Isabella end-to-end delivery rehearsal
 **Status: TODO**
+
+Package A/A2 opening work has been accepted as completed rehearsal follow-up:
+Launch orientation, Meet-a-Planet browsing, and catalogue reveal placement are
+working delivery foundations for this rehearsal item.
 
 Test the deployed experience as a facilitator would actually use it, with a fresh session and Isabella's existing guide as the script/acceptance surface.
 

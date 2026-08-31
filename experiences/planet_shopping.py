@@ -11,7 +11,7 @@ import pandas as pd
 import streamlit as st
 
 from data import PARSEC_TO_LIGHT_YEARS
-from ui_helpers import hard_reveal, role_image, scroll_to_top_if_requested, step_buttons, step_tabs, think_q
+from ui_helpers import completion_gate, hard_reveal, role_image, scroll_to_top_if_requested, step_buttons, step_tabs, think_q
 
 TITLE = "Planet Shopping Outside Our Solar System"
 SUBTITLE = "Use real exoplanet data to find your perfect planet."
@@ -55,6 +55,7 @@ _COMBINE_REVEAL_KEY = "planet_shopping_combine_result_revealed"
 _COMBINE_DESTINATION_KEY = "planet_shopping_combine_destination"
 _BROWSED_PLANET_KEY = "planet_shopping_browsed_planet"
 _BROWSED_PLANET_BUTTON_KEY = "planet_shopping_browsed_planet_button"
+_TEMPERATURE_UNKNOWN_REVEAL_KEY = "planet_shopping_temperature_unknown_revealed"
 
 
 def _catalogue_counts(data: pd.DataFrame, current_year: int | None = None) -> dict[str, int]:
@@ -244,13 +245,10 @@ def _candidate_names(candidates: pd.DataFrame) -> list[str]:
 def _render_temperature(data: pd.DataFrame) -> None:
     """Render the independent temperature criterion and missing-data decision."""
     st.subheader("🌡️ Temperature")
-    st.write(
-        "Now choose a second thing that matters: how hot or cold a planet is. "
-        "This temperature choice is independent of your distance choice."
-    )
+    st.write("Choose an acceptable temperature range for your planet.")
     st.caption(
-        "The catalogue records estimated equilibrium temperature. Choose an acceptable range in °C; "
-        "it is an estimate, not a direct measurement of a planet's surface."
+        "The catalogue records estimated equilibrium temperature in °C. It is an estimate, "
+        "not a direct measurement of a planet's surface."
     )
 
     temperature_range_c = st.slider(
@@ -265,29 +263,30 @@ def _render_temperature(data: pd.DataFrame) -> None:
     st.session_state[_APPLIED_TEMPERATURE_KEY] = temperature_range_c
 
     matches, does_not_match, unknown = _split_temperature_groups(data, temperature_range_c)
-    known_match, known_non_match, unknown_temperature = st.columns(3)
-    with known_match:
-        st.metric("Known match", f"{len(matches):,}")
-    with known_non_match:
-        st.metric("Known non-match", f"{len(does_not_match):,}")
-    with unknown_temperature:
-        st.metric("Unknown temperature", f"{len(unknown):,}")
+    st.metric("Planets with known temperatures in your range", f"{len(matches):,}")
 
-    st.write(
-        "A **known match** has a recorded estimate inside your range. A **known non-match** "
-        "has a recorded estimate outside it. **Unknown temperature** means the catalogue "
-        "does not record an estimate — it is not a zero, failure or known non-match."
+    st.write("**Happy with that?**")
+    unknown_revealed = hard_reveal(
+        "What information might still be missing?",
+        _TEMPERATURE_UNKNOWN_REVEAL_KEY,
+        reveal_label="Show what is missing",
+        revealed_message=f"But we don't know the temperature of {len(unknown):,} other planets.",
     )
-    _initialise_unknown_temperature_control(st.session_state)
+    if not unknown_revealed:
+        return
+
+    st.caption("Unknown means we do not know — it does not mean unsuitable.")
+    if _UNKNOWN_TEMPERATURE_DECISION_KEY in st.session_state:
+        _initialise_unknown_temperature_control(st.session_state)
     unknown_decision = st.radio(
         "What should we do with planets whose temperature is unknown?",
         options=_UNKNOWN_TEMPERATURE_OPTIONS,
+        index=None if _UNKNOWN_TEMPERATURE_CONTROL_KEY not in st.session_state else 0,
         key=_UNKNOWN_TEMPERATURE_CONTROL_KEY,
     )
-    st.session_state[_UNKNOWN_TEMPERATURE_DECISION_KEY] = unknown_decision
-    st.caption(
-        "Your temperature range and unknown-temperature decision are saved for the Combine screen."
-    )
+    if unknown_decision is not None:
+        st.session_state[_UNKNOWN_TEMPERATURE_DECISION_KEY] = unknown_decision
+    completion_gate(unknown_decision is not None)
 
 
 def _render_launch(data: pd.DataFrame) -> None:
@@ -402,6 +401,9 @@ def _render_distance(data: pd.DataFrame) -> None:
         "This is the distance from Earth to the planetary system, not the distance of a planet from its own star. "
         "Even the nearest stars are several light-years away."
     )
+    st.caption(
+        "A light-year is a distance: the distance light travels in one year. Even 100 light-years is extremely far beyond our Solar System."
+    )
     _initialise_distance_control(st.session_state)
     distance_limit_ly = st.slider(
         "How far away are you willing to go? (light-years)",
@@ -411,16 +413,13 @@ def _render_distance(data: pd.DataFrame) -> None:
         key=_DISTANCE_CONTROL_KEY,
     )
     interacted = _record_distance_interaction(st.session_state, int(distance_limit_ly))
-    if not interacted:
+    if not completion_gate(interacted):
         st.info("Move the distance control to see how many catalogue records remain.")
         return
 
     distance_filtered = _filter_distance_light_years(distance_population, distance_limit_ly)
-    before_distance, after_distance = st.columns(2)
-    with before_distance:
-        st.metric("Planets with recorded distances", f"{len(distance_population):,}")
-    with after_distance:
-        st.metric(f"Possible planets within {distance_limit_ly:,} light-years", f"{len(distance_filtered):,}")
+    st.metric(f"Possible planets within {distance_limit_ly:,} light-years", f"{len(distance_filtered):,}")
+    st.caption(f"{len(distance_population):,} catalogue records have a recorded distance; missing distances are left out of this introductory filter.")
     st.write("The planet data did not change. The filter changed which records remain in the search.")
 
 

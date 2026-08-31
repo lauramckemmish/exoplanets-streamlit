@@ -77,10 +77,17 @@ Main cognitive job: understand a simple filter.
 
 - Use distance from Earth / planetary-system distance (`sy_dist`).
 - Learner-facing units are light-years.
-- Moving the distance control updates the number of matching exoplanets live.
+- The learner must make a meaningful first slider move before normal
+  progression; the count is hidden until then.
+- After the first move, the dominant result is the number of possible planets
+  within the chosen distance and it updates live as the learner varies the
+  threshold.
 - There is no Apply button required to see the effect.
 - Records with missing distance may be quietly omitted from this introductory
-  filtering population.
+  filtering population; this bookkeeping remains subordinate to the main
+  result.
+- A light-year is a distance, and even 100 light-years is extremely far beyond
+  our Solar System. Keep this orientation compact.
 - The learner settles on a maximum distance.
 - Persist that choice for later screens.
 - Do not apply the learner's temperature criterion on this screen.
@@ -93,16 +100,18 @@ missing information.
 - Use estimated equilibrium temperature (`pl_eqt`).
 - Learner-facing values are in degrees Celsius, while wording must remain
   scientifically accurate that this is estimated equilibrium temperature.
-- This choice is made independently of the distance choice.
 - Learners choose an acceptable temperature range.
-- Explicitly distinguish:
-  - known match;
-  - known non-match;
-  - unknown temperature.
+- First show the number of planets with known temperatures that match the
+  chosen range; keep this as the primary result.
+- Then use a hard reveal to introduce how many other planets have unknown
+  temperature. Unknown is not unsuitable.
 - Learners make a third decision:
   - **take the risk** — retain planets whose temperature is unknown; or
   - **play it safe** — retain only planets known to meet the temperature range.
+- Require this decision before normal progression into Screen 5.
 - Persist the temperature range and unknown-temperature decision for Screen 5.
+- Known non-matches remain available to the calculation but subordinate to the
+  main learning job.
 - Unknown never means zero or failed criterion.
 
 ### 5. Combine — What happens when your choices have to work together?
