@@ -10,8 +10,11 @@ from experiences.planet_shopping import (
     _APPLIED_DISTANCE_KEY,
     _DISTANCE_CONTROL_KEY,
     _DISTANCE_INTERACTED_KEY,
+    _format_travel_years,
     _initialise_distance_control,
     _record_distance_interaction,
+    _TEMPERATURE_DEFAULT_RANGE_C,
+    _voyager_travel_years,
     _distance_profile,
     _planet_display_value,
     _random_planet_name,
@@ -29,6 +32,14 @@ from experiences.planet_shopping import (
 
 
 class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
+    def test_voyager_anchor_uses_approximate_years_per_light_year(self):
+        self.assertEqual(_voyager_travel_years(1), 17_600)
+        self.assertEqual(_format_travel_years(_voyager_travel_years(100)), "1.8 million years")
+        self.assertEqual(_format_travel_years(_voyager_travel_years(500)), "8.8 million years")
+
+    def test_fresh_temperature_range_is_deliberately_hot(self):
+        self.assertEqual(_TEMPERATURE_DEFAULT_RANGE_C, (1_000, 2_000))
+
     def test_random_planet_name_comes_from_named_catalogue_and_changes_when_possible(self):
         data = pd.DataFrame({"pl_name": ["Planet A", "Planet B", None]})
 

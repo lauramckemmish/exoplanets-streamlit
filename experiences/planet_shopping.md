@@ -87,7 +87,11 @@ Main cognitive job: understand a simple filter.
   filtering population; this bookkeeping remains subordinate to the main
   result.
 - A light-year is a distance, and even 100 light-years is extremely far beyond
-  our Solar System. Keep this orientation compact.
+  our Solar System. For one concrete scale anchor, use the approximate travel
+  time of Voyager 1 at about 17 km/s: 1 light-year is about 17,600 years at
+  that speed. Keep this orientation compact; it is not a scale lesson.
+- Show an approximate Voyager-equivalent travel time for the selected distance
+  as support for the learner's travel decision.
 - The learner settles on a maximum distance.
 - Persist that choice for later screens.
 - Do not apply the learner's temperature criterion on this screen.
@@ -101,6 +105,9 @@ missing information.
 - Learner-facing values are in degrees Celsius, while wording must remain
   scientifically accurate that this is estimated equilibrium temperature.
 - Learners choose an acceptable temperature range.
+- For a fresh session, start with a deliberately unsuitable hot range of
+  1000–2000 °C so learners have a reason to revise the criterion. Do not reset
+  a later learner choice when navigating or rerunning.
 - First show the number of planets with known temperatures that match the
   chosen range; keep this as the primary result.
 - Then use a hard reveal to introduce how many other planets have unknown
