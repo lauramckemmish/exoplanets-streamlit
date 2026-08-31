@@ -6,18 +6,19 @@ from experiences import catalog
 
 
 class PublicDestinationCatalogueTests(unittest.TestCase):
-    def test_all_experiences_are_publicly_enabled(self):
+    def test_release_surface_exposes_only_curious_routes(self):
         self.assertEqual(
             catalog.enabled_experience_names(),
-            tuple(entry["name"] for entry in catalog.EXPERIENCES),
+            ("Planet Shopping Outside Our Solar System",),
         )
+        self.assertEqual(catalog.enabled_explore_resource_names(), ("Exoplanet Data Lab",))
 
     def test_guided_experiences_and_explore_resources_are_separate(self):
         experience_names = {entry["name"] for entry in catalog.experience_catalog()}
         explore_names = {entry["name"] for entry in catalog.explore_catalog()}
 
-        self.assertEqual(experience_names, {entry["name"] for entry in catalog.EXPERIENCES})
-        self.assertEqual(explore_names, {entry["name"] for entry in catalog.EXPLORE_RESOURCES})
+        self.assertEqual(experience_names, {"Planet Shopping Outside Our Solar System"})
+        self.assertEqual(explore_names, {"Exoplanet Data Lab"})
 
     def test_data_lab_explore_resource_reuses_the_existing_route(self):
         resource = catalog.get_explore_resource("Exoplanet Data Lab")
@@ -25,7 +26,9 @@ class PublicDestinationCatalogueTests(unittest.TestCase):
 
     def test_all_explore_resources_are_available(self):
         for resource in catalog.EXPLORE_RESOURCES:
-            self.assertIsNotNone(catalog.get_explore_resource(resource["name"]))
+            self.assertIsNotNone(
+                catalog.get_explore_resource(resource["name"], enabled_only=False)
+            )
 
 
 if __name__ == "__main__":
