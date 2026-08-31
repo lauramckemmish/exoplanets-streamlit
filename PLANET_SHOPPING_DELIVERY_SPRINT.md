@@ -54,7 +54,7 @@ One screen should have one obvious main cognitive job.
 
 ## Current pointer
 
-> **CURRENT: PS-02 — Combine + Choose Your Destination**
+> **CURRENT: PS-05 — Isabella end-to-end delivery rehearsal**
 
 Everything else in this document is context, not permission to modify it.
 
@@ -102,7 +102,7 @@ Temperature acceptance criteria:
 - unrelated experiences remain unchanged.
 
 ### PS-02 — Combine + Choose Your Destination
-**Status: CURRENT**
+**Status: DONE**
 
 Implement the main intersection/evidence-based-decision screen.
 

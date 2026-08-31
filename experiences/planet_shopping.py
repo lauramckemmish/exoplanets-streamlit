@@ -730,40 +730,22 @@ def _render_destination(data: pd.DataFrame) -> None:
 
 def _render_data_science() -> None:
     st.subheader("💡 Data Science")
-    think_q("Think back over your planet search. What did you actually do with the data?")
-    st.write(
-        "You just used a real exoplanet catalogue to make a decision from evidence. "
-        "That is data science."
-    )
-
-    st.markdown("#### The process")
-    st.write(
-        "**Inspect data** → **understand variables** → **choose criteria** → **filter** → "
-        "**deal with missing information** → **combine criteria** → **inspect evidence** → "
-        "**make a decision**"
-    )
-    st.write(
-        "The catalogue was incomplete. Missing information did not become zero or failure; "
-        "you kept track of what was known, unknown and worth checking."
-    )
-
-    st.markdown("#### This way of thinking travels")
-    st.write(
-        "Online shopping follows a similar pattern: start with a large catalogue, use useful "
-        "variables, set criteria, filter to a shortlist and choose. Scientists use the same "
-        "broad reasoning with datasets about animals, molecules and medicines."
-    )
-    st.write(
-        "The important endpoint is not finding a planet we can call habitable. It is that you "
-        "can narrow possibilities, reason about evidence and make a defensible choice with "
-        "real, incomplete data."
-    )
+    st.write("So why did we call this a shopping expedition?")
     with st.container(width=720):
         role_image(
             TRANSFER_IMAGE_PATH,
             role="support",
             key="planet_shopping_transfer",
         )
+    st.write(
+        "You started with thousands of possibilities.\n\n"
+        "You chose what mattered.\n\n"
+        "You filtered the data.\n\n"
+        "You dealt with things we didn't know.\n\n"
+        "You combined your choices.\n\n"
+        "You used evidence to choose."
+    )
+    st.write("Data science is using data to narrow down the possibilities and make a decision.")
 
 
 def render(data: pd.DataFrame) -> None:

@@ -192,13 +192,13 @@ the chosen planet is habitable.
 
 ### 7. Data Science — What did you just do?
 
-Make the transferable process explicit:
-
-inspect data → understand variables → choose criteria → filter →
-deal with missing information → combine criteria → make a decision from evidence.
-
-Connect this reasoning to familiar filtering/search tasks such as online
-shopping and to other scientific datasets.
+Open with “So why did we call this a shopping expedition?”, then keep the
+existing transfer graphic as the main object. Briefly reconstruct the learner's
+actions: start with possibilities, choose what matters, filter, deal with what
+is unknown, combine choices and use evidence to choose. Finish with the concise
+recognition that data science is using data to narrow possibilities and make a
+decision. Leave room for the facilitator's human connection rather than
+introducing another topic.
 
 ## State that must persist
 
