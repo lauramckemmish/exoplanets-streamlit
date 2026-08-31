@@ -469,17 +469,38 @@ def _render_combine(data: pd.DataFrame) -> None:
 
 def _render_data_science() -> None:
     st.subheader("💡 Data Science")
-    st.warning("**Rough destination-card prototype — no selection logic yet.**")
-    with st.container(border=True):
-        st.markdown("### Destination: [a candidate planet]")
-        st.markdown("**Evidence:** [which recorded values match your shopping list]")
-        st.markdown("**Unknowns:** [which values are not recorded]")
-        st.markdown("**Decision:** [why this is your best available destination]")
-    st.caption("The final stage will ask students to make an evidence-based choice despite incomplete information.")
-    with st.container(width=1050):
+    think_q("Think back over your planet search. What did you actually do with the data?")
+    st.write(
+        "You just used a real exoplanet catalogue to make a decision from evidence. "
+        "That is data science."
+    )
+
+    st.markdown("#### The process")
+    st.write(
+        "**Inspect data** → **understand variables** → **choose criteria** → **filter** → "
+        "**deal with missing information** → **combine criteria** → **inspect evidence** → "
+        "**make a decision**"
+    )
+    st.write(
+        "The catalogue was incomplete. Missing information did not become zero or failure; "
+        "you kept track of what was known, unknown and worth checking."
+    )
+
+    st.markdown("#### This way of thinking travels")
+    st.write(
+        "Online shopping follows a similar pattern: start with a large catalogue, use useful "
+        "variables, set criteria, filter to a shortlist and choose. Scientists use the same "
+        "broad reasoning with datasets about animals, molecules and medicines."
+    )
+    st.write(
+        "The important endpoint is not finding a planet we can call habitable. It is that you "
+        "can narrow possibilities, reason about evidence and make a defensible choice with "
+        "real, incomplete data."
+    )
+    with st.container(width=720):
         role_image(
             TRANSFER_IMAGE_PATH,
-            role="hero",
+            role="support",
             key="planet_shopping_transfer",
         )
 

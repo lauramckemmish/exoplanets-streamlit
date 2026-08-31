@@ -54,7 +54,7 @@ One screen should have one obvious main cognitive job.
 
 ## Current pointer
 
-> **CURRENT: PS-02 — Combine screen and destination choice**
+> **CURRENT: PS-03 — Data Science landing**
 
 Everything else in this document is context, not permission to modify it.
 
@@ -102,7 +102,7 @@ Temperature acceptance criteria:
 - unrelated experiences remain unchanged.
 
 ### PS-02 — Combine screen and destination choice
-**Status: CURRENT**
+**Status: DONE**
 
 Implement the main intersection/evidence-based-decision screen.
 
@@ -124,7 +124,7 @@ Acceptance criteria:
 - a Venn-style overlap is preferred, but a robust intelligible representation takes priority over bespoke visual polish.
 
 ### PS-03 — Data Science landing
-**Status: TODO**
+**Status: CURRENT**
 
 Complete the transfer/closure screen Isabella has been briefed to deliver.
 
