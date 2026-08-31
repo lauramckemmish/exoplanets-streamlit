@@ -143,7 +143,10 @@ Before combining them:
 Then ask learners to reason about how many planets will satisfy the criteria
 together.
 
-Use a hard reveal for the first combined result.
+Show the two known-set counts and a substantial overlap visual before the
+reveal. Put a question mark in the centre of the overlap and ask how many
+planets learners think are in both groups. Use a hard reveal to replace that
+question mark with the known-both count.
 
 The overlap representation should distinguish:
 
@@ -160,12 +163,11 @@ must not imply that unknown temperature means non-match.
 After the first reveal, learners may change the three controls and see the
 combined result update live.
 
-Use a simple bounded overlap visual to show the distance-only group, the known
-temperature-only group and the known-both group. Keep the combined shortlist as
-the dominant result. If learners take the risk, qualify the result quietly by
-noting that some possibilities have unknown temperature; if they play it safe,
-unknown-temperature records stay out of the shortlist. Do not choose a
-destination on this screen.
+Only after the known intersection is revealed, apply the inherited
+Take the risk / Play it safe choice to form the possible-destination count.
+Known-both planets remain distinct from distance-matching planets whose
+temperature is unknown. Keep the final possibilities count clear and do not
+choose a destination on this screen.
 
 **Planet size is not a required core filter in the current pathway.**
 

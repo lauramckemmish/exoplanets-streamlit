@@ -333,21 +333,24 @@ def _record_destination_selection(state: dict, destination_name: str | None) -> 
 
 
 def _render_overlap_visual(
-    distance_count: int, temperature_count: int, known_both_count: int
+    distance_count: int, temperature_count: int, known_both_count: int | None = None
 ) -> None:
-    """Show a small local overlap visual for the two independent criteria."""
+    """Show the two known sets with a substantial, revealable overlap."""
+    overlap_label = "?" if known_both_count is None else f"{known_both_count:,}"
     st.markdown("#### Where the criteria overlap")
     st.markdown(
         f"""
-        <div style="display:flex; justify-content:center; align-items:center; gap:0; margin:.5rem 0 1rem;">
-          <div style="width:150px; height:90px; border:2px solid #3F61C4; border-radius:50%; padding:1.1rem .5rem .2rem; text-align:center; margin-right:-18px; background:#3F61C422;">
+        <div style="position:relative; width:380px; max-width:100%; height:145px; margin:.5rem auto 1rem;">
+          <div style="position:absolute; left:5px; top:10px; width:205px; height:120px; border:2px solid #3F61C4; border-radius:50%; padding:2.2rem .5rem .2rem; text-align:left; box-sizing:border-box; background:#3F61C422;">
             Distance<br><strong>{distance_count:,}</strong>
           </div>
-          <div style="width:150px; height:90px; border:2px solid #007882; border-radius:50%; padding:1.1rem .5rem .2rem; text-align:center; background:#00788222;">
+          <div style="position:absolute; right:5px; top:10px; width:205px; height:120px; border:2px solid #007882; border-radius:50%; padding:2.2rem .5rem .2rem; text-align:right; box-sizing:border-box; background:#00788222;">
             Temperature<br><strong>{temperature_count:,}</strong>
           </div>
+          <div style="position:absolute; left:50%; top:50%; transform:translate(-50%, -50%); z-index:2; min-width:64px; padding:.65rem .45rem; border:2px solid currentColor; border-radius:999px; text-align:center; font-size:1.25rem; font-weight:700; background:var(--background-color, white);">
+            {overlap_label}
+          </div>
         </div>
-        <div style="text-align:center; font-size:.9rem;">Known to meet both: <strong>{known_both_count:,}</strong></div>
         """,
         unsafe_allow_html=True,
     )
@@ -592,7 +595,9 @@ def _render_combine(data: pd.DataFrame) -> None:
     with temperature_count:
         st.metric("Known temperature matches", f"{len(temperature_matches):,}")
         st.caption("Records with a recorded estimated temperature inside your range.")
-    think_q("How many do you think satisfy both?", title="Think")
+    if not st.session_state.get(_COMBINE_REVEAL_KEY, False):
+        _render_overlap_visual(len(distance_matches), len(temperature_matches))
+    think_q("How many planets do you think are in both groups?", title="Think")
     if not hard_reveal(
         "Make your prediction before seeing the combined result.",
         _COMBINE_REVEAL_KEY,
@@ -600,10 +605,15 @@ def _render_combine(data: pd.DataFrame) -> None:
     ):
         return
 
-    st.metric("Possible planets satisfying both", f"{len(candidates):,}")
     _render_overlap_visual(len(distance_matches), len(temperature_matches), len(known_both))
     if keep_unknowns and len(distance_unknown):
-        st.caption("Some of these are still possibilities because their temperature is unknown.")
+        st.caption(
+            f"Known to meet both: {len(known_both):,}. Plus {len(distance_unknown):,} "
+            "within your distance limit whose temperature is unknown — possibilities "
+            "because you chose to take the risk."
+        )
+    else:
+        st.caption("Play it safe: possible destinations are the planets known to meet both criteria.")
     st.write(f"You've narrowed thousands of planets to **{len(candidates):,} possibilities**.")
 
 

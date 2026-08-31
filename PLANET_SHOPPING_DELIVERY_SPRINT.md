@@ -127,6 +127,11 @@ The separate Destination screen lets learners inspect the surviving real
 planets using the existing profile and choose one using evidence. A destination
 choice is not required on Combine.
 
+The Combine visual appears before the hard reveal with a substantial overlap
+and a centred question mark. The reveal replaces it with the known-both count;
+only then does the inherited risk/safe policy add or exclude distance-matching
+temperature-unknown possibilities.
+
 The current PS-02 Destination completion work adds learner-controlled optional
 filters for size, stars, year length and known planets in a system where the
 prepared fields are usable. It must preserve the risk/safe missing-data policy,
