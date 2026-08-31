@@ -17,6 +17,7 @@ TITLE = "Planet Shopping Outside Our Solar System"
 SUBTITLE = "Use real exoplanet data to find your perfect planet."
 ASSETS_DIR = Path(__file__).resolve().parent.parent / "assets"
 WELCOME_HOOK_IMAGE_PATH = ASSETS_DIR / "planet-shopping-welcome-hook.png"
+SOLAR_SYSTEM_IMAGE_PATH = ASSETS_DIR / "solar-system-nasa.jpeg"
 TRANSFER_IMAGE_PATH = ASSETS_DIR / "planet-shopping-transfer.png"
 
 STAGE_LABELS = [
@@ -33,7 +34,7 @@ STAGE_LABELS = [
 _STAGE_KEY = "planet_shopping_stage"
 _TAB_KEY = "planet_shopping_tab"
 _SCROLL_KEY = "planet_shopping_scroll_to_top"
-_CATALOGUE_REVEAL_KEY = "planet_shopping_launch_catalogue_revealed"
+_CATALOGUE_REVEAL_KEY = "planet_shopping_meet_catalogue_revealed"
 _DISTANCE_CONTROL_KEY = "planet_shopping_distance_control_ly"
 _APPLIED_DISTANCE_KEY = "planet_shopping_applied_distance_ly"
 _DISTANCE_INITIAL_VALUE_KEY = "planet_shopping_distance_initial_value_ly"
@@ -302,30 +303,14 @@ def _render_launch(data: pd.DataFrame) -> None:
     with st.container(width="content"):
         st.markdown("#### Where can we go?")
         st.write("Earth is unavailable. Could we go somewhere else in our Solar System?")
-        st.write("The other planets are not much of a replacement, so let's look beyond the Sun.")
-        st.write("The Sun is our star. Other stars can have planets too: these are exoplanets.")
-
-    st.markdown("#### A catalogue that keeps growing")
-    catalogue_revealed = hard_reveal(
-        "**How many exoplanets do you think are in our catalogue today?**",
-        _CATALOGUE_REVEAL_KEY,
-        reveal_label="Show the catalogue",
-    )
-    if not catalogue_revealed:
-        return
-
-    current_year = date.today().year
-    counts = _catalogue_counts(data, current_year)
-    today, one_year, ten_years = st.columns(3)
-    with today:
-        st.metric(f"Today ({current_year})", f"{counts['today']:,}")
-    with one_year:
-        st.metric(f"A year ago ({current_year - 1})", f"{counts['one_year_ago']:,}")
-    with ten_years:
-        st.metric(f"Ten years ago ({current_year - 10})", f"{counts['ten_years_ago']:,}")
-    st.write("This catalogue is data: **one planet → one record → different pieces of information about that planet.**")
-    st.caption("Scientists have recorded more information for some planets than for others.")
-    st.markdown("#### We have thousands of planets. But what does one planet actually look like in the data?")
+        role_image(
+            SOLAR_SYSTEM_IMAGE_PATH,
+            role="context",
+            caption="Our Solar System: the Sun and its planets.",
+            key="planet_shopping_solar_system",
+        )
+        st.write("The other planets are not much of a replacement. Imagine none of those options works: we have run out of planets around our Sun.")
+        st.write("The Sun is one star. Other stars can have planets too. Those planets are exoplanets.")
 
 
 def _planet_visual_style(planet: pd.Series) -> tuple[int, str, str]:
@@ -383,7 +368,28 @@ def _render_meet_your_planet(data: pd.DataFrame) -> None:
         with top_right:
             _render_planet_property("☀️ Stars in the system", planet["sy_snum"], _stars_profile)
             _render_planet_property("📅 Year length", planet["pl_orbper"], _year_profile)
-    st.write("You could keep doing this. There are thousands of planets in the catalogue. Maybe we need a better way to shop.")
+
+    st.markdown("#### A catalogue that keeps growing")
+    catalogue_revealed = hard_reveal(
+        "**So how many planets like this do we actually know about?**",
+        _CATALOGUE_REVEAL_KEY,
+        reveal_label="Show the catalogue",
+    )
+    if not catalogue_revealed:
+        return
+
+    current_year = date.today().year
+    counts = _catalogue_counts(data, current_year)
+    today, one_year, ten_years = st.columns(3)
+    with today:
+        st.metric(f"Today ({current_year})", f"{counts['today']:,}")
+    with one_year:
+        st.metric(f"A year ago ({current_year - 1})", f"{counts['one_year_ago']:,}")
+    with ten_years:
+        st.metric(f"Ten years ago ({current_year - 10})", f"{counts['ten_years_ago']:,}")
+    st.write("The catalogue keeps growing: **one planet → one record → different pieces of information about that planet.**")
+    st.caption("We have measurements for many planets, but not every property is known for every planet.")
+    st.write("You could keep doing this one planet at a time. There are thousands in the catalogue, so we need a better way to shop.")
 
 
 def _render_distance(data: pd.DataFrame) -> None:

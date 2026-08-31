@@ -33,8 +33,9 @@ other planets are not much of a replacement → look beyond the Sun → other
 stars can have planets → astronomers have organised thousands of known
 exoplanets into data.
 
-Preserve the catalogue hard reveal and strong catalogue-growth end state. Keep
-the opening concise and do not add explanatory text beyond this story.
+Use the existing Solar System representation for conceptual orientation, not
+data analysis. The catalogue-number reveal does not belong on this screen.
+Keep the opening concise and do not add explanatory text beyond this story.
 
 ### 2. Meet a Planet — Pick a planet. Any planet.
 
@@ -61,6 +62,14 @@ but must remain compact and readable at ordinary laptop width.
 
 End with a short transition: there are thousands of planets, so a better way
 to shop is needed.
+
+After learners have browsed individual planets, use the existing catalogue
+hard reveal and growth display here:
+
+- ask how many planets like this we actually know about;
+- reveal the current catalogue size and growth over time;
+- note briefly that not every property is known for every planet;
+- motivate systematic filtering.
 
 ### 3. Distance — How far are you willing to go?
 
