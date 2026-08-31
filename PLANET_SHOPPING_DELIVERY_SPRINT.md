@@ -199,7 +199,7 @@ Protect the core arc if time is tight:
 **Distance → Temperature → Combine → Choose Your Destination → Data Science**.
 
 ### PS-06 — Tests, deployed smoke test and delivery freeze
-**Status: TODO**
+**Status: DONE**
 
 Acceptance criteria:
 
@@ -208,6 +208,10 @@ Acceptance criteria:
 - manually sanity-check a normal student browser width and projector/desktop presentation;
 - verify current `main` deploys and Planet Shopping loads successfully;
 - once the delivery path is accepted, avoid further shared-architecture or visual-system changes unless they fix a real delivery problem.
+
+The current build has passed the automated, fresh-session and classroom-width
+smoke checks on local `main` and is frozen for delivery pending the Isabella
+facilitator rehearsal in PS-05. No delivery-blocking issue was found.
 
 ---
 
