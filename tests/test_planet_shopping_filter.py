@@ -5,6 +5,7 @@ import unittest
 import pandas as pd
 
 from experiences.planet_shopping import (
+    STAGE_LABELS,
     _filter_distance_light_years,
     _known_distance_population,
     _split_temperature_groups,
@@ -13,6 +14,12 @@ from experiences.planet_shopping import (
 
 
 class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
+    def test_stage_shell_matches_established_six_screen_sequence(self):
+        self.assertEqual(
+            STAGE_LABELS,
+            ["Launch", "Meet a Planet", "Distance", "Temperature", "Combine", "Data Science"],
+        )
+
     def test_temperature_groups_partition_every_catalogue_record(self):
         data = pd.DataFrame(
             {
@@ -61,6 +68,21 @@ class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
         self.assertEqual(len(matches) + len(does_not_match) + len(unknown), len(distance_filtered))
         self.assertEqual(len(_temperature_candidates(matches, unknown, True)), 2)
         self.assertEqual(len(_temperature_candidates(matches, unknown, False)), 1)
+
+    def test_temperature_groups_can_use_the_full_population_independently(self):
+        data = pd.DataFrame(
+            {
+                "pl_name": ["Near match", "Far match", "Unknown"],
+                "sy_dist": [1.0, 10.0, 1.5],
+                "pl_eqt": [273.15, 273.15, None],
+            }
+        )
+
+        matches, does_not_match, unknown = _split_temperature_groups(data, (0, 30))
+
+        self.assertEqual(matches["pl_name"].tolist(), ["Near match", "Far match"])
+        self.assertEqual(does_not_match["pl_name"].tolist(), [])
+        self.assertEqual(unknown["pl_name"].tolist(), ["Unknown"])
 
 
 if __name__ == "__main__":

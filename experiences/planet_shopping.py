@@ -19,11 +19,12 @@ WELCOME_HOOK_IMAGE_PATH = ASSETS_DIR / "planet-shopping-welcome-hook.png"
 TRANSFER_IMAGE_PATH = ASSETS_DIR / "planet-shopping-transfer.png"
 
 STAGE_LABELS = [
-    "🚀 Launch",
-    "🛰️ Meet a Planet",
-    "🔎 Filter",
-    "🛒 Build Search",
-    "💡 Data Science",
+    "Launch",
+    "Meet a Planet",
+    "Distance",
+    "Temperature",
+    "Combine",
+    "Data Science",
 ]
 
 # These keys belong only to this experience. Do not reuse the mission or
@@ -93,6 +94,57 @@ def _temperature_candidates(
     """Build the Stage 3 candidate pool without treating unknowns as failures."""
 
     return pd.concat([matches, unknown], ignore_index=True) if keep_unknowns else matches.copy()
+
+
+def _render_temperature(data: pd.DataFrame) -> None:
+    """Render the independent temperature criterion and missing-data decision."""
+    st.subheader("🌡️ Temperature")
+    st.write(
+        "Now choose a second thing that matters: how hot or cold a planet is. "
+        "This temperature choice is independent of your distance choice."
+    )
+    st.caption(
+        "The catalogue records estimated equilibrium temperature. Choose an acceptable range in °C; "
+        "it is an estimate, not a direct measurement of a planet's surface."
+    )
+
+    temperature_range_c = st.slider(
+        "What estimated equilibrium temperature range is acceptable? (°C)",
+        min_value=-200,
+        max_value=2_000,
+        value=(0, 30),
+        step=10,
+        key=_TEMPERATURE_CONTROL_KEY,
+    )
+    temperature_range_c = (int(temperature_range_c[0]), int(temperature_range_c[1]))
+    st.session_state[_APPLIED_TEMPERATURE_KEY] = temperature_range_c
+
+    matches, does_not_match, unknown = _split_temperature_groups(data, temperature_range_c)
+    known_match, known_non_match, unknown_temperature = st.columns(3)
+    with known_match:
+        st.metric("Known match", f"{len(matches):,}")
+    with known_non_match:
+        st.metric("Known non-match", f"{len(does_not_match):,}")
+    with unknown_temperature:
+        st.metric("Unknown temperature", f"{len(unknown):,}")
+
+    st.write(
+        "A **known match** has a recorded estimate inside your range. A **known non-match** "
+        "has a recorded estimate outside it. **Unknown temperature** means the catalogue "
+        "does not record an estimate — it is not a zero, failure or known non-match."
+    )
+    unknown_decision = st.radio(
+        "What should we do with planets whose temperature is unknown?",
+        options=[
+            "Take the risk — keep unknowns as possibilities",
+            "Play it safe — set unknowns aside",
+        ],
+        key=_UNKNOWN_TEMPERATURE_DECISION_KEY,
+    )
+    st.session_state[_UNKNOWN_TEMPERATURE_DECISION_KEY] = unknown_decision
+    st.caption(
+        "Your temperature range and unknown-temperature decision are saved for the Combine screen."
+    )
 
 
 def _render_launch(data: pd.DataFrame) -> None:
@@ -216,8 +268,8 @@ def _render_meet_your_planet(data: pd.DataFrame) -> None:
     st.caption("Unknown means this value has not been recorded in the catalogue. It does not mean zero or a failed planet.")
 
 
-def _render_filter(data: pd.DataFrame) -> None:
-    st.subheader("🔎 Filter")
+def _render_distance(data: pd.DataFrame) -> None:
+    st.subheader("🔎 Distance")
     st.write("**Start simple.** We have thousands of possible planets. First, choose one thing that matters and use it to narrow the list.")
 
     distance_population = _known_distance_population(data)
@@ -248,8 +300,8 @@ def _render_filter(data: pd.DataFrame) -> None:
     st.write("The planet data did not change. The filter changed which records remain in the search.")
 
 
-def _render_build_your_search() -> None:
-    st.subheader("🛒 Build Your Search")
+def _render_combine() -> None:
+    st.subheader("🛒 Combine")
     st.warning("**Rough intersection prototype — no final controls yet.**")
     st.write("Now imagine choosing several things that matter: size **and** temperature **and** distance from Earth.")
     st.markdown(
@@ -259,8 +311,8 @@ def _render_build_your_search() -> None:
     st.info("This stage is about the intersection of filters, not repeating the one-variable lesson.")
 
 
-def _render_choose_your_destination() -> None:
-    st.subheader("🪐 Choose Your Destination")
+def _render_data_science() -> None:
+    st.subheader("💡 Data Science")
     st.warning("**Rough destination-card prototype — no selection logic yet.**")
     with st.container(border=True):
         st.markdown("### Destination: [a candidate planet]")
@@ -277,7 +329,7 @@ def _render_choose_your_destination() -> None:
 
 
 def render(data: pd.DataFrame) -> None:
-    """Render the five-stage live prototype using the shared prepared dataset."""
+    """Render the six-stage live prototype using the shared prepared dataset."""
     if _STAGE_KEY not in st.session_state:
         st.session_state[_STAGE_KEY] = 0
 
@@ -297,11 +349,13 @@ def render(data: pd.DataFrame) -> None:
     elif stage == 1:
         _render_meet_your_planet(data)
     elif stage == 2:
-        _render_filter(data)
+        _render_distance(data)
     elif stage == 3:
-        _render_build_your_search()
+        _render_temperature(data)
+    elif stage == 4:
+        _render_combine()
     else:
-        _render_choose_your_destination()
+        _render_data_science()
 
     step_buttons(
         STAGE_LABELS,
