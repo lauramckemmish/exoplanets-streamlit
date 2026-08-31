@@ -86,12 +86,12 @@ Main cognitive job: understand a simple filter.
 - Records with missing distance may be quietly omitted from this introductory
   filtering population; this bookkeeping remains subordinate to the main
   result.
-- A light-year is a distance, and even 100 light-years is extremely far beyond
-  our Solar System. For one concrete scale anchor, use the approximate travel
-  time of Voyager 1 at about 17 km/s: 1 light-year is about 17,600 years at
-  that speed. Keep this orientation compact; it is not a scale lesson.
-- Show an approximate Voyager-equivalent travel time for the selected distance
-  as support for the learner's travel decision.
+- A light-year is a distance — and it is enormous. For one familiar relational
+  anchor, if you could fly through space at passenger-plane speed (about 900
+  km/h), 1 light-year would take about 1.2 million years. This is support for
+  the travel decision, not an astronomy scale lesson.
+- Show an approximate passenger-plane-speed travel time for the selected
+  distance as support for the learner's travel decision.
 - The learner settles on a maximum distance.
 - Persist that choice for later screens.
 - Do not apply the learner's temperature criterion on this screen.

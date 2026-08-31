@@ -40,7 +40,7 @@ _APPLIED_DISTANCE_KEY = "planet_shopping_applied_distance_ly"
 _DISTANCE_INITIAL_VALUE_KEY = "planet_shopping_distance_initial_value_ly"
 _DISTANCE_INTERACTED_KEY = "planet_shopping_distance_interacted"
 _DISTANCE_DEFAULT_VALUE = 500
-_VOYAGER_YEARS_PER_LIGHT_YEAR = 17_600
+_PASSENGER_PLANE_YEARS_PER_LIGHT_YEAR = 1_200_000
 _TEMPERATURE_CONTROL_KEY = "planet_shopping_temperature_control_c"
 _APPLIED_TEMPERATURE_KEY = "planet_shopping_applied_temperature_range_c"
 _TEMPERATURE_DEFAULT_RANGE_C = (1_000, 2_000)
@@ -77,15 +77,16 @@ def _value_or_unknown(value, formatter) -> str:
     return "Unknown" if pd.isna(value) else formatter(value)
 
 
-def _voyager_travel_years(distance_light_years: int | float) -> float:
-    """Estimate Voyager 1 travel time using the sprint's approximate anchor."""
-    return float(distance_light_years) * _VOYAGER_YEARS_PER_LIGHT_YEAR
+def _passenger_plane_travel_years(distance_light_years: int | float) -> float:
+    """Estimate hypothetical passenger-plane-speed travel time."""
+    return float(distance_light_years) * _PASSENGER_PLANE_YEARS_PER_LIGHT_YEAR
 
 
 def _format_travel_years(years: float) -> str:
     """Format an approximate travel time without implying false precision."""
     if years >= 1_000_000:
-        return f"{years / 1_000_000:.1f} million years"
+        millions = f"{years / 1_000_000:.1f}".rstrip("0").rstrip(".")
+        return f"{millions} million years"
     return f"{years:,.0f} years"
 
 
@@ -407,20 +408,15 @@ def _render_meet_your_planet(data: pd.DataFrame) -> None:
 
 def _render_distance(data: pd.DataFrame) -> None:
     st.subheader("🔎 Distance")
-    st.write("**Start simple.** We have thousands of possible planets. First, choose one thing that matters and use it to narrow the list.")
 
     distance_population = _known_distance_population(data)
     st.markdown("#### How far away?")
     st.caption(
-        "This is the distance from Earth to the planetary system, not the distance of a planet from its own star. "
-        "Even the nearest stars are several light-years away."
+        "A light-year is a **distance** — and it is enormous."
     )
     st.caption(
-        "A light-year is a distance: the distance light travels in one year. Even 100 light-years is extremely far beyond our Solar System."
-    )
-    st.caption(
-        "For scale: Voyager 1 is travelling out into interstellar space at about 17 km/s. "
-        "At that speed, 100 light-years would take about 1.8 million years."
+        "✈️ **For scale:** If you could fly through space at passenger-plane speed, "
+        "travelling just **1 light-year would take about 1.2 million years.**"
     )
     _initialise_distance_control(st.session_state)
     distance_limit_ly = st.slider(
@@ -438,7 +434,7 @@ def _render_distance(data: pd.DataFrame) -> None:
     distance_filtered = _filter_distance_light_years(distance_population, distance_limit_ly)
     st.metric(f"Possible planets within {distance_limit_ly:,} light-years", f"{len(distance_filtered):,}")
     st.caption(
-        f"🚀 At about Voyager 1's speed: ~{_format_travel_years(_voyager_travel_years(distance_limit_ly))}"
+        f"✈️ At passenger-plane speed: ~{_format_travel_years(_passenger_plane_travel_years(distance_limit_ly))}"
     )
     st.caption(f"{len(distance_population):,} catalogue records have a recorded distance; missing distances are left out of this introductory filter.")
     st.write("The planet data did not change. The filter changed which records remain in the search.")
