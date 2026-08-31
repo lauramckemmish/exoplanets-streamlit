@@ -35,6 +35,9 @@ _SCROLL_KEY = "planet_shopping_scroll_to_top"
 _CATALOGUE_REVEAL_KEY = "planet_shopping_launch_catalogue_revealed"
 _DISTANCE_CONTROL_KEY = "planet_shopping_distance_control_ly"
 _APPLIED_DISTANCE_KEY = "planet_shopping_applied_distance_ly"
+_DISTANCE_INITIAL_VALUE_KEY = "planet_shopping_distance_initial_value_ly"
+_DISTANCE_INTERACTED_KEY = "planet_shopping_distance_interacted"
+_DISTANCE_DEFAULT_VALUE = 500
 _TEMPERATURE_CONTROL_KEY = "planet_shopping_temperature_control_c"
 _APPLIED_TEMPERATURE_KEY = "planet_shopping_applied_temperature_range_c"
 _UNKNOWN_TEMPERATURE_CONTROL_KEY = "planet_shopping_unknown_temperature_control"
@@ -96,6 +99,23 @@ def _filter_distance_light_years(data: pd.DataFrame, maximum_distance_ly: int) -
     maximum_distance_parsecs = maximum_distance_ly / PARSEC_TO_LIGHT_YEARS
     distance = pd.to_numeric(data["sy_dist"], errors="coerce")
     return data.loc[distance <= maximum_distance_parsecs].copy()
+
+
+def _initialise_distance_control(state: dict) -> int:
+    """Seed the Distance widget from the durable choice and remember its baseline."""
+    if _DISTANCE_CONTROL_KEY not in state:
+        state[_DISTANCE_CONTROL_KEY] = state.get(_APPLIED_DISTANCE_KEY, _DISTANCE_DEFAULT_VALUE)
+    if _DISTANCE_INITIAL_VALUE_KEY not in state:
+        state[_DISTANCE_INITIAL_VALUE_KEY] = state[_DISTANCE_CONTROL_KEY]
+    return int(state[_DISTANCE_CONTROL_KEY])
+
+
+def _record_distance_interaction(state: dict, distance_limit_ly: int) -> bool:
+    """Persist a distance choice and reveal status after meaningful movement."""
+    if distance_limit_ly != state[_DISTANCE_INITIAL_VALUE_KEY]:
+        state[_DISTANCE_INTERACTED_KEY] = True
+    state[_APPLIED_DISTANCE_KEY] = distance_limit_ly
+    return state.get(_DISTANCE_INTERACTED_KEY, False)
 
 
 def _temperature_candidates(
@@ -332,19 +352,19 @@ def _render_distance(data: pd.DataFrame) -> None:
         "This is the distance from Earth to the planetary system, not the distance of a planet from its own star. "
         "Even the nearest stars are several light-years away."
     )
-    think_q(
-        "What do you think will happen to our list if we only keep planets this close?",
-        title="Pause and predict",
-    )
+    _initialise_distance_control(st.session_state)
     distance_limit_ly = st.slider(
         "How far away are you willing to go? (light-years)",
         min_value=10,
         max_value=2_000,
-        value=500,
         step=10,
         key=_DISTANCE_CONTROL_KEY,
     )
-    st.session_state[_APPLIED_DISTANCE_KEY] = distance_limit_ly
+    interacted = _record_distance_interaction(st.session_state, int(distance_limit_ly))
+    if not interacted:
+        st.info("Move the distance control to see how many catalogue records remain.")
+        return
+
     distance_filtered = _filter_distance_light_years(distance_population, distance_limit_ly)
     before_distance, after_distance = st.columns(2)
     with before_distance:

@@ -54,7 +54,7 @@ One screen should have one obvious main cognitive job.
 
 ## Current pointer
 
-> **CURRENT: PS-03 — Data Science landing**
+> **CURRENT: PS-04 — Distance choreography alignment**
 
 Everything else in this document is context, not permission to modify it.
 
@@ -124,7 +124,7 @@ Acceptance criteria:
 - a Venn-style overlap is preferred, but a robust intelligible representation takes priority over bespoke visual polish.
 
 ### PS-03 — Data Science landing
-**Status: CURRENT**
+**Status: DONE**
 
 Complete the transfer/closure screen Isabella has been briefed to deliver.
 
@@ -139,7 +139,7 @@ Acceptance criteria:
 - keep the screen concise enough for a facilitated 50-minute workshop.
 
 ### PS-04 — Distance choreography alignment
-**Status: TODO**
+**Status: CURRENT**
 
 Bring the existing Distance screen into alignment with the facilitator brief and canonical sequence.
 

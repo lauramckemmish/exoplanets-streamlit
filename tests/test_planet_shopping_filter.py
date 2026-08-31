@@ -6,6 +6,11 @@ import pandas as pd
 
 from experiences.planet_shopping import (
     STAGE_LABELS,
+    _APPLIED_DISTANCE_KEY,
+    _DISTANCE_CONTROL_KEY,
+    _DISTANCE_INTERACTED_KEY,
+    _initialise_distance_control,
+    _record_distance_interaction,
     _UNKNOWN_TEMPERATURE_OPTIONS,
     _combine_groups,
     _candidate_names,
@@ -19,6 +24,17 @@ from experiences.planet_shopping import (
 
 
 class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
+    def test_distance_result_stays_hidden_until_slider_moves_and_choice_is_durable(self):
+        state = {}
+
+        self.assertEqual(_initialise_distance_control(state), 500)
+        self.assertNotIn(_DISTANCE_INTERACTED_KEY, state)
+        self.assertFalse(_record_distance_interaction(state, 500))
+        state[_DISTANCE_CONTROL_KEY] = 600
+        self.assertTrue(_record_distance_interaction(state, 600))
+        self.assertEqual(state[_APPLIED_DISTANCE_KEY], 600)
+        self.assertTrue(state[_DISTANCE_INTERACTED_KEY])
+
     def test_unknown_temperature_control_is_separate_and_restores_durable_decision(self):
         state = {_UNKNOWN_TEMPERATURE_DECISION_KEY: _UNKNOWN_TEMPERATURE_OPTIONS[1]}
 
