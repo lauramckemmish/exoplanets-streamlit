@@ -6,7 +6,11 @@ import pandas as pd
 
 from experiences.planet_shopping import (
     STAGE_LABELS,
+    _UNKNOWN_TEMPERATURE_CONTROL_KEY,
+    _UNKNOWN_TEMPERATURE_DECISION_KEY,
+    _UNKNOWN_TEMPERATURE_OPTIONS,
     _filter_distance_light_years,
+    _initialise_unknown_temperature_control,
     _known_distance_population,
     _split_temperature_groups,
     _temperature_candidates,
@@ -14,6 +18,16 @@ from experiences.planet_shopping import (
 
 
 class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
+    def test_unknown_temperature_control_is_separate_and_restores_durable_decision(self):
+        state = {_UNKNOWN_TEMPERATURE_DECISION_KEY: _UNKNOWN_TEMPERATURE_OPTIONS[1]}
+
+        control_value = _initialise_unknown_temperature_control(state)
+
+        self.assertNotEqual(_UNKNOWN_TEMPERATURE_CONTROL_KEY, _UNKNOWN_TEMPERATURE_DECISION_KEY)
+        self.assertEqual(control_value, _UNKNOWN_TEMPERATURE_OPTIONS[1])
+        state[_UNKNOWN_TEMPERATURE_DECISION_KEY] = control_value
+        self.assertEqual(state[_UNKNOWN_TEMPERATURE_DECISION_KEY], _UNKNOWN_TEMPERATURE_OPTIONS[1])
+
     def test_stage_shell_matches_established_six_screen_sequence(self):
         self.assertEqual(
             STAGE_LABELS,

@@ -37,7 +37,12 @@ _DISTANCE_CONTROL_KEY = "planet_shopping_distance_control_ly"
 _APPLIED_DISTANCE_KEY = "planet_shopping_applied_distance_ly"
 _TEMPERATURE_CONTROL_KEY = "planet_shopping_temperature_control_c"
 _APPLIED_TEMPERATURE_KEY = "planet_shopping_applied_temperature_range_c"
+_UNKNOWN_TEMPERATURE_CONTROL_KEY = "planet_shopping_unknown_temperature_control"
 _UNKNOWN_TEMPERATURE_DECISION_KEY = "planet_shopping_unknown_temperature_decision"
+_UNKNOWN_TEMPERATURE_OPTIONS = (
+    "Take the risk — keep unknowns as possibilities",
+    "Play it safe — set unknowns aside",
+)
 
 
 def _catalogue_counts(data: pd.DataFrame, current_year: int | None = None) -> dict[str, int]:
@@ -96,6 +101,15 @@ def _temperature_candidates(
     return pd.concat([matches, unknown], ignore_index=True) if keep_unknowns else matches.copy()
 
 
+def _initialise_unknown_temperature_control(state: dict) -> str:
+    """Seed the widget control from the durable decision without coupling keys."""
+    if _UNKNOWN_TEMPERATURE_CONTROL_KEY not in state:
+        state[_UNKNOWN_TEMPERATURE_CONTROL_KEY] = state.get(
+            _UNKNOWN_TEMPERATURE_DECISION_KEY, _UNKNOWN_TEMPERATURE_OPTIONS[0]
+        )
+    return state[_UNKNOWN_TEMPERATURE_CONTROL_KEY]
+
+
 def _render_temperature(data: pd.DataFrame) -> None:
     """Render the independent temperature criterion and missing-data decision."""
     st.subheader("🌡️ Temperature")
@@ -133,13 +147,11 @@ def _render_temperature(data: pd.DataFrame) -> None:
         "has a recorded estimate outside it. **Unknown temperature** means the catalogue "
         "does not record an estimate — it is not a zero, failure or known non-match."
     )
+    _initialise_unknown_temperature_control(st.session_state)
     unknown_decision = st.radio(
         "What should we do with planets whose temperature is unknown?",
-        options=[
-            "Take the risk — keep unknowns as possibilities",
-            "Play it safe — set unknowns aside",
-        ],
-        key=_UNKNOWN_TEMPERATURE_DECISION_KEY,
+        options=_UNKNOWN_TEMPERATURE_OPTIONS,
+        key=_UNKNOWN_TEMPERATURE_CONTROL_KEY,
     )
     st.session_state[_UNKNOWN_TEMPERATURE_DECISION_KEY] = unknown_decision
     st.caption(
