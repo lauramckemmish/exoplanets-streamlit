@@ -43,7 +43,7 @@ EXPERIENCES = (
     },
     {
         "name": "Planet Shopping Outside Our Solar System",
-        "nav_label": "Planet Shopping Outside Our Solar System",
+        "nav_label": "Planet Shopping",
         "summary": "Use real exoplanet data to find your perfect planet.",
         "enabled": True,
         "icon": "🛒",
