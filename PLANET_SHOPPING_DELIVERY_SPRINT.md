@@ -32,9 +32,29 @@ If work on the current item reveals another useful change:
 
 The project owner / coordinating ChatGPT thread owns movement of the pointer and backlog status. **Codex should not edit sprint statuses or move the pointer unless explicitly instructed to do so.**
 
+## UI GRAMMAR CONSTRAINT
+
+Planet Shopping is a guided facilitated Investigation. Express learning
+interactions using the established Investigation grammar where it fits:
+Think, Respond, Hard Reveal, Soft Reveal, Choice Reveal, Completion Gate,
+Investigation Progression, Teacher Guidance, and variable /
+representation / sample-context support.
+
+Ordinary Streamlit controls remain ordinary controls.
+
+Do not invent a new shared semantic primitive during this sprint.
+If the existing grammar genuinely cannot express something required for
+delivery, use the smallest local experimental solution and report it as a
+discovery rather than generalising it.
+
+Stage orientation/navigation remains conceptually separate from
+Back / Continue progression.
+
+One screen should have one obvious main cognitive job.
+
 ## Current pointer
 
-> **CURRENT: PS-01 — Temperature screen + six-screen shell**
+> **CURRENT: PS-02 — Combine screen and destination choice**
 
 Everything else in this document is context, not permission to modify it.
 
@@ -45,7 +65,7 @@ Everything else in this document is context, not permission to modify it.
 ## ESSENTIAL — required for Isabella delivery
 
 ### PS-01 — Temperature screen + six-screen shell
-**Status: CURRENT**
+**Status: DONE**
 
 Bring the navigation structure into the established six-screen sequence and implement the missing Temperature screen.
 
@@ -82,7 +102,7 @@ Temperature acceptance criteria:
 - unrelated experiences remain unchanged.
 
 ### PS-02 — Combine screen and destination choice
-**Status: TODO**
+**Status: CURRENT**
 
 Implement the main intersection/evidence-based-decision screen.
 

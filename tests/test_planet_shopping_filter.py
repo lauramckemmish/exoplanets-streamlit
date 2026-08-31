@@ -6,14 +6,15 @@ import pandas as pd
 
 from experiences.planet_shopping import (
     STAGE_LABELS,
+    _UNKNOWN_TEMPERATURE_OPTIONS,
+    _combine_groups,
+    _candidate_names,
     _UNKNOWN_TEMPERATURE_CONTROL_KEY,
     _UNKNOWN_TEMPERATURE_DECISION_KEY,
-    _UNKNOWN_TEMPERATURE_OPTIONS,
     _filter_distance_light_years,
     _initialise_unknown_temperature_control,
     _known_distance_population,
     _split_temperature_groups,
-    _temperature_candidates,
 )
 
 
@@ -65,7 +66,7 @@ class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
         self.assertEqual(filtered["pl_name"].tolist(), ["Near"])
         self.assertEqual(data.loc[0, "sy_dist"], 1.0)
 
-    def test_temperature_filter_uses_the_distance_filtered_population(self):
+    def test_combine_intersection_is_distinct_from_independent_temperature_filter(self):
         data = pd.DataFrame(
             {
                 "pl_name": ["Near match", "Near unknown", "Far match"],
@@ -73,15 +74,51 @@ class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
                 "pl_eqt": [273.15, None, 273.15],
             }
         )
-        distance_filtered = _filter_distance_light_years(_known_distance_population(data), 5)
-        matches, does_not_match, unknown = _split_temperature_groups(distance_filtered, (0, 30))
+        distance, temperature, known_both, distance_unknown, candidates = _combine_groups(
+            data, 5, (0, 30), True
+        )
 
-        self.assertEqual(matches["pl_name"].tolist(), ["Near match"])
-        self.assertEqual(does_not_match["pl_name"].tolist(), [])
-        self.assertEqual(unknown["pl_name"].tolist(), ["Near unknown"])
-        self.assertEqual(len(matches) + len(does_not_match) + len(unknown), len(distance_filtered))
-        self.assertEqual(len(_temperature_candidates(matches, unknown, True)), 2)
-        self.assertEqual(len(_temperature_candidates(matches, unknown, False)), 1)
+        self.assertEqual(len(distance), 2)
+        self.assertEqual(len(temperature), 2)
+        self.assertEqual(known_both["pl_name"].tolist(), ["Near match"])
+        self.assertEqual(distance_unknown["pl_name"].tolist(), ["Near unknown"])
+        self.assertEqual(candidates["pl_name"].tolist(), ["Near match", "Near unknown"])
+
+    def test_combine_separates_counts_and_applies_risk_policy(self):
+        data = pd.DataFrame(
+            {
+                "pl_name": ["Near both", "Near unknown", "Far both", "Near cold"],
+                "sy_dist": [1.0, 1.5, 10.0, 1.2],
+                "pl_eqt": [273.15, None, 273.15, 350.0],
+            }
+        )
+
+        distance, temperature, known_both, distance_unknown, risk_candidates = _combine_groups(
+            data, 5, (0, 30), True
+        )
+        _, _, _, _, safe_candidates = _combine_groups(data, 5, (0, 30), False)
+
+        self.assertEqual(len(distance), 3)
+        self.assertEqual(len(temperature), 2)
+        self.assertEqual(known_both["pl_name"].tolist(), ["Near both"])
+        self.assertEqual(distance_unknown["pl_name"].tolist(), ["Near unknown"])
+        self.assertEqual(risk_candidates["pl_name"].tolist(), ["Near both", "Near unknown"])
+        self.assertEqual(safe_candidates["pl_name"].tolist(), ["Near both"])
+
+    def test_combine_keeps_missing_values_unknown_and_shortlist_real_survivors(self):
+        data = pd.DataFrame(
+            {
+                "pl_name": ["Unknown temperature", "No distance", None],
+                "sy_dist": [1.0, None, 1.0],
+                "pl_eqt": [None, 273.15, 273.15],
+            }
+        )
+
+        _, _, known_both, distance_unknown, candidates = _combine_groups(data, 5, (0, 30), True)
+
+        self.assertEqual(known_both["pl_name"].tolist(), [None])
+        self.assertEqual(distance_unknown["pl_name"].tolist(), ["Unknown temperature"])
+        self.assertEqual(_candidate_names(candidates), ["Unknown temperature"])
 
     def test_temperature_groups_can_use_the_full_population_independently(self):
         data = pd.DataFrame(

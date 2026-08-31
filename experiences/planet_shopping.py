@@ -43,6 +43,11 @@ _UNKNOWN_TEMPERATURE_OPTIONS = (
     "Take the risk — keep unknowns as possibilities",
     "Play it safe — set unknowns aside",
 )
+_COMBINE_DISTANCE_CONTROL_KEY = "planet_shopping_combine_distance_control_ly"
+_COMBINE_TEMPERATURE_CONTROL_KEY = "planet_shopping_combine_temperature_control_c"
+_COMBINE_UNKNOWN_CONTROL_KEY = "planet_shopping_combine_unknown_temperature_control"
+_COMBINE_REVEAL_KEY = "planet_shopping_combine_result_revealed"
+_COMBINE_DESTINATION_KEY = "planet_shopping_combine_destination"
 
 
 def _catalogue_counts(data: pd.DataFrame, current_year: int | None = None) -> dict[str, int]:
@@ -108,6 +113,43 @@ def _initialise_unknown_temperature_control(state: dict) -> str:
             _UNKNOWN_TEMPERATURE_DECISION_KEY, _UNKNOWN_TEMPERATURE_OPTIONS[0]
         )
     return state[_UNKNOWN_TEMPERATURE_CONTROL_KEY]
+
+
+def _combine_groups(
+    data: pd.DataFrame,
+    maximum_distance_ly: int,
+    temperature_range_c: tuple[int, int],
+    keep_unknowns: bool,
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Return separate criteria and intersection groups for the Combine screen."""
+    distance_matches = _filter_distance_light_years(
+        _known_distance_population(data), maximum_distance_ly
+    )
+    temperature_matches, _, temperature_unknown = _split_temperature_groups(
+        data, temperature_range_c
+    )
+    known_both = _filter_distance_light_years(temperature_matches, maximum_distance_ly)
+    distance_unknown = _filter_distance_light_years(temperature_unknown, maximum_distance_ly)
+    candidates = (
+        pd.concat([known_both, distance_unknown], ignore_index=True)
+        if keep_unknowns
+        else known_both.copy()
+    )
+    return distance_matches, temperature_matches, known_both, distance_unknown, candidates
+
+
+def _initialise_combine_control(
+    state: dict, control_key: str, applied_key: str, default
+):
+    """Seed a Combine widget from its durable earlier-screen choice."""
+    if control_key not in state:
+        state[control_key] = state.get(applied_key, default)
+    return state[control_key]
+
+
+def _candidate_names(candidates: pd.DataFrame) -> list[str]:
+    """Return a deterministic, manageable set of real catalogue planet names."""
+    return sorted(candidates.dropna(subset=["pl_name"]).drop_duplicates("pl_name")["pl_name"].astype(str).head(12).tolist())
 
 
 def _render_temperature(data: pd.DataFrame) -> None:
@@ -312,15 +354,117 @@ def _render_distance(data: pd.DataFrame) -> None:
     st.write("The planet data did not change. The filter changed which records remain in the search.")
 
 
-def _render_combine() -> None:
+def _render_combine(data: pd.DataFrame) -> None:
     st.subheader("🛒 Combine")
-    st.warning("**Rough intersection prototype — no final controls yet.**")
-    st.write("Now imagine choosing several things that matter: size **and** temperature **and** distance from Earth.")
-    st.markdown(
-        "A candidate must meet **all** active criteria to remain in the search. Each added criterion can make "
-        "the candidate list smaller."
+    st.write(
+        "Your choices now have to work together: distance **and** estimated equilibrium "
+        "temperature, with a decision about unknown temperatures."
     )
-    st.info("This stage is about the intersection of filters, not repeating the one-variable lesson.")
+    st.markdown("#### Your choices")
+    _initialise_combine_control(st.session_state, _COMBINE_DISTANCE_CONTROL_KEY, _APPLIED_DISTANCE_KEY, 500)
+    combine_distance = st.slider(
+        "Maximum distance (light-years)",
+        min_value=10,
+        max_value=2_000,
+        step=10,
+        key=_COMBINE_DISTANCE_CONTROL_KEY,
+    )
+    st.session_state[_APPLIED_DISTANCE_KEY] = combine_distance
+
+    _initialise_combine_control(
+        st.session_state, _COMBINE_TEMPERATURE_CONTROL_KEY, _APPLIED_TEMPERATURE_KEY, (0, 30)
+    )
+    combine_temperature = st.slider(
+        "Acceptable estimated equilibrium temperature (°C)",
+        min_value=-200,
+        max_value=2_000,
+        step=10,
+        key=_COMBINE_TEMPERATURE_CONTROL_KEY,
+    )
+    combine_temperature = (int(combine_temperature[0]), int(combine_temperature[1]))
+    st.session_state[_APPLIED_TEMPERATURE_KEY] = combine_temperature
+
+    _initialise_combine_control(
+        st.session_state,
+        _COMBINE_UNKNOWN_CONTROL_KEY,
+        _UNKNOWN_TEMPERATURE_DECISION_KEY,
+        _UNKNOWN_TEMPERATURE_OPTIONS[0],
+    )
+    combine_unknown_decision = st.radio(
+        "Unknown-temperature policy",
+        options=_UNKNOWN_TEMPERATURE_OPTIONS,
+        key=_COMBINE_UNKNOWN_CONTROL_KEY,
+    )
+    st.session_state[_UNKNOWN_TEMPERATURE_DECISION_KEY] = combine_unknown_decision
+    keep_unknowns = combine_unknown_decision == _UNKNOWN_TEMPERATURE_OPTIONS[0]
+
+    distance_matches, temperature_matches, known_both, distance_unknown, candidates = _combine_groups(
+        data, int(combine_distance), combine_temperature, keep_unknowns
+    )
+    st.markdown("#### Each criterion on its own")
+    distance_count, temperature_count = st.columns(2)
+    with distance_count:
+        st.metric("Within the distance criterion", f"{len(distance_matches):,}")
+        st.caption("Records with a known system distance inside your limit.")
+    with temperature_count:
+        st.metric("Known temperature matches", f"{len(temperature_matches):,}")
+        st.caption("Records with a recorded estimated temperature inside your range.")
+    st.markdown(
+        "A missing distance is omitted from the distance population. A missing temperature "
+        "is still unknown — it is not counted as a temperature non-match."
+    )
+    think_q("How many do you think satisfy both?", title="Think")
+    if not hard_reveal(
+        "Make your prediction before seeing the combined result.",
+        _COMBINE_REVEAL_KEY,
+        reveal_label="Show the combined result",
+    ):
+        return
+
+    st.markdown("#### The intersection")
+    known_both_count, unknown_count, possible_count = st.columns(3)
+    with known_both_count:
+        st.metric("Known to satisfy both", f"{len(known_both):,}")
+    with unknown_count:
+        st.metric("Within distance, temperature unknown", f"{len(distance_unknown):,}")
+    with possible_count:
+        st.metric("Possible shortlist", f"{len(candidates):,}")
+    st.write(
+        "The known-both group meets both criteria. The second group meets the distance "
+        "criterion, but its temperature is unknown. Your risk/safe choice decides whether "
+        "that second group remains possible."
+    )
+
+    names = _candidate_names(candidates)
+    if not names:
+        st.warning("No surviving catalogue planets match this combination of choices yet.")
+        return
+
+    st.markdown("#### Choose a destination from the shortlist")
+    destination_name = st.selectbox(
+        "Select one real catalogue planet to inspect",
+        names,
+        key=_COMBINE_DESTINATION_KEY,
+    )
+    destination = candidates.loc[candidates["pl_name"].astype(str) == destination_name].iloc[0]
+    distance_text = _value_or_unknown(
+        destination["sy_dist"], lambda value: f"{value * PARSEC_TO_LIGHT_YEARS:.0f} light-years"
+    )
+    temperature_text = _value_or_unknown(
+        destination["pl_eqt"], lambda value: f"{value - 273.15:.0f}°C estimated equilibrium temperature"
+    )
+    size_text = _value_or_unknown(destination["pl_rade"], lambda value: f"{value:.2f} Earth radii")
+    evidence_left, evidence_right = st.columns(2)
+    with evidence_left:
+        st.metric("Distance", distance_text)
+        st.metric("Estimated temperature", temperature_text)
+    with evidence_right:
+        st.metric("Size", size_text)
+        st.metric("Stars in system", _value_or_unknown(destination["sy_snum"], lambda value: f"{int(value)}"))
+    st.write(
+        "Explain your choice: which evidence matches your shopping criteria, what remains "
+        "unknown, and why this is your best available option. Temperature is not a claim of habitability."
+    )
 
 
 def _render_data_science() -> None:
@@ -365,7 +509,7 @@ def render(data: pd.DataFrame) -> None:
     elif stage == 3:
         _render_temperature(data)
     elif stage == 4:
-        _render_combine()
+        _render_combine(data)
     else:
         _render_data_science()
 
