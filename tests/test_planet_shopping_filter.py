@@ -5,12 +5,17 @@ import unittest
 import pandas as pd
 
 from experiences.planet_shopping import (
+    PARSEC_TO_LIGHT_YEARS,
     STAGE_LABELS,
     _APPLIED_DISTANCE_KEY,
     _DISTANCE_CONTROL_KEY,
     _DISTANCE_INTERACTED_KEY,
     _initialise_distance_control,
     _record_distance_interaction,
+    _distance_profile,
+    _planet_display_value,
+    _random_planet_name,
+    _temperature_profile,
     _UNKNOWN_TEMPERATURE_OPTIONS,
     _combine_groups,
     _candidate_names,
@@ -24,6 +29,23 @@ from experiences.planet_shopping import (
 
 
 class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
+    def test_random_planet_name_comes_from_named_catalogue_and_changes_when_possible(self):
+        data = pd.DataFrame({"pl_name": ["Planet A", "Planet B", None]})
+
+        selected = _random_planet_name(data, current="Planet A")
+
+        self.assertEqual(selected, "Planet B")
+
+    def test_profile_values_use_learner_facing_units(self):
+        self.assertEqual(_temperature_profile(273.15)[0], "0 °C")
+        self.assertEqual(_distance_profile(1.0)[0], f"{PARSEC_TO_LIGHT_YEARS:.0f} light-years")
+
+    def test_profile_missing_value_is_explicitly_unknown(self):
+        value, interpretation = _planet_display_value(None, _temperature_profile)
+
+        self.assertEqual(value, "Unknown")
+        self.assertEqual(interpretation, "We don't know this one yet.")
+
     def test_distance_result_stays_hidden_until_slider_moves_and_choice_is_durable(self):
         state = {}
 

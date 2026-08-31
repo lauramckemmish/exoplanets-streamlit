@@ -5,6 +5,7 @@ See ``planet_shopping.md`` for the established pedagogical design.
 
 from datetime import date
 from pathlib import Path
+import random
 
 import pandas as pd
 import streamlit as st
@@ -51,6 +52,8 @@ _COMBINE_TEMPERATURE_CONTROL_KEY = "planet_shopping_combine_temperature_control_
 _COMBINE_UNKNOWN_CONTROL_KEY = "planet_shopping_combine_unknown_temperature_control"
 _COMBINE_REVEAL_KEY = "planet_shopping_combine_result_revealed"
 _COMBINE_DESTINATION_KEY = "planet_shopping_combine_destination"
+_BROWSED_PLANET_KEY = "planet_shopping_browsed_planet"
+_BROWSED_PLANET_BUTTON_KEY = "planet_shopping_browsed_planet_button"
 
 
 def _catalogue_counts(data: pd.DataFrame, current_year: int | None = None) -> dict[str, int]:
@@ -68,6 +71,71 @@ def _catalogue_counts(data: pd.DataFrame, current_year: int | None = None) -> di
 def _value_or_unknown(value, formatter) -> str:
     """Format a catalogue value without treating a missing value as zero."""
     return "Unknown" if pd.isna(value) else formatter(value)
+
+
+def _random_planet_name(data: pd.DataFrame, current: str | None = None, rng=random) -> str:
+    """Choose a real catalogue planet, preferring a different one when possible."""
+    names = sorted(data["pl_name"].dropna().astype(str).unique())
+    if not names:
+        raise ValueError("The prepared catalogue contains no named planets")
+    choices = [name for name in names if name != current] or names
+    return rng.choice(choices)
+
+
+def _planet_display_value(value, formatter: callable) -> tuple[str, str]:
+    """Return a readable value and plain-language interpretation for a profile item."""
+    if pd.isna(value):
+        return "Unknown", "We don't know this one yet."
+    return formatter(value)
+
+
+def _temperature_profile(value) -> tuple[str, str]:
+    celsius = float(value) - 273.15
+    if celsius < -50:
+        interpretation = "Extremely cold."
+    elif celsius < 10:
+        interpretation = "Cold."
+    elif celsius <= 35:
+        interpretation = "In a comfortable Earth-like range."
+    elif celsius <= 100:
+        interpretation = "Hotter than a summer day on Earth."
+    else:
+        interpretation = "Extremely hot."
+    return f"{celsius:.0f} °C", interpretation
+
+
+def _distance_profile(value) -> tuple[str, str]:
+    light_years = float(value) * PARSEC_TO_LIGHT_YEARS
+    interpretation = "Relatively nearby for an exoplanet." if light_years < 100 else "A very long trip from Earth."
+    return f"{light_years:.0f} light-years", interpretation
+
+
+def _size_profile(value) -> tuple[str, str]:
+    size = float(value)
+    if size < 0.95:
+        interpretation = "Smaller than Earth."
+    elif size > 1.05:
+        interpretation = "Bigger than Earth."
+    else:
+        interpretation = "About the size of Earth."
+    return f"{size:.1f} × Earth", interpretation
+
+
+def _stars_profile(value) -> tuple[str, str]:
+    stars = int(value)
+    interpretation = "One sun in the sky." if stars == 1 else f"{stars} suns in the sky."
+    return str(stars), interpretation
+
+
+def _year_profile(value) -> tuple[str, str]:
+    days = float(value)
+    interpretation = "Birthdays come around fast." if days < 365 else "A long trip around its star."
+    return f"{days:.0f} Earth days", interpretation
+
+
+def _render_planet_property(label: str, value, formatter: callable) -> None:
+    display_value, interpretation = _planet_display_value(value, formatter)
+    st.markdown(f"**{label}**  \n**{display_value}**  \n*{interpretation}*")
 
 
 def _split_temperature_groups(
@@ -233,18 +301,9 @@ def _render_launch(data: pd.DataFrame) -> None:
 
     with st.container(width="content"):
         st.markdown("#### Where can we go?")
-        st.write("Earth is one planet in our Solar System.")
-        st.markdown("**Pause and discuss**")
-        st.markdown("**Could we just move somewhere else in our Solar System?**")
-        st.write("The other planets in our Solar System are not obvious replacements for Earth.")
-        st.markdown("**Maybe we need to look further away.**")
-
-    st.markdown("#### Look beyond the Sun")
-    st.write("The Sun is our star.")
-    st.markdown("**Pause and discuss**")
-    st.markdown("**The Sun is our star. Could other stars have planets too?**")
-    st.write("Other stars can have their own planetary systems.")
-    st.write("An **exoplanet** is a planet outside our Solar System.")
+        st.write("Earth is unavailable. Could we go somewhere else in our Solar System?")
+        st.write("The other planets are not much of a replacement, so let's look beyond the Sun.")
+        st.write("The Sun is our star. Other stars can have planets too: these are exoplanets.")
 
     st.markdown("#### A catalogue that keeps growing")
     catalogue_revealed = hard_reveal(
@@ -284,28 +343,20 @@ def _planet_visual_style(planet: pd.Series) -> tuple[int, str, str]:
 
 
 def _render_meet_your_planet(data: pd.DataFrame) -> None:
-    st.subheader("🛰️ Meet Your Planet")
-    st.write("A catalogue records measurements, but each row still describes a real world. Choose one planet to inspect.")
-    names = sorted(data["pl_name"].dropna().astype(str).unique())
-    planet_name = st.selectbox(
-        "Choose or search for a planet",
-        names,
-        key="planet_shopping_selected_planet",
+    st.subheader("🛰️ Meet a Planet")
+    st.write("**Pick a planet. Any planet.** Browse a few real worlds before we find a better way to search.")
+    if _BROWSED_PLANET_KEY not in st.session_state:
+        st.session_state[_BROWSED_PLANET_KEY] = _random_planet_name(data)
+    st.button(
+        "Show me another planet",
+        key=_BROWSED_PLANET_BUTTON_KEY,
+        on_click=lambda: st.session_state.__setitem__(
+            _BROWSED_PLANET_KEY,
+            _random_planet_name(data, st.session_state.get(_BROWSED_PLANET_KEY)),
+        ),
     )
+    planet_name = st.session_state[_BROWSED_PLANET_KEY]
     planet = data.loc[data["pl_name"].astype(str) == planet_name].iloc[0]
-
-    temperature = _value_or_unknown(
-        planet["pl_eqt"],
-        lambda value: f"{value:.0f} K (about {value - 273.15:.0f}°C)",
-    )
-    distance = _value_or_unknown(
-        planet["sy_dist"],
-        lambda value: f"{value * PARSEC_TO_LIGHT_YEARS:.0f} light-years",
-    )
-    radius = _value_or_unknown(planet["pl_rade"], lambda value: f"{value:.2f} Earth radii")
-    stars = _value_or_unknown(planet["sy_snum"], lambda value: f"{int(value)}")
-    known_planets = _value_or_unknown(planet["sy_pnum"], lambda value: f"{int(value)}")
-    year_length = _value_or_unknown(planet["pl_orbper"], lambda value: f"{value:.1f} days")
     planet_size, planet_colour, colour_description = _planet_visual_style(planet)
 
     portrait, details = st.columns([1, 2])
@@ -324,22 +375,15 @@ def _render_meet_your_planet(data: pd.DataFrame) -> None:
             st.caption("Symbolic data portrait — colour and size are not to scale.")
     with details:
         st.markdown("#### Planet profile")
-        top_left, top_right, top_far = st.columns(3)
+        top_left, top_right = st.columns(2)
         with top_left:
-            st.metric("Estimated temperature", temperature)
+            _render_planet_property("🌡️ Temperature", planet["pl_eqt"], _temperature_profile)
+            _render_planet_property("🚀 Distance", planet["sy_dist"], _distance_profile)
+            _render_planet_property("🌍 Size", planet["pl_rade"], _size_profile)
         with top_right:
-            st.metric("Size relative to Earth", radius)
-        with top_far:
-            st.metric("Distance from Earth", distance)
-        st.markdown("**Its planetary system**")
-        system_left, system_middle, system_right = st.columns(3)
-        with system_left:
-            st.metric("Stars in the system", stars)
-        with system_middle:
-            st.metric("Known planets", known_planets)
-        with system_right:
-            st.metric("Year length", year_length)
-    st.caption("Unknown means this value has not been recorded in the catalogue. It does not mean zero or a failed planet.")
+            _render_planet_property("☀️ Stars in the system", planet["sy_snum"], _stars_profile)
+            _render_planet_property("📅 Year length", planet["pl_orbper"], _year_profile)
+    st.write("You could keep doing this. There are thousands of planets in the catalogue. Maybe we need a better way to shop.")
 
 
 def _render_distance(data: pd.DataFrame) -> None:

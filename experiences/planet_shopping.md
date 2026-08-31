@@ -28,17 +28,39 @@ experience in code. Return the question for design review.
 
 Establish:
 
-Earth → Solar System → Sun is a star → other stars can have planets →
-exoplanets → astronomers have organised thousands of discovered worlds into data.
+Earth is unavailable → could we go somewhere else in our Solar System? → the
+other planets are not much of a replacement → look beyond the Sun → other
+stars can have planets → astronomers have organised thousands of known
+exoplanets into data.
 
-Preserve the existing implemented Launch unless separately asked to change it.
+Preserve the catalogue hard reveal and strong catalogue-growth end state. Keep
+the opening concise and do not add explanatory text beyond this story.
 
-### 2. Meet Your Planet — What does a planet look like as data?
+### 2. Meet a Planet — Pick a planet. Any planet.
 
-Students inspect one real exoplanet as a planet-centred data profile.
+Show one random real planet from the current prepared NASA dataframe. Provide
+one clear action, **Show me another planet**, which shows another real planet
+on each activation. Do not require searching by name.
 
-Preserve the existing implemented Meet Your Planet screen unless separately
-asked to change it.
+The purpose is casual browsing and recognition that inspecting thousands of
+planets one by one is not an efficient search strategy.
+
+Each compact planet portrait should show, where available:
+
+- estimated equilibrium temperature in °C;
+- distance from Earth in light-years;
+- size relative to Earth;
+- stars in the system;
+- year length in Earth days.
+
+Each property includes the variable name, a learner-readable value and a short
+plain-language interpretation. Missing values remain **Unknown** with a brief
+explanation; they are never treated as zero, failure or non-match. The
+symbolic portrait may use temperature category as meaningful colour encoding,
+but must remain compact and readable at ordinary laptop width.
+
+End with a short transition: there are thousands of planets, so a better way
+to shop is needed.
 
 ### 3. Distance — How far are you willing to go?
 
@@ -118,7 +140,13 @@ Then inspect the surviving real planets and choose a destination.
 **Planet size is not a required core filter in the current pathway.**
 Additional planet properties may appear when comparing shortlisted planets.
 
-### 6. Data Science — What did you just do?
+### 6. Destination — Which planet would you choose?
+
+Learners inspect evidence for a surviving candidate and choose a destination.
+The destination choice is evidence-based and qualified; do not claim that the
+chosen planet is habitable.
+
+### 7. Data Science — What did you just do?
 
 Make the transferable process explicit:
 
@@ -134,11 +162,12 @@ Planet Shopping owns its own session state.
 
 Persist at least:
 
-- selected planet from Screen 2 where required;
+- browsed planet state from Screen 2 where required;
 - distance threshold from Screen 3;
 - temperature range from Screen 4;
 - unknown-temperature decision from Screen 4;
-- Screen 5 reveal state as needed.
+- Screen 5 reveal state as needed;
+- selected destination from Screen 6 where required.
 
 Do not couple this experience to Tatooine session state.
 
@@ -163,7 +192,7 @@ responsive layout and reuse of shared components.
 
 Codex should not independently:
 
-- add or remove learning screens;
+- add or remove learning screens from the seven-screen sequence;
 - add new core filtering variables;
 - reorder the reasoning sequence;
 - reinterpret missing values;
