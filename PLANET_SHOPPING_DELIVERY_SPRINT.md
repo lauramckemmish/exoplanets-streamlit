@@ -54,7 +54,7 @@ One screen should have one obvious main cognitive job.
 
 ## Current pointer
 
-> **CURRENT: PS-04 — Distance + Temperature choreography**
+> **CURRENT: PS-02 — Combine + Choose Your Destination**
 
 Everything else in this document is context, not permission to modify it.
 
@@ -97,12 +97,12 @@ Temperature acceptance criteria:
 - learner chooses either **Take the risk — keep unknowns as possibilities** or **Play it safe — set unknowns aside**;
 - temperature range and unknown-temperature decision persist for Screen 5;
 - unknown is never represented as zero, failure, or known non-match;
-- navigation exposes the six established stages;
+- navigation exposes the seven established stages;
 - appropriate tests/checks pass;
 - unrelated experiences remain unchanged.
 
-### PS-02 — Combine screen and destination choice
-**Status: DONE**
+### PS-02 — Combine + Choose Your Destination
+**Status: CURRENT**
 
 Implement the main intersection/evidence-based-decision screen.
 
@@ -118,10 +118,14 @@ Acceptance criteria:
   - within distance but temperature unknown;
 - risk/safe decision determines whether temperature-unknown candidates remain possible;
 - after first reveal, controls update combined result live;
-- show a manageable shortlist of real surviving planets;
-- allow learner to choose a destination;
+- show a manageable combined shortlist count and bounded overlap representation;
+- leave destination inspection and choice to the separate Destination screen;
 - additional planet properties may support comparison but do not become new core filters;
 - a Venn-style overlap is preferred, but a robust intelligible representation takes priority over bespoke visual polish.
+
+The separate Destination screen lets learners inspect the surviving real
+planets using the existing profile and choose one using evidence. A destination
+choice is not required on Combine.
 
 ### PS-03 — Data Science landing
 **Status: DONE**
@@ -139,7 +143,7 @@ Acceptance criteria:
 - keep the screen concise enough for a facilitated 50-minute workshop.
 
 ### PS-04 — Distance + Temperature choreography
-**Status: CURRENT**
+**Status: DONE**
 
 Bring the Distance and Temperature screens into alignment with the facilitator brief and canonical sequence.
 
@@ -181,7 +185,7 @@ Check at minimum:
 
 Protect the core arc if time is tight:
 
-**Distance → Temperature → Combine → Data Science**.
+**Distance → Temperature → Combine → Choose Your Destination → Data Science**.
 
 ### PS-06 — Tests, deployed smoke test and delivery freeze
 **Status: TODO**

@@ -26,6 +26,7 @@ STAGE_LABELS = [
     "Distance",
     "Temperature",
     "Combine",
+    "Choose Your Destination",
     "Data Science",
 ]
 
@@ -55,6 +56,8 @@ _COMBINE_TEMPERATURE_CONTROL_KEY = "planet_shopping_combine_temperature_control_
 _COMBINE_UNKNOWN_CONTROL_KEY = "planet_shopping_combine_unknown_temperature_control"
 _COMBINE_REVEAL_KEY = "planet_shopping_combine_result_revealed"
 _COMBINE_DESTINATION_KEY = "planet_shopping_combine_destination"
+_DESTINATION_CONTROL_KEY = "planet_shopping_destination_control"
+_APPLIED_DESTINATION_KEY = "planet_shopping_applied_destination"
 _BROWSED_PLANET_KEY = "planet_shopping_browsed_planet"
 _BROWSED_PLANET_BUTTON_KEY = "planet_shopping_browsed_planet_button"
 _TEMPERATURE_UNKNOWN_REVEAL_KEY = "planet_shopping_temperature_unknown_revealed"
@@ -257,6 +260,43 @@ def _candidate_names(candidates: pd.DataFrame) -> list[str]:
     return sorted(candidates.dropna(subset=["pl_name"]).drop_duplicates("pl_name")["pl_name"].astype(str).head(12).tolist())
 
 
+def _initialise_destination_control(state: dict, names: list[str]) -> str | None:
+    """Seed the destination choice from the durable selection, if it is valid."""
+    current = state.get(_DESTINATION_CONTROL_KEY)
+    if current not in names:
+        previous = state.get(_APPLIED_DESTINATION_KEY, state.get(_COMBINE_DESTINATION_KEY))
+        state[_DESTINATION_CONTROL_KEY] = previous if previous in names else None
+    return state[_DESTINATION_CONTROL_KEY]
+
+
+def _record_destination_selection(state: dict, destination_name: str | None) -> bool:
+    """Persist a destination only after the learner selects a shortlist item."""
+    if destination_name is not None:
+        state[_APPLIED_DESTINATION_KEY] = destination_name
+    return destination_name is not None
+
+
+def _render_overlap_visual(
+    distance_count: int, temperature_count: int, known_both_count: int
+) -> None:
+    """Show a small local overlap visual for the two independent criteria."""
+    st.markdown("#### Where the criteria overlap")
+    st.markdown(
+        f"""
+        <div style="display:flex; justify-content:center; align-items:center; gap:0; margin:.5rem 0 1rem;">
+          <div style="width:150px; height:90px; border:2px solid #3F61C4; border-radius:50%; padding:1.1rem .5rem .2rem; text-align:center; margin-right:-18px; background:#3F61C422;">
+            Distance<br><strong>{distance_count:,}</strong>
+          </div>
+          <div style="width:150px; height:90px; border:2px solid #007882; border-radius:50%; padding:1.1rem .5rem .2rem; text-align:center; background:#00788222;">
+            Temperature<br><strong>{temperature_count:,}</strong>
+          </div>
+        </div>
+        <div style="text-align:center; font-size:.9rem;">Known to meet both: <strong>{known_both_count:,}</strong></div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def _render_temperature(data: pd.DataFrame) -> None:
     """Render the independent temperature criterion and missing-data decision."""
     st.subheader("🌡️ Temperature")
@@ -341,23 +381,9 @@ def _planet_visual_style(planet: pd.Series) -> tuple[int, str, str]:
     return diameter, "#B570C9", "Middle-range colour"
 
 
-def _render_meet_your_planet(data: pd.DataFrame) -> None:
-    st.subheader("🛰️ Meet a Planet")
-    st.write("**Pick a planet. Any planet.** Browse a few real worlds before we find a better way to search.")
-    if _BROWSED_PLANET_KEY not in st.session_state:
-        st.session_state[_BROWSED_PLANET_KEY] = _random_planet_name(data)
-    st.button(
-        "Show me another planet",
-        key=_BROWSED_PLANET_BUTTON_KEY,
-        on_click=lambda: st.session_state.__setitem__(
-            _BROWSED_PLANET_KEY,
-            _random_planet_name(data, st.session_state.get(_BROWSED_PLANET_KEY)),
-        ),
-    )
-    planet_name = st.session_state[_BROWSED_PLANET_KEY]
-    planet = data.loc[data["pl_name"].astype(str) == planet_name].iloc[0]
+def _render_planet_profile(planet_name: str, planet: pd.Series) -> None:
+    """Render the compact evidence profile shared by browsing and destination choice."""
     planet_size, planet_colour, colour_description = _planet_visual_style(planet)
-
     portrait, details = st.columns([1, 2])
     with portrait:
         with st.container(border=True):
@@ -382,6 +408,24 @@ def _render_meet_your_planet(data: pd.DataFrame) -> None:
         with top_right:
             _render_planet_property("☀️ Stars in the system", planet["sy_snum"], _stars_profile)
             _render_planet_property("📅 Year length", planet["pl_orbper"], _year_profile)
+
+
+def _render_meet_your_planet(data: pd.DataFrame) -> None:
+    st.subheader("🛰️ Meet a Planet")
+    st.write("**Pick a planet. Any planet.** Browse a few real worlds before we find a better way to search.")
+    if _BROWSED_PLANET_KEY not in st.session_state:
+        st.session_state[_BROWSED_PLANET_KEY] = _random_planet_name(data)
+    st.button(
+        "Show me another planet",
+        key=_BROWSED_PLANET_BUTTON_KEY,
+        on_click=lambda: st.session_state.__setitem__(
+            _BROWSED_PLANET_KEY,
+            _random_planet_name(data, st.session_state.get(_BROWSED_PLANET_KEY)),
+        ),
+    )
+    planet_name = st.session_state[_BROWSED_PLANET_KEY]
+    planet = data.loc[data["pl_name"].astype(str) == planet_name].iloc[0]
+    _render_planet_profile(planet_name, planet)
 
     st.markdown("#### A catalogue that keeps growing")
     catalogue_revealed = hard_reveal(
@@ -442,10 +486,7 @@ def _render_distance(data: pd.DataFrame) -> None:
 
 def _render_combine(data: pd.DataFrame) -> None:
     st.subheader("🛒 Combine")
-    st.write(
-        "Your choices now have to work together: distance **and** estimated equilibrium "
-        "temperature, with a decision about unknown temperatures."
-    )
+    st.write("You want a planet you can reach **AND** a temperature you can live with.")
     st.markdown("#### Your choices")
     _initialise_combine_control(st.session_state, _COMBINE_DISTANCE_CONTROL_KEY, _APPLIED_DISTANCE_KEY, 500)
     combine_distance = st.slider(
@@ -495,10 +536,6 @@ def _render_combine(data: pd.DataFrame) -> None:
     with temperature_count:
         st.metric("Known temperature matches", f"{len(temperature_matches):,}")
         st.caption("Records with a recorded estimated temperature inside your range.")
-    st.markdown(
-        "A missing distance is omitted from the distance population. A missing temperature "
-        "is still unknown — it is not counted as a temperature non-match."
-    )
     think_q("How many do you think satisfy both?", title="Think")
     if not hard_reveal(
         "Make your prediction before seeing the combined result.",
@@ -507,50 +544,53 @@ def _render_combine(data: pd.DataFrame) -> None:
     ):
         return
 
-    st.markdown("#### The intersection")
-    known_both_count, unknown_count, possible_count = st.columns(3)
-    with known_both_count:
-        st.metric("Known to satisfy both", f"{len(known_both):,}")
-    with unknown_count:
-        st.metric("Within distance, temperature unknown", f"{len(distance_unknown):,}")
-    with possible_count:
-        st.metric("Possible shortlist", f"{len(candidates):,}")
-    st.write(
-        "The known-both group meets both criteria. The second group meets the distance "
-        "criterion, but its temperature is unknown. Your risk/safe choice decides whether "
-        "that second group remains possible."
-    )
+    st.metric("Possible planets satisfying both", f"{len(candidates):,}")
+    _render_overlap_visual(len(distance_matches), len(temperature_matches), len(known_both))
+    if keep_unknowns and len(distance_unknown):
+        st.caption("Some of these are still possibilities because their temperature is unknown.")
+    st.write(f"You've narrowed thousands of planets to **{len(candidates):,} possibilities**.")
 
+
+def _render_destination(data: pd.DataFrame) -> None:
+    st.subheader("🪐 Choose Your Destination")
+    st.write("Inspect a few possibilities, then choose one using the evidence.")
+
+    combine_distance = int(st.session_state.get(_COMBINE_DISTANCE_CONTROL_KEY, st.session_state.get(_APPLIED_DISTANCE_KEY, _DISTANCE_DEFAULT_VALUE)))
+    combine_temperature = st.session_state.get(_COMBINE_TEMPERATURE_CONTROL_KEY, st.session_state.get(_APPLIED_TEMPERATURE_KEY, (0, 30)))
+    combine_unknown_decision = st.session_state.get(_COMBINE_UNKNOWN_CONTROL_KEY, st.session_state.get(_UNKNOWN_TEMPERATURE_DECISION_KEY, _UNKNOWN_TEMPERATURE_OPTIONS[0]))
+    _, _, _, _, candidates = _combine_groups(
+        data,
+        combine_distance,
+        tuple(int(value) for value in combine_temperature),
+        combine_unknown_decision == _UNKNOWN_TEMPERATURE_OPTIONS[0],
+    )
     names = _candidate_names(candidates)
     if not names:
-        st.warning("No surviving catalogue planets match this combination of choices yet.")
+        st.warning("Your criteria produced no destination.")
+        st.info("Go back to Combine and adjust your distance, temperature range or unknown-temperature choice.")
+        completion_gate(False)
         return
+    if len(candidates.dropna(subset=["pl_name"]).drop_duplicates("pl_name")) > len(names):
+        st.caption("Showing 12 catalogue planets from your shortlist; this is not a ranking.")
 
-    st.markdown("#### Choose a destination from the shortlist")
+    previous = _initialise_destination_control(st.session_state, names)
+    index = names.index(previous) if previous in names else None
     destination_name = st.selectbox(
-        "Select one real catalogue planet to inspect",
+        "Which planet would you choose?",
         names,
-        key=_COMBINE_DESTINATION_KEY,
+        index=index,
+        key=_DESTINATION_CONTROL_KEY,
     )
+    selected = _record_destination_selection(st.session_state, destination_name)
+    if not selected:
+        completion_gate(False)
+        return
     destination = candidates.loc[candidates["pl_name"].astype(str) == destination_name].iloc[0]
-    distance_text = _value_or_unknown(
-        destination["sy_dist"], lambda value: f"{value * PARSEC_TO_LIGHT_YEARS:.0f} light-years"
-    )
-    temperature_text = _value_or_unknown(
-        destination["pl_eqt"], lambda value: f"{value - 273.15:.0f}°C estimated equilibrium temperature"
-    )
-    size_text = _value_or_unknown(destination["pl_rade"], lambda value: f"{value:.2f} Earth radii")
-    evidence_left, evidence_right = st.columns(2)
-    with evidence_left:
-        st.metric("Distance", distance_text)
-        st.metric("Estimated temperature", temperature_text)
-    with evidence_right:
-        st.metric("Size", size_text)
-        st.metric("Stars in system", _value_or_unknown(destination["sy_snum"], lambda value: f"{int(value)}"))
-    st.write(
-        "Explain your choice: which evidence matches your shopping criteria, what remains "
-        "unknown, and why this is your best available option. Temperature is not a claim of habitability."
-    )
+    _render_planet_profile(destination_name, destination)
+    st.write("Why did you choose that one? Look for evidence that fits what matters to you, and notice what remains unknown.")
+    if selected:
+        st.success("Given what we know and what matters to you, this is the planet you chose.")
+    completion_gate(selected)
 
 
 def _render_data_science() -> None:
@@ -592,7 +632,7 @@ def _render_data_science() -> None:
 
 
 def render(data: pd.DataFrame) -> None:
-    """Render the six-stage live prototype using the shared prepared dataset."""
+    """Render the seven-stage workshop using the shared prepared dataset."""
     if _STAGE_KEY not in st.session_state:
         st.session_state[_STAGE_KEY] = 0
 
@@ -617,6 +657,8 @@ def render(data: pd.DataFrame) -> None:
         _render_temperature(data)
     elif stage == 4:
         _render_combine(data)
+    elif stage == 5:
+        _render_destination(data)
     else:
         _render_data_science()
 

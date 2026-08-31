@@ -160,16 +160,23 @@ must not imply that unknown temperature means non-match.
 After the first reveal, learners may change the three controls and see the
 combined result update live.
 
-Then inspect the surviving real planets and choose a destination.
+Use a simple bounded overlap visual to show the distance-only group, the known
+temperature-only group and the known-both group. Keep the combined shortlist as
+the dominant result. If learners take the risk, qualify the result quietly by
+noting that some possibilities have unknown temperature; if they play it safe,
+unknown-temperature records stay out of the shortlist. Do not choose a
+destination on this screen.
 
 **Planet size is not a required core filter in the current pathway.**
-Additional planet properties may appear when comparing shortlisted planets.
 
-### 6. Destination — Which planet would you choose?
+### 6. Choose Your Destination — Which planet would you choose?
 
-Learners inspect evidence for a surviving candidate and choose a destination.
-The destination choice is evidence-based and qualified; do not claim that the
-chosen planet is habitable.
+Learners inspect a manageable, honestly labelled shortlist derived from their
+combined criteria, using the existing Meet-a-Planet profile machinery. They
+choose one candidate using evidence and the choice persists for the final
+reflection. Do not rank candidates, score habitability or claim that the chosen
+planet is habitable. If there are no candidates, direct learners back to
+Combine to adjust their criteria.
 
 ### 7. Data Science — What did you just do?
 

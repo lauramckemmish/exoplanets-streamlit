@@ -8,6 +8,7 @@ from experiences.planet_shopping import (
     PARSEC_TO_LIGHT_YEARS,
     STAGE_LABELS,
     _APPLIED_DISTANCE_KEY,
+    _APPLIED_DESTINATION_KEY,
     _DISTANCE_CONTROL_KEY,
     _DISTANCE_INTERACTED_KEY,
     _format_travel_years,
@@ -22,6 +23,8 @@ from experiences.planet_shopping import (
     _UNKNOWN_TEMPERATURE_OPTIONS,
     _combine_groups,
     _candidate_names,
+    _initialise_destination_control,
+    _record_destination_selection,
     _UNKNOWN_TEMPERATURE_CONTROL_KEY,
     _UNKNOWN_TEMPERATURE_DECISION_KEY,
     _filter_distance_light_years,
@@ -77,11 +80,37 @@ class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
         state[_UNKNOWN_TEMPERATURE_DECISION_KEY] = control_value
         self.assertEqual(state[_UNKNOWN_TEMPERATURE_DECISION_KEY], _UNKNOWN_TEMPERATURE_OPTIONS[1])
 
-    def test_stage_shell_matches_established_six_screen_sequence(self):
+    def test_stage_shell_matches_established_seven_screen_sequence(self):
         self.assertEqual(
             STAGE_LABELS,
-            ["Launch", "Meet a Planet", "Distance", "Temperature", "Combine", "Data Science"],
+            [
+                "Launch", "Meet a Planet", "Distance", "Temperature", "Combine",
+                "Choose Your Destination", "Data Science",
+            ],
         )
+
+    def test_destination_selection_is_durable_and_must_be_a_shortlist_member(self):
+        names = ["Planet A", "Planet B"]
+        state = {}
+
+        self.assertIsNone(_initialise_destination_control(state, names))
+        self.assertFalse(_record_destination_selection(state, None))
+        self.assertTrue(_record_destination_selection(state, "Planet B"))
+        self.assertEqual(state[_APPLIED_DESTINATION_KEY], "Planet B")
+
+        restored = {_APPLIED_DESTINATION_KEY: "Planet B"}
+        self.assertEqual(_initialise_destination_control(restored, names), "Planet B")
+
+    def test_destination_control_discards_stale_selection(self):
+        state = {_APPLIED_DESTINATION_KEY: "Not a candidate"}
+
+        self.assertIsNone(_initialise_destination_control(state, ["Planet A"]))
+
+    def test_destination_shortlist_has_only_named_catalogue_planets(self):
+        candidates = pd.DataFrame({"pl_name": ["Planet B", None, "Planet A", "Planet B"]})
+
+        self.assertEqual(_candidate_names(candidates), ["Planet A", "Planet B"])
+        self.assertEqual(_candidate_names(candidates.iloc[0:0]), [])
 
     def test_temperature_groups_partition_every_catalogue_record(self):
         data = pd.DataFrame(
