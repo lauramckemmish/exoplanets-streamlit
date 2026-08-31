@@ -42,7 +42,9 @@ class UNSWVisualSystemTests(unittest.TestCase):
         self.assertIn('st-key-graph_reading_support', styles)
         self.assertIn('graph_reading_support', helpers)
         self.assertIn('st-key-hard_reveal_', styles)
-        self.assertIn('💭', helpers)
+        self.assertIn("interaction-marker'>THINK", helpers)
+        self.assertIn("interaction-marker'>REVEAL", helpers)
+        self.assertIn('.st-key-think_q', styles)
         self.assertIn('🧩 {label}', helpers)
         self.assertIn('**🧭 {prompt}**', helpers)
 

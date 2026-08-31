@@ -4,6 +4,8 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
+from ui_helpers import think_q
+
 TITLE = "Exoplanet Data Laboratory"
 SUBTITLE = "Open exploration with contextual guidance for analytical choices"
 TAB_LABELS = [
@@ -63,7 +65,7 @@ def render_intro(data, guidance_mode, guidance_box):
     st.subheader("What are we looking at here?")
     st.write("Each row represents one known exoplanet record. This is an incomplete sample: it contains planets that have been detected and confirmed, not every planet that exists. Many known systems are hundreds to a few thousand light-years away, and most of the Milky Way has not been searched in the same way.")
     st.caption("Sources: [NASA — What is an exoplanet?](https://science.nasa.gov/exoplanets/what-is-an-exoplanet/) · [NASA — Kepler's legacy](https://science.nasa.gov/exoplanets/keplerscience/)")
-    st.info("A graph is an answer to a question. Before changing a setting, say what you want to find out.")
+    think_q("A graph is an answer to a question. Before changing a setting, say what you want to find out.")
     st.subheader("A useful investigation cycle")
     st.markdown("1. Ask a question  \n2. Choose variables  \n3. Make a graph  \n4. Describe the pattern  \n5. Consider what might affect the pattern")
     if guidance_mode == "Teacher":

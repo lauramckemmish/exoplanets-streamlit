@@ -160,10 +160,12 @@ def persistent_reveal(
     )
 
 
-def think_q(prompt: str, *, title: str = "Pause and discuss") -> None:
-    """Render a visible, non-blocking reasoning prompt."""
-    del title  # Retained for compatibility; the prompt, not a generic title, leads.
-    st.info(f"💭\n\n{prompt}")
+def think_q(prompt: str, *, title: str = "Think") -> None:
+    """Render a visible, non-blocking reasoning cue."""
+    del title  # Retained for compatibility; THINK is the shared visual marker.
+    with st.container(key="think_q"):
+        st.markdown("<p class='interaction-marker'>THINK</p>", unsafe_allow_html=True)
+        st.markdown(prompt)
 
 
 def pause_cue(prompt: str, *, title: str = "Pause and discuss") -> None:
@@ -185,7 +187,7 @@ def hard_reveal(
     reveal_label: str,
     revealed_message: str | None = None,
     explanation: str | None = None,
-    title: str = "Pause and predict",
+    title: str | None = None,
 ) -> bool:
     """Reveal essential material and register shared progression gating.
 
@@ -194,8 +196,10 @@ def hard_reveal(
     callers do not need to pass this return value into navigation. Multiple
     hard reveals on one screen remain blocking until each is revealed.
     """
+    del title  # Prerequisite wording belongs to the experience, not the helper.
     with st.container(key=f"hard_reveal_{key}"):
-        st.info(f"💭\n\n{prompt}")
+        st.markdown("<p class='interaction-marker'>REVEAL</p>", unsafe_allow_html=True)
+        st.markdown(prompt)
         if key not in st.session_state:
             st.session_state[key] = False
         if not st.session_state[key]:

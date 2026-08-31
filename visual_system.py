@@ -218,17 +218,28 @@ def apply_visual_system() -> None:
             margin: 0.35rem 0 0.55rem;
         }}
         .st-key-graph_reading_support p {{ margin-bottom: 0.2rem; }}
-        /* Shared interaction grammar: quiet information surfaces with clear semantic markers. */
+        /* Shared interaction grammar: THINK is a cue, while REVEAL protects evidence. */
         [data-testid="stAlert"][data-baseweb="notification"] {{
             border-left: 3px solid var(--unsw-information);
             background: rgba(63, 97, 196, 0.08);
         }}
+        .st-key-think_q {{
+            border-left: 3px solid currentColor;
+            padding-left: 0.65rem;
+            margin: 0.5rem 0;
+        }}
+        .st-key-think_q .interaction-marker,
+        [class*="st-key-hard_reveal_"] .interaction-marker {{
+            font-size: 0.72rem;
+            font-weight: 750;
+            letter-spacing: 0.08em;
+            line-height: 1;
+            margin: 0.05rem 0 0.35rem;
+        }}
+        .st-key-think_q [data-testid="stMarkdownContainer"] {{ background: transparent; }}
         [class*="st-key-hard_reveal_"] {{
             border-left: 3px solid var(--unsw-active-emphasis);
             padding-left: 0.65rem;
-        }}
-        [class*="st-key-hard_reveal_"] [data-testid="stAlert"] {{
-            border-left-color: var(--unsw-active-emphasis);
         }}
         [data-testid="stExpander"] {{ border-left: 3px solid var(--unsw-exploration); }}
         [data-testid="stSidebar"] [data-testid="stButton"] > button {{

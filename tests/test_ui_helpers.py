@@ -18,6 +18,7 @@ class _StreamlitStub:
     def __init__(self):
         self.session_state = {}
         self.buttons = []
+        self.markdown_calls = []
 
     def info(self, *args, **kwargs):
         pass
@@ -36,7 +37,7 @@ class _StreamlitStub:
         return _Column()
 
     def markdown(self, *_args, **_kwargs):
-        pass
+        self.markdown_calls.append(_args[0])
 
     def multiselect(self, *_args, **_kwargs):
         return []
@@ -74,6 +75,21 @@ class SharedInteractionContractTests(unittest.TestCase):
                 pass
             ui_helpers.choice_reveal("Explore", {"A": "Detail"}, "choice")
             self.assertTrue(self._navigation(stub))
+
+    def test_think_uses_the_shared_marker_without_a_reveal_or_gate(self):
+        stub = _StreamlitStub()
+        with patch.object(ui_helpers, "st", stub):
+            ui_helpers.think_q("Consider the evidence.")
+            self.assertTrue(self._navigation(stub))
+        self.assertIn("<p class='interaction-marker'>THINK</p>", stub.markdown_calls)
+        self.assertIn("Consider the evidence.", stub.markdown_calls)
+
+    def test_hard_reveal_uses_a_neutral_reveal_marker(self):
+        stub = _StreamlitStub()
+        with patch.object(ui_helpers, "st", stub):
+            ui_helpers.hard_reveal("What is missing?", "reveal", reveal_label="Show it")
+        self.assertIn("<p class='interaction-marker'>REVEAL</p>", stub.markdown_calls)
+        self.assertNotIn("Pause and predict", " ".join(stub.markdown_calls))
 
     def test_graph_reading_support_is_nonblocking_and_state_free(self):
         stub = _StreamlitStub()
