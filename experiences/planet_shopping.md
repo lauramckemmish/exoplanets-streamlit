@@ -171,12 +171,22 @@ destination on this screen.
 
 ### 6. Choose Your Destination — Which planet would you choose?
 
-Learners inspect a manageable, honestly labelled shortlist derived from their
-combined criteria, using the existing Meet-a-Planet profile machinery. They
-choose one candidate using evidence and the choice persists for the final
-reflection. Do not rank candidates, score habitability or claim that the chosen
-planet is habitable. If there are no candidates, direct learners back to
-Combine to adjust their criteria.
+The combined shortlist may still be large. Learners choose what else matters
+and apply optional filters using planet size (`pl_rade`), stars in the system
+(`sy_snum`), year length (`pl_orbper`) and, where cleanly available, known
+planets in the system (`sy_pnum`). Filters are ordinary controls and update a
+live **Possible destinations** count; learners narrow the list until it feels
+manageable. The existing Take the risk / Play it safe decision applies to
+missing values for each enabled filter: risk retains an unknown as a
+possibility, while safe sets it aside. Unknown is never treated as a match.
+
+Do not arbitrarily truncate, rank or score the shortlist. Learners inspect
+surviving real planets with the existing Meet-a-Planet profile machinery and
+choose one using evidence. The selected planet is shown on the existing sky
+map when coordinates are available. If no candidates remain, explain that the
+criteria are too strict and invite learners to loosen one. The destination
+choice persists and is required before the final reflection; do not claim that
+the chosen planet is habitable.
 
 ### 7. Data Science — What did you just do?
 

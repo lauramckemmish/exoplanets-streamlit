@@ -11,6 +11,7 @@ import pandas as pd
 import streamlit as st
 
 from data import PARSEC_TO_LIGHT_YEARS
+from charts import sky_map
 from ui_helpers import completion_gate, hard_reveal, role_image, scroll_to_top_if_requested, step_buttons, step_tabs, think_q
 
 TITLE = "Planet Shopping Outside Our Solar System"
@@ -58,6 +59,14 @@ _COMBINE_REVEAL_KEY = "planet_shopping_combine_result_revealed"
 _COMBINE_DESTINATION_KEY = "planet_shopping_combine_destination"
 _DESTINATION_CONTROL_KEY = "planet_shopping_destination_control"
 _APPLIED_DESTINATION_KEY = "planet_shopping_applied_destination"
+_DESTINATION_USE_SIZE_KEY = "planet_shopping_destination_use_size"
+_DESTINATION_SIZE_CONTROL_KEY = "planet_shopping_destination_size_control"
+_DESTINATION_USE_STARS_KEY = "planet_shopping_destination_use_stars"
+_DESTINATION_STARS_CONTROL_KEY = "planet_shopping_destination_stars_control"
+_DESTINATION_USE_YEAR_KEY = "planet_shopping_destination_use_year"
+_DESTINATION_YEAR_CONTROL_KEY = "planet_shopping_destination_year_control"
+_DESTINATION_USE_PLANETS_KEY = "planet_shopping_destination_use_planets"
+_DESTINATION_PLANETS_CONTROL_KEY = "planet_shopping_destination_planets_control"
 _BROWSED_PLANET_KEY = "planet_shopping_browsed_planet"
 _BROWSED_PLANET_BUTTON_KEY = "planet_shopping_browsed_planet_button"
 _TEMPERATURE_UNKNOWN_REVEAL_KEY = "planet_shopping_temperature_unknown_revealed"
@@ -119,8 +128,12 @@ def _temperature_profile(value) -> tuple[str, str]:
         interpretation = "In a comfortable Earth-like range."
     elif celsius <= 100:
         interpretation = "Hotter than a summer day on Earth."
-    else:
+    elif celsius <= 500:
+        interpretation = "Very hot."
+    elif celsius <= 1_000:
         interpretation = "Extremely hot."
+    else:
+        interpretation = "Over 1,000 °C — extraordinarily hot."
     return f"{celsius:.0f} °C", interpretation
 
 
@@ -256,8 +269,49 @@ def _initialise_combine_control(
 
 
 def _candidate_names(candidates: pd.DataFrame) -> list[str]:
-    """Return a deterministic, manageable set of real catalogue planet names."""
-    return sorted(candidates.dropna(subset=["pl_name"]).drop_duplicates("pl_name")["pl_name"].astype(str).head(12).tolist())
+    """Return every named real catalogue planet in deterministic order."""
+    return sorted(candidates.dropna(subset=["pl_name"]).drop_duplicates("pl_name")["pl_name"].astype(str).tolist())
+
+
+def _apply_optional_filter(
+    data: pd.DataFrame, field: str, predicate, keep_unknowns: bool
+) -> pd.DataFrame:
+    """Apply one optional filter while preserving missing values only when requested."""
+    values = pd.to_numeric(data[field], errors="coerce")
+    matches = values.notna() & predicate(values)
+    if keep_unknowns:
+        matches |= values.isna()
+    return data.loc[matches].copy()
+
+
+def _filter_destination_candidates(
+    data: pd.DataFrame,
+    *,
+    size_range: tuple[float, float] | None = None,
+    stars_range: tuple[int, int] | None = None,
+    year_range: tuple[float, float] | None = None,
+    planets_range: tuple[int, int] | None = None,
+    keep_unknowns: bool,
+) -> pd.DataFrame:
+    """Apply enabled Destination filters with the learner's missing-data policy."""
+    filtered = data.copy()
+    for field, value_range in (
+        ("pl_rade", size_range),
+        ("sy_snum", stars_range),
+        ("pl_orbper", year_range),
+        ("sy_pnum", planets_range),
+    ):
+        if value_range is not None:
+            lower, upper = value_range
+            filtered = _apply_optional_filter(
+                filtered,
+                field,
+                lambda values, lower=lower, upper=upper: values.between(
+                    lower, upper, inclusive="both"
+                ),
+                keep_unknowns,
+            )
+    return filtered
 
 
 def _initialise_destination_control(state: dict, names: list[str]) -> str | None:
@@ -266,6 +320,8 @@ def _initialise_destination_control(state: dict, names: list[str]) -> str | None
     if current not in names:
         previous = state.get(_APPLIED_DESTINATION_KEY, state.get(_COMBINE_DESTINATION_KEY))
         state[_DESTINATION_CONTROL_KEY] = previous if previous in names else None
+        if state.get(_APPLIED_DESTINATION_KEY) not in names:
+            state[_APPLIED_DESTINATION_KEY] = None
     return state[_DESTINATION_CONTROL_KEY]
 
 
@@ -553,26 +609,88 @@ def _render_combine(data: pd.DataFrame) -> None:
 
 def _render_destination(data: pd.DataFrame) -> None:
     st.subheader("🪐 Choose Your Destination")
-    st.write("Inspect a few possibilities, then choose one using the evidence.")
+    st.write("You’ve narrowed the catalogue — but that may still be a lot of planets.")
+    st.write("What else matters to you? Add filters until you have a shortlist you can actually inspect.")
 
     combine_distance = int(st.session_state.get(_COMBINE_DISTANCE_CONTROL_KEY, st.session_state.get(_APPLIED_DISTANCE_KEY, _DISTANCE_DEFAULT_VALUE)))
     combine_temperature = st.session_state.get(_COMBINE_TEMPERATURE_CONTROL_KEY, st.session_state.get(_APPLIED_TEMPERATURE_KEY, (0, 30)))
     combine_unknown_decision = st.session_state.get(_COMBINE_UNKNOWN_CONTROL_KEY, st.session_state.get(_UNKNOWN_TEMPERATURE_DECISION_KEY, _UNKNOWN_TEMPERATURE_OPTIONS[0]))
-    _, _, _, _, candidates = _combine_groups(
+    _, _, _, _, combined_candidates = _combine_groups(
         data,
         combine_distance,
         tuple(int(value) for value in combine_temperature),
         combine_unknown_decision == _UNKNOWN_TEMPERATURE_OPTIONS[0],
     )
-    names = _candidate_names(candidates)
-    if not names:
-        st.warning("Your criteria produced no destination.")
-        st.info("Go back to Combine and adjust your distance, temperature range or unknown-temperature choice.")
+
+    st.markdown("#### What else matters to you?")
+    use_size = st.checkbox("Filter by planet size", key=_DESTINATION_USE_SIZE_KEY)
+    size_range = st.slider(
+        "Planet size (× Earth)",
+        min_value=0.1,
+        max_value=20.0,
+        value=(0.1, 20.0),
+        step=0.1,
+        disabled=not use_size,
+        key=_DESTINATION_SIZE_CONTROL_KEY,
+    )
+
+    use_stars = st.checkbox("Filter by number of stars in the system", key=_DESTINATION_USE_STARS_KEY)
+    stars_option = st.selectbox(
+        "Stars in the system",
+        ["Any number", "1 star", "2 stars", "3 or more stars"],
+        disabled=not use_stars,
+        key=_DESTINATION_STARS_CONTROL_KEY,
+    )
+    stars_range = {
+        "1 star": (1, 1),
+        "2 stars": (2, 2),
+        "3 or more stars": (3, 10),
+    }.get(stars_option)
+
+    use_year = st.checkbox("Filter by year length", key=_DESTINATION_USE_YEAR_KEY)
+    year_range = st.slider(
+        "Year length (Earth days)",
+        min_value=0.1,
+        max_value=10_000.0,
+        value=(0.1, 10_000.0),
+        step=1.0,
+        disabled=not use_year,
+        key=_DESTINATION_YEAR_CONTROL_KEY,
+    )
+
+    use_planets = st.checkbox("Filter by number of known planets in the system", key=_DESTINATION_USE_PLANETS_KEY)
+    planets_option = st.selectbox(
+        "Known planets in the system",
+        ["Any number", "1 planet", "2 planets", "3 or more planets"],
+        disabled=not use_planets,
+        key=_DESTINATION_PLANETS_CONTROL_KEY,
+    )
+    planets_range = {
+        "1 planet": (1, 1),
+        "2 planets": (2, 2),
+        "3 or more planets": (3, 20),
+    }.get(planets_option)
+
+    keep_unknowns = combine_unknown_decision == _UNKNOWN_TEMPERATURE_OPTIONS[0]
+    candidates = _filter_destination_candidates(
+        combined_candidates,
+        size_range=tuple(size_range) if use_size else None,
+        stars_range=stars_range if use_stars else None,
+        year_range=tuple(year_range) if use_year else None,
+        planets_range=planets_range if use_planets else None,
+        keep_unknowns=keep_unknowns,
+    )
+    st.metric("Possible destinations", f"{len(candidates):,}")
+    if candidates.empty:
+        st.warning("These filters leave no possible destinations. Try loosening one of them.")
         completion_gate(False)
         return
-    if len(candidates.dropna(subset=["pl_name"]).drop_duplicates("pl_name")) > len(names):
-        st.caption("Showing 12 catalogue planets from your shortlist; this is not a ranking.")
 
+    names = _candidate_names(candidates)
+    if not names:
+        st.warning("The remaining records do not have planet names to inspect. Try loosening a filter.")
+        completion_gate(False)
+        return
     previous = _initialise_destination_control(st.session_state, names)
     index = names.index(previous) if previous in names else None
     destination_name = st.selectbox(
@@ -590,6 +708,13 @@ def _render_destination(data: pd.DataFrame) -> None:
     st.write("Why did you choose that one? Look for evidence that fits what matters to you, and notice what remains unknown.")
     if selected:
         st.success("Given what we know and what matters to you, this is the planet you chose.")
+        st.markdown("#### Where is your planet?")
+        coordinates = destination.reindex(["x", "y", "z"])
+        if coordinates.notna().all():
+            st.write("Here’s your destination among the exoplanets we know about.")
+            st.plotly_chart(sky_map(data, selected_planet=destination_name), width="stretch")
+        else:
+            st.caption("This planet's position is not available in the map data.")
     completion_gate(selected)
 
 

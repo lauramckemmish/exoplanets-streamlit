@@ -23,6 +23,7 @@ from experiences.planet_shopping import (
     _UNKNOWN_TEMPERATURE_OPTIONS,
     _combine_groups,
     _candidate_names,
+    _filter_destination_candidates,
     _initialise_destination_control,
     _record_destination_selection,
     _UNKNOWN_TEMPERATURE_CONTROL_KEY,
@@ -52,6 +53,12 @@ class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
     def test_profile_values_use_learner_facing_units(self):
         self.assertEqual(_temperature_profile(273.15)[0], "0 °C")
         self.assertEqual(_distance_profile(1.0)[0], f"{PARSEC_TO_LIGHT_YEARS:.0f} light-years")
+
+    def test_temperature_profile_uses_distinct_high_temperature_bands(self):
+        self.assertEqual(_temperature_profile(373.15)[1], "Hotter than a summer day on Earth.")
+        self.assertEqual(_temperature_profile(773.15)[1], "Very hot.")
+        self.assertEqual(_temperature_profile(1272.15)[1], "Extremely hot.")
+        self.assertEqual(_temperature_profile(1274.15)[1], "Over 1,000 °C — extraordinarily hot.")
 
     def test_profile_missing_value_is_explicitly_unknown(self):
         value, interpretation = _planet_display_value(None, _temperature_profile)
@@ -105,12 +112,54 @@ class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
         state = {_APPLIED_DESTINATION_KEY: "Not a candidate"}
 
         self.assertIsNone(_initialise_destination_control(state, ["Planet A"]))
+        self.assertIsNone(state[_APPLIED_DESTINATION_KEY])
 
     def test_destination_shortlist_has_only_named_catalogue_planets(self):
-        candidates = pd.DataFrame({"pl_name": ["Planet B", None, "Planet A", "Planet B"]})
+        candidates = pd.DataFrame({"pl_name": [f"Planet {i}" for i in range(20)] + [None]})
 
-        self.assertEqual(_candidate_names(candidates), ["Planet A", "Planet B"])
+        self.assertEqual(len(_candidate_names(candidates)), 20)
         self.assertEqual(_candidate_names(candidates.iloc[0:0]), [])
+
+    def test_destination_optional_filters_use_and_logic_and_missing_policy(self):
+        candidates = pd.DataFrame(
+            {
+                "pl_name": ["Both", "Size only", "Unknown size", "Wrong stars"],
+                "pl_rade": [1.0, 1.0, None, 1.0],
+                "sy_snum": [1, 2, 1, 2],
+                "pl_orbper": [365.0, 365.0, 365.0, 365.0],
+                "sy_pnum": [2, 2, 2, 2],
+            }
+        )
+
+        safe = _filter_destination_candidates(
+            candidates, size_range=(0.9, 1.1), stars_range=(1, 1), keep_unknowns=False
+        )
+        risk = _filter_destination_candidates(
+            candidates, size_range=(0.9, 1.1), stars_range=(1, 1), keep_unknowns=True
+        )
+
+        self.assertEqual(safe["pl_name"].tolist(), ["Both"])
+        self.assertEqual(risk["pl_name"].tolist(), ["Both", "Unknown size"])
+
+    def test_destination_year_and_system_planet_filters_are_optional_and_live(self):
+        candidates = pd.DataFrame(
+            {
+                "pl_name": ["Fast", "Slow", "Many"],
+                "pl_rade": [1.0, 1.0, 1.0],
+                "sy_snum": [1, 1, 1],
+                "pl_orbper": [30.0, 400.0, 30.0],
+                "sy_pnum": [2, 2, 5],
+            }
+        )
+
+        filtered = _filter_destination_candidates(
+            candidates,
+            year_range=(1, 100),
+            planets_range=(1, 2),
+            keep_unknowns=False,
+        )
+
+        self.assertEqual(filtered["pl_name"].tolist(), ["Fast"])
 
     def test_temperature_groups_partition_every_catalogue_record(self):
         data = pd.DataFrame(

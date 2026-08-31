@@ -127,6 +127,12 @@ The separate Destination screen lets learners inspect the surviving real
 planets using the existing profile and choose one using evidence. A destination
 choice is not required on Combine.
 
+The current PS-02 Destination completion work adds learner-controlled optional
+filters for size, stars, year length and known planets in a system where the
+prepared fields are usable. It must preserve the risk/safe missing-data policy,
+avoid arbitrary truncation or ranking, support zero-result recovery, and show
+the selected planet on the existing sky map before final reflection.
+
 ### PS-03 — Data Science landing
 **Status: DONE**
 
