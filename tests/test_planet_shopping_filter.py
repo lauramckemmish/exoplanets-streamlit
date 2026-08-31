@@ -40,6 +40,11 @@ class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
         self.assertEqual(_passenger_plane_travel_years(1), 1_200_000)
         self.assertEqual(_format_travel_years(_passenger_plane_travel_years(100)), "120 million years")
 
+    def test_travel_time_format_uses_billions_at_the_billion_year_threshold(self):
+        self.assertEqual(_format_travel_years(999_000_000), "999 million years")
+        self.assertEqual(_format_travel_years(1_000_000_000), "1.0 billion years")
+        self.assertEqual(_format_travel_years(1_400_000_000), "1.4 billion years")
+
     def test_fresh_temperature_range_is_deliberately_hot(self):
         self.assertEqual(_TEMPERATURE_DEFAULT_RANGE_C, (1_000, 2_000))
 

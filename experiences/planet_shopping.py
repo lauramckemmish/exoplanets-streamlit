@@ -96,6 +96,8 @@ def _passenger_plane_travel_years(distance_light_years: int | float) -> float:
 
 def _format_travel_years(years: float) -> str:
     """Format an approximate travel time without implying false precision."""
+    if years >= 1_000_000_000:
+        return f"{years / 1_000_000_000:.1f} billion years"
     if years >= 1_000_000:
         millions = f"{years / 1_000_000:.1f}".rstrip("0").rstrip(".")
         return f"{millions} million years"
