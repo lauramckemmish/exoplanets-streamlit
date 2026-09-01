@@ -23,3 +23,31 @@ The data layer automatically uses live NASA data when available and falls back
 to the bundled NASA-derived notebook sample when live acquisition fails. Live
 catalogue requests are cached for six hours; the app receives the prepared data
 with explicit source metadata so it can describe either state accurately.
+
+## Classroom concurrency release check
+
+Before releasing a classroom app, run this small browser smoke test to check
+that the real learner route remains usable when learners act together. It is a
+release-readiness gate, not a performance-engineering framework: if it passes
+comfortably, stop.
+
+Install the browser runtime once, then run the check:
+
+```bash
+python -m playwright install chromium
+python tools/classroom_concurrency.py
+```
+
+The default levels are **1 → 20 → 30** independent sessions and three
+synchronized interaction rounds per level. The test starts and stops its own
+local Streamlit server; it fails on failed sessions, browser/page errors,
+interaction timeouts or a server exit. It does not profile resource use.
+
+`tools/classroom_concurrency.py` is the generic mechanism. This repository's
+`classroom_smoke_adapter.py` uses the normal sidebar and stage tabs to reach
+**Planet Shopping → Combine**, then performs a small live distance-slider
+adjustment. Levels can be overridden when needed:
+
+```bash
+python tools/classroom_concurrency.py --sessions 1 --sessions 20 --sessions 30
+```
