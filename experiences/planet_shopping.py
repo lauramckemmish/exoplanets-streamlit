@@ -362,10 +362,6 @@ def _render_temperature(data: pd.DataFrame) -> None:
     """Render the independent temperature criterion and missing-data decision."""
     st.subheader("🌡️ Temperature")
     st.write("Choose an acceptable temperature range for your planet.")
-    st.caption(
-        "The catalogue records estimated equilibrium temperature in °C. It is an estimate, "
-        "not a direct measurement of a planet's surface."
-    )
 
     temperature_range_c = st.slider(
         "What estimated equilibrium temperature range is acceptable? (°C)",
@@ -391,7 +387,6 @@ def _render_temperature(data: pd.DataFrame) -> None:
     if not unknown_revealed:
         return
 
-    st.caption("Unknown means we do not know — it does not mean unsuitable.")
     if _UNKNOWN_TEMPERATURE_DECISION_KEY in st.session_state:
         _initialise_unknown_temperature_control(st.session_state)
     unknown_decision = st.radio(
