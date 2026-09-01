@@ -21,6 +21,10 @@ def raw_catalogue(*names: str) -> pd.DataFrame:
 
 
 class CatalogueLoadingTests(unittest.TestCase):
+    def setUp(self):
+        data._prepare_live_catalogue.clear()
+        data._prepare_sample_catalogue.clear()
+
     @patch("data.load_sample")
     @patch("data.load_live")
     def test_live_catalogue_returns_live_source_metadata(self, mock_live, mock_sample):
@@ -61,6 +65,23 @@ class CatalogueLoadingTests(unittest.TestCase):
 
         self.assertEqual(result.source.kind, "bundled")
         self.assertEqual(len(result.data), 3)
+
+    @patch("data._prepare_catalogue", wraps=data._prepare_catalogue)
+    @patch("data.load_sample")
+    @patch("data.load_live")
+    def test_repeated_catalogue_loads_reuse_preparation(self, mock_live, mock_sample, mock_prepare):
+        raw = raw_catalogue("Cached One", "Cached Two")
+        mock_live.return_value = raw
+
+        first = data.load_catalogue()
+        second = data.load_catalogue()
+
+        self.assertEqual(mock_prepare.call_count, 1)
+        self.assertTrue(first.source.is_live)
+        self.assertTrue(second.source.is_live)
+        self.assertEqual(first.data["pl_name"].tolist(), ["Cached One", "Cached Two"])
+        self.assertEqual(second.data["pl_name"].tolist(), ["Cached One", "Cached Two"])
+        mock_sample.assert_not_called()
 
 
 if __name__ == "__main__":

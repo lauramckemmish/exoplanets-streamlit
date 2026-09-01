@@ -74,7 +74,6 @@ SOLAR_SYSTEM_PLANETS = pd.DataFrame([
 ])
 
 
-@st.cache_data(ttl=21_600, show_spinner=False)
 def load_live() -> pd.DataFrame:
     query = "select " + ",".join(COLUMNS) + " from pscomppars"
     try:
@@ -92,12 +91,13 @@ def load_live() -> pd.DataFrame:
         raise LiveCatalogueError("NASA Exoplanet Archive returned unreadable CSV") from error
 
 
-@st.cache_data(show_spinner=False)
 def load_sample() -> pd.DataFrame:
     return pd.read_csv(SAMPLE_PATH)
 
 
-def prepare(raw: pd.DataFrame) -> pd.DataFrame:
+def _prepare_catalogue(raw: pd.DataFrame) -> pd.DataFrame:
+    """Normalise raw catalogue data into the dataframe used by experiences."""
+
     data = raw.copy()
     for column in COLUMNS:
         if column not in data.columns:
@@ -119,8 +119,15 @@ def prepare(raw: pd.DataFrame) -> pd.DataFrame:
     return data.reset_index(drop=True)
 
 
+def prepare(raw: pd.DataFrame) -> pd.DataFrame:
+    """Prepare a raw catalogue for use by experiences."""
+
+    return _prepare_catalogue(raw)
+
+
+@st.cache_data(ttl=21_600, show_spinner=False)
 def _prepare_live_catalogue() -> pd.DataFrame:
-    """Prepare live data and reject a response with no usable planet records."""
+    """Load and prepare the live catalogue once per six-hour source state."""
 
     try:
         prepared = prepare(load_live())
@@ -129,6 +136,13 @@ def _prepare_live_catalogue() -> pd.DataFrame:
     if prepared.empty:
         raise LiveCatalogueError("NASA Exoplanet Archive returned no usable planet records")
     return prepared
+
+
+@st.cache_data(show_spinner=False)
+def _prepare_sample_catalogue() -> pd.DataFrame:
+    """Prepare the stable bundled fallback once for ordinary reruns."""
+
+    return prepare(load_sample())
 
 
 def load_catalogue() -> CatalogueLoad:
@@ -147,7 +161,7 @@ def load_catalogue() -> CatalogueLoad:
             error,
             exc_info=True,
         )
-        return CatalogueLoad(prepare(load_sample()), BUNDLED_SAMPLE_SOURCE)
+        return CatalogueLoad(_prepare_sample_catalogue(), BUNDLED_SAMPLE_SOURCE)
 
 
 def apply_filter(frame: pd.DataFrame, column: str, mask: pd.Series, label: str) -> tuple[pd.DataFrame, dict[str, int | str]]:
