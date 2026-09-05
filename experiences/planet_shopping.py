@@ -857,6 +857,27 @@ def _render_data_science() -> None:
         "You used evidence to choose."
     )
     st.write("Data science is using data to narrow down the possibilities and make a decision.")
+    st.markdown(
+        """
+        <style>
+        .st-key-planet_shopping_data_science_completion {
+            margin-top: 1rem;
+            padding: 0.85rem 1rem;
+            border: 1px solid #e2cd75;
+            border-left: 5px solid #d3aa00;
+            border-radius: 0.5rem;
+            background: #fff8d8;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+    with st.container(border=True, key="planet_shopping_data_science_completion"):
+        st.markdown(
+            "**You just used data science to make a decision.**  \n"
+            "You started with thousands of possibilities, chose what mattered, dealt with missing information "
+            "and used evidence to choose."
+        )
 
 
 def render(data: pd.DataFrame) -> None:
