@@ -124,6 +124,7 @@ class SkyMapTests(unittest.TestCase):
 
         self.assertTrue(np.isfinite(np.concatenate([eye, center, up])).all())
         self.assertFalse(np.allclose(eye, 0))
+        self.assertGreater(_NEAR_CENTRE_CAMERA_EPSILON, 0.08)
         np.testing.assert_allclose(eye, [0.0, -_NEAR_CENTRE_CAMERA_EPSILON, 0.0])
         np.testing.assert_allclose(center, [0.0, 1.0, 0.0])
         np.testing.assert_allclose(np.dot(up, center), 0.0)

@@ -341,7 +341,7 @@ def _galactic_plane_band() -> tuple[np.ndarray, np.ndarray, np.ndarray, list[int
     return points[:, 0], points[:, 1], points[:, 2], i, j, k
 
 
-_NEAR_CENTRE_CAMERA_EPSILON = 0.08
+_NEAR_CENTRE_CAMERA_EPSILON = 0.20
 
 
 def _camera_for_selected_direction(direction: np.ndarray) -> dict[str, dict[str, float]] | None:
