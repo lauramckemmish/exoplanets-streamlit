@@ -32,30 +32,83 @@ def map_data() -> pd.DataFrame:
 
 class OrientedSkyMapTests(unittest.TestCase):
     def test_existing_sky_map_still_returns_a_plotly_figure(self):
-        self.assertIsInstance(sky_map(map_data()), go.Figure)
+        figure = sky_map(map_data())
+
+        self.assertIsInstance(figure, go.Figure)
+        self.assertEqual(figure.data[0].name, "Known exoplanets")
 
     def test_oriented_map_returns_a_plotly_figure_with_landmarks(self):
         figure = oriented_sky_map(map_data())
         trace_names = {trace.name for trace in figure.data}
 
         self.assertIsInstance(figure, go.Figure)
-        self.assertIn("Southern Cross / Crux orientation figure", trace_names)
-        self.assertIn("Big Dipper orientation figure (Ursa Major)", trace_names)
-        self.assertIn("Milky Way orientation region (Galactic plane)", trace_names)
+        self.assertIn("Southern Cross / Crux", trace_names)
+        self.assertIn("Big Dipper", trace_names)
+        self.assertIn("Milky Way", trace_names)
+
+    def test_legend_has_deterministic_right_hand_layer_order(self):
+        figure = oriented_sky_map(map_data(), selected_planet="Planet B")
+        legend_traces = sorted(
+            (trace for trace in figure.data if trace.showlegend),
+            key=lambda trace: trace.legendrank,
+        )
+
+        self.assertEqual(
+            [trace.name for trace in legend_traces],
+            [
+                "Detected exoplanets",
+                "Your planet: Planet B",
+                "Southern Cross / Crux",
+                "Big Dipper",
+                "Milky Way",
+            ],
+        )
+        self.assertEqual(figure.layout.legend.orientation, "v")
+        self.assertGreater(figure.layout.legend.x, 1)
+        self.assertEqual(figure.layout.legend.title.text, "Show on the sky")
+        self.assertEqual(figure.layout.legend.groupclick, "togglegroup")
 
     def test_selected_planet_remains_highlighted(self):
         figure = oriented_sky_map(map_data(), selected_planet="Planet B")
 
-        selected = next(trace for trace in figure.data if trace.name == "Selected: Planet B")
+        selected = next(trace for trace in figure.data if trace.name == "Your planet: Planet B")
         self.assertEqual(selected.marker.symbol, "diamond")
         self.assertEqual(selected.marker.size, 9)
+        self.assertEqual(selected.legendgroup, "selected-planet")
+        self.assertTrue(selected.showlegend)
+
+    def test_landmark_components_share_logical_legend_groups(self):
+        figure = oriented_sky_map(map_data())
+
+        crux_traces = [trace for trace in figure.data if trace.legendgroup == "southern-cross-crux"]
+        dipper_traces = [trace for trace in figure.data if trace.legendgroup == "big-dipper"]
+        milky_way = next(trace for trace in figure.data if trace.legendgroup == "milky-way")
+
+        self.assertEqual(len(crux_traces), 2)
+        self.assertEqual({trace.name for trace in crux_traces}, {"Southern Cross / Crux"})
+        self.assertEqual(len(dipper_traces), 2)
+        self.assertEqual({trace.name for trace in dipper_traces}, {"Big Dipper"})
+        self.assertEqual(milky_way.name, "Milky Way")
+        self.assertTrue(milky_way.showlegend)
+
+    def test_catalogue_is_an_independent_legend_group(self):
+        figure = oriented_sky_map(map_data(), colour_field="discoverymethod")
+        catalogue_traces = [trace for trace in figure.data if trace.legendgroup == "detected-exoplanets"]
+
+        self.assertEqual(len(catalogue_traces), 2)
+        self.assertEqual({trace.name for trace in catalogue_traces}, {"Detected exoplanets"})
+        self.assertEqual(sum(bool(trace.showlegend) for trace in catalogue_traces), 1)
 
     def test_numeric_and_categorical_colours_remain_compatible(self):
         numeric = oriented_sky_map(map_data(), colour_field="disc_year", colour_label="Discovery year")
         categorical = oriented_sky_map(map_data(), colour_field="discoverymethod", colour_label="Method")
 
-        self.assertEqual(next(trace for trace in numeric.data if trace.name == "Known exoplanets").marker.colorbar.title.text, "Discovery year")
-        self.assertEqual({trace.name for trace in categorical.data} & {"Transit", "Imaging"}, {"Transit", "Imaging"})
+        numeric_trace = next(trace for trace in numeric.data if trace.legendgroup == "detected-exoplanets")
+        categorical_traces = [trace for trace in categorical.data if trace.legendgroup == "detected-exoplanets"]
+
+        self.assertEqual(numeric_trace.marker.colorbar.title.text, "Discovery year")
+        self.assertEqual(len(categorical_traces), 2)
+        self.assertEqual({tuple(trace.text) for trace in categorical_traces}, {("Planet A",), ("Planet B",)})
 
     def test_reference_positions_are_finite_unit_sphere_coordinates(self):
         stars = _CRUX_STARS + _BIG_DIPPER_STARS

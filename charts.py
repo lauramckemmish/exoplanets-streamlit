@@ -245,10 +245,34 @@ def oriented_sky_map(data: pd.DataFrame, selected_planet: str | None = None, col
     """
     figure = sky_map(data, selected_planet, colour_field, colour_label)
 
+    # Keep the catalogue as one logical, independently toggleable layer even
+    # when ``sky_map`` has created several traces for a categorical colour
+    # encoding. The colours remain visible on the points; the oriented-map
+    # legend is reserved for choosing broad sky layers.
+    catalogue_traces: list[go.Scatter3d] = []
+    selected_trace: go.Scatter3d | None = None
+    for trace in figure.data:
+        if trace.name == f"Selected: {selected_planet}":
+            selected_trace = trace
+        else:
+            catalogue_traces.append(trace)
+
+    for index, trace in enumerate(catalogue_traces):
+        trace.name = "Detected exoplanets"
+        trace.legendgroup = "detected-exoplanets"
+        trace.legendrank = 10
+        trace.showlegend = index == 0
+
+    if selected_trace is not None:
+        selected_trace.name = f"Your planet: {selected_planet}"
+        selected_trace.legendgroup = "selected-planet"
+        selected_trace.legendrank = 20
+        selected_trace.showlegend = True
+
     band_x, band_y, band_z, band_i, band_j, band_k = _galactic_plane_band()
     figure.add_trace(go.Mesh3d(
         x=band_x, y=band_y, z=band_z, i=band_i, j=band_j, k=band_k,
-        name="Milky Way orientation region (Galactic plane)",
+        name="Milky Way", legendgroup="milky-way", legendrank=50,
         color="#8A68C8", opacity=0.13, hoverinfo="skip", showlegend=True,
         lighting={"ambient": 1, "diffuse": 0, "specular": 0, "roughness": 1},
     ))
@@ -257,12 +281,12 @@ def oriented_sky_map(data: pd.DataFrame, selected_planet: str | None = None, col
     crux_line = _constellation_line_positions(crux_positions, ((0, 2), (1, 3)))
     figure.add_trace(go.Scatter3d(
         x=_raise_orientation_overlay(crux_line[0]), y=_raise_orientation_overlay(crux_line[1]), z=_raise_orientation_overlay(crux_line[2]), mode="lines",
-        name="Southern Cross / Crux orientation figure", hoverinfo="skip",
+        name="Southern Cross / Crux", legendgroup="southern-cross-crux", legendrank=30, hoverinfo="skip", showlegend=True,
         line={"color": "rgba(255, 220, 0, 0.72)", "width": 4},
     ))
     figure.add_trace(go.Scatter3d(
         x=crux_positions[0] * 1.016, y=crux_positions[1] * 1.016, z=crux_positions[2] * 1.016, mode="markers+text",
-        name="Crux reference stars", hoverinfo="skip",
+        name="Southern Cross / Crux", legendgroup="southern-cross-crux", legendrank=30, hoverinfo="skip",
         marker={"size": 4, "color": "#FFDC00", "opacity": 0.9},
         text=[None, None, "Southern Cross / Crux", None], textposition="top center",
         textfont={"size": 11}, showlegend=False,
@@ -272,16 +296,32 @@ def oriented_sky_map(data: pd.DataFrame, selected_planet: str | None = None, col
     dipper_line = _constellation_line_positions(dipper_positions, tuple((index, index + 1) for index in range(6)))
     figure.add_trace(go.Scatter3d(
         x=_raise_orientation_overlay(dipper_line[0]), y=_raise_orientation_overlay(dipper_line[1]), z=_raise_orientation_overlay(dipper_line[2]), mode="lines",
-        name="Big Dipper orientation figure (Ursa Major)", hoverinfo="skip",
+        name="Big Dipper", legendgroup="big-dipper", legendrank=40, hoverinfo="skip", showlegend=True,
         line={"color": "rgba(128, 182, 244, 0.7)", "width": 4},
     ))
     figure.add_trace(go.Scatter3d(
         x=dipper_positions[0] * 1.016, y=dipper_positions[1] * 1.016, z=dipper_positions[2] * 1.016, mode="markers+text",
-        name="Big Dipper reference stars", hoverinfo="skip",
+        name="Big Dipper", legendgroup="big-dipper", legendrank=40, hoverinfo="skip",
         marker={"size": 4, "color": "#80B6F4", "opacity": 0.9},
         text=[None, None, None, "Big Dipper (in Ursa Major)", None, None, None], textposition="top center",
         textfont={"size": 11}, showlegend=False,
     ))
+    figure.update_layout(
+        margin={"l": 0, "r": 210, "t": 20, "b": 0},
+        legend={
+            "title": {"text": "Show on the sky", "font": {"size": 16}},
+            "orientation": "v",
+            "x": 1.01,
+            "xanchor": "left",
+            "y": 1,
+            "yanchor": "top",
+            "font": {"size": 14},
+            "itemsizing": "constant",
+            "traceorder": "normal",
+            "tracegroupgap": 8,
+            "groupclick": "togglegroup",
+        },
+    )
     return figure
 
 
