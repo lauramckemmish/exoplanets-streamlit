@@ -81,7 +81,7 @@ class SkyMapTests(unittest.TestCase):
 
         selected = next(trace for trace in figure.data if trace.name == "Your planet: Planet B")
         self.assertEqual(selected.marker.symbol, "diamond")
-        self.assertEqual(selected.marker.size, 14)
+        self.assertEqual(selected.marker.size, 12)
         self.assertEqual(selected.marker.color, "#FF8066")
         self.assertEqual(selected.marker.line.color, "#FFFFFF")
         self.assertEqual(selected.marker.line.width, 3)
@@ -139,6 +139,7 @@ class SkyMapTests(unittest.TestCase):
         self.assertTrue(all(glyph == "✦" for glyph in stars.text))
         self.assertEqual(set(labels.text), expected_names)
         self.assertEqual(labels.textfont.color, "#B48A38")
+        self.assertEqual(labels.textfont.size, 12)
 
     def test_zodiac_reference_coordinates_are_finite_unit_sphere_positions(self):
         zodiac_lines, zodiac_stars, zodiac_labels, zodiac_names = _zodiac_layer_positions()

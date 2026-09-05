@@ -368,7 +368,7 @@ def sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field
         selected_trace.legendrank = 20
         selected_trace.showlegend = True
         selected_trace.marker.update(
-            size=14,
+            size=12,
             symbol="diamond",
             color="#FF8066",
             opacity=1,
@@ -433,7 +433,7 @@ def sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field
         x=zodiac_labels[0] * 1.018, y=zodiac_labels[1] * 1.018, z=zodiac_labels[2] * 1.018,
         mode="text", name="Zodiac constellations", legendgroup="zodiac-constellations",
         legendrank=50, hoverinfo="skip", text=zodiac_names,
-        textposition="middle center", textfont={"color": "#B48A38", "size": 10}, showlegend=False,
+        textposition="middle center", textfont={"color": "#B48A38", "size": 12}, showlegend=False,
     ))
     figure.update_layout(
         margin={"l": 0, "r": 210, "t": 20, "b": 0},
