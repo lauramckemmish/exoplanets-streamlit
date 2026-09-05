@@ -262,18 +262,29 @@ def oriented_sky_map(data: pd.DataFrame, selected_planet: str | None = None, col
         trace.legendgroup = "detected-exoplanets"
         trace.legendrank = 10
         trace.showlegend = index == 0
+        trace.marker.update(size=4, opacity=0.65, symbol="circle")
+        if not colour_field or colour_field not in data:
+            trace.marker.color = "#007C78"
 
     if selected_trace is not None:
         selected_trace.name = f"Your planet: {selected_planet}"
         selected_trace.legendgroup = "selected-planet"
         selected_trace.legendrank = 20
         selected_trace.showlegend = True
+        selected_trace.marker.update(
+            size=12,
+            symbol="diamond",
+            color="#009E91",
+            opacity=1,
+            line={"color": "#053B3A", "width": 3},
+        )
+        selected_trace.textfont = {"color": "#053B3A", "size": 13}
 
     band_x, band_y, band_z, band_i, band_j, band_k = _galactic_plane_band()
     figure.add_trace(go.Mesh3d(
         x=band_x, y=band_y, z=band_z, i=band_i, j=band_j, k=band_k,
         name="Milky Way", legendgroup="milky-way", legendrank=50,
-        color="#8A68C8", opacity=0.13, hoverinfo="skip", showlegend=True,
+        color="#6E7378", opacity=0.20, hoverinfo="skip", showlegend=True,
         lighting={"ambient": 1, "diffuse": 0, "specular": 0, "roughness": 1},
     ))
 
@@ -282,14 +293,15 @@ def oriented_sky_map(data: pd.DataFrame, selected_planet: str | None = None, col
     figure.add_trace(go.Scatter3d(
         x=_raise_orientation_overlay(crux_line[0]), y=_raise_orientation_overlay(crux_line[1]), z=_raise_orientation_overlay(crux_line[2]), mode="lines",
         name="Southern Cross / Crux", legendgroup="southern-cross-crux", legendrank=30, hoverinfo="skip", showlegend=True,
-        line={"color": "rgba(255, 220, 0, 0.72)", "width": 4},
+        line={"color": "rgba(197, 139, 0, 0.85)", "width": 4},
     ))
     figure.add_trace(go.Scatter3d(
-        x=crux_positions[0] * 1.016, y=crux_positions[1] * 1.016, z=crux_positions[2] * 1.016, mode="markers+text",
+        x=crux_positions[0] * 1.016, y=crux_positions[1] * 1.016, z=crux_positions[2] * 1.016, mode="text",
         name="Southern Cross / Crux", legendgroup="southern-cross-crux", legendrank=30, hoverinfo="skip",
-        marker={"size": 4, "color": "#FFDC00", "opacity": 0.9},
-        text=[None, None, "Southern Cross / Crux", None], textposition="top center",
-        textfont={"size": 11}, showlegend=False,
+        # Scatter3d has no star marker. A text glyph keeps a recognisable star
+        # shape while rotating with the constellation's 3D coordinates.
+        text=["✦"] * len(_CRUX_STARS), textposition="middle center",
+        textfont={"color": "#C58B00", "size": 17}, showlegend=False,
     ))
 
     dipper_positions = _landmark_positions(_BIG_DIPPER_STARS)
@@ -297,14 +309,13 @@ def oriented_sky_map(data: pd.DataFrame, selected_planet: str | None = None, col
     figure.add_trace(go.Scatter3d(
         x=_raise_orientation_overlay(dipper_line[0]), y=_raise_orientation_overlay(dipper_line[1]), z=_raise_orientation_overlay(dipper_line[2]), mode="lines",
         name="Big Dipper", legendgroup="big-dipper", legendrank=40, hoverinfo="skip", showlegend=True,
-        line={"color": "rgba(128, 182, 244, 0.7)", "width": 4},
+        line={"color": "rgba(197, 139, 0, 0.85)", "width": 4},
     ))
     figure.add_trace(go.Scatter3d(
-        x=dipper_positions[0] * 1.016, y=dipper_positions[1] * 1.016, z=dipper_positions[2] * 1.016, mode="markers+text",
+        x=dipper_positions[0] * 1.016, y=dipper_positions[1] * 1.016, z=dipper_positions[2] * 1.016, mode="text",
         name="Big Dipper", legendgroup="big-dipper", legendrank=40, hoverinfo="skip",
-        marker={"size": 4, "color": "#80B6F4", "opacity": 0.9},
-        text=[None, None, None, "Big Dipper (in Ursa Major)", None, None, None], textposition="top center",
-        textfont={"size": 11}, showlegend=False,
+        text=["✦"] * len(_BIG_DIPPER_STARS), textposition="middle center",
+        textfont={"color": "#C58B00", "size": 17}, showlegend=False,
     ))
     figure.update_layout(
         margin={"l": 0, "r": 210, "t": 20, "b": 0},

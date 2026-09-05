@@ -68,12 +68,24 @@ class OrientedSkyMapTests(unittest.TestCase):
         self.assertEqual(figure.layout.legend.title.text, "Show on the sky")
         self.assertEqual(figure.layout.legend.groupclick, "togglegroup")
 
-    def test_selected_planet_remains_highlighted(self):
+    def test_detected_exoplanets_use_teal_circle_markers(self):
+        figure = oriented_sky_map(map_data())
+        detected = next(trace for trace in figure.data if trace.legendgroup == "detected-exoplanets")
+
+        self.assertEqual(detected.marker.color, "#007C78")
+        self.assertEqual(detected.marker.symbol, "circle")
+        self.assertEqual(detected.marker.size, 4)
+        self.assertEqual(detected.marker.opacity, 0.65)
+
+    def test_selected_planet_is_a_prominent_outlined_teal_diamond(self):
         figure = oriented_sky_map(map_data(), selected_planet="Planet B")
 
         selected = next(trace for trace in figure.data if trace.name == "Your planet: Planet B")
         self.assertEqual(selected.marker.symbol, "diamond")
-        self.assertEqual(selected.marker.size, 9)
+        self.assertEqual(selected.marker.size, 12)
+        self.assertEqual(selected.marker.color, "#009E91")
+        self.assertEqual(selected.marker.line.color, "#053B3A")
+        self.assertEqual(selected.marker.line.width, 3)
         self.assertEqual(selected.legendgroup, "selected-planet")
         self.assertTrue(selected.showlegend)
 
@@ -90,6 +102,20 @@ class OrientedSkyMapTests(unittest.TestCase):
         self.assertEqual({trace.name for trace in dipper_traces}, {"Big Dipper"})
         self.assertEqual(milky_way.name, "Milky Way")
         self.assertTrue(milky_way.showlegend)
+
+        for traces in (crux_traces, dipper_traces):
+            line = next(trace for trace in traces if trace.mode == "lines")
+            stars = next(trace for trace in traces if trace.mode == "text")
+            self.assertEqual(line.line.color, "rgba(197, 139, 0, 0.85)")
+            self.assertEqual(stars.textfont.color, "#C58B00")
+            self.assertTrue(all(glyph == "✦" for glyph in stars.text))
+
+    def test_milky_way_is_a_more_visible_neutral_grey_band(self):
+        figure = oriented_sky_map(map_data())
+        milky_way = next(trace for trace in figure.data if trace.legendgroup == "milky-way")
+
+        self.assertEqual(milky_way.color, "#6E7378")
+        self.assertEqual(milky_way.opacity, 0.20)
 
     def test_catalogue_is_an_independent_legend_group(self):
         figure = oriented_sky_map(map_data(), colour_field="discoverymethod")
