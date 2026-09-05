@@ -80,8 +80,6 @@ EXPLORE_RESOURCES = (
         "summary": "Explore the exoplanet catalogue yourself.",
         "enabled": True,
         "icon": "🔬",
-        "thumbnail": "assets/exoplanets-artists-concept-nasa.jpeg",
-        "thumbnail_caption": "Artist's concept of the variety of known exoplanets. Credit: NASA/JPL-Caltech",
         "app_experience": "Exoplanet Data Laboratory",
     },
 )

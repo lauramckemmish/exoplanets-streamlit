@@ -2,7 +2,7 @@
 
 import unittest
 
-from experiences import catalog
+from experiences import catalog, landing
 
 
 class PublicDestinationCatalogueTests(unittest.TestCase):
@@ -20,10 +20,18 @@ class PublicDestinationCatalogueTests(unittest.TestCase):
         self.assertEqual(experience_names, {"Planet Shopping Outside Our Solar System"})
         self.assertEqual(explore_names, {"Exoplanet Data Lab"})
 
-    def test_data_lab_explore_resource_reuses_the_existing_route(self):
+    def test_data_lab_explore_resource_reuses_the_existing_route_without_thumbnail(self):
         resource = catalog.get_explore_resource("Exoplanet Data Lab")
         self.assertEqual(resource["app_experience"], "Exoplanet Data Laboratory")
-        self.assertEqual(resource["thumbnail"], "assets/exoplanets-artists-concept-nasa.jpeg")
+        self.assertNotIn("thumbnail", resource)
+
+    def test_thumbnail_card_keys_are_unique_per_catalogue_identity(self):
+        shopping = catalog.get_experience("Planet Shopping Outside Our Solar System")
+        data_lab = catalog.get_explore_resource("Exoplanet Data Lab")
+        self.assertNotEqual(
+            landing._thumbnail_container_key(shopping, "open_experience"),
+            landing._thumbnail_container_key(data_lab, "open_explore"),
+        )
 
     def test_planet_shopping_card_presentation_preserves_internal_destination(self):
         experience = catalog.get_experience("Planet Shopping Outside Our Solar System")
