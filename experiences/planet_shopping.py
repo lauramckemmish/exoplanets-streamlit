@@ -596,7 +596,7 @@ def _render_combine(data: pd.DataFrame) -> None:
         _render_overlap_visual(len(distance_matches), len(temperature_matches))
     think_q("How many planets do you think are in both groups?", title="Think")
     if not hard_reveal(
-        "Make your prediction before seeing the combined result.",
+        "",
         _COMBINE_REVEAL_KEY,
         reveal_label="Show the combined result",
     ):
