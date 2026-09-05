@@ -72,13 +72,13 @@ class SkyMapTests(unittest.TestCase):
         self.assertEqual(detected.marker.size, 3.2)
         self.assertEqual(detected.marker.opacity, 0.50)
 
-    def test_selected_planet_is_a_prominent_outlined_teal_diamond(self):
+    def test_selected_planet_is_a_prominent_outlined_coral_diamond(self):
         figure = sky_map(map_data(), selected_planet="Planet B")
 
         selected = next(trace for trace in figure.data if trace.name == "Your planet: Planet B")
         self.assertEqual(selected.marker.symbol, "diamond")
-        self.assertEqual(selected.marker.size, 16)
-        self.assertEqual(selected.marker.color, "#52E0C4")
+        self.assertEqual(selected.marker.size, 14)
+        self.assertEqual(selected.marker.color, "#FF8066")
         self.assertEqual(selected.marker.line.color, "#FFFFFF")
         self.assertEqual(selected.marker.line.width, 3)
         self.assertEqual(selected.textfont.color, "#F7FBFF")

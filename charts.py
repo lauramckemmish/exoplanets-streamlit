@@ -279,9 +279,9 @@ def sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field
         selected_trace.legendrank = 20
         selected_trace.showlegend = True
         selected_trace.marker.update(
-            size=16,
+            size=14,
             symbol="diamond",
-            color="#52E0C4",
+            color="#FF8066",
             opacity=1,
             line={"color": "#FFFFFF", "width": 3},
         )
