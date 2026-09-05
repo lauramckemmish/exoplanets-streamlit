@@ -800,39 +800,42 @@ def _render_destination(data: pd.DataFrame) -> None:
         coordinates = destination.reindex(["x", "y", "z"])
         if coordinates.notna().all():
             st.markdown("#### Where is your planet?")
-            st.plotly_chart(
-                sky_map(data, selected_planet=destination_name),
-                width="stretch",
-                height=540,
-            )
-            st.caption(
-                "Want some landmarks? Use the legend to add the Milky Way and familiar constellations to help orient yourself on the sky."
-            )
-            st.caption("Drag to rotate • scroll or pinch to zoom • hover or tap a sky landmark to learn more.")
-            st.info(
-                "**The green dots are detected exoplanets — not stars.**  \n"
-                "Most of these planets are not visible to the naked eye. The map shows where **known** exoplanets appear on our sky — not where all planets really are."
-            )
-            st.markdown(
-                "**Notice anything unusual about where the green dots are?**  \n"
-                "Some parts of the sky have lots of **known** exoplanets. Other parts have very few."
-            )
-            with soft_reveal("Why are they so unevenly spread across the sky?"):
-                st.write(
-                    "One reason is that astronomers have not searched every part of the sky in the same way. "
-                    "NASA’s Kepler mission spent years watching one patch of sky around Cygnus and Lyra, repeatedly "
-                    "measuring the brightness of more than 100,000 stars and finding planets when they crossed in front of them."
+            map_column, interpretation_column = st.columns([3, 2], gap="large")
+            with map_column:
+                st.plotly_chart(
+                    sky_map(data, selected_planet=destination_name),
+                    width="stretch",
+                    height=620,
                 )
-                st.write(
-                    "So the clumps and gaps in this map partly reflect **where we looked and how we looked** — "
-                    "not just where planets exist."
+            with interpretation_column:
+                st.info(
+                    "**The green dots are detected exoplanets — not stars.**  \n"
+                    "Most of these planets are not visible to the naked eye. The map shows where **known** exoplanets appear on our sky — not where all planets really are."
                 )
-            with st.container(border=True):
-                st.caption("The search continues")
+                st.caption(
+                    "Want some landmarks? Use the legend to add the Milky Way and familiar constellations to help orient yourself on the sky."
+                )
+                st.caption("Drag to rotate • scroll or pinch to zoom • hover or tap a sky landmark to learn more.")
                 st.markdown(
-                    "**There are more exoplanets out there than the ones in this catalogue.**  \n"
-                    "You chose from the worlds we have detected so far. Astronomers are still finding more."
+                    "**Notice anything unusual about where the green dots are?**  \n"
+                    "Some parts of the sky have lots of **known** exoplanets. Other parts have very few."
                 )
+                with soft_reveal("Why are they so unevenly spread across the sky?"):
+                    st.write(
+                        "One reason is that astronomers have not searched every part of the sky in the same way. "
+                        "NASA’s Kepler mission spent years watching one patch of sky around Cygnus and Lyra, repeatedly "
+                        "measuring the brightness of more than 100,000 stars and finding planets when they crossed in front of them."
+                    )
+                    st.write(
+                        "So the clumps and gaps in this map partly reflect **where we looked and how we looked** — "
+                        "not just where planets exist."
+                    )
+                with st.container(border=True):
+                    st.caption("The search continues")
+                    st.markdown(
+                        "**There are more exoplanets out there than the ones in this catalogue.**  \n"
+                        "You chose from the worlds we have detected so far. Astronomers are still finding more."
+                    )
         else:
             st.caption("This planet's position is not available in the map data.")
     completion_gate(selected)
