@@ -822,6 +822,10 @@ def _render_destination(data: pd.DataFrame) -> None:
             st.caption(
                 "The Pleiades, often known as the Seven Sisters, are recognised in many Aboriginal cultures across Australia. Names and stories vary by Nation."
             )
+            st.markdown(
+                "**There are more exoplanets out there than the ones in this catalogue.**  \n"
+                "You chose from the worlds we have detected so far. Astronomers are still finding more."
+            )
         else:
             st.caption("This planet's position is not available in the map data.")
     completion_gate(selected)

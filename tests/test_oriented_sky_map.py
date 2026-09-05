@@ -286,6 +286,18 @@ class SkyMapTests(unittest.TestCase):
         self.assertIn('with soft_reveal("Why are they so unevenly spread across the sky?"):', shopping_source)
         self.assertIn("**where we looked and how we looked**", shopping_source)
 
+    def test_planet_shopping_ends_the_destination_map_with_the_catalogue_coda(self):
+        shopping_source = Path("experiences/planet_shopping.py").read_text()
+
+        self.assertIn(
+            "**There are more exoplanets out there than the ones in this catalogue.**",
+            shopping_source,
+        )
+        self.assertIn(
+            "You chose from the worlds we have detected so far. Astronomers are still finding more.",
+            shopping_source,
+        )
+
     def test_no_public_oriented_map_alternative_remains(self):
         legacy_name = "oriented_" + "sky_map"
 
