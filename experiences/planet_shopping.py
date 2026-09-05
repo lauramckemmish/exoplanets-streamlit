@@ -834,6 +834,24 @@ def _render_destination(data: pd.DataFrame) -> None:
                     "**There are more exoplanets out there than the ones in this catalogue.**  \n"
                     "You chose from the worlds we have detected so far. **Astronomers are still finding more.**"
                 )
+            # TEMPORARY 2026 DELIVERY ENRICHMENT — review/remove after CURIOUS
+            with soft_reveal("Where will we find the next exoplanets?"):
+                st.write(
+                    "NASA’s Nancy Grace Roman Space Telescope launched on **30 August 2026**. "
+                    "One way Roman will search for exoplanets is **gravitational microlensing** — "
+                    "using the gravity of a foreground star to magnify the light of a more distant star "
+                    "and reveal planets we might otherwise miss."
+                )
+                st.link_button(
+                    "Watch Roman launch",
+                    "https://science.nasa.gov/blogs/roman/2026/08/30/nasas-roman-space-telescope-launches/",
+                    width="stretch",
+                )
+                st.link_button(
+                    "How microlensing can reveal an exoplanet",
+                    "https://svs.gsfc.nasa.gov/20315/",
+                    width="stretch",
+                )
         else:
             st.caption("This planet's position is not available in the map data.")
     completion_gate(selected)
