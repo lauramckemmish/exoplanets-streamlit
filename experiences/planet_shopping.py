@@ -846,10 +846,9 @@ def _render_destination(data: pd.DataFrame) -> None:
                 with st.container(width=720):
                     st.caption("Roman launch")
                     st.video("https://www.youtube.com/watch?v=U_yGbjnLMGM")
-                    st.caption("How microlensing can reveal an exoplanet")
-                    st.video(
-                        "https://svs.gsfc.nasa.gov/vis/a020000/a020300/a020315/"
-                        "WFIRST_Microlensing_S1a_4k_30fps_h264.mp4"
+                    st.markdown(
+                        "[**Want to know how microlensing works? → NASA**]("
+                        "https://science.nasa.gov/mission/roman-space-telescope/microlensing/)"
                     )
         else:
             st.caption("This planet's position is not available in the map data.")
