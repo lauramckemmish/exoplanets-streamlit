@@ -315,6 +315,22 @@ class SkyMapTests(unittest.TestCase):
             shopping_source,
         )
 
+    def test_planet_shopping_reveals_the_destination_map_before_its_interpretation(self):
+        shopping_source = Path("experiences/planet_shopping.py").read_text()
+
+        reveal_index = shopping_source.index('reveal_label="Show me on the sky"')
+        map_index = shopping_source.index("st.plotly_chart(", reveal_index)
+        clarification_index = shopping_source.index("**The green dots are detected exoplanets", map_index)
+        noticing_index = shopping_source.index("**Notice anything unusual", clarification_index)
+        soft_reveal_index = shopping_source.index('with soft_reveal("Why are they so unevenly spread across the sky?"):', noticing_index)
+
+        self.assertLess(reveal_index, map_index)
+        self.assertLess(map_index, clarification_index)
+        self.assertLess(clarification_index, noticing_index)
+        self.assertLess(noticing_index, soft_reveal_index)
+        self.assertIn("_DESTINATION_SKY_MAP_REVEAL_KEY", shopping_source)
+        self.assertIn("height=625", shopping_source)
+
     def test_planet_shopping_ends_the_destination_map_with_the_catalogue_coda(self):
         shopping_source = Path("experiences/planet_shopping.py").read_text()
 

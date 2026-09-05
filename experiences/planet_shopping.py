@@ -59,6 +59,7 @@ _COMBINE_REVEAL_KEY = "planet_shopping_combine_result_revealed"
 _COMBINE_DESTINATION_KEY = "planet_shopping_combine_destination"
 _DESTINATION_CONTROL_KEY = "planet_shopping_destination_control"
 _APPLIED_DESTINATION_KEY = "planet_shopping_applied_destination"
+_DESTINATION_SKY_MAP_REVEAL_KEY = "planet_shopping_destination_sky_map_revealed"
 _DESTINATION_USE_SIZE_KEY = "planet_shopping_destination_use_size"
 _DESTINATION_SIZE_CONTROL_KEY = "planet_shopping_destination_size_control"
 _DESTINATION_USE_STARS_KEY = "planet_shopping_destination_use_stars"
@@ -797,38 +798,48 @@ def _render_destination(data: pd.DataFrame) -> None:
         st.markdown("#### Where is your planet?")
         coordinates = destination.reindex(["x", "y", "z"])
         if coordinates.notna().all():
-            st.write("Here’s your destination among the exoplanets we know about.")
-            st.info(
-                "**The green dots are detected exoplanets — not stars.**  \n"
-                "Most of these planets are not visible to the naked eye. The map shows where **known** exoplanets appear on our sky — not where all planets really are."
+            sky_map_revealed = hard_reveal(
+                "Ready to see where your destination appears on the sky?",
+                _DESTINATION_SKY_MAP_REVEAL_KEY,
+                reveal_label="Show me on the sky",
             )
-            st.markdown(
-                "**Notice anything unusual about where the green dots are?**  \n"
-                "Some parts of the sky have lots of **known** exoplanets. Other parts have very few."
-            )
-            with soft_reveal("Why are they so unevenly spread across the sky?"):
-                st.write(
-                    "One reason is that astronomers have not searched every part of the sky in the same way. "
-                    "NASA’s Kepler mission spent years watching one patch of sky around Cygnus and Lyra, repeatedly "
-                    "measuring the brightness of more than 100,000 stars and finding planets when they crossed in front of them."
+            if sky_map_revealed:
+                st.write("Here’s your destination among the exoplanets we know about.")
+                st.plotly_chart(
+                    sky_map(data, selected_planet=destination_name),
+                    width="stretch",
+                    height=625,
                 )
-                st.write(
-                    "So the clumps and gaps in this map partly reflect **where we looked and how we looked** — "
-                    "not just where planets exist."
+                st.info(
+                    "**The green dots are detected exoplanets — not stars.**  \n"
+                    "Most of these planets are not visible to the naked eye. The map shows where **known** exoplanets appear on our sky — not where all planets really are."
                 )
-            st.caption(
-                "Want some landmarks? Use the legend to add the Milky Way and familiar constellations to help orient yourself on the sky."
-            )
-            st.plotly_chart(sky_map(data, selected_planet=destination_name), width="stretch")
-            # High-level wording follows ANU's Indigenous Songlines overview:
-            # Seven Sisters knowledge has many variations across Australia.
-            st.caption(
-                "The Pleiades, often known as the Seven Sisters, are recognised in many Aboriginal cultures across Australia. Names and stories vary by Nation."
-            )
-            st.markdown(
-                "**There are more exoplanets out there than the ones in this catalogue.**  \n"
-                "You chose from the worlds we have detected so far. Astronomers are still finding more."
-            )
+                st.markdown(
+                    "**Notice anything unusual about where the green dots are?**  \n"
+                    "Some parts of the sky have lots of **known** exoplanets. Other parts have very few."
+                )
+                with soft_reveal("Why are they so unevenly spread across the sky?"):
+                    st.write(
+                        "One reason is that astronomers have not searched every part of the sky in the same way. "
+                        "NASA’s Kepler mission spent years watching one patch of sky around Cygnus and Lyra, repeatedly "
+                        "measuring the brightness of more than 100,000 stars and finding planets when they crossed in front of them."
+                    )
+                    st.write(
+                        "So the clumps and gaps in this map partly reflect **where we looked and how we looked** — "
+                        "not just where planets exist."
+                    )
+                st.caption(
+                    "Want some landmarks? Use the legend to add the Milky Way and familiar constellations to help orient yourself on the sky."
+                )
+                # High-level wording follows ANU's Indigenous Songlines overview:
+                # Seven Sisters knowledge has many variations across Australia.
+                st.caption(
+                    "The Pleiades, often known as the Seven Sisters, are recognised in many Aboriginal cultures across Australia. Names and stories vary by Nation."
+                )
+                st.markdown(
+                    "**There are more exoplanets out there than the ones in this catalogue.**  \n"
+                    "You chose from the worlds we have detected so far. Astronomers are still finding more."
+                )
         else:
             st.caption("This planet's position is not available in the map data.")
     completion_gate(selected)
