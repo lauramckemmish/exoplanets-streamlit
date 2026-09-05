@@ -66,8 +66,13 @@ class SkyMapTests(unittest.TestCase):
                 "Milky Way",
             ],
         )
-        self.assertEqual(figure.layout.legend.orientation, "v")
-        self.assertGreater(figure.layout.legend.x, 1)
+        self.assertEqual(figure.layout.legend.orientation, "h")
+        self.assertEqual(figure.layout.legend.x, 0.5)
+        self.assertEqual(figure.layout.legend.xanchor, "center")
+        self.assertEqual(figure.layout.legend.y, -0.12)
+        self.assertEqual(figure.layout.legend.yanchor, "top")
+        self.assertEqual(figure.layout.margin.r, 0)
+        self.assertEqual(figure.layout.margin.b, 95)
         self.assertEqual(figure.layout.legend.title.text, "Show on the sky")
         self.assertEqual(figure.layout.legend.groupclick, "togglegroup")
 

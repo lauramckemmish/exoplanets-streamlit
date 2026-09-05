@@ -543,14 +543,14 @@ def sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field
         scene["dragmode"] = "orbit"
 
     figure.update_layout(
-        margin={"l": 0, "r": 210, "t": 20, "b": 0},
+        margin={"l": 0, "r": 0, "t": 20, "b": 95},
         paper_bgcolor="#071725",
         legend={
             "title": {"text": "Show on the sky", "font": {"size": 16, "color": "#F7FBFF"}},
-            "orientation": "v",
-            "x": 1.01,
-            "xanchor": "left",
-            "y": 1,
+            "orientation": "h",
+            "x": 0.5,
+            "xanchor": "center",
+            "y": -0.12,
             "yanchor": "top",
             "font": {"size": 14, "color": "#F7FBFF"},
             "bgcolor": "rgba(7, 23, 37, 0.82)",
