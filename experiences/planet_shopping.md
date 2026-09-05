@@ -22,6 +22,13 @@ experience in code. Return the question for design review.
   combining criteria and making a decision from evidence.
 - This is not primarily a graphing experience.
 
+## Facilitator view
+
+At Launch, an optional facilitator view provides a compact before-you-teach
+orientation, scientific/data-science guardrails, lightweight recovery advice
+and expandable scientific context. It supports professional judgement without
+duplicating the learner journey or becoming a screen-by-screen script.
+
 ## Screen sequence
 
 ### 1. Launch — Where can we go?

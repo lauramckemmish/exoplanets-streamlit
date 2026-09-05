@@ -36,6 +36,7 @@ STAGE_LABELS = [
 _STAGE_KEY = "planet_shopping_stage"
 _TAB_KEY = "planet_shopping_tab"
 _SCROLL_KEY = "planet_shopping_scroll_to_top"
+_FACILITATOR_VIEW_KEY = "planet_shopping_facilitator_view"
 _CATALOGUE_REVEAL_KEY = "planet_shopping_meet_catalogue_revealed"
 _DISTANCE_CONTROL_KEY = "planet_shopping_distance_control_ly"
 _APPLIED_DISTANCE_KEY = "planet_shopping_applied_distance_ly"
@@ -103,6 +104,84 @@ def _format_travel_years(years: float) -> str:
         millions = f"{years / 1_000_000:.1f}".rstrip("0").rstrip(".")
         return f"{millions} million years"
     return f"{years:,.0f} years"
+
+
+def _render_facilitator_orientation() -> None:
+    """Render the compact, Launch-associated facilitator handover."""
+    with st.container(border=True):
+        st.markdown("### Facilitator view")
+        st.markdown("#### Before you teach")
+        st.markdown(
+            "**What this experience is doing**  \n"
+            "Planet Shopping uses real exoplanet data to move through: "
+            "**real objects represented as data → one criterion → incomplete information → "
+            "independent criteria → intersection → evidence-based choice → transfer**."
+        )
+        st.caption(
+            "Learner sequence: Launch → Meet a Planet → Distance → Temperature → Combine → "
+            "Choose Your Destination → Data Science"
+        )
+        st.markdown(
+            "**Working timing**  \n"
+            "Designed for about **50 minutes**. This timing has not yet been validated in live classroom delivery."
+        )
+        st.markdown(
+            "**Room rhythm**  \n"
+            "Use a short common-room prompt when useful, let learners explore on their own devices or in pairs, "
+            "then regroup for meaningful reasoning before returning to the data. Adapt wording, examples and "
+            "discussion to your group."
+        )
+        st.markdown(
+            "**Whole-room reasoning anchors**  \n"
+            "- **Temperature:** incomplete information becomes a real reasoning problem. Unknown temperature is "
+            "not the same as unsuitable.  \n"
+            "- **Combine:** learners bring independent criteria together, predict the known intersection, and compare "
+            "expectation with evidence."
+        )
+        st.markdown(
+            "**What you need to know**  \n"
+            "Scientific literacy is enough; you do not need specialist exoplanet knowledge or an explanation for "
+            "every field or unusual planet."
+        )
+        st.markdown(
+            "#### Scientific and data-science guardrails\n"
+            "- Equilibrium temperature is an **estimated model quantity**, not a direct measurement of surface climate.\n"
+            "- Unknown temperature means **unknown**, not automatically unsuitable.\n"
+            "- The known overlap is based on the evidence currently available.\n"
+            "- Filtering identifies candidates that meet chosen criteria; it does not prove broader properties such as habitability."
+        )
+        with st.expander("Practical recovery", expanded=False):
+            st.markdown(
+                "- Pair learners when devices or pacing make that useful.\n"
+                "- Regroup when the room has dispersed too far through the experience.\n"
+                "- If time is short, protect the central reasoning progression rather than adding extra discussion.\n"
+                "- An empty shortlist is useful evidence: loosen criteria and ask why their combination left no candidates.\n"
+                "- Unexpected real-data cases can be acknowledged or explored; an immediate expert explanation is not required."
+            )
+        with st.expander("Want to go deeper?", expanded=False):
+            st.markdown(
+                "**Why the catalogue looks historically uneven**  \n"
+                "Exoplanet discoveries did not accumulate uniformly. Kepler produced major increases because it "
+                "systematically observed one region of the sky to learn about exoplanet populations. The conspicuous "
+                "Kepler-era jumps are meaningful scientific context, not random plotting artefacts."
+            )
+            st.markdown(
+                "**Kepler → TESS → Roman: changing scientific questions**  \n"
+                "- **Kepler — How common are different kinds of planets?** It went deep on one patch of sky to build a "
+                "population census.\n"
+                "- **TESS — Where are nearby planetary systems we can investigate in more detail?** It surveys much more "
+                "of the sky, especially bright nearby stars, producing strong targets for follow-up characterisation.\n"
+                "- **Roman — What parts of the planetary population are still poorly sampled?** It will extend the "
+                "statistical census into different regions and planetary parameter space."
+            )
+            st.markdown(
+                "**Where the science goes next**  \n"
+                "This activity is dominated by the physics of finding and counting planets, then reasoning from basic "
+                "planetary properties. "
+                "As researchers characterise exoplanet atmospheres, chemistry becomes more central. Questions about "
+                "habitability and possible biosignatures then draw on chemistry, biology, geology, stellar physics and "
+                "planetary science."
+            )
 
 
 def _random_planet_name(data: pd.DataFrame, current: str | None = None, rng=random) -> str:
@@ -917,14 +996,25 @@ def render(data: pd.DataFrame) -> None:
         st.session_state[_STAGE_KEY] = 0
 
     stage = max(0, min(int(st.session_state[_STAGE_KEY]), len(STAGE_LABELS) - 1))
-    st.header(TITLE)
-    st.caption(SUBTITLE)
+    heading, activity_controls = st.columns([4, 2])
+    with heading:
+        st.header(TITLE)
+        st.caption(SUBTITLE)
+    with activity_controls:
+        st.toggle(
+            "Facilitator view",
+            key=_FACILITATOR_VIEW_KEY,
+            help="Show concise preparation, facilitation guidance and optional scientific context.",
+        )
 
     _, selected_stage = step_tabs(STAGE_LABELS, _TAB_KEY, stage)
     if selected_stage != stage:
         stage = selected_stage
         st.session_state[_STAGE_KEY] = stage
     scroll_to_top_if_requested(_SCROLL_KEY)
+
+    if stage == 0 and st.session_state.get(_FACILITATOR_VIEW_KEY, False):
+        _render_facilitator_orientation()
 
     if stage == 0:
         _render_launch(data)
