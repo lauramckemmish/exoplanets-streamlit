@@ -372,35 +372,6 @@ def _galactic_plane_band() -> tuple[np.ndarray, np.ndarray, np.ndarray, list[int
     return points[:, 0], points[:, 1], points[:, 2], i, j, k
 
 
-_NEAR_CENTRE_CAMERA_EPSILON = 0.20
-
-
-def _camera_for_selected_direction(direction: np.ndarray) -> dict[str, dict[str, float]] | None:
-    """Aim a stable near-centre Plotly camera toward one sky direction."""
-    unit_direction = np.asarray(direction, dtype=float)
-    if unit_direction.shape != (3,) or not np.isfinite(unit_direction).all():
-        return None
-    norm = np.linalg.norm(unit_direction)
-    if norm == 0:
-        return None
-    unit_direction /= norm
-
-    # Keep the page upright without a roll. Near either celestial pole, use
-    # y rather than z as the reference so the perpendicular projection stays
-    # well-conditioned.
-    reference_up = np.array([0.0, 0.0, 1.0])
-    if abs(np.dot(reference_up, unit_direction)) > 0.92:
-        reference_up = np.array([0.0, 1.0, 0.0])
-    up = reference_up - np.dot(reference_up, unit_direction) * unit_direction
-    up /= np.linalg.norm(up)
-
-    return {
-        "eye": dict(zip(("x", "y", "z"), -_NEAR_CENTRE_CAMERA_EPSILON * unit_direction, strict=True)),
-        "center": dict(zip(("x", "y", "z"), unit_direction, strict=True)),
-        "up": dict(zip(("x", "y", "z"), up, strict=True)),
-    }
-
-
 def sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field: str | None = None, colour_label: str | None = None) -> go.Figure:
     """Build the canonical celestial map with familiar orientation landmarks.
 
@@ -416,7 +387,6 @@ def sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field
     # legend is reserved for choosing broad sky layers.
     catalogue_traces: list[go.Scatter3d] = []
     selected_trace: go.Scatter3d | None = None
-    selected_camera: dict[str, dict[str, float]] | None = None
     for trace in figure.data:
         if trace.name == f"Selected: {selected_planet}":
             selected_trace = trace
@@ -451,9 +421,6 @@ def sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field
             line={"color": "#FFFFFF", "width": 3},
         )
         selected_trace.textfont = {"color": "#F7FBFF", "size": 16}
-        selected_camera = _camera_for_selected_direction(
-            np.asarray([selected_trace.x[0], selected_trace.y[0], selected_trace.z[0]])
-        )
 
     band_x, band_y, band_z, band_i, band_j, band_k = _galactic_plane_band()
     figure.add_trace(go.Mesh3d(
@@ -537,10 +504,10 @@ def sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field
         "yaxis": {"visible": False, "showbackground": False, "showgrid": False, "showline": False, "showticklabels": False, "showspikes": False, "zeroline": False, "title": {"text": ""}},
         "zaxis": {"visible": False, "showbackground": False, "showgrid": False, "showline": False, "showticklabels": False, "showspikes": False, "zeroline": False, "title": {"text": ""}},
         "aspectmode": "cube",
+        # Keep learner-driven rotation and zoom while equivalent figures are
+        # rebuilt by Streamlit, including after ordinary layer interactions.
+        "uirevision": "sky-map",
     }
-    if selected_camera is not None:
-        scene["camera"] = selected_camera
-        scene["dragmode"] = "orbit"
 
     figure.update_layout(
         margin={"l": 0, "r": 0, "t": 20, "b": 95},

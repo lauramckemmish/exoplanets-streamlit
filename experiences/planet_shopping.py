@@ -831,7 +831,7 @@ def _render_destination(data: pd.DataFrame) -> None:
                 st.caption(
                     "Want some landmarks? Use the legend to add the Milky Way and familiar constellations to help orient yourself on the sky."
                 )
-                st.caption("Hover or tap a sky landmark to learn more.")
+                st.caption("Drag to rotate • scroll or pinch to zoom • hover or tap a sky landmark to learn more.")
                 with st.container(border=True):
                     st.caption("The search continues")
                     st.markdown(

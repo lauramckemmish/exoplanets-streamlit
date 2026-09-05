@@ -11,7 +11,6 @@ import charts
 from charts import (
     _BIG_DIPPER_STARS,
     _CRUX_STARS,
-    _NEAR_CENTRE_CAMERA_EPSILON,
     _PLEIADES_STARS,
     _ZODIAC_CONSTELLATIONS,
     _equatorial_unit_sphere,
@@ -120,33 +119,15 @@ class SkyMapTests(unittest.TestCase):
             self.assertTrue(all(trace.visible == "legendonly" for trace in traces))
             self.assertEqual(sum(bool(trace.showlegend) for trace in traces), 1)
 
-    def test_selected_planet_gets_a_finite_near_centre_camera_aimed_at_its_direction(self):
+    def test_sky_map_uses_a_stable_ui_revision_without_a_selected_planet_camera_override(self):
         figure = sky_map(map_data(), selected_planet="Planet B")
-        camera = figure.layout.scene.camera
-        eye = np.asarray([camera.eye.x, camera.eye.y, camera.eye.z], dtype=float)
-        center = np.asarray([camera.center.x, camera.center.y, camera.center.z], dtype=float)
-        up = np.asarray([camera.up.x, camera.up.y, camera.up.z], dtype=float)
-
-        self.assertTrue(np.isfinite(np.concatenate([eye, center, up])).all())
-        self.assertFalse(np.allclose(eye, 0))
-        self.assertGreater(_NEAR_CENTRE_CAMERA_EPSILON, 0.08)
-        np.testing.assert_allclose(eye, [0.0, -_NEAR_CENTRE_CAMERA_EPSILON, 0.0])
-        np.testing.assert_allclose(center, [0.0, 1.0, 0.0])
-        np.testing.assert_allclose(np.dot(up, center), 0.0)
-        self.assertEqual(figure.layout.scene.dragmode, "orbit")
-
-    def test_different_selected_planets_get_different_camera_orientations(self):
-        planet_a = sky_map(map_data(), selected_planet="Planet A").layout.scene.camera
-        planet_b = sky_map(map_data(), selected_planet="Planet B").layout.scene.camera
-
-        self.assertNotEqual(planet_a.eye, planet_b.eye)
-        self.assertNotEqual(planet_a.center, planet_b.center)
-
-    def test_unselected_sky_map_keeps_the_default_camera_view(self):
-        figure = sky_map(map_data())
-
-        self.assertIsNone(figure.layout.scene.camera.eye.x)
+        self.assertEqual(figure.layout.scene.uirevision, "sky-map")
+        self.assertFalse(hasattr(charts, "_camera_for_selected_direction"))
         self.assertIsNone(figure.layout.scene.dragmode)
+        camera = figure.layout.scene.camera
+        self.assertIsNone(figure.layout.scene.camera.eye.x)
+        self.assertIsNone(camera.center.x)
+        self.assertIsNone(camera.up.x)
 
     def test_landmark_components_share_logical_legend_groups(self):
         figure = sky_map(map_data())
@@ -332,7 +313,10 @@ class SkyMapTests(unittest.TestCase):
             "Want some landmarks? Use the legend to add the Milky Way and familiar constellations to help orient yourself on the sky.",
             shopping_source,
         )
-        self.assertIn("Hover or tap a sky landmark to learn more.", shopping_source)
+        self.assertIn(
+            "Drag to rotate • scroll or pinch to zoom • hover or tap a sky landmark to learn more.",
+            shopping_source,
+        )
 
     def test_planet_shopping_reveals_the_destination_map_before_its_interpretation(self):
         shopping_source = Path("experiences/planet_shopping.py").read_text()
