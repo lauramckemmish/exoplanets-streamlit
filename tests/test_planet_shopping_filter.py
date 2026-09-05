@@ -109,10 +109,14 @@ class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
         self.assertEqual(state[_UNKNOWN_TEMPERATURE_CONTROL_KEY], _UNKNOWN_TEMPERATURE_OPTIONS[1])
         self.assertEqual(state[_UNKNOWN_TEMPERATURE_DECISION_KEY], _UNKNOWN_TEMPERATURE_OPTIONS[1])
 
-    def test_temperature_policy_cards_use_the_action_title_as_the_only_control_label(self):
+    def test_temperature_policy_cards_are_complete_native_button_surfaces(self):
         source = Path("experiences/planet_shopping.py").read_text()
 
-        self.assertIn('f"{icon} {title}"', source)
+        self.assertIn('button_label = f"{icon} **{title}**\\n{consequence}"', source)
+        self.assertIn('button_label += "\\n✓ Selected"', source)
+        self.assertIn("use_container_width=True", source)
+        self.assertIn('background: #fff8d8;', source)
+        self.assertNotIn('with st.container(border=True, key=f"{key_prefix}_card")', source)
         self.assertNotIn('f"Choose {title}"', source)
         self.assertNotIn('f"Selected: {title}"', source)
 

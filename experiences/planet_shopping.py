@@ -398,29 +398,35 @@ def _render_temperature(data: pd.DataFrame) -> None:
         """
         <style>
         .st-key-planet_shopping_temperature_policy [data-testid="stHorizontalBlock"] { gap: 0.75rem; }
-        .st-key-planet_shopping_temperature_policy [data-testid="stVerticalBlockBorderWrapper"] {
-            background: #fffdf2;
-            border-color: #e6dfc5;
-            padding: 0.55rem 0.7rem;
-        }
         .st-key-planet_shopping_temperature_policy [data-testid="stButton"] { margin: 0; }
         .st-key-planet_shopping_temperature_policy [data-testid="stButton"] button {
             width: 100%;
-            min-height: 0;
-            padding: 0;
-            border: 0;
-            background: transparent;
+            min-height: 6.5rem;
+            padding: 0.7rem 0.8rem;
+            border: 1px solid #e2cd75;
+            border-left: 4px solid #e2cd75;
+            background: #fff8d8;
             color: #1f1f1f;
-            font-size: 1.05rem;
-            font-weight: 700;
             justify-content: flex-start;
+            text-align: left;
+        }
+        .st-key-planet_shopping_temperature_policy [data-testid="stButton"] button p {
+            white-space: pre-line;
+            text-align: left;
+            line-height: 1.35;
         }
         .st-key-planet_shopping_temperature_policy [data-testid="stButton"] button:hover {
-            background: rgba(255, 221, 0, 0.12);
+            background: #fff2ae;
+            border-color: #d3aa00;
+        }
+        .st-key-planet_shopping_temperature_policy [data-testid="stButton"] button:focus-visible {
+            outline: 3px solid #ffdc00;
+            outline-offset: 2px;
         }
         .st-key-planet_shopping_temperature_policy [data-testid="stButton"] button[kind="primary"] {
-            background: #ffdc00;
-            border: 1px solid #d3aa00;
+            background: #fff0ad;
+            border: 2px solid #e5b900;
+            border-left: 5px solid #ffdc00;
             color: #1f1f1f;
         }
         @media (max-width: 640px) {
@@ -454,31 +460,17 @@ def _render_temperature(data: pd.DataFrame) -> None:
         for card, option, icon, title, consequence, key_prefix in choices:
             selected = unknown_decision == option
             with card:
-                with st.container(border=True, key=f"{key_prefix}_card"):
-                    if selected:
-                        st.markdown(
-                            f"""
-                            <style>
-                            .st-key-{key_prefix}_card,
-                            .st-key-{key_prefix}_card [data-testid="stVerticalBlockBorderWrapper"] {{
-                                background: #fff8d8;
-                                border-left: 4px solid #ffdc00;
-                                border-color: #e5b900;
-                            }}
-                            </style>
-                            """,
-                            unsafe_allow_html=True,
-                        )
-                    st.button(
-                        f"{icon} {title}",
-                        type="primary" if selected else "secondary",
-                        key=f"{key_prefix}_button",
-                        on_click=_record_unknown_temperature_decision,
-                        args=(st.session_state, option),
-                    )
-                    st.caption(consequence)
-                    if selected:
-                        st.caption("✓ Selected")
+                button_label = f"{icon} **{title}**\n{consequence}"
+                if selected:
+                    button_label += "\n✓ Selected"
+                st.button(
+                    button_label,
+                    type="primary" if selected else "secondary",
+                    key=f"{key_prefix}_button",
+                    on_click=_record_unknown_temperature_decision,
+                    args=(st.session_state, option),
+                    use_container_width=True,
+                )
     completion_gate(unknown_decision is not None)
 
 
