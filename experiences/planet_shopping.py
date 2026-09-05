@@ -832,10 +832,12 @@ def _render_destination(data: pd.DataFrame) -> None:
                     "Want some landmarks? Use the legend to add the Milky Way and familiar constellations to help orient yourself on the sky."
                 )
                 st.caption("Hover or tap a sky landmark to learn more.")
-                st.markdown(
-                    "**There are more exoplanets out there than the ones in this catalogue.**  \n"
-                    "You chose from the worlds we have detected so far. Astronomers are still finding more."
-                )
+                with st.container(border=True):
+                    st.caption("The search continues")
+                    st.markdown(
+                        "**There are more exoplanets out there than the ones in this catalogue.**  \n"
+                        "You chose from the worlds we have detected so far. Astronomers are still finding more."
+                    )
         else:
             st.caption("This planet's position is not available in the map data.")
     completion_gate(selected)
