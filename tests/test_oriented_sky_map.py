@@ -321,7 +321,7 @@ class SkyMapTests(unittest.TestCase):
         self.assertIn("**The green dots are detected exoplanets — not stars.**", shopping_source)
         self.assertIn("The map shows where **known** exoplanets appear on our sky", shopping_source)
 
-    def test_planet_shopping_commits_the_destination_before_showing_the_map(self):
+    def test_planet_shopping_requires_a_deliberate_transition_before_showing_the_map(self):
         shopping_source = Path("experiences/planet_shopping.py").read_text()
 
         profile_index = shopping_source.index("_render_planet_profile(inspected_name, inspected_destination)")
@@ -330,6 +330,16 @@ class SkyMapTests(unittest.TestCase):
         choose_index = shopping_source.index('st.button("Choose this planet", type="primary")')
         commit_index = shopping_source.index("_record_destination_selection(st.session_state, inspected_name)")
         confirmation_index = shopping_source.index('st.success(f"Destination chosen: {destination_name}")')
+        claim_boundary_index = shopping_source.index(
+            "_HABITABILITY_BOUNDARY_REVEAL_KEY", confirmation_index
+        )
+        sky_map_reveal_index = shopping_source.index("_SKY_MAP_REVEAL_KEY", claim_boundary_index)
+        sky_map_prompt_index = shopping_source.index(
+            "**Where is your planet in the sky?**", claim_boundary_index
+        )
+        sky_map_action_index = shopping_source.index(
+            'reveal_label="Show me the sky map"', sky_map_reveal_index
+        )
         layout_index = shopping_source.index(
             'map_column, interpretation_column = st.columns(',
             confirmation_index,
@@ -346,6 +356,11 @@ class SkyMapTests(unittest.TestCase):
         self.assertLess(prompt_index, choose_index)
         self.assertLess(choose_index, commit_index)
         self.assertLess(commit_index, confirmation_index)
+        self.assertLess(confirmation_index, claim_boundary_index)
+        self.assertLess(claim_boundary_index, sky_map_prompt_index)
+        self.assertLess(sky_map_prompt_index, sky_map_reveal_index)
+        self.assertLess(sky_map_reveal_index, sky_map_action_index)
+        self.assertLess(sky_map_action_index, layout_index)
         self.assertLess(confirmation_index, layout_index)
         self.assertLess(layout_index, map_column_index)
         self.assertLess(map_column_index, map_index)
@@ -358,11 +373,11 @@ class SkyMapTests(unittest.TestCase):
         self.assertIn("completion_gate(selected)", shopping_source)
         self.assertIn('vertical_alignment="bottom"', shopping_source)
         self.assertIn("width=\"stretch\"", shopping_source)
-        self.assertIn("height=620", shopping_source)
+        self.assertIn('with st.container(width=900):', shopping_source)
+        self.assertIn("height=465", shopping_source)
         self.assertNotIn('st.markdown("#### Where is your planet?")', shopping_source)
         self.assertNotIn("Here’s your destination among the exoplanets we know about.", shopping_source)
         self.assertNotIn('reveal_label="Show me on the sky"', shopping_source)
-        self.assertNotIn("_DESTINATION_SKY_MAP_REVEAL_KEY", shopping_source)
         self.assertNotIn("Why did you choose that one?", shopping_source)
         self.assertNotIn("Given what we know and what matters to you, this is the planet you chose.", shopping_source)
 

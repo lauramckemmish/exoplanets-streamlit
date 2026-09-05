@@ -197,12 +197,14 @@ criteria are too strict and invite learners to loosen one. The destination
 choice persists and is required before the final reflection; do not claim that
 the chosen planet is habitable.
 
-Immediately after destination commitment, before the sky-map coda, learners
-encounter a short claim-boundary hard reveal. Distance, estimated temperature
-and other filters identify promising candidates rather than establishing
-habitability: the search answers which planets meet the chosen criteria, not
-which planets are habitable. This is a concise boundary on the existing
-inference, not a new habitability content strand.
+Immediately after destination commitment, learners encounter a short
+claim-boundary hard reveal. Distance, estimated temperature and other filters
+identify promising candidates rather than establishing habitability: the search
+answers which planets meet the chosen criteria, not which planets are
+habitable. This is a concise boundary on the existing inference, not a new
+habitability content strand. A second hard reveal then lets learners
+deliberately transition to the sky map, separating that new reasoning job from
+the claim boundary without introducing additional science content.
 
 ### 7. Data Science — What did you just do?
 

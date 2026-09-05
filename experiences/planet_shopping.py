@@ -61,6 +61,7 @@ _COMBINE_DESTINATION_KEY = "planet_shopping_combine_destination"
 _DESTINATION_CONTROL_KEY = "planet_shopping_destination_control"
 _APPLIED_DESTINATION_KEY = "planet_shopping_applied_destination"
 _HABITABILITY_BOUNDARY_REVEAL_KEY = "planet_shopping_habitability_boundary_revealed"
+_SKY_MAP_REVEAL_KEY = "planet_shopping_sky_map_revealed"
 _DESTINATION_USE_SIZE_KEY = "planet_shopping_destination_use_size"
 _DESTINATION_SIZE_CONTROL_KEY = "planet_shopping_destination_size_control"
 _DESTINATION_USE_STARS_KEY = "planet_shopping_destination_use_stars"
@@ -878,36 +879,45 @@ def _render_destination(data: pd.DataFrame) -> None:
         ):
             completion_gate(selected)
             return
+        if not hard_reveal(
+            "**Where is your planet in the sky?**",
+            _SKY_MAP_REVEAL_KEY,
+            reveal_label="Show me the sky map",
+        ):
+            completion_gate(selected)
+            return
         coordinates = destination.reindex(["x", "y", "z"])
         if coordinates.notna().all():
-            map_column, interpretation_column = st.columns(
-                [3, 2], gap="large", vertical_alignment="bottom"
-            )
-            with map_column:
-                st.plotly_chart(
-                    sky_map(data, selected_planet=destination_name),
-                    width="stretch",
-                    height=620,
-                )
-            with interpretation_column:
-                st.info(
-                    "**The green dots are detected exoplanets — not stars.**  \n"
-                    "The map shows where **known** exoplanets appear on our sky — not where all planets really are."
-                )
-                st.markdown(
-                    "**Notice anything unusual about where the green dots are?**  \n"
-                    "Some parts of the sky have lots of **known** exoplanets. Other parts have very few."
-                )
-                with soft_reveal("Why are they so unevenly spread across the sky?"):
-                    st.write(
-                        "One reason is that astronomers have not searched every part of the sky in the same way. "
-                        "NASA’s Kepler mission spent years watching one patch of sky around Cygnus and Lyra, repeatedly "
-                        "measuring the brightness of more than 100,000 stars and finding planets when they crossed in front of them."
+            with st.container(horizontal_alignment="center"):
+                with st.container(width=900):
+                    map_column, interpretation_column = st.columns(
+                        [3, 2], gap="large", vertical_alignment="bottom"
                     )
-                    st.write(
-                        "So the clumps and gaps in this map partly reflect **where we looked and how we looked** — "
-                        "not just where planets exist."
-                    )
+                    with map_column:
+                        st.plotly_chart(
+                            sky_map(data, selected_planet=destination_name),
+                            width="stretch",
+                            height=465,
+                        )
+                    with interpretation_column:
+                        st.info(
+                            "**The green dots are detected exoplanets — not stars.**  \n"
+                            "The map shows where **known** exoplanets appear on our sky — not where all planets really are."
+                        )
+                        st.markdown(
+                            "**Notice anything unusual about where the green dots are?**  \n"
+                            "Some parts of the sky have lots of **known** exoplanets. Other parts have very few."
+                        )
+                        with soft_reveal("Why are they so unevenly spread across the sky?"):
+                            st.write(
+                                "One reason is that astronomers have not searched every part of the sky in the same way. "
+                                "NASA’s Kepler mission spent years watching one patch of sky around Cygnus and Lyra, repeatedly "
+                                "measuring the brightness of more than 100,000 stars and finding planets when they crossed in front of them."
+                            )
+                            st.write(
+                                "So the clumps and gaps in this map partly reflect **where we looked and how we looked** — "
+                                "not just where planets exist."
+                            )
             st.markdown(
                 """
                 <style>
