@@ -69,18 +69,21 @@ class SkyMapTests(unittest.TestCase):
 
         self.assertEqual(detected.marker.color, "#007C78")
         self.assertEqual(detected.marker.symbol, "circle")
-        self.assertEqual(detected.marker.size, 4)
-        self.assertEqual(detected.marker.opacity, 0.65)
+        self.assertEqual(detected.marker.size, 3.2)
+        self.assertEqual(detected.marker.opacity, 0.50)
 
     def test_selected_planet_is_a_prominent_outlined_teal_diamond(self):
         figure = sky_map(map_data(), selected_planet="Planet B")
 
         selected = next(trace for trace in figure.data if trace.name == "Your planet: Planet B")
         self.assertEqual(selected.marker.symbol, "diamond")
-        self.assertEqual(selected.marker.size, 12)
-        self.assertEqual(selected.marker.color, "#009E91")
-        self.assertEqual(selected.marker.line.color, "#053B3A")
+        self.assertEqual(selected.marker.size, 16)
+        self.assertEqual(selected.marker.color, "#52E0C4")
+        self.assertEqual(selected.marker.line.color, "#FFFFFF")
         self.assertEqual(selected.marker.line.width, 3)
+        self.assertEqual(selected.textfont.color, "#F7FBFF")
+        self.assertEqual(selected.textfont.size, 16)
+        self.assertEqual(selected.textposition, "top center")
         self.assertEqual(selected.legendgroup, "selected-planet")
         self.assertTrue(selected.showlegend)
 
@@ -109,8 +112,21 @@ class SkyMapTests(unittest.TestCase):
         figure = sky_map(map_data())
         milky_way = next(trace for trace in figure.data if trace.legendgroup == "milky-way")
 
-        self.assertEqual(milky_way.color, "#6E7378")
-        self.assertEqual(milky_way.opacity, 0.20)
+        self.assertEqual(milky_way.color, "#D9E0E7")
+        self.assertEqual(milky_way.opacity, 0.28)
+
+    def test_night_sky_scene_hides_cartesian_scaffolding(self):
+        figure = sky_map(map_data())
+
+        self.assertEqual(figure.layout.paper_bgcolor, "#071725")
+        self.assertEqual(figure.layout.scene.bgcolor, "#071725")
+        for axis in (figure.layout.scene.xaxis, figure.layout.scene.yaxis, figure.layout.scene.zaxis):
+            self.assertFalse(axis.visible)
+            self.assertFalse(axis.showgrid)
+            self.assertFalse(axis.showline)
+            self.assertFalse(axis.showticklabels)
+            self.assertFalse(axis.zeroline)
+            self.assertEqual(axis.title.text, "")
 
     def test_catalogue_is_an_independent_legend_group(self):
         figure = sky_map(map_data(), colour_field="discoverymethod")
@@ -128,6 +144,8 @@ class SkyMapTests(unittest.TestCase):
         categorical_traces = [trace for trace in categorical.data if trace.legendgroup == "detected-exoplanets"]
 
         self.assertEqual(numeric_trace.marker.colorbar.title.text, "Discovery year")
+        self.assertEqual(numeric_trace.marker.colorbar.title.font.color, "#F7FBFF")
+        self.assertEqual(numeric_trace.marker.colorbar.tickfont.color, "#F7FBFF")
         self.assertEqual(len(categorical_traces), 2)
         self.assertEqual({tuple(trace.text) for trace in categorical_traces}, {("Planet A",), ("Planet B",)})
 

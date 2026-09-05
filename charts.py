@@ -263,9 +263,15 @@ def sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field
         trace.legendgroup = "detected-exoplanets"
         trace.legendrank = 10
         trace.showlegend = index == 0
-        trace.marker.update(size=4, opacity=0.65, symbol="circle")
+        trace.marker.update(size=3.2, opacity=0.50, symbol="circle")
         if not colour_field or colour_field not in data:
             trace.marker.color = "#007C78"
+        elif trace.marker.colorbar.title.text:
+            trace.marker.colorbar.update(
+                tickfont={"color": "#F7FBFF"},
+                title={"font": {"color": "#F7FBFF"}},
+                outlinecolor="#F7FBFF",
+            )
 
     if selected_trace is not None:
         selected_trace.name = f"Your planet: {selected_planet}"
@@ -273,19 +279,19 @@ def sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field
         selected_trace.legendrank = 20
         selected_trace.showlegend = True
         selected_trace.marker.update(
-            size=12,
+            size=16,
             symbol="diamond",
-            color="#009E91",
+            color="#52E0C4",
             opacity=1,
-            line={"color": "#053B3A", "width": 3},
+            line={"color": "#FFFFFF", "width": 3},
         )
-        selected_trace.textfont = {"color": "#053B3A", "size": 13}
+        selected_trace.textfont = {"color": "#F7FBFF", "size": 16}
 
     band_x, band_y, band_z, band_i, band_j, band_k = _galactic_plane_band()
     figure.add_trace(go.Mesh3d(
         x=band_x, y=band_y, z=band_z, i=band_i, j=band_j, k=band_k,
         name="Milky Way", legendgroup="milky-way", legendrank=50,
-        color="#6E7378", opacity=0.20, hoverinfo="skip", showlegend=True,
+        color="#D9E0E7", opacity=0.28, hoverinfo="skip", showlegend=True,
         lighting={"ambient": 1, "diffuse": 0, "specular": 0, "roughness": 1},
     ))
 
@@ -320,18 +326,27 @@ def sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field
     ))
     figure.update_layout(
         margin={"l": 0, "r": 210, "t": 20, "b": 0},
+        paper_bgcolor="#071725",
         legend={
-            "title": {"text": "Show on the sky", "font": {"size": 16}},
+            "title": {"text": "Show on the sky", "font": {"size": 16, "color": "#F7FBFF"}},
             "orientation": "v",
             "x": 1.01,
             "xanchor": "left",
             "y": 1,
             "yanchor": "top",
-            "font": {"size": 14},
+            "font": {"size": 14, "color": "#F7FBFF"},
+            "bgcolor": "rgba(7, 23, 37, 0.82)",
             "itemsizing": "constant",
             "traceorder": "normal",
             "tracegroupgap": 8,
             "groupclick": "togglegroup",
+        },
+        scene={
+            "bgcolor": "#071725",
+            "xaxis": {"visible": False, "showbackground": False, "showgrid": False, "showline": False, "showticklabels": False, "showspikes": False, "zeroline": False, "title": {"text": ""}},
+            "yaxis": {"visible": False, "showbackground": False, "showgrid": False, "showline": False, "showticklabels": False, "showspikes": False, "zeroline": False, "title": {"text": ""}},
+            "zaxis": {"visible": False, "showbackground": False, "showgrid": False, "showline": False, "showticklabels": False, "showspikes": False, "zeroline": False, "title": {"text": ""}},
+            "aspectmode": "cube",
         },
     )
     return figure
