@@ -79,7 +79,6 @@ def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalo
         st.metric("Bundled NASA-derived catalogue sample", f"{len(data):,}")
         st.caption("Live archive unavailable — using the bundled sample.")
     semantic_heading("Choose an investigation", "major-section")
-    st.write("Follow a guided investigation designed for a classroom or workshop.")
     experiences = catalog.experience_catalog()
     _render_cards(
         experiences,
@@ -88,7 +87,6 @@ def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalo
         open_item=open_experience,
     )
     semantic_heading("Explore the data", "major-section")
-    st.write("Follow a question or dataset that interests you.")
     _render_cards(
         catalog.explore_catalog(),
         button_label="Explore resource →",
