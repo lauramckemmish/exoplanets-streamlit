@@ -380,6 +380,27 @@ class SkyMapTests(unittest.TestCase):
         self.assertIn('with st.container(border=True, key="planet_shopping_astronomy_coda"):', shopping_source)
         self.assertIn('st.caption("THE SEARCH CONTINUES")', shopping_source)
 
+    def test_planet_shopping_places_the_claim_boundary_after_post_choice_material(self):
+        shopping_source = Path("experiences/planet_shopping.py").read_text()
+
+        confirmation_index = shopping_source.index('st.success(f"Destination chosen: {destination_name}")')
+        coda_index = shopping_source.index('st.caption("THE SEARCH CONTINUES")', confirmation_index)
+        unavailable_map_index = shopping_source.index(
+            'st.caption("This planet\'s position is not available in the map data.")',
+            coda_index,
+        )
+        claim_boundary_call_index = shopping_source.index("hard_reveal(", unavailable_map_index)
+        claim_boundary_key_index = shopping_source.index(
+            "_HABITABILITY_BOUNDARY_REVEAL_KEY", claim_boundary_call_index
+        )
+        completion_gate_index = shopping_source.index("completion_gate(selected)", claim_boundary_key_index)
+
+        self.assertLess(confirmation_index, coda_index)
+        self.assertLess(coda_index, unavailable_map_index)
+        self.assertLess(unavailable_map_index, claim_boundary_call_index)
+        self.assertLess(claim_boundary_call_index, claim_boundary_key_index)
+        self.assertLess(claim_boundary_key_index, completion_gate_index)
+
     def test_no_public_oriented_map_alternative_remains(self):
         legacy_name = "oriented_" + "sky_map"
 

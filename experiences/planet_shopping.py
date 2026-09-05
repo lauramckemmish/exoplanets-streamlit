@@ -59,6 +59,7 @@ _COMBINE_REVEAL_KEY = "planet_shopping_combine_result_revealed"
 _COMBINE_DESTINATION_KEY = "planet_shopping_combine_destination"
 _DESTINATION_CONTROL_KEY = "planet_shopping_destination_control"
 _APPLIED_DESTINATION_KEY = "planet_shopping_applied_destination"
+_HABITABILITY_BOUNDARY_REVEAL_KEY = "planet_shopping_habitability_boundary_revealed"
 _DESTINATION_USE_SIZE_KEY = "planet_shopping_destination_use_size"
 _DESTINATION_SIZE_CONTROL_KEY = "planet_shopping_destination_size_control"
 _DESTINATION_USE_STARS_KEY = "planet_shopping_destination_use_stars"
@@ -852,6 +853,19 @@ def _render_destination(data: pd.DataFrame) -> None:
                     )
         else:
             st.caption("This planet's position is not available in the map data.")
+        hard_reveal(
+            "**You’ve chosen a promising candidate. Are we done?**",
+            _HABITABILITY_BOUNDARY_REVEAL_KEY,
+            reveal_label="Check the claim",
+            revealed_message="**Not quite. You found a promising candidate — not proof of habitability.**",
+            explanation=(
+                "Distance and estimated temperature helped you narrow the search. They do **not** tell us "
+                "whether the planet is actually habitable. We would need much more evidence about the planet "
+                "and its atmosphere.\n\n"
+                "Your filters answered **Which planets meet the criteria we chose?** — not "
+                "**Which planets are habitable?**"
+            ),
+        )
     completion_gate(selected)
 
 
