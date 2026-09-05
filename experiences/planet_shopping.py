@@ -785,7 +785,9 @@ def _render_destination(data: pd.DataFrame) -> None:
         st.success(f"Destination chosen: {destination_name}")
         coordinates = destination.reindex(["x", "y", "z"])
         if coordinates.notna().all():
-            map_column, interpretation_column = st.columns([3, 2], gap="large")
+            map_column, interpretation_column = st.columns(
+                [3, 2], gap="large", vertical_alignment="bottom"
+            )
             with map_column:
                 st.plotly_chart(
                     sky_map(data, selected_planet=destination_name),
@@ -811,12 +813,12 @@ def _render_destination(data: pd.DataFrame) -> None:
                         "So the clumps and gaps in this map partly reflect **where we looked and how we looked** — "
                         "not just where planets exist."
                     )
-                with st.container(border=True):
-                    st.caption("The search continues")
-                    st.markdown(
-                        "**There are more exoplanets out there than the ones in this catalogue.**  \n"
-                        "You chose from the worlds we have detected so far. Astronomers are still finding more."
-                    )
+            with st.container(border=True):
+                st.caption("The search continues")
+                st.markdown(
+                    "**There are more exoplanets out there than the ones in this catalogue.**  \n"
+                    "You chose from the worlds we have detected so far. Astronomers are still finding more."
+                )
         else:
             st.caption("This planet's position is not available in the map data.")
     completion_gate(selected)

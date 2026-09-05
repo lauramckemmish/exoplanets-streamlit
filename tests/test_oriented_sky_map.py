@@ -331,7 +331,7 @@ class SkyMapTests(unittest.TestCase):
         commit_index = shopping_source.index("_record_destination_selection(st.session_state, inspected_name)")
         confirmation_index = shopping_source.index('st.success(f"Destination chosen: {destination_name}")')
         layout_index = shopping_source.index(
-            'map_column, interpretation_column = st.columns([3, 2], gap="large")',
+            'map_column, interpretation_column = st.columns(',
             confirmation_index,
         )
         map_column_index = shopping_source.index("with map_column:", layout_index)
@@ -356,7 +356,7 @@ class SkyMapTests(unittest.TestCase):
         self.assertLess(clarification_index, noticing_index)
         self.assertLess(noticing_index, soft_reveal_index)
         self.assertIn("completion_gate(selected)", shopping_source)
-        self.assertIn('map_column, interpretation_column = st.columns([3, 2], gap="large")', shopping_source)
+        self.assertIn('vertical_alignment="bottom"', shopping_source)
         self.assertIn("width=\"stretch\"", shopping_source)
         self.assertIn("height=620", shopping_source)
         self.assertNotIn('st.markdown("#### Where is your planet?")', shopping_source)
