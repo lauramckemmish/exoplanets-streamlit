@@ -23,7 +23,11 @@ def _render_cards(entries, *, button_label, button_key_prefix, open_item):
                     unsafe_allow_html=True,
                 )
                 with st.container(key="planet-shopping-thumbnail"):
-                    st.image(Path(__file__).resolve().parent.parent / thumbnail, use_container_width=True)
+                    st.image(
+                        Path(__file__).resolve().parent.parent / thumbnail,
+                        caption=entry.get("thumbnail_caption"),
+                        use_container_width=True,
+                    )
                 st.button(
                     button_label,
                     key=f"{button_key_prefix}_{entry['name']}",
@@ -54,34 +58,26 @@ def _render_cards(entries, *, button_label, button_key_prefix, open_item):
 
 def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalog, open_experience, open_explore_resource, source):
     st.title("Other worlds are becoming data")
-    introduction_column, image_column = st.columns([3, 2])
-    with introduction_column:
-        st.markdown(
-            "For most of human history, we knew about one planetary system: our own. "
-            "That has changed."
+    st.markdown(
+        "For most of human history, we knew about one planetary system: our own. "
+        "That has changed."
+    )
+    st.markdown(
+        "We now know thousands of planets orbiting other stars, and the catalogue is "
+        "still growing. New planets are being discovered, old observations are being "
+        "analysed in new ways, and new telescopes are opening questions that could not "
+        "previously be asked."
+    )
+    if source.is_live:
+        current_date = date.today()
+        date_label = f"{current_date.day} {current_date.strftime('%b %Y')}"
+        st.metric(
+            f"Live count of confirmed exoplanets in the NASA archive · {date_label}",
+            f"{len(data):,}",
         )
-        st.markdown(
-            "We now know thousands of planets orbiting other stars, and the catalogue is "
-            "still growing. New planets are being discovered, old observations are being "
-            "analysed in new ways, and new telescopes are opening questions that could not "
-            "previously be asked."
-        )
-        if source.is_live:
-            current_date = date.today()
-            date_label = f"{current_date.day} {current_date.strftime('%b %Y')}"
-            st.metric(
-                f"Live count of confirmed exoplanets in the NASA archive · {date_label}",
-                f"{len(data):,}",
-            )
-        else:
-            st.metric("Bundled NASA-derived catalogue sample", f"{len(data):,}")
-            st.caption("Live archive unavailable — using the bundled sample.")
-    with image_column:
-        st.image(
-            image_path,
-            caption="Artist's concept of the variety of known exoplanets. Credit: NASA/JPL-Caltech",
-            use_container_width=True,
-        )
+    else:
+        st.metric("Bundled NASA-derived catalogue sample", f"{len(data):,}")
+        st.caption("Live archive unavailable — using the bundled sample.")
     semantic_heading("Choose an investigation", "major-section")
     st.write("Follow a guided investigation designed for a classroom or workshop.")
     experiences = catalog.experience_catalog()

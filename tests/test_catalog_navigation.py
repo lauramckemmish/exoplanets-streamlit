@@ -23,6 +23,7 @@ class PublicDestinationCatalogueTests(unittest.TestCase):
     def test_data_lab_explore_resource_reuses_the_existing_route(self):
         resource = catalog.get_explore_resource("Exoplanet Data Lab")
         self.assertEqual(resource["app_experience"], "Exoplanet Data Laboratory")
+        self.assertEqual(resource["thumbnail"], "assets/exoplanets-artists-concept-nasa.jpeg")
 
     def test_all_explore_resources_are_available(self):
         for resource in catalog.EXPLORE_RESOURCES:
