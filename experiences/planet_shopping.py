@@ -805,6 +805,10 @@ def _render_destination(data: pd.DataFrame) -> None:
                 width="stretch",
                 height=540,
             )
+            st.caption(
+                "Want some landmarks? Use the legend to add the Milky Way and familiar constellations to help orient yourself on the sky."
+            )
+            st.caption("Drag to rotate • scroll or pinch to zoom • hover or tap a sky landmark to learn more.")
             st.info(
                 "**The green dots are detected exoplanets — not stars.**  \n"
                 "Most of these planets are not visible to the naked eye. The map shows where **known** exoplanets appear on our sky — not where all planets really are."
@@ -823,10 +827,6 @@ def _render_destination(data: pd.DataFrame) -> None:
                     "So the clumps and gaps in this map partly reflect **where we looked and how we looked** — "
                     "not just where planets exist."
                 )
-            st.caption(
-                "Want some landmarks? Use the legend to add the Milky Way and familiar constellations to help orient yourself on the sky."
-            )
-            st.caption("Drag to rotate • scroll or pinch to zoom • hover or tap a sky landmark to learn more.")
             with st.container(border=True):
                 st.caption("The search continues")
                 st.markdown(
