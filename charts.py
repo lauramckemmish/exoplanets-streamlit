@@ -152,6 +152,139 @@ def sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field
     return figure
 
 
+def _equatorial_unit_sphere(ra_degrees: np.ndarray, dec_degrees: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Convert J2000-style right ascension and declination to the map's unit sphere."""
+    ra = np.deg2rad(ra_degrees)
+    dec = np.deg2rad(dec_degrees)
+    return np.cos(dec) * np.cos(ra), np.cos(dec) * np.sin(ra), np.sin(dec)
+
+
+# Bright-star positions are J2000 FK5 coordinates, rounded to 0.001 degree.
+# Source: CDS SIMBAD basic data pages (queried 2026-09-05), which report the
+# FK5 J2000 coordinates used here.  These lines are conventional asterism
+# figures for orientation, not IAU constellation boundaries.
+_CRUX_STARS = (
+    ("Acrux", 186.650, -63.099),
+    ("Mimosa", 191.930, -59.689),
+    ("Gacrux", 187.792, -57.113),
+    ("Delta Crucis", 183.787, -58.749),
+)
+_BIG_DIPPER_STARS = (
+    ("Dubhe", 165.932, 61.751),
+    ("Merak", 165.460, 56.382),
+    ("Phecda", 178.457, 53.694),
+    ("Megrez", 183.856, 57.032),
+    ("Alioth", 193.507, 55.960),
+    ("Mizar", 200.981, 54.925),
+    ("Alkaid", 206.885, 49.313),
+)
+
+
+def _landmark_positions(stars: tuple[tuple[str, float, float], ...]) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    coordinates = np.asarray([(ra, dec) for _, ra, dec in stars], dtype=float)
+    return _equatorial_unit_sphere(coordinates[:, 0], coordinates[:, 1])
+
+
+def _constellation_line_positions(
+    positions: tuple[np.ndarray, np.ndarray, np.ndarray], segments: tuple[tuple[int, int], ...]
+) -> tuple[list[float | None], list[float | None], list[float | None]]:
+    x, y, z = positions
+    line_x: list[float | None] = []
+    line_y: list[float | None] = []
+    line_z: list[float | None] = []
+    for start, end in segments:
+        line_x.extend([float(x[start]), float(x[end]), None])
+        line_y.extend([float(y[start]), float(y[end]), None])
+        line_z.extend([float(z[start]), float(z[end]), None])
+    return line_x, line_y, line_z
+
+
+def _raise_orientation_overlay(values: list[float | None], radius: float = 1.012) -> list[float | None]:
+    """Lift lines just above dense data markers while preserving sky direction."""
+    return [value * radius if value is not None else None for value in values]
+
+
+def _galactic_plane_band() -> tuple[np.ndarray, np.ndarray, np.ndarray, list[int], list[int], list[int]]:
+    """Return a narrow illustrative band around the J2000 Galactic plane.
+
+    The IAU J2000 Galactic north pole is RA 192.85948°, Dec +27.12825°.
+    A point toward the Galactic centre fixes the direction around that plane.
+    This geometric band is deliberately not a Milky Way brightness map.
+    """
+    pole = np.asarray(_equatorial_unit_sphere(np.asarray([192.85948]), np.asarray([27.12825]))).reshape(3)
+    centre = np.asarray(_equatorial_unit_sphere(np.asarray([266.4051]), np.asarray([-28.936175]))).reshape(3)
+    centre = centre - np.dot(centre, pole) * pole
+    centre /= np.linalg.norm(centre)
+    plane_east = np.cross(pole, centre)
+    longitudes = np.linspace(0, 2 * np.pi, 145)
+    half_width = np.deg2rad(5.0)
+
+    def edge(latitude: float) -> np.ndarray:
+        return np.outer(np.cos(longitudes) * np.cos(latitude), centre) + np.outer(np.sin(longitudes) * np.cos(latitude), plane_east) + np.sin(latitude) * pole
+
+    lower = edge(-half_width)
+    upper = edge(half_width)
+    points = np.vstack([lower, upper])
+    point_count = len(longitudes)
+    i: list[int] = []
+    j: list[int] = []
+    k: list[int] = []
+    for index in range(point_count - 1):
+        i.extend([index, index + 1])
+        j.extend([index + 1, point_count + index])
+        k.extend([point_count + index, point_count + index + 1])
+    return points[:, 0], points[:, 1], points[:, 2], i, j, k
+
+
+def oriented_sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field: str | None = None, colour_label: str | None = None) -> go.Figure:
+    """Build ``sky_map`` with restrained familiar landmarks for sky orientation.
+
+    Exoplanets remain the data layer. Crux and the Big Dipper are conventional
+    connecting figures; the faint Milky Way region marks the Galactic plane
+    only and does not model measured or simulated sky brightness.
+    """
+    figure = sky_map(data, selected_planet, colour_field, colour_label)
+
+    band_x, band_y, band_z, band_i, band_j, band_k = _galactic_plane_band()
+    figure.add_trace(go.Mesh3d(
+        x=band_x, y=band_y, z=band_z, i=band_i, j=band_j, k=band_k,
+        name="Milky Way orientation region (Galactic plane)",
+        color="#8A68C8", opacity=0.13, hoverinfo="skip", showlegend=True,
+        lighting={"ambient": 1, "diffuse": 0, "specular": 0, "roughness": 1},
+    ))
+
+    crux_positions = _landmark_positions(_CRUX_STARS)
+    crux_line = _constellation_line_positions(crux_positions, ((0, 2), (1, 3)))
+    figure.add_trace(go.Scatter3d(
+        x=_raise_orientation_overlay(crux_line[0]), y=_raise_orientation_overlay(crux_line[1]), z=_raise_orientation_overlay(crux_line[2]), mode="lines",
+        name="Southern Cross / Crux orientation figure", hoverinfo="skip",
+        line={"color": "rgba(255, 220, 0, 0.72)", "width": 4},
+    ))
+    figure.add_trace(go.Scatter3d(
+        x=crux_positions[0] * 1.016, y=crux_positions[1] * 1.016, z=crux_positions[2] * 1.016, mode="markers+text",
+        name="Crux reference stars", hoverinfo="skip",
+        marker={"size": 4, "color": "#FFDC00", "opacity": 0.9},
+        text=[None, None, "Southern Cross / Crux", None], textposition="top center",
+        textfont={"size": 11}, showlegend=False,
+    ))
+
+    dipper_positions = _landmark_positions(_BIG_DIPPER_STARS)
+    dipper_line = _constellation_line_positions(dipper_positions, tuple((index, index + 1) for index in range(6)))
+    figure.add_trace(go.Scatter3d(
+        x=_raise_orientation_overlay(dipper_line[0]), y=_raise_orientation_overlay(dipper_line[1]), z=_raise_orientation_overlay(dipper_line[2]), mode="lines",
+        name="Big Dipper orientation figure (Ursa Major)", hoverinfo="skip",
+        line={"color": "rgba(128, 182, 244, 0.7)", "width": 4},
+    ))
+    figure.add_trace(go.Scatter3d(
+        x=dipper_positions[0] * 1.016, y=dipper_positions[1] * 1.016, z=dipper_positions[2] * 1.016, mode="markers+text",
+        name="Big Dipper reference stars", hoverinfo="skip",
+        marker={"size": 4, "color": "#80B6F4", "opacity": 0.9},
+        text=[None, None, None, "Big Dipper (in Ursa Major)", None, None, None], textposition="top center",
+        textfont={"size": 11}, showlegend=False,
+    ))
+    return figure
+
+
 def scale_profile(data: pd.DataFrame, field: str) -> dict[str, float | int | str | None]:
     series = pd.to_numeric(data[field], errors="coerce")
     complete = series.dropna()
