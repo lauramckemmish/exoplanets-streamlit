@@ -11,7 +11,7 @@ import pandas as pd
 import streamlit as st
 
 from data import PARSEC_TO_LIGHT_YEARS
-from charts import oriented_sky_map
+from charts import sky_map
 from ui_helpers import completion_gate, hard_reveal, role_image, scroll_to_top_if_requested, step_buttons, step_tabs, think_q
 
 TITLE = "Planet Shopping Outside Our Solar System"
@@ -801,7 +801,7 @@ def _render_destination(data: pd.DataFrame) -> None:
         coordinates = destination.reindex(["x", "y", "z"])
         if coordinates.notna().all():
             st.write("Here’s your destination among the exoplanets we know about.")
-            st.plotly_chart(oriented_sky_map(data, selected_planet=destination_name), width="stretch")
+            st.plotly_chart(sky_map(data, selected_planet=destination_name), width="stretch")
         else:
             st.caption("This planet's position is not available in the map data.")
     completion_gate(selected)

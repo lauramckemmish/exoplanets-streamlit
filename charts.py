@@ -131,7 +131,8 @@ def solar_system_demographics_chart(log_axes: bool) -> go.Figure:
     return figure
 
 
-def sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field: str | None = None, colour_label: str | None = None) -> go.Figure:
+def _base_sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field: str | None = None, colour_label: str | None = None) -> go.Figure:
+    """Build the catalogue-point foundation for the canonical celestial map."""
     mapped = data.dropna(subset=["x", "y", "z"]).copy()
     figure = go.Figure()
     mapped["_distance_ly"] = mapped["sy_dist"] * 3.26156
@@ -236,14 +237,14 @@ def _galactic_plane_band() -> tuple[np.ndarray, np.ndarray, np.ndarray, list[int
     return points[:, 0], points[:, 1], points[:, 2], i, j, k
 
 
-def oriented_sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field: str | None = None, colour_label: str | None = None) -> go.Figure:
-    """Build ``sky_map`` with restrained familiar landmarks for sky orientation.
+def sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field: str | None = None, colour_label: str | None = None) -> go.Figure:
+    """Build the canonical celestial map with familiar orientation landmarks.
 
     Exoplanets remain the data layer. Crux and the Big Dipper are conventional
     connecting figures; the faint Milky Way region marks the Galactic plane
     only and does not model measured or simulated sky brightness.
     """
-    figure = sky_map(data, selected_planet, colour_field, colour_label)
+    figure = _base_sky_map(data, selected_planet, colour_field, colour_label)
 
     # Keep the catalogue as one logical, independently toggleable layer even
     # when ``sky_map`` has created several traces for a categorical colour
