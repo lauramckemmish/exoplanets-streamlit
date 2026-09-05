@@ -348,10 +348,10 @@ def _render_overlap_visual(
     st.markdown(
         f"""
         <div style="position:relative; width:380px; max-width:100%; height:145px; margin:.5rem auto 1rem;">
-          <div style="position:absolute; left:5px; top:10px; width:205px; height:120px; border:2px solid #3F61C4; border-radius:50%; padding:2.2rem .5rem .2rem; text-align:left; box-sizing:border-box; background:#3F61C422;">
+          <div style="position:absolute; left:5px; top:10px; width:205px; height:120px; border:2px solid #3F61C4; border-radius:50%; padding:2.2rem 1.25rem .2rem; text-align:left; box-sizing:border-box; background:#3F61C422;">
             Distance<br><strong>{distance_count:,}</strong>
           </div>
-          <div style="position:absolute; right:5px; top:10px; width:205px; height:120px; border:2px solid #007882; border-radius:50%; padding:2.2rem .5rem .2rem; text-align:right; box-sizing:border-box; background:#00788222;">
+          <div style="position:absolute; right:5px; top:10px; width:205px; height:120px; border:2px solid #007882; border-radius:50%; padding:2.2rem 1.25rem .2rem; text-align:right; box-sizing:border-box; background:#00788222;">
             Temperature<br><strong>{temperature_count:,}</strong>
           </div>
           <div style="position:absolute; left:50%; top:50%; transform:translate(-50%, -50%); z-index:2; min-width:64px; padding:.65rem .45rem; border:2px solid currentColor; border-radius:999px; text-align:center; font-size:1.25rem; font-weight:700; background:var(--background-color, white);">
