@@ -677,15 +677,20 @@ def _render_combine(data: pd.DataFrame) -> None:
         return
 
     _render_overlap_visual(len(distance_matches), len(temperature_matches), len(known_both))
-    if keep_unknowns and len(distance_unknown):
-        st.caption(
-            f"Known to meet both: {len(known_both):,}. Plus {len(distance_unknown):,} "
-            "within your distance limit whose temperature is unknown — possibilities "
-            "because you chose to take the risk."
+    if keep_unknowns:
+        st.markdown(
+            f"**Known to meet both criteria: {len(known_both):,}**  \n"
+            f"**{len(distance_unknown):,} more planets have unknown temperatures, so you chose "
+            "to keep them as possibilities.**  \n"
+            f"**Your shortlist: {len(candidates):,} planets**"
         )
     else:
-        st.caption("Play it safe: possible destinations are the planets known to meet both criteria.")
-    st.write(f"You've narrowed thousands of planets to **{len(candidates):,} possibilities**.")
+        st.markdown(
+            f"**Known to meet both criteria: {len(known_both):,}**  \n"
+            f"**{len(distance_unknown):,} more planets have unknown temperatures, so you chose "
+            "to set them aside.**  \n"
+            f"**Your shortlist: {len(candidates):,} planets**"
+        )
 
 
 def _render_destination(data: pd.DataFrame) -> None:

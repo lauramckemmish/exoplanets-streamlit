@@ -120,6 +120,16 @@ class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
         self.assertNotIn('f"Choose {title}"', source)
         self.assertNotIn('f"Selected: {title}"', source)
 
+    def test_combine_reveal_presents_the_policy_consequences_as_three_lines(self):
+        source = Path("experiences/planet_shopping.py").read_text()
+
+        self.assertIn('**Known to meet both criteria: {len(known_both):,}**', source)
+        self.assertIn('**{len(distance_unknown):,} more planets have unknown temperatures, so you chose "', source)
+        self.assertIn('"to keep them as possibilities.**', source)
+        self.assertIn('"to set them aside.**', source)
+        self.assertIn('**Your shortlist: {len(candidates):,} planets**', source)
+        self.assertNotIn("You've narrowed thousands of planets", source)
+
     def test_stage_shell_matches_established_seven_screen_sequence(self):
         self.assertEqual(
             STAGE_LABELS,
