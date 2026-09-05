@@ -12,7 +12,7 @@ import streamlit as st
 
 from data import PARSEC_TO_LIGHT_YEARS
 from charts import sky_map
-from ui_helpers import completion_gate, hard_reveal, role_image, scroll_to_top_if_requested, step_buttons, step_tabs, think_q
+from ui_helpers import completion_gate, hard_reveal, role_image, scroll_to_top_if_requested, soft_reveal, step_buttons, step_tabs, think_q
 
 TITLE = "Planet Shopping Outside Our Solar System"
 SUBTITLE = "Use real exoplanet data to find your perfect planet."
@@ -800,8 +800,22 @@ def _render_destination(data: pd.DataFrame) -> None:
             st.write("Here’s your destination among the exoplanets we know about.")
             st.info(
                 "**The green dots are detected exoplanets — not stars.**  \n"
-                "Most of these planets are not visible to the naked eye. The clumps and gaps partly reflect where astronomers have looked and what our detection methods are good at finding."
+                "Most of these planets are not visible to the naked eye. The map shows where **known** exoplanets appear on our sky — not where all planets really are."
             )
+            st.markdown(
+                "**Notice anything unusual about where the green dots are?**  \n"
+                "Some parts of the sky have lots of **known** exoplanets. Other parts have very few."
+            )
+            with soft_reveal("Why are they so unevenly spread across the sky?"):
+                st.write(
+                    "One reason is that astronomers have not searched every part of the sky in the same way. "
+                    "NASA’s Kepler mission spent years watching one patch of sky around Cygnus and Lyra, repeatedly "
+                    "measuring the brightness of more than 100,000 stars and finding planets when they crossed in front of them."
+                )
+                st.write(
+                    "So the clumps and gaps in this map partly reflect **where we looked and how we looked** — "
+                    "not just where planets exist."
+                )
             st.plotly_chart(sky_map(data, selected_planet=destination_name), width="stretch")
             # High-level wording follows ANU's Indigenous Songlines overview:
             # Seven Sisters knowledge has many variations across Australia.

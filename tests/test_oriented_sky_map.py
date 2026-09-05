@@ -250,6 +250,14 @@ class SkyMapTests(unittest.TestCase):
             shopping_source,
         )
 
+    def test_planet_shopping_explains_known_exoplanet_clumps_with_an_optional_reveal(self):
+        shopping_source = Path("experiences/planet_shopping.py").read_text()
+
+        self.assertIn("The map shows where **known** exoplanets appear on our sky", shopping_source)
+        self.assertIn("**Notice anything unusual about where the green dots are?**", shopping_source)
+        self.assertIn('with soft_reveal("Why are they so unevenly spread across the sky?"):', shopping_source)
+        self.assertIn("**where we looked and how we looked**", shopping_source)
+
     def test_no_public_oriented_map_alternative_remains(self):
         legacy_name = "oriented_" + "sky_map"
 
