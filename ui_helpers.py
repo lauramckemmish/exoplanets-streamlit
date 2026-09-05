@@ -220,9 +220,14 @@ def hard_reveal(
 
 
 @contextmanager
-def soft_reveal(label: str, *, expanded: bool = False) -> Iterator[None]:
+def soft_reveal(
+    label: str,
+    *,
+    expanded: bool = False,
+    icon: str = "🧩",
+) -> Iterator[None]:
     """Provide optional supporting material without gating progression."""
-    with st.expander(f"🧩 {label}", expanded=expanded):
+    with st.expander(f"{icon} {label}", expanded=expanded):
         yield
 
 

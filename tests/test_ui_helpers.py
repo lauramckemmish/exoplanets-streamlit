@@ -18,6 +18,7 @@ class _StreamlitStub:
     def __init__(self):
         self.session_state = {}
         self.buttons = []
+        self.expanders = []
         self.markdown_calls = []
 
     def info(self, *args, **kwargs):
@@ -33,7 +34,8 @@ class _StreamlitStub:
     def container(self, **_kwargs):
         return _Column()
 
-    def expander(self, *_args, **_kwargs):
+    def expander(self, label, **_kwargs):
+        self.expanders.append(label)
         return _Column()
 
     def markdown(self, *_args, **_kwargs):
@@ -75,6 +77,16 @@ class SharedInteractionContractTests(unittest.TestCase):
                 pass
             ui_helpers.choice_reveal("Explore", {"A": "Detail"}, "choice")
             self.assertTrue(self._navigation(stub))
+
+    def test_soft_reveal_accepts_a_local_icon_without_changing_its_default(self):
+        stub = _StreamlitStub()
+        with patch.object(ui_helpers, "st", stub):
+            with ui_helpers.soft_reveal("Default"):
+                pass
+            with ui_helpers.soft_reveal("Rocket", icon="🚀"):
+                pass
+
+        self.assertEqual(stub.expanders[-2:], ["🧩 Default", "🚀 Rocket"])
 
     def test_think_uses_the_shared_marker_without_a_reveal_or_gate(self):
         stub = _StreamlitStub()

@@ -45,7 +45,8 @@ class UNSWVisualSystemTests(unittest.TestCase):
         self.assertIn("interaction-marker'>THINK", helpers)
         self.assertIn("interaction-marker'>REVEAL", helpers)
         self.assertIn('.st-key-think_q', styles)
-        self.assertIn('🧩 {label}', helpers)
+        self.assertIn('icon: str = "🧩"', helpers)
+        self.assertIn('f"{icon} {label}"', helpers)
         self.assertIn('**🧭 {prompt}**', helpers)
 
 
