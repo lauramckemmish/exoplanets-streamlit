@@ -813,11 +813,26 @@ def _render_destination(data: pd.DataFrame) -> None:
                         "So the clumps and gaps in this map partly reflect **where we looked and how we looked** — "
                         "not just where planets exist."
                     )
-            with st.container(border=True):
-                st.caption("The search continues")
+            st.markdown(
+                """
+                <style>
+                .st-key-planet_shopping_astronomy_coda {
+                    margin-top: 1rem;
+                    padding: 0.85rem 1rem;
+                    border: 1px solid #e2cd75;
+                    border-left: 5px solid #d3aa00;
+                    border-radius: 0.5rem;
+                    background: #fff8d8;
+                }
+                </style>
+                """,
+                unsafe_allow_html=True,
+            )
+            with st.container(border=True, key="planet_shopping_astronomy_coda"):
+                st.caption("THE SEARCH CONTINUES")
                 st.markdown(
                     "**There are more exoplanets out there than the ones in this catalogue.**  \n"
-                    "You chose from the worlds we have detected so far. Astronomers are still finding more."
+                    "You chose from the worlds we have detected so far. **Astronomers are still finding more.**"
                 )
         else:
             st.caption("This planet's position is not available in the map data.")

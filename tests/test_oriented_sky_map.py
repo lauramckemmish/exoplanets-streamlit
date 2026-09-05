@@ -374,11 +374,11 @@ class SkyMapTests(unittest.TestCase):
             shopping_source,
         )
         self.assertIn(
-            "You chose from the worlds we have detected so far. Astronomers are still finding more.",
+            "You chose from the worlds we have detected so far. **Astronomers are still finding more.**",
             shopping_source,
         )
-        self.assertIn('with st.container(border=True):', shopping_source)
-        self.assertIn('st.caption("The search continues")', shopping_source)
+        self.assertIn('with st.container(border=True, key="planet_shopping_astronomy_coda"):', shopping_source)
+        self.assertIn('st.caption("THE SEARCH CONTINUES")', shopping_source)
 
     def test_no_public_oriented_map_alternative_remains(self):
         legacy_name = "oriented_" + "sky_map"
