@@ -229,13 +229,18 @@ def _temperature_candidates(
     return pd.concat([matches, unknown], ignore_index=True) if keep_unknowns else matches.copy()
 
 
-def _initialise_unknown_temperature_control(state: dict) -> str:
-    """Seed the widget control from the durable decision without coupling keys."""
-    if _UNKNOWN_TEMPERATURE_CONTROL_KEY not in state:
-        state[_UNKNOWN_TEMPERATURE_CONTROL_KEY] = state.get(
-            _UNKNOWN_TEMPERATURE_DECISION_KEY, _UNKNOWN_TEMPERATURE_OPTIONS[0]
-        )
-    return state[_UNKNOWN_TEMPERATURE_CONTROL_KEY]
+def _initialise_unknown_temperature_control(state: dict) -> str | None:
+    """Restore the visual control only when the learner has made a decision."""
+    if _UNKNOWN_TEMPERATURE_CONTROL_KEY not in state and _UNKNOWN_TEMPERATURE_DECISION_KEY in state:
+        state[_UNKNOWN_TEMPERATURE_CONTROL_KEY] = state[_UNKNOWN_TEMPERATURE_DECISION_KEY]
+    return state.get(_UNKNOWN_TEMPERATURE_CONTROL_KEY)
+
+
+def _record_unknown_temperature_decision(state: dict, decision: str) -> str:
+    """Persist the Temperature-screen decision under its durable and UI keys."""
+    state[_UNKNOWN_TEMPERATURE_CONTROL_KEY] = decision
+    state[_UNKNOWN_TEMPERATURE_DECISION_KEY] = decision
+    return decision
 
 
 def _combine_groups(
@@ -387,16 +392,56 @@ def _render_temperature(data: pd.DataFrame) -> None:
     if not unknown_revealed:
         return
 
-    if _UNKNOWN_TEMPERATURE_DECISION_KEY in st.session_state:
-        _initialise_unknown_temperature_control(st.session_state)
-    unknown_decision = st.radio(
-        "What should we do with planets whose temperature is unknown?",
-        options=_UNKNOWN_TEMPERATURE_OPTIONS,
-        index=None if _UNKNOWN_TEMPERATURE_CONTROL_KEY not in st.session_state else 0,
-        key=_UNKNOWN_TEMPERATURE_CONTROL_KEY,
+    unknown_decision = _initialise_unknown_temperature_control(st.session_state)
+    st.write("What should we do with planets whose temperature is unknown?")
+    st.markdown(
+        """
+        <style>
+        .st-key-planet_shopping_temperature_policy [data-testid="stButton"] button { width: 100%; }
+        @media (max-width: 640px) {
+            .st-key-planet_shopping_temperature_policy [data-testid="stHorizontalBlock"] { flex-direction: column; }
+            .st-key-planet_shopping_temperature_policy [data-testid="column"] { width: 100% !important; flex: 1 1 100% !important; }
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
     )
-    if unknown_decision is not None:
-        st.session_state[_UNKNOWN_TEMPERATURE_DECISION_KEY] = unknown_decision
+    with st.container(key="planet_shopping_temperature_policy"):
+        risk_card, safe_card = st.columns(2)
+        choices = (
+            (
+                risk_card,
+                _UNKNOWN_TEMPERATURE_OPTIONS[0],
+                "🧭",
+                "Take the risk",
+                "Keep planets with unknown temperatures as possibilities.",
+                "planet_shopping_temperature_take_risk",
+            ),
+            (
+                safe_card,
+                _UNKNOWN_TEMPERATURE_OPTIONS[1],
+                "🛡️",
+                "Play it safe",
+                "Only keep planets known to fit your temperature range.",
+                "planet_shopping_temperature_play_safe",
+            ),
+        )
+        for card, option, icon, title, consequence, key_prefix in choices:
+            selected = unknown_decision == option
+            with card:
+                with st.container(border=True, key=f"{key_prefix}_card"):
+                    st.markdown(icon)
+                    st.markdown(f"**{title}**")
+                    st.write(consequence)
+                    st.button(
+                        f"Selected: {title}" if selected else f"Choose {title}",
+                        type="primary" if selected else "secondary",
+                        key=f"{key_prefix}_button",
+                        on_click=_record_unknown_temperature_decision,
+                        args=(st.session_state, option),
+                    )
+                    if selected:
+                        st.caption("Selected policy")
     completion_gate(unknown_decision is not None)
 
 

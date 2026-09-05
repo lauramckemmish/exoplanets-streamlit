@@ -30,6 +30,7 @@ from experiences.planet_shopping import (
     _UNKNOWN_TEMPERATURE_DECISION_KEY,
     _filter_distance_light_years,
     _initialise_unknown_temperature_control,
+    _record_unknown_temperature_decision,
     _known_distance_population,
     _split_temperature_groups,
 )
@@ -90,6 +91,21 @@ class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
         self.assertNotEqual(_UNKNOWN_TEMPERATURE_CONTROL_KEY, _UNKNOWN_TEMPERATURE_DECISION_KEY)
         self.assertEqual(control_value, _UNKNOWN_TEMPERATURE_OPTIONS[1])
         state[_UNKNOWN_TEMPERATURE_DECISION_KEY] = control_value
+        self.assertEqual(state[_UNKNOWN_TEMPERATURE_DECISION_KEY], _UNKNOWN_TEMPERATURE_OPTIONS[1])
+
+    def test_unknown_temperature_decision_starts_empty_and_records_both_state_keys(self):
+        state = {}
+
+        self.assertIsNone(_initialise_unknown_temperature_control(state))
+        self.assertNotIn(_UNKNOWN_TEMPERATURE_DECISION_KEY, state)
+        self.assertEqual(
+            _record_unknown_temperature_decision(state, _UNKNOWN_TEMPERATURE_OPTIONS[0]),
+            _UNKNOWN_TEMPERATURE_OPTIONS[0],
+        )
+        self.assertEqual(state[_UNKNOWN_TEMPERATURE_CONTROL_KEY], _UNKNOWN_TEMPERATURE_OPTIONS[0])
+        self.assertEqual(state[_UNKNOWN_TEMPERATURE_DECISION_KEY], _UNKNOWN_TEMPERATURE_OPTIONS[0])
+        _record_unknown_temperature_decision(state, _UNKNOWN_TEMPERATURE_OPTIONS[1])
+        self.assertEqual(state[_UNKNOWN_TEMPERATURE_CONTROL_KEY], _UNKNOWN_TEMPERATURE_OPTIONS[1])
         self.assertEqual(state[_UNKNOWN_TEMPERATURE_DECISION_KEY], _UNKNOWN_TEMPERATURE_OPTIONS[1])
 
     def test_stage_shell_matches_established_seven_screen_sequence(self):
