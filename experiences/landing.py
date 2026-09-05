@@ -12,10 +12,14 @@ def _render_cards(entries, *, button_label, button_key_prefix, open_item):
     """Render a compact two-column collection of landing-page destinations."""
     def render_card(entry):
         with st.container(border=True):
+            card_title = entry.get("card_title", entry["name"])
+            card_summary = entry.get("card_summary", entry["summary"])
+            card_button_label = entry.get("card_button_label", button_label)
             thumbnail = entry.get("thumbnail")
             if thumbnail:
-                semantic_heading(entry["name"], "subsection")
-                st.write(entry["summary"])
+                semantic_heading(card_title, "subsection")
+                if card_summary:
+                    st.write(card_summary)
                 st.markdown(
                     "<style>"
                     ".st-key-planet-shopping-thumbnail { max-width: 30rem; width: 100%; margin: 0 auto; }"
@@ -29,16 +33,17 @@ def _render_cards(entries, *, button_label, button_key_prefix, open_item):
                         use_container_width=True,
                     )
                 st.button(
-                    button_label,
+                    card_button_label,
                     key=f"{button_key_prefix}_{entry['name']}",
                     on_click=open_item,
                     args=(entry["name"],),
                 )
                 return
-            semantic_heading(f"{entry['icon']} {entry['name']}", "subsection")
-            st.write(entry["summary"])
+            semantic_heading(f"{entry['icon']} {card_title}", "subsection")
+            if card_summary:
+                st.write(card_summary)
             st.button(
-                button_label,
+                card_button_label,
                 key=f"{button_key_prefix}_{entry['name']}",
                 use_container_width=True,
                 on_click=open_item,

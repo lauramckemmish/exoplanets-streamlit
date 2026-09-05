@@ -25,6 +25,14 @@ class PublicDestinationCatalogueTests(unittest.TestCase):
         self.assertEqual(resource["app_experience"], "Exoplanet Data Laboratory")
         self.assertEqual(resource["thumbnail"], "assets/exoplanets-artists-concept-nasa.jpeg")
 
+    def test_planet_shopping_card_presentation_preserves_internal_destination(self):
+        experience = catalog.get_experience("Planet Shopping Outside Our Solar System")
+        self.assertEqual(experience["card_title"], "Planet Shopping")
+        self.assertIsNone(experience["card_summary"])
+        self.assertEqual(experience["card_button_label"], "Start →")
+        self.assertEqual(experience["app_experience"], "Planet Shopping Outside Our Solar System")
+        self.assertEqual(experience["thumbnail"], "assets/planet-shopping-thumbnail.png")
+
     def test_all_explore_resources_are_available(self):
         for resource in catalog.EXPLORE_RESOURCES:
             self.assertIsNotNone(
