@@ -369,7 +369,7 @@ def _render_temperature(data: pd.DataFrame) -> None:
     st.write("Choose an acceptable temperature range for your planet.")
 
     temperature_range_c = st.slider(
-        "What estimated equilibrium temperature range is acceptable? (°C)",
+        "Estimated equilibrium temperature range (°C)",
         min_value=-200,
         max_value=2_000,
         value=_TEMPERATURE_DEFAULT_RANGE_C,
@@ -382,7 +382,6 @@ def _render_temperature(data: pd.DataFrame) -> None:
     matches, does_not_match, unknown = _split_temperature_groups(data, temperature_range_c)
     st.metric("Planets with known temperatures in your range", f"{len(matches):,}")
 
-    st.write("**Happy with that?**")
     unknown_revealed = hard_reveal(
         "What information might still be missing?",
         _TEMPERATURE_UNKNOWN_REVEAL_KEY,
@@ -480,7 +479,6 @@ def _render_launch(data: pd.DataFrame) -> None:
         role_image(
             WELCOME_HOOK_IMAGE_PATH,
             role="hero",
-            caption="Wonder mission: Where could we end up?",
             key="planet_shopping_welcome_hook",
         )
 
@@ -490,10 +488,9 @@ def _render_launch(data: pd.DataFrame) -> None:
         role_image(
             SOLAR_SYSTEM_IMAGE_PATH,
             role="context",
-            caption="Our Solar System: the Sun and its planets.",
             key="planet_shopping_solar_system",
         )
-        st.write("The other planets are not much of a replacement. Imagine none of those options works: we have run out of planets around our Sun.")
+        st.write("Suppose none of those planets works either.")
         st.write("The Sun is one star. Other stars can have planets too. Those planets are exoplanets.")
 
 
@@ -542,7 +539,7 @@ def _render_planet_profile(planet_name: str, planet: pd.Series) -> None:
 
 def _render_meet_your_planet(data: pd.DataFrame) -> None:
     st.subheader("🛰️ Meet a Planet")
-    st.write("**Pick a planet. Any planet.** Browse a few real worlds before we find a better way to search.")
+    st.write("**Pick a planet. Any planet.**")
     if _BROWSED_PLANET_KEY not in st.session_state:
         st.session_state[_BROWSED_PLANET_KEY] = _random_planet_name(data)
     st.button(
@@ -557,7 +554,6 @@ def _render_meet_your_planet(data: pd.DataFrame) -> None:
     planet = data.loc[data["pl_name"].astype(str) == planet_name].iloc[0]
     _render_planet_profile(planet_name, planet)
 
-    st.markdown("#### A catalogue that keeps growing")
     catalogue_revealed = hard_reveal(
         "**So how many planets like this do we actually know about?**",
         _CATALOGUE_REVEAL_KEY,
@@ -575,7 +571,6 @@ def _render_meet_your_planet(data: pd.DataFrame) -> None:
         st.metric(f"A year ago ({current_year - 1})", f"{counts['one_year_ago']:,}")
     with ten_years:
         st.metric(f"Ten years ago ({current_year - 10})", f"{counts['ten_years_ago']:,}")
-    st.write("The catalogue keeps growing: **one planet → one record → different pieces of information about that planet.**")
     st.caption("We have measurements for many planets, but not every property is known for every planet.")
     st.write("You could keep doing this one planet at a time. There are thousands in the catalogue, so we need a better way to shop.")
 
@@ -584,12 +579,8 @@ def _render_distance(data: pd.DataFrame) -> None:
     st.subheader("🔎 Distance")
 
     distance_population = _known_distance_population(data)
-    st.markdown("#### How far away?")
     st.caption(
-        "A light-year is a **distance** — and it is enormous."
-    )
-    st.caption(
-        "✈️ **For scale:** If you could fly through space at passenger-plane speed, "
+        "A light-year is a **distance** — and it is enormous. At passenger-plane speed, "
         "travelling just **1 light-year would take about 1.2 million years.**"
     )
     _initialise_distance_control(st.session_state)
@@ -602,7 +593,7 @@ def _render_distance(data: pd.DataFrame) -> None:
     )
     interacted = _record_distance_interaction(st.session_state, int(distance_limit_ly))
     if not completion_gate(interacted):
-        st.info("Move the distance control to see how many catalogue records remain.")
+        st.info("Move the slider to see how many planets remain.")
         return
 
     distance_filtered = _filter_distance_light_years(distance_population, distance_limit_ly)
@@ -610,8 +601,6 @@ def _render_distance(data: pd.DataFrame) -> None:
     st.caption(
         f"✈️ At passenger-plane speed: ~{_format_travel_years(_passenger_plane_travel_years(distance_limit_ly))}"
     )
-    st.caption(f"{len(distance_population):,} catalogue records have a recorded distance; missing distances are left out of this introductory filter.")
-    st.write("The planet data did not change. The filter changed which records remain in the search.")
 
 
 def _render_combine(data: pd.DataFrame) -> None:
@@ -662,10 +651,8 @@ def _render_combine(data: pd.DataFrame) -> None:
     distance_count, temperature_count = st.columns(2)
     with distance_count:
         st.metric("Within the distance criterion", f"{len(distance_matches):,}")
-        st.caption("Records with a known system distance inside your limit.")
     with temperature_count:
         st.metric("Known temperature matches", f"{len(temperature_matches):,}")
-        st.caption("Records with a recorded estimated temperature inside your range.")
     if not st.session_state.get(_COMBINE_REVEAL_KEY, False):
         _render_overlap_visual(len(distance_matches), len(temperature_matches))
     think_q("How many planets do you think are in both groups?", title="Think")
@@ -696,7 +683,6 @@ def _render_combine(data: pd.DataFrame) -> None:
 def _render_destination(data: pd.DataFrame) -> None:
     st.subheader("🪐 Choose Your Destination")
     st.write("You’ve narrowed the catalogue — but that may still be a lot of planets.")
-    st.write("What else matters to you? Add filters until you have a shortlist you can actually inspect.")
 
     combine_distance = int(st.session_state.get(_COMBINE_DISTANCE_CONTROL_KEY, st.session_state.get(_APPLIED_DISTANCE_KEY, _DISTANCE_DEFAULT_VALUE)))
     combine_temperature = st.session_state.get(_COMBINE_TEMPERATURE_CONTROL_KEY, st.session_state.get(_APPLIED_TEMPERATURE_KEY, (0, 30)))
@@ -788,7 +774,7 @@ def _render_destination(data: pd.DataFrame) -> None:
     if inspected_name is not None:
         inspected_destination = candidates.loc[candidates["pl_name"].astype(str) == inspected_name].iloc[0]
         _render_planet_profile(inspected_name, inspected_destination)
-        st.write("Does this planet still look like the one you want? Check the evidence against what matters to you — and notice anything we still don't know.")
+        st.write("Still want this one? Check the evidence — including what we still don't know.")
         if st.button("Choose this planet", type="primary"):
             _record_destination_selection(st.session_state, inspected_name)
 
@@ -799,7 +785,6 @@ def _render_destination(data: pd.DataFrame) -> None:
         st.success(f"Destination chosen: {destination_name}")
         coordinates = destination.reindex(["x", "y", "z"])
         if coordinates.notna().all():
-            st.markdown("#### Where is your planet?")
             map_column, interpretation_column = st.columns([3, 2], gap="large")
             with map_column:
                 st.plotly_chart(
@@ -810,12 +795,8 @@ def _render_destination(data: pd.DataFrame) -> None:
             with interpretation_column:
                 st.info(
                     "**The green dots are detected exoplanets — not stars.**  \n"
-                    "Most of these planets are not visible to the naked eye. The map shows where **known** exoplanets appear on our sky — not where all planets really are."
+                    "The map shows where **known** exoplanets appear on our sky — not where all planets really are."
                 )
-                st.caption(
-                    "Want some landmarks? Use the legend to add the Milky Way and familiar constellations to help orient yourself on the sky."
-                )
-                st.caption("Drag to rotate • scroll or pinch to zoom • hover or tap a sky landmark to learn more.")
                 st.markdown(
                     "**Notice anything unusual about where the green dots are?**  \n"
                     "Some parts of the sky have lots of **known** exoplanets. Other parts have very few."
@@ -869,7 +850,6 @@ def render(data: pd.DataFrame) -> None:
     stage = max(0, min(int(st.session_state[_STAGE_KEY]), len(STAGE_LABELS) - 1))
     st.header(TITLE)
     st.caption(SUBTITLE)
-    st.caption(f"This experience is using the currently selected NASA exoplanet dataset ({len(data):,} planet records).")
 
     _, selected_stage = step_tabs(STAGE_LABELS, _TAB_KEY, stage)
     if selected_stage != stage:

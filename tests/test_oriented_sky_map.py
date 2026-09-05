@@ -306,38 +306,38 @@ class SkyMapTests(unittest.TestCase):
         self.assertIn('with soft_reveal("Why are they so unevenly spread across the sky?"):', shopping_source)
         self.assertIn("**where we looked and how we looked**", shopping_source)
 
-    def test_planet_shopping_invites_learners_to_use_the_sky_map_legend(self):
+    def test_planet_shopping_keeps_the_sky_map_interpretation_concise(self):
         shopping_source = Path("experiences/planet_shopping.py").read_text()
 
-        self.assertIn(
+        self.assertNotIn(
             "Want some landmarks? Use the legend to add the Milky Way and familiar constellations to help orient yourself on the sky.",
             shopping_source,
         )
-        self.assertIn(
+        self.assertNotIn(
             "Drag to rotate • scroll or pinch to zoom • hover or tap a sky landmark to learn more.",
             shopping_source,
         )
+        self.assertNotIn("Most of these planets are not visible to the naked eye.", shopping_source)
+        self.assertIn("**The green dots are detected exoplanets — not stars.**", shopping_source)
+        self.assertIn("The map shows where **known** exoplanets appear on our sky", shopping_source)
 
     def test_planet_shopping_commits_the_destination_before_showing_the_map(self):
         shopping_source = Path("experiences/planet_shopping.py").read_text()
 
         profile_index = shopping_source.index("_render_planet_profile(inspected_name, inspected_destination)")
         selection_guard_index = shopping_source.index("if inspected_name is not None:")
-        prompt_index = shopping_source.index("Does this planet still look like the one you want?")
+        prompt_index = shopping_source.index("Still want this one? Check the evidence")
         choose_index = shopping_source.index('st.button("Choose this planet", type="primary")')
         commit_index = shopping_source.index("_record_destination_selection(st.session_state, inspected_name)")
         confirmation_index = shopping_source.index('st.success(f"Destination chosen: {destination_name}")')
-        heading_index = shopping_source.index('st.markdown("#### Where is your planet?")', confirmation_index)
         layout_index = shopping_source.index(
             'map_column, interpretation_column = st.columns([3, 2], gap="large")',
-            heading_index,
+            confirmation_index,
         )
         map_column_index = shopping_source.index("with map_column:", layout_index)
-        map_index = shopping_source.index("st.plotly_chart(", heading_index)
+        map_index = shopping_source.index("st.plotly_chart(", layout_index)
         interpretation_column_index = shopping_source.index("with interpretation_column:", map_index)
         clarification_index = shopping_source.index("**The green dots are detected exoplanets", map_index)
-        landmarks_index = shopping_source.index("Want some landmarks?", clarification_index)
-        navigation_index = shopping_source.index("Drag to rotate", landmarks_index)
         noticing_index = shopping_source.index("**Notice anything unusual", clarification_index)
         soft_reveal_index = shopping_source.index('with soft_reveal("Why are they so unevenly spread across the sky?"):', noticing_index)
 
@@ -346,24 +346,20 @@ class SkyMapTests(unittest.TestCase):
         self.assertLess(prompt_index, choose_index)
         self.assertLess(choose_index, commit_index)
         self.assertLess(commit_index, confirmation_index)
-        self.assertLess(confirmation_index, heading_index)
-        self.assertLess(heading_index, layout_index)
+        self.assertLess(confirmation_index, layout_index)
         self.assertLess(layout_index, map_column_index)
         self.assertLess(map_column_index, map_index)
-        self.assertLess(heading_index, map_index)
         self.assertLess(confirmation_index, map_index)
         self.assertLess(map_index, interpretation_column_index)
         self.assertLess(interpretation_column_index, clarification_index)
         self.assertLess(map_index, clarification_index)
-        self.assertLess(clarification_index, landmarks_index)
-        self.assertLess(landmarks_index, navigation_index)
-        self.assertLess(navigation_index, noticing_index)
         self.assertLess(clarification_index, noticing_index)
         self.assertLess(noticing_index, soft_reveal_index)
         self.assertIn("completion_gate(selected)", shopping_source)
         self.assertIn('map_column, interpretation_column = st.columns([3, 2], gap="large")', shopping_source)
         self.assertIn("width=\"stretch\"", shopping_source)
         self.assertIn("height=620", shopping_source)
+        self.assertNotIn('st.markdown("#### Where is your planet?")', shopping_source)
         self.assertNotIn("Here’s your destination among the exoplanets we know about.", shopping_source)
         self.assertNotIn('reveal_label="Show me on the sky"', shopping_source)
         self.assertNotIn("_DESTINATION_SKY_MAP_REVEAL_KEY", shopping_source)
