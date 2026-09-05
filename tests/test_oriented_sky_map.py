@@ -322,6 +322,7 @@ class SkyMapTests(unittest.TestCase):
         shopping_source = Path("experiences/planet_shopping.py").read_text()
 
         profile_index = shopping_source.index("_render_planet_profile(inspected_name, inspected_destination)")
+        selection_guard_index = shopping_source.index("if inspected_name is not None:")
         prompt_index = shopping_source.index("Does this planet still look like the one you want?")
         choose_index = shopping_source.index('st.button("Choose this planet", type="primary")')
         commit_index = shopping_source.index("_record_destination_selection(st.session_state, inspected_name)")
@@ -332,6 +333,7 @@ class SkyMapTests(unittest.TestCase):
         noticing_index = shopping_source.index("**Notice anything unusual", clarification_index)
         soft_reveal_index = shopping_source.index('with soft_reveal("Why are they so unevenly spread across the sky?"):', noticing_index)
 
+        self.assertLess(selection_guard_index, profile_index)
         self.assertLess(profile_index, prompt_index)
         self.assertLess(prompt_index, choose_index)
         self.assertLess(choose_index, commit_index)

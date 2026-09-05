@@ -785,11 +785,12 @@ def _render_destination(data: pd.DataFrame) -> None:
         index=index,
         key=_DESTINATION_CONTROL_KEY,
     )
-    inspected_destination = candidates.loc[candidates["pl_name"].astype(str) == inspected_name].iloc[0]
-    _render_planet_profile(inspected_name, inspected_destination)
-    st.write("Does this planet still look like the one you want? Check the evidence against what matters to you — and notice anything we still don't know.")
-    if st.button("Choose this planet", type="primary"):
-        _record_destination_selection(st.session_state, inspected_name)
+    if inspected_name is not None:
+        inspected_destination = candidates.loc[candidates["pl_name"].astype(str) == inspected_name].iloc[0]
+        _render_planet_profile(inspected_name, inspected_destination)
+        st.write("Does this planet still look like the one you want? Check the evidence against what matters to you — and notice anything we still don't know.")
+        if st.button("Choose this planet", type="primary"):
+            _record_destination_selection(st.session_state, inspected_name)
 
     destination_name = st.session_state.get(_APPLIED_DESTINATION_KEY)
     selected = destination_name in names
