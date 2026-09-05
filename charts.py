@@ -199,14 +199,13 @@ _PLEIADES_LABEL_ANCHOR = (58.000, 25.700)
 # overview: Seven Sisters knowledge has many variations across Australia.
 _SOUTHERN_CROSS_HOVER = (
     "<b>Southern Cross</b><br>"
-    "A prominent southern-sky constellation, also known astronomically as Crux, "
-    "and a familiar orientation landmark in Australia.<extra></extra>"
+    "A prominent southern-sky constellation, also known as Crux, and a familiar "
+    "landmark in Australia.<extra></extra>"
 )
 _PLEIADES_HOVER = (
     "<b>Seven Sisters / Pleiades</b><br>"
-    "A nearby open star cluster. The Pleiades, often known as the Seven Sisters, "
-    "are recognised in many Aboriginal cultures across Australia. Names and stories "
-    "vary by Nation.<extra></extra>"
+    "An open star cluster recognised in many Aboriginal cultures across Australia. "
+    "Names and stories vary by Nation.<extra></extra>"
 )
 _BIG_DIPPER_HOVER = (
     "<b>Big Dipper</b><br>"
@@ -222,8 +221,8 @@ _ZODIAC_LABEL_HOVER = (
     "<extra></extra>"
 )
 _MILKY_WAY_HOVER = (
-    "<b>Milky Way</b><br>Our view through the dense plane of the Milky Way Galaxy. "
-    "This band is an orientation guide, not a brightness map.<extra></extra>"
+    "<b>Milky Way</b><br>A guide to the Milky Way's plane on the sky; this band is "
+    "not a brightness map.<extra></extra>"
 )
 
 # Zodiac stick-figure paths and label anchors are a small extracted subset of

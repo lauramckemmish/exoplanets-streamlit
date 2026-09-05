@@ -143,9 +143,9 @@ class SkyMapTests(unittest.TestCase):
         self.assertEqual(milky_way.name, "Milky Way")
         self.assertTrue(milky_way.showlegend)
 
-        self.assertTrue(all("also known astronomically as Crux" in trace.hovertemplate for trace in crux_traces))
+        self.assertTrue(all("also known as Crux" in trace.hovertemplate for trace in crux_traces))
         self.assertTrue(all("forming part of Ursa Major" in trace.hovertemplate for trace in dipper_traces))
-        self.assertIn("orientation guide, not a brightness map", milky_way.hovertemplate)
+        self.assertIn("this band is not a brightness map", milky_way.hovertemplate)
 
         for traces in (crux_traces, dipper_traces):
             line = next(trace for trace in traces if trace.mode == "lines")
@@ -290,7 +290,7 @@ class SkyMapTests(unittest.TestCase):
         figure = sky_map(map_data())
         shopping_source = Path("experiences/planet_shopping.py").read_text()
         acknowledgement = (
-            "The Pleiades, often known as the Seven Sisters, are recognised in many Aboriginal cultures across Australia. "
+            "An open star cluster recognised in many Aboriginal cultures across Australia. "
             "Names and stories vary by Nation."
         )
         pleiades_traces = [trace for trace in figure.data if trace.legendgroup == "seven-sisters-pleiades"]
