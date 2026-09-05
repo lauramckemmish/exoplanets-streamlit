@@ -41,7 +41,7 @@ class SkyMapTests(unittest.TestCase):
 
         self.assertIsInstance(figure, go.Figure)
         self.assertIn("Detected exoplanets", trace_names)
-        self.assertIn("Southern Cross / Crux", trace_names)
+        self.assertIn("Southern Cross", trace_names)
         self.assertIn("Big Dipper", trace_names)
         self.assertIn("Seven Sisters / Pleiades", trace_names)
         self.assertIn("Zodiac constellations", trace_names)
@@ -59,9 +59,9 @@ class SkyMapTests(unittest.TestCase):
             [
                 "Detected exoplanets",
                 "Your planet: Planet B",
-                "Southern Cross / Crux",
-                "Big Dipper",
+                "Southern Cross",
                 "Seven Sisters / Pleiades",
+                "Big Dipper",
                 "Zodiac constellations",
                 "Milky Way",
             ],
@@ -151,11 +151,15 @@ class SkyMapTests(unittest.TestCase):
         milky_way = next(trace for trace in figure.data if trace.legendgroup == "milky-way")
 
         self.assertEqual(len(crux_traces), 2)
-        self.assertEqual({trace.name for trace in crux_traces}, {"Southern Cross / Crux"})
+        self.assertEqual({trace.name for trace in crux_traces}, {"Southern Cross"})
         self.assertEqual(len(dipper_traces), 2)
         self.assertEqual({trace.name for trace in dipper_traces}, {"Big Dipper"})
         self.assertEqual(milky_way.name, "Milky Way")
         self.assertTrue(milky_way.showlegend)
+
+        self.assertTrue(all("also known astronomically as Crux" in trace.hovertemplate for trace in crux_traces))
+        self.assertTrue(all("forming part of Ursa Major" in trace.hovertemplate for trace in dipper_traces))
+        self.assertIn("orientation guide, not a brightness map", milky_way.hovertemplate)
 
         for traces in (crux_traces, dipper_traces):
             line = next(trace for trace in traces if trace.mode == "lines")
@@ -192,6 +196,9 @@ class SkyMapTests(unittest.TestCase):
         self.assertEqual(set(labels.text), expected_names)
         self.assertEqual(labels.textfont.color, "#B48A38")
         self.assertEqual(labels.textfont.size, 12)
+        self.assertIn("Sun's apparent path", line.hovertemplate)
+        self.assertIn("Sun's apparent path", stars.hovertemplate)
+        self.assertIn("one of the 12 familiar zodiac constellations", labels.hovertemplate)
 
     def test_pleiades_is_an_independent_compact_cluster_layer(self):
         figure = sky_map(map_data())
@@ -212,6 +219,8 @@ class SkyMapTests(unittest.TestCase):
         self.assertEqual(label.text, ("Seven Sisters / Pleiades",))
         self.assertEqual(label.textfont.color, "#E8C463")
         self.assertEqual(label.textfont.size, 13)
+        self.assertTrue(all("recognised in many Aboriginal cultures across Australia" in trace.hovertemplate for trace in pleiades_traces))
+        self.assertTrue(all("Names and stories vary by Nation" in trace.hovertemplate for trace in pleiades_traces))
         for trace, radius in ((stars, 1.016), (label, 1.024)):
             coordinates = np.column_stack([trace.x, trace.y, trace.z])
             self.assertTrue(np.isfinite(coordinates).all())
@@ -291,13 +300,17 @@ class SkyMapTests(unittest.TestCase):
         self.assertIn("sky_map=sky_map", app_source)
         self.assertIn("from charts import sky_map", tatooine_source)
 
-    def test_planet_shopping_includes_the_plurals_aware_pleiades_acknowledgement(self):
+    def test_pleiades_acknowledgement_is_in_the_landmark_hover_not_a_standalone_caption(self):
+        figure = sky_map(map_data())
         shopping_source = Path("experiences/planet_shopping.py").read_text()
-
-        self.assertIn(
-            "The Pleiades, often known as the Seven Sisters, are recognised in many Aboriginal cultures across Australia. Names and stories vary by Nation.",
-            shopping_source,
+        acknowledgement = (
+            "The Pleiades, often known as the Seven Sisters, are recognised in many Aboriginal cultures across Australia. "
+            "Names and stories vary by Nation."
         )
+        pleiades_traces = [trace for trace in figure.data if trace.legendgroup == "seven-sisters-pleiades"]
+
+        self.assertTrue(all(acknowledgement in trace.hovertemplate for trace in pleiades_traces))
+        self.assertNotIn(acknowledgement, shopping_source)
 
     def test_planet_shopping_explains_known_exoplanet_clumps_with_an_optional_reveal(self):
         shopping_source = Path("experiences/planet_shopping.py").read_text()
@@ -314,6 +327,7 @@ class SkyMapTests(unittest.TestCase):
             "Want some landmarks? Use the legend to add the Milky Way and familiar constellations to help orient yourself on the sky.",
             shopping_source,
         )
+        self.assertIn("Hover or tap a sky landmark to learn more.", shopping_source)
 
     def test_planet_shopping_reveals_the_destination_map_before_its_interpretation(self):
         shopping_source = Path("experiences/planet_shopping.py").read_text()

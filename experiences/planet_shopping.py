@@ -831,11 +831,7 @@ def _render_destination(data: pd.DataFrame) -> None:
                 st.caption(
                     "Want some landmarks? Use the legend to add the Milky Way and familiar constellations to help orient yourself on the sky."
                 )
-                # High-level wording follows ANU's Indigenous Songlines overview:
-                # Seven Sisters knowledge has many variations across Australia.
-                st.caption(
-                    "The Pleiades, often known as the Seven Sisters, are recognised in many Aboriginal cultures across Australia. Names and stories vary by Nation."
-                )
+                st.caption("Hover or tap a sky landmark to learn more.")
                 st.markdown(
                     "**There are more exoplanets out there than the ones in this catalogue.**  \n"
                     "You chose from the worlds we have detected so far. Astronomers are still finding more."

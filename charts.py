@@ -195,6 +195,37 @@ _PLEIADES_STARS = (
 )
 _PLEIADES_LABEL_ANCHOR = (58.000, 25.700)
 
+# The high-level acknowledgement below follows ANU's Indigenous Songlines
+# overview: Seven Sisters knowledge has many variations across Australia.
+_SOUTHERN_CROSS_HOVER = (
+    "<b>Southern Cross</b><br>"
+    "A prominent southern-sky constellation, also known astronomically as Crux, "
+    "and a familiar orientation landmark in Australia.<extra></extra>"
+)
+_PLEIADES_HOVER = (
+    "<b>Seven Sisters / Pleiades</b><br>"
+    "A nearby open star cluster. The Pleiades, often known as the Seven Sisters, "
+    "are recognised in many Aboriginal cultures across Australia. Names and stories "
+    "vary by Nation.<extra></extra>"
+)
+_BIG_DIPPER_HOVER = (
+    "<b>Big Dipper</b><br>"
+    "A familiar northern-sky asterism forming part of Ursa Major.<extra></extra>"
+)
+_ZODIAC_HOVER = (
+    "<b>Zodiac constellations</b><br>"
+    "The 12 familiar zodiac constellations lie along the Sun's apparent path through "
+    "the sky.<extra></extra>"
+)
+_ZODIAC_LABEL_HOVER = (
+    "<b>%{text}</b><br>%{text} — one of the 12 familiar zodiac constellations."
+    "<extra></extra>"
+)
+_MILKY_WAY_HOVER = (
+    "<b>Milky Way</b><br>Our view through the dense plane of the Milky Way Galaxy. "
+    "This band is an orientation guide, not a brightness map.<extra></extra>"
+)
+
 # Zodiac stick-figure paths and label anchors are a small extracted subset of
 # d3-celestial's BSD-3-Clause J2000 constellation data. Its line coordinates
 # derive from the IAU constellation material cited by that project. These are
@@ -428,7 +459,7 @@ def sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field
     figure.add_trace(go.Mesh3d(
         x=band_x, y=band_y, z=band_z, i=band_i, j=band_j, k=band_k,
         name="Milky Way", legendgroup="milky-way", legendrank=60,
-        color="#D9E0E7", opacity=0.28, hoverinfo="skip", showlegend=True, visible="legendonly",
+        color="#D9E0E7", opacity=0.28, hovertemplate=_MILKY_WAY_HOVER, showlegend=True, visible="legendonly",
         lighting={"ambient": 1, "diffuse": 0, "specular": 0, "roughness": 1},
     ))
 
@@ -436,12 +467,12 @@ def sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field
     crux_line = _constellation_line_positions(crux_positions, ((0, 2), (1, 3)))
     figure.add_trace(go.Scatter3d(
         x=_raise_orientation_overlay(crux_line[0]), y=_raise_orientation_overlay(crux_line[1]), z=_raise_orientation_overlay(crux_line[2]), mode="lines",
-        name="Southern Cross / Crux", legendgroup="southern-cross-crux", legendrank=30, hoverinfo="skip", showlegend=True,
+        name="Southern Cross", legendgroup="southern-cross-crux", legendrank=30, hovertemplate=_SOUTHERN_CROSS_HOVER, showlegend=True,
         line={"color": "rgba(197, 139, 0, 0.85)", "width": 4}, visible="legendonly",
     ))
     figure.add_trace(go.Scatter3d(
         x=crux_positions[0] * 1.016, y=crux_positions[1] * 1.016, z=crux_positions[2] * 1.016, mode="text",
-        name="Southern Cross / Crux", legendgroup="southern-cross-crux", legendrank=30, hoverinfo="skip",
+        name="Southern Cross", legendgroup="southern-cross-crux", legendrank=30, hovertemplate=_SOUTHERN_CROSS_HOVER,
         # Scatter3d has no star marker. A text glyph keeps a recognisable star
         # shape while rotating with the constellation's 3D coordinates.
         text=["✦"] * len(_CRUX_STARS), textposition="middle center",
@@ -452,12 +483,12 @@ def sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field
     dipper_line = _constellation_line_positions(dipper_positions, tuple((index, index + 1) for index in range(6)))
     figure.add_trace(go.Scatter3d(
         x=_raise_orientation_overlay(dipper_line[0]), y=_raise_orientation_overlay(dipper_line[1]), z=_raise_orientation_overlay(dipper_line[2]), mode="lines",
-        name="Big Dipper", legendgroup="big-dipper", legendrank=40, hoverinfo="skip", showlegend=True,
+        name="Big Dipper", legendgroup="big-dipper", legendrank=45, hovertemplate=_BIG_DIPPER_HOVER, showlegend=True,
         line={"color": "rgba(197, 139, 0, 0.85)", "width": 4}, visible="legendonly",
     ))
     figure.add_trace(go.Scatter3d(
         x=dipper_positions[0] * 1.016, y=dipper_positions[1] * 1.016, z=dipper_positions[2] * 1.016, mode="text",
-        name="Big Dipper", legendgroup="big-dipper", legendrank=40, hoverinfo="skip",
+        name="Big Dipper", legendgroup="big-dipper", legendrank=45, hovertemplate=_BIG_DIPPER_HOVER,
         text=["✦"] * len(_BIG_DIPPER_STARS), textposition="middle center",
         textfont={"color": "#C58B00", "size": 17}, showlegend=False, visible="legendonly",
     ))
@@ -466,7 +497,7 @@ def sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field
     figure.add_trace(go.Scatter3d(
         x=pleiades_positions[0] * 1.016, y=pleiades_positions[1] * 1.016, z=pleiades_positions[2] * 1.016,
         mode="text", name="Seven Sisters / Pleiades", legendgroup="seven-sisters-pleiades",
-        legendrank=45, hoverinfo="skip", text=["✦"] * len(_PLEIADES_STARS),
+        legendrank=40, hovertemplate=_PLEIADES_HOVER, text=["✦"] * len(_PLEIADES_STARS),
         textposition="middle center", textfont={"color": "#D5A62A", "size": 15}, showlegend=True, visible="legendonly",
     ))
     pleiades_label = _equatorial_unit_sphere(
@@ -475,7 +506,7 @@ def sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field
     figure.add_trace(go.Scatter3d(
         x=pleiades_label[0] * 1.024, y=pleiades_label[1] * 1.024, z=pleiades_label[2] * 1.024,
         mode="text", name="Seven Sisters / Pleiades", legendgroup="seven-sisters-pleiades",
-        legendrank=45, hoverinfo="skip", text=["Seven Sisters / Pleiades"],
+        legendrank=40, hovertemplate=_PLEIADES_HOVER, text=["Seven Sisters / Pleiades"],
         textposition="middle center", textfont={"color": "#E8C463", "size": 13}, showlegend=False, visible="legendonly",
     ))
 
@@ -485,19 +516,19 @@ def sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field
         y=_raise_orientation_overlay(zodiac_lines[1], 1.008),
         z=_raise_orientation_overlay(zodiac_lines[2], 1.008),
         mode="lines", name="Zodiac constellations", legendgroup="zodiac-constellations",
-        legendrank=50, hoverinfo="skip", showlegend=True,
+        legendrank=50, hovertemplate=_ZODIAC_HOVER, showlegend=True,
         line={"color": "rgba(156, 116, 37, 0.62)", "width": 2}, visible="legendonly",
     ))
     figure.add_trace(go.Scatter3d(
         x=zodiac_stars[0] * 1.012, y=zodiac_stars[1] * 1.012, z=zodiac_stars[2] * 1.012,
         mode="text", name="Zodiac constellations", legendgroup="zodiac-constellations",
-        legendrank=50, hoverinfo="skip", text=["✦"] * len(zodiac_stars[0]),
+        legendrank=50, hovertemplate=_ZODIAC_HOVER, text=["✦"] * len(zodiac_stars[0]),
         textposition="middle center", textfont={"color": "#9C7425", "size": 11}, showlegend=False, visible="legendonly",
     ))
     figure.add_trace(go.Scatter3d(
         x=zodiac_labels[0] * 1.018, y=zodiac_labels[1] * 1.018, z=zodiac_labels[2] * 1.018,
         mode="text", name="Zodiac constellations", legendgroup="zodiac-constellations",
-        legendrank=50, hoverinfo="skip", text=zodiac_names,
+        legendrank=50, hovertemplate=_ZODIAC_LABEL_HOVER, text=zodiac_names,
         textposition="middle center", textfont={"color": "#B48A38", "size": 12}, showlegend=False, visible="legendonly",
     ))
     scene = {
