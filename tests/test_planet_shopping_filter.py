@@ -1,5 +1,6 @@
 """Stage 3 filtering checks for Planet Shopping."""
 
+from pathlib import Path
 import unittest
 
 import pandas as pd
@@ -107,6 +108,13 @@ class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
         _record_unknown_temperature_decision(state, _UNKNOWN_TEMPERATURE_OPTIONS[1])
         self.assertEqual(state[_UNKNOWN_TEMPERATURE_CONTROL_KEY], _UNKNOWN_TEMPERATURE_OPTIONS[1])
         self.assertEqual(state[_UNKNOWN_TEMPERATURE_DECISION_KEY], _UNKNOWN_TEMPERATURE_OPTIONS[1])
+
+    def test_temperature_policy_cards_use_the_action_title_as_the_only_control_label(self):
+        source = Path("experiences/planet_shopping.py").read_text()
+
+        self.assertIn('f"{icon} {title}"', source)
+        self.assertNotIn('f"Choose {title}"', source)
+        self.assertNotIn('f"Selected: {title}"', source)
 
     def test_stage_shell_matches_established_seven_screen_sequence(self):
         self.assertEqual(

@@ -397,7 +397,32 @@ def _render_temperature(data: pd.DataFrame) -> None:
     st.markdown(
         """
         <style>
-        .st-key-planet_shopping_temperature_policy [data-testid="stButton"] button { width: 100%; }
+        .st-key-planet_shopping_temperature_policy [data-testid="stHorizontalBlock"] { gap: 0.75rem; }
+        .st-key-planet_shopping_temperature_policy [data-testid="stVerticalBlockBorderWrapper"] {
+            background: #fffdf2;
+            border-color: #e6dfc5;
+            padding: 0.55rem 0.7rem;
+        }
+        .st-key-planet_shopping_temperature_policy [data-testid="stButton"] { margin: 0; }
+        .st-key-planet_shopping_temperature_policy [data-testid="stButton"] button {
+            width: 100%;
+            min-height: 0;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            color: #1f1f1f;
+            font-size: 1.05rem;
+            font-weight: 700;
+            justify-content: flex-start;
+        }
+        .st-key-planet_shopping_temperature_policy [data-testid="stButton"] button:hover {
+            background: rgba(255, 221, 0, 0.12);
+        }
+        .st-key-planet_shopping_temperature_policy [data-testid="stButton"] button[kind="primary"] {
+            background: #ffdc00;
+            border: 1px solid #d3aa00;
+            color: #1f1f1f;
+        }
         @media (max-width: 640px) {
             .st-key-planet_shopping_temperature_policy [data-testid="stHorizontalBlock"] { flex-direction: column; }
             .st-key-planet_shopping_temperature_policy [data-testid="column"] { width: 100% !important; flex: 1 1 100% !important; }
@@ -430,18 +455,30 @@ def _render_temperature(data: pd.DataFrame) -> None:
             selected = unknown_decision == option
             with card:
                 with st.container(border=True, key=f"{key_prefix}_card"):
-                    st.markdown(icon)
-                    st.markdown(f"**{title}**")
-                    st.write(consequence)
+                    if selected:
+                        st.markdown(
+                            f"""
+                            <style>
+                            .st-key-{key_prefix}_card,
+                            .st-key-{key_prefix}_card [data-testid="stVerticalBlockBorderWrapper"] {{
+                                background: #fff8d8;
+                                border-left: 4px solid #ffdc00;
+                                border-color: #e5b900;
+                            }}
+                            </style>
+                            """,
+                            unsafe_allow_html=True,
+                        )
                     st.button(
-                        f"Selected: {title}" if selected else f"Choose {title}",
+                        f"{icon} {title}",
                         type="primary" if selected else "secondary",
                         key=f"{key_prefix}_button",
                         on_click=_record_unknown_temperature_decision,
                         args=(st.session_state, option),
                     )
+                    st.caption(consequence)
                     if selected:
-                        st.caption("Selected policy")
+                        st.caption("✓ Selected")
     completion_gate(unknown_decision is not None)
 
 
