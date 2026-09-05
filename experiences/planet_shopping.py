@@ -816,6 +816,9 @@ def _render_destination(data: pd.DataFrame) -> None:
                     "So the clumps and gaps in this map partly reflect **where we looked and how we looked** — "
                     "not just where planets exist."
                 )
+            st.caption(
+                "Want some landmarks? Use the legend to add the Milky Way and familiar constellations to help orient yourself on the sky."
+            )
             st.plotly_chart(sky_map(data, selected_planet=destination_name), width="stretch")
             # High-level wording follows ANU's Indigenous Songlines overview:
             # Seven Sisters knowledge has many variations across Australia.

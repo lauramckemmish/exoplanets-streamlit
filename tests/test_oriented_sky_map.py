@@ -95,6 +95,26 @@ class SkyMapTests(unittest.TestCase):
         self.assertEqual(selected.legendgroup, "selected-planet")
         self.assertTrue(selected.showlegend)
 
+    def test_orientation_layers_start_hidden_but_discoverable_in_the_legend(self):
+        figure = sky_map(map_data(), selected_planet="Planet B")
+        detected = next(trace for trace in figure.data if trace.legendgroup == "detected-exoplanets")
+        selected = next(trace for trace in figure.data if trace.legendgroup == "selected-planet")
+        expected_group_sizes = {
+            "southern-cross-crux": 2,
+            "big-dipper": 2,
+            "seven-sisters-pleiades": 2,
+            "zodiac-constellations": 3,
+            "milky-way": 1,
+        }
+
+        self.assertIsNone(detected.visible)
+        self.assertIsNone(selected.visible)
+        for group, expected_size in expected_group_sizes.items():
+            traces = [trace for trace in figure.data if trace.legendgroup == group]
+            self.assertEqual(len(traces), expected_size)
+            self.assertTrue(all(trace.visible == "legendonly" for trace in traces))
+            self.assertEqual(sum(bool(trace.showlegend) for trace in traces), 1)
+
     def test_selected_planet_gets_a_finite_near_centre_camera_aimed_at_its_direction(self):
         figure = sky_map(map_data(), selected_planet="Planet B")
         camera = figure.layout.scene.camera
@@ -285,6 +305,14 @@ class SkyMapTests(unittest.TestCase):
         self.assertIn("**Notice anything unusual about where the green dots are?**", shopping_source)
         self.assertIn('with soft_reveal("Why are they so unevenly spread across the sky?"):', shopping_source)
         self.assertIn("**where we looked and how we looked**", shopping_source)
+
+    def test_planet_shopping_invites_learners_to_use_the_sky_map_legend(self):
+        shopping_source = Path("experiences/planet_shopping.py").read_text()
+
+        self.assertIn(
+            "Want some landmarks? Use the legend to add the Milky Way and familiar constellations to help orient yourself on the sky.",
+            shopping_source,
+        )
 
     def test_planet_shopping_ends_the_destination_map_with_the_catalogue_coda(self):
         shopping_source = Path("experiences/planet_shopping.py").read_text()
