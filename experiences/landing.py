@@ -1,5 +1,6 @@
 """Introduction page for the exoplanet learning experiences."""
 
+from datetime import date
 from pathlib import Path
 
 import streamlit as st
@@ -66,11 +67,15 @@ def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalo
             "previously be asked."
         )
         if source.is_live:
-            st.metric("Confirmed exoplanets in the NASA archive", f"{len(data):,}")
-            st.caption("**Live NASA catalogue** · count changes as new planets are confirmed")
+            current_date = date.today()
+            date_label = f"{current_date.day} {current_date.strftime('%b %Y')}"
+            st.metric(
+                f"Live count of confirmed exoplanets in the NASA archive · {date_label}",
+                f"{len(data):,}",
+            )
         else:
-            st.metric("Planets in the bundled notebook sample", f"{len(data):,}")
-            st.caption("This bundled sample supports offline use. Its row count is not the current confirmed-planet total.")
+            st.metric("Bundled NASA-derived catalogue sample", f"{len(data):,}")
+            st.caption("Live archive unavailable — using the bundled sample.")
     with image_column:
         st.image(
             image_path,
