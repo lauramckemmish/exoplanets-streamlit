@@ -318,22 +318,33 @@ class SkyMapTests(unittest.TestCase):
             shopping_source,
         )
 
-    def test_planet_shopping_reveals_the_destination_map_before_its_interpretation(self):
+    def test_planet_shopping_commits_the_destination_before_showing_the_map(self):
         shopping_source = Path("experiences/planet_shopping.py").read_text()
 
-        reveal_index = shopping_source.index('reveal_label="Show me on the sky"')
-        map_index = shopping_source.index("st.plotly_chart(", reveal_index)
+        profile_index = shopping_source.index("_render_planet_profile(inspected_name, inspected_destination)")
+        prompt_index = shopping_source.index("Does this planet still look like the one you want?")
+        choose_index = shopping_source.index('st.button("Choose this planet", type="primary")')
+        commit_index = shopping_source.index("_record_destination_selection(st.session_state, inspected_name)")
+        confirmation_index = shopping_source.index('st.success(f"Destination chosen: {destination_name}")')
+        map_index = shopping_source.index("st.plotly_chart(", confirmation_index)
         clarification_index = shopping_source.index("**The green dots are detected exoplanets", map_index)
         noticing_index = shopping_source.index("**Notice anything unusual", clarification_index)
         soft_reveal_index = shopping_source.index('with soft_reveal("Why are they so unevenly spread across the sky?"):', noticing_index)
 
-        self.assertLess(reveal_index, map_index)
+        self.assertLess(profile_index, prompt_index)
+        self.assertLess(prompt_index, choose_index)
+        self.assertLess(choose_index, commit_index)
+        self.assertLess(commit_index, confirmation_index)
+        self.assertLess(confirmation_index, map_index)
         self.assertLess(map_index, clarification_index)
         self.assertLess(clarification_index, noticing_index)
         self.assertLess(noticing_index, soft_reveal_index)
-        self.assertIn("_DESTINATION_SKY_MAP_REVEAL_KEY", shopping_source)
+        self.assertIn("completion_gate(selected)", shopping_source)
         self.assertIn("height=625", shopping_source)
-        self.assertNotIn("Ready to see where your destination appears on the sky?", shopping_source)
+        self.assertNotIn('reveal_label="Show me on the sky"', shopping_source)
+        self.assertNotIn("_DESTINATION_SKY_MAP_REVEAL_KEY", shopping_source)
+        self.assertNotIn("Why did you choose that one?", shopping_source)
+        self.assertNotIn("Given what we know and what matters to you, this is the planet you chose.", shopping_source)
 
     def test_planet_shopping_ends_the_destination_map_with_the_catalogue_coda(self):
         shopping_source = Path("experiences/planet_shopping.py").read_text()

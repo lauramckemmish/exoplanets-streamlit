@@ -10,6 +10,7 @@ from experiences.planet_shopping import (
     STAGE_LABELS,
     _APPLIED_DISTANCE_KEY,
     _APPLIED_DESTINATION_KEY,
+    _DESTINATION_CONTROL_KEY,
     _DISTANCE_CONTROL_KEY,
     _DISTANCE_INTERACTED_KEY,
     _format_travel_years,
@@ -139,7 +140,7 @@ class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
             ],
         )
 
-    def test_destination_selection_is_durable_and_must_be_a_shortlist_member(self):
+    def test_destination_commitment_is_durable_and_distinct_from_inspection(self):
         names = ["Planet A", "Planet B"]
         state = {}
 
@@ -147,6 +148,13 @@ class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
         self.assertFalse(_record_destination_selection(state, None))
         self.assertTrue(_record_destination_selection(state, "Planet B"))
         self.assertEqual(state[_APPLIED_DESTINATION_KEY], "Planet B")
+
+        inspecting_another = {
+            _APPLIED_DESTINATION_KEY: "Planet A",
+            _DESTINATION_CONTROL_KEY: "Planet B",
+        }
+        self.assertEqual(_initialise_destination_control(inspecting_another, names), "Planet B")
+        self.assertEqual(inspecting_another[_APPLIED_DESTINATION_KEY], "Planet A")
 
         restored = {_APPLIED_DESTINATION_KEY: "Planet B"}
         self.assertEqual(_initialise_destination_control(restored, names), "Planet B")
