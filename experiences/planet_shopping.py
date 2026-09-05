@@ -784,6 +784,21 @@ def _render_destination(data: pd.DataFrame) -> None:
     if selected:
         destination = candidates.loc[candidates["pl_name"].astype(str) == destination_name].iloc[0]
         st.success(f"Destination chosen: {destination_name}")
+        if not hard_reveal(
+            "**You’ve chosen a promising candidate. Are we done?**",
+            _HABITABILITY_BOUNDARY_REVEAL_KEY,
+            reveal_label="Check the claim",
+            revealed_message="**Not quite. You found a promising candidate — not proof of habitability.**",
+            explanation=(
+                "Distance and estimated temperature helped you narrow the search. They do **not** tell us "
+                "whether the planet is actually habitable. We would need much more evidence about the planet "
+                "and its atmosphere.\n\n"
+                "Your filters answered **Which planets meet the criteria we chose?** — not "
+                "**Which planets are habitable?**"
+            ),
+        ):
+            completion_gate(selected)
+            return
         coordinates = destination.reindex(["x", "y", "z"])
         if coordinates.notna().all():
             map_column, interpretation_column = st.columns(
@@ -852,19 +867,6 @@ def _render_destination(data: pd.DataFrame) -> None:
                     )
         else:
             st.caption("This planet's position is not available in the map data.")
-        hard_reveal(
-            "**You’ve chosen a promising candidate. Are we done?**",
-            _HABITABILITY_BOUNDARY_REVEAL_KEY,
-            reveal_label="Check the claim",
-            revealed_message="**Not quite. You found a promising candidate — not proof of habitability.**",
-            explanation=(
-                "Distance and estimated temperature helped you narrow the search. They do **not** tell us "
-                "whether the planet is actually habitable. We would need much more evidence about the planet "
-                "and its atmosphere.\n\n"
-                "Your filters answered **Which planets meet the criteria we chose?** — not "
-                "**Which planets are habitable?**"
-            ),
-        )
     completion_gate(selected)
 
 
