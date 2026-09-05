@@ -11,6 +11,7 @@ import charts
 from charts import (
     _BIG_DIPPER_STARS,
     _CRUX_STARS,
+    _PLEIADES_STARS,
     _ZODIAC_CONSTELLATIONS,
     _equatorial_unit_sphere,
     _zodiac_layer_positions,
@@ -41,6 +42,7 @@ class SkyMapTests(unittest.TestCase):
         self.assertIn("Detected exoplanets", trace_names)
         self.assertIn("Southern Cross / Crux", trace_names)
         self.assertIn("Big Dipper", trace_names)
+        self.assertIn("Seven Sisters / Pleiades", trace_names)
         self.assertIn("Zodiac constellations", trace_names)
         self.assertIn("Milky Way", trace_names)
 
@@ -58,6 +60,7 @@ class SkyMapTests(unittest.TestCase):
                 "Your planet: Planet B",
                 "Southern Cross / Crux",
                 "Big Dipper",
+                "Seven Sisters / Pleiades",
                 "Zodiac constellations",
                 "Milky Way",
             ],
@@ -141,6 +144,30 @@ class SkyMapTests(unittest.TestCase):
         self.assertEqual(labels.textfont.color, "#B48A38")
         self.assertEqual(labels.textfont.size, 12)
 
+    def test_pleiades_is_an_independent_compact_cluster_layer(self):
+        figure = sky_map(map_data())
+        pleiades_traces = [
+            trace for trace in figure.data
+            if trace.legendgroup == "seven-sisters-pleiades"
+        ]
+
+        self.assertEqual(len(pleiades_traces), 2)
+        self.assertEqual(sum(bool(trace.showlegend) for trace in pleiades_traces), 1)
+        self.assertEqual({trace.name for trace in pleiades_traces}, {"Seven Sisters / Pleiades"})
+        stars = next(trace for trace in pleiades_traces if trace.text[0] == "✦")
+        label = next(trace for trace in pleiades_traces if trace.text[0] != "✦")
+        self.assertTrue(all(glyph == "✦" for glyph in stars.text))
+        self.assertEqual(len(stars.text), len(_PLEIADES_STARS))
+        self.assertEqual(stars.textfont.color, "#D5A62A")
+        self.assertEqual(stars.textfont.size, 15)
+        self.assertEqual(label.text, ("Seven Sisters / Pleiades",))
+        self.assertEqual(label.textfont.color, "#E8C463")
+        self.assertEqual(label.textfont.size, 13)
+        for trace, radius in ((stars, 1.016), (label, 1.024)):
+            coordinates = np.column_stack([trace.x, trace.y, trace.z])
+            self.assertTrue(np.isfinite(coordinates).all())
+            np.testing.assert_allclose(np.sum(coordinates**2, axis=1), radius**2)
+
     def test_zodiac_reference_coordinates_are_finite_unit_sphere_positions(self):
         zodiac_lines, zodiac_stars, zodiac_labels, zodiac_names = _zodiac_layer_positions()
         line_coordinates = np.column_stack([
@@ -196,7 +223,7 @@ class SkyMapTests(unittest.TestCase):
         self.assertEqual({tuple(trace.text) for trace in categorical_traces}, {("Planet A",), ("Planet B",)})
 
     def test_reference_positions_are_finite_unit_sphere_coordinates(self):
-        stars = _CRUX_STARS + _BIG_DIPPER_STARS
+        stars = _CRUX_STARS + _BIG_DIPPER_STARS + _PLEIADES_STARS
         coordinates = np.asarray([(ra, dec) for _, ra, dec in stars])
         x, y, z = _equatorial_unit_sphere(coordinates[:, 0], coordinates[:, 1])
 
@@ -214,6 +241,14 @@ class SkyMapTests(unittest.TestCase):
         self.assertIn("sky_map(map_data, None, colour_field, colour_label)", data_lab_source)
         self.assertIn("sky_map=sky_map", app_source)
         self.assertIn("from charts import sky_map", tatooine_source)
+
+    def test_planet_shopping_includes_the_plurals_aware_pleiades_acknowledgement(self):
+        shopping_source = Path("experiences/planet_shopping.py").read_text()
+
+        self.assertIn(
+            "The Pleiades, often known as the Seven Sisters, are recognised in many Aboriginal cultures across Australia. Names and stories vary by Nation.",
+            shopping_source,
+        )
 
     def test_no_public_oriented_map_alternative_remains(self):
         legacy_name = "oriented_" + "sky_map"

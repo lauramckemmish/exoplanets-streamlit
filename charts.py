@@ -180,6 +180,21 @@ _BIG_DIPPER_STARS = (
     ("Alkaid", 206.885, 49.313),
 )
 
+# Seven prominent Pleiades members, using ICRS/J2000 coordinates rounded to
+# 0.001 degree. Source: CDS SIMBAD basic-data records for 16, 17, 19, 20, 21,
+# 23 and 25 Tauri (queried 2026-09-05). The Pleiades is a real open cluster;
+# its stars are shown without an invented connecting-line figure.
+_PLEIADES_STARS = (
+    ("Celaeno", 56.201, 24.289),
+    ("Electra", 56.219, 24.113),
+    ("Taygeta", 56.302, 24.467),
+    ("Maia", 56.457, 24.368),
+    ("Asterope", 56.477, 24.555),
+    ("Merope", 56.582, 23.948),
+    ("Alcyone", 56.871, 24.105),
+)
+_PLEIADES_LABEL_ANCHOR = (58.000, 25.700)
+
 # Zodiac stick-figure paths and label anchors are a small extracted subset of
 # d3-celestial's BSD-3-Clause J2000 constellation data. Its line coordinates
 # derive from the IAU constellation material cited by that project. These are
@@ -412,6 +427,23 @@ def sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field
         name="Big Dipper", legendgroup="big-dipper", legendrank=40, hoverinfo="skip",
         text=["✦"] * len(_BIG_DIPPER_STARS), textposition="middle center",
         textfont={"color": "#C58B00", "size": 17}, showlegend=False,
+    ))
+
+    pleiades_positions = _landmark_positions(_PLEIADES_STARS)
+    figure.add_trace(go.Scatter3d(
+        x=pleiades_positions[0] * 1.016, y=pleiades_positions[1] * 1.016, z=pleiades_positions[2] * 1.016,
+        mode="text", name="Seven Sisters / Pleiades", legendgroup="seven-sisters-pleiades",
+        legendrank=45, hoverinfo="skip", text=["✦"] * len(_PLEIADES_STARS),
+        textposition="middle center", textfont={"color": "#D5A62A", "size": 15}, showlegend=True,
+    ))
+    pleiades_label = _equatorial_unit_sphere(
+        np.asarray([_PLEIADES_LABEL_ANCHOR[0]]), np.asarray([_PLEIADES_LABEL_ANCHOR[1]])
+    )
+    figure.add_trace(go.Scatter3d(
+        x=pleiades_label[0] * 1.024, y=pleiades_label[1] * 1.024, z=pleiades_label[2] * 1.024,
+        mode="text", name="Seven Sisters / Pleiades", legendgroup="seven-sisters-pleiades",
+        legendrank=45, hoverinfo="skip", text=["Seven Sisters / Pleiades"],
+        textposition="middle center", textfont={"color": "#E8C463", "size": 13}, showlegend=False,
     ))
 
     zodiac_lines, zodiac_stars, zodiac_labels, zodiac_names = _zodiac_layer_positions()

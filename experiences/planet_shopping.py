@@ -803,6 +803,11 @@ def _render_destination(data: pd.DataFrame) -> None:
                 "Most of these planets are not visible to the naked eye. The clumps and gaps partly reflect where astronomers have looked and what our detection methods are good at finding."
             )
             st.plotly_chart(sky_map(data, selected_planet=destination_name), width="stretch")
+            # High-level wording follows ANU's Indigenous Songlines overview:
+            # Seven Sisters knowledge has many variations across Australia.
+            st.caption(
+                "The Pleiades, often known as the Seven Sisters, are recognised in many Aboriginal cultures across Australia. Names and stories vary by Nation."
+            )
         else:
             st.caption("This planet's position is not available in the map data.")
     completion_gate(selected)
