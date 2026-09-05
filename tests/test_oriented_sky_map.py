@@ -11,7 +11,9 @@ import charts
 from charts import (
     _BIG_DIPPER_STARS,
     _CRUX_STARS,
+    _ZODIAC_CONSTELLATIONS,
     _equatorial_unit_sphere,
+    _zodiac_layer_positions,
     sky_map,
 )
 
@@ -39,6 +41,7 @@ class SkyMapTests(unittest.TestCase):
         self.assertIn("Detected exoplanets", trace_names)
         self.assertIn("Southern Cross / Crux", trace_names)
         self.assertIn("Big Dipper", trace_names)
+        self.assertIn("Zodiac constellations", trace_names)
         self.assertIn("Milky Way", trace_names)
 
     def test_legend_has_deterministic_right_hand_layer_order(self):
@@ -55,6 +58,7 @@ class SkyMapTests(unittest.TestCase):
                 "Your planet: Planet B",
                 "Southern Cross / Crux",
                 "Big Dipper",
+                "Zodiac constellations",
                 "Milky Way",
             ],
         )
@@ -107,6 +111,47 @@ class SkyMapTests(unittest.TestCase):
             self.assertEqual(line.line.color, "rgba(197, 139, 0, 0.85)")
             self.assertEqual(stars.textfont.color, "#C58B00")
             self.assertTrue(all(glyph == "✦" for glyph in stars.text))
+
+    def test_zodiac_constellations_are_one_quiet_legend_layer_with_all_labels(self):
+        figure = sky_map(map_data())
+        zodiac_traces = [trace for trace in figure.data if trace.legendgroup == "zodiac-constellations"]
+        expected_names = {
+            "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra",
+            "Scorpius", "Sagittarius", "Capricornus", "Aquarius", "Pisces",
+        }
+
+        self.assertEqual({name for name, _, _ in _ZODIAC_CONSTELLATIONS}, expected_names)
+        self.assertEqual(len(zodiac_traces), 3)
+        self.assertEqual(sum(bool(trace.showlegend) for trace in zodiac_traces), 1)
+        self.assertEqual({trace.name for trace in zodiac_traces}, {"Zodiac constellations"})
+        line = next(trace for trace in zodiac_traces if trace.mode == "lines")
+        stars = next(trace for trace in zodiac_traces if trace.mode == "text" and trace.text[0] == "✦")
+        labels = next(trace for trace in zodiac_traces if trace.mode == "text" and trace.text[0] != "✦")
+        primary_line = next(
+            trace for trace in figure.data
+            if trace.legendgroup == "southern-cross-crux" and trace.mode == "lines"
+        )
+
+        self.assertEqual(line.line.color, "rgba(156, 116, 37, 0.62)")
+        self.assertLess(line.line.width, primary_line.line.width)
+        self.assertEqual(stars.textfont.color, "#9C7425")
+        self.assertLess(stars.textfont.size, 17)
+        self.assertTrue(all(glyph == "✦" for glyph in stars.text))
+        self.assertEqual(set(labels.text), expected_names)
+        self.assertEqual(labels.textfont.color, "#B48A38")
+
+    def test_zodiac_reference_coordinates_are_finite_unit_sphere_positions(self):
+        zodiac_lines, zodiac_stars, zodiac_labels, zodiac_names = _zodiac_layer_positions()
+        line_coordinates = np.column_stack([
+            [value for value in zodiac_lines[0] if value is not None],
+            [value for value in zodiac_lines[1] if value is not None],
+            [value for value in zodiac_lines[2] if value is not None],
+        ])
+
+        self.assertEqual(set(zodiac_names), {name for name, _, _ in _ZODIAC_CONSTELLATIONS})
+        for coordinates in (line_coordinates, np.column_stack(zodiac_stars), np.column_stack(zodiac_labels)):
+            self.assertTrue(np.isfinite(coordinates).all())
+            np.testing.assert_allclose(np.sum(coordinates**2, axis=1), 1.0)
 
     def test_milky_way_is_a_more_visible_neutral_grey_band(self):
         figure = sky_map(map_data())

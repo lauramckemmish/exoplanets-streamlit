@@ -180,6 +180,66 @@ _BIG_DIPPER_STARS = (
     ("Alkaid", 206.885, 49.313),
 )
 
+# Zodiac stick-figure paths and label anchors are a small extracted subset of
+# d3-celestial's BSD-3-Clause J2000 constellation data. Its line coordinates
+# derive from the IAU constellation material cited by that project. These are
+# conventional orientation figures, not IAU constellation boundaries.
+_ZODIAC_CONSTELLATIONS = (
+    ("Aries", (39.5412, 20.7923), (
+        ((42.496, 27.2605), (31.7934, 23.4624), (28.66, 20.808), (28.3826, 19.2939)),
+    )),
+    ("Taurus", (70, 15), (
+        ((84.4112, 21.1425), (68.9802, 16.5093), (67.1656, 15.8709), (64.9483, 15.6276), (65.7337, 17.5425), (67.1542, 19.1804), (81.573, 28.6075)),
+        ((64.9483, 15.6276), (60.1701, 12.4903), (51.7923, 9.7327), (60.7891, 5.9893)),
+        ((51.7923, 9.7327), (51.2033, 9.0289), (54.2183, 0.4017)),
+    )),
+    ("Gemini", (106.0592, 22.6002), (
+        ((93.7194, 22.5068), (95.7401, 22.5136), (100.983, 25.1311), (107.7849, 30.2452), (113.6494, 31.8883), (116.329, 28.0262), (113.9806, 26.8957), (110.0307, 21.9823), (106.0272, 20.5703), (99.4279, 16.3993), (101.3224, 12.8956)),
+        ((110.0307, 21.9823), (109.5232, 16.5404)),
+    )),
+    ("Cancer", (129.7392, 19.8058), (
+        ((134.6218, 11.8577), (131.1712, 18.1543), (130.8214, 21.4685), (131.6666, 28.7651)),
+        ((131.1712, 18.1543), (124.1288, 9.1855)),
+    )),
+    ("Leo", (160, 13), (
+        ((152.093, 11.9672), (151.8331, 16.7627), (154.9931, 19.8415), (168.5271, 20.5237), (177.2649, 14.5721), (168.56, 15.4296), (152.093, 11.9672)),
+        ((154.9931, 19.8415), (154.1726, 23.4173), (148.1909, 26.007), (146.4628, 23.7743)),
+    )),
+    ("Virgo", (-158, -4), (
+        ((176.4648, 6.5294), (177.6738, 1.7647), (-175.0235, -0.6668), (-169.5848, -1.4494), (-162.5125, -5.539), (-158.7018, -11.1613), (-145.9964, -6.0005), (-139.2349, -5.6582)),
+        ((-164.4558, 10.9592), (-166.0991, 3.3975), (-169.5848, -1.4494)),
+        ((-162.5125, -5.539), (-156.3267, -0.5958), (-149.5884, 1.5445), (-138.4378, 1.8929)),
+    )),
+    ("Libra", (-132.0099, -15.2346), (
+        ((-133.9824, -25.282), (-137.2804, -16.0418), (-130.7483, -9.3829), (-126.1184, -14.7895), (-125.744, -28.1351), (-125.336, -29.7778)),
+        ((-137.2804, -16.0418), (-126.1184, -14.7895)),
+    )),
+    ("Scorpius", (-106, -32), (
+        ((-120.287, -26.1141), (-119.9166, -22.6217), (-118.6407, -19.8055)),
+        ((-119.9166, -22.6217), (-114.7028, -25.5928), (-112.6481, -26.432), (-111.0294, -28.216), (-107.4591, -34.2932), (-107.0324, -38.0474), (-106.3541, -42.3613), (-101.9617, -43.2392), (-95.6703, -42.9978), (-93.1038, -40.127), (-94.378, -39.03), (-96.5978, -37.1038)),
+    )),
+    ("Sagittarius", (-73.5153, -28.4769), (
+        ((-85.5932, -36.7617), (-83.957, -34.3846), (-84.7515, -29.8281), (-83.0073, -25.4217), (-86.5591, -21.0588)),
+        ((-69.3404, -44.459), (-69.0284, -40.6159), (-74.347, -29.8801), (-78.5859, -26.9908), (-83.0073, -25.4217)),
+        ((-61.1846, -41.8683), (-60.0659, -35.2763), (-61.0402, -26.2995), (-65.8232, -24.8836), (-68.6813, -24.5086), (-71.1149, -25.2567), (-76.1836, -26.2967), (-78.5859, -26.9908), (-84.7515, -29.8281), (-88.548, -30.4241), (-83.957, -34.3846), (-74.347, -29.8801), (-73.265, -27.6704), (-76.1836, -26.2967), (-73.8292, -21.7415), (-72.559, -21.0236), (-70.5913, -18.9529), (-69.5818, -17.8472), (-69.5682, -15.955)),
+        ((-73.8292, -21.7415), (-75.5675, -21.1067), (-76.4576, -22.7448), (-76.1836, -26.2967)),
+    )),
+    ("Capricornus", (-44.268, -18.0232), (
+        ((-55.588, -12.5082), (-54.7472, -14.7814), (-52.7849, -17.8137), (-48.4761, -25.2709), (-47.0446, -26.9191), (-38.3332, -22.4113), (-33.2398, -16.1273), (-34.9773, -16.6623), (-39.4383, -16.8345), (-43.5132, -17.2329), (-55.588, -12.5082)),
+    )),
+    ("Aquarius", (-25, -11), (
+        ((-48.081, -9.4958), (-46.8365, -8.9833), (-37.1103, -5.5712), (-28.554, -0.3199), (-24.5859, -1.3873), (-22.792, -0.02), (-21.1609, -0.1175), (-16.8464, -7.5796), (-10.5241, -9.1825), (-12.6383, -21.1724)),
+        ((-37.1103, -5.5712), (-28.3907, -13.8697)),
+        ((-28.554, -0.3199), (-25.7915, -7.7833)),
+        ((-22.792, -0.02), (-23.6807, 1.3774)),
+        ((-9.2574, -20.1006), (-10.5241, -9.1825), (-4.5591, -17.8165)),
+    )),
+    ("Pisces", (-353, 14), (
+        ((18.4373, 24.5837), (17.9152, 30.0896), (19.8666, 27.2641), (18.4373, 24.5837), (17.8634, 21.0347), (22.8709, 15.3458), (26.3485, 9.1577), (30.5118, 2.7638), (28.389, 3.1875), (25.3579, 5.4876), (22.5463, 6.1438), (18.4329, 7.5754), (15.7359, 7.8901), (12.1706, 7.5851), (-0.1721, 6.8633), (-5.0123, 5.6263), (-8.0079, 6.379), (-9.9142, 5.3813), (-10.7086, 3.2823), (-8.2669, 1.2556), (-4.4883, 1.78), (-3.402, 3.4868), (-5.0123, 5.6263)),
+        ((-10.7086, 3.2823), (-14.0308, 3.82)),
+    )),
+)
+
 
 def _landmark_positions(stars: tuple[tuple[str, float, float], ...]) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     coordinates = np.asarray([(ra, dec) for _, ra, dec in stars], dtype=float)
@@ -198,6 +258,35 @@ def _constellation_line_positions(
         line_y.extend([float(y[start]), float(y[end]), None])
         line_z.extend([float(z[start]), float(z[end]), None])
     return line_x, line_y, line_z
+
+
+def _zodiac_layer_positions():
+    """Return static zodiac line, star-glyph, and label positions on the sphere."""
+    line_x: list[float | None] = []
+    line_y: list[float | None] = []
+    line_z: list[float | None] = []
+    star_coordinates: list[tuple[float, float]] = []
+    label_coordinates: list[tuple[float, float]] = []
+    labels: list[str] = []
+    for name, label_anchor, paths in _ZODIAC_CONSTELLATIONS:
+        labels.append(name)
+        label_coordinates.append(label_anchor)
+        for path in paths:
+            coordinates = np.asarray(path, dtype=float)
+            x, y, z = _equatorial_unit_sphere(coordinates[:, 0], coordinates[:, 1])
+            line_x.extend([*(float(value) for value in x), None])
+            line_y.extend([*(float(value) for value in y), None])
+            line_z.extend([*(float(value) for value in z), None])
+            star_coordinates.extend(path)
+    unique_star_coordinates = tuple(dict.fromkeys(star_coordinates))
+    stars = np.asarray(unique_star_coordinates, dtype=float)
+    labels_array = np.asarray(label_coordinates, dtype=float)
+    return (
+        (line_x, line_y, line_z),
+        _equatorial_unit_sphere(stars[:, 0], stars[:, 1]),
+        _equatorial_unit_sphere(labels_array[:, 0], labels_array[:, 1]),
+        labels,
+    )
 
 
 def _raise_orientation_overlay(values: list[float | None], radius: float = 1.012) -> list[float | None]:
@@ -290,7 +379,7 @@ def sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field
     band_x, band_y, band_z, band_i, band_j, band_k = _galactic_plane_band()
     figure.add_trace(go.Mesh3d(
         x=band_x, y=band_y, z=band_z, i=band_i, j=band_j, k=band_k,
-        name="Milky Way", legendgroup="milky-way", legendrank=50,
+        name="Milky Way", legendgroup="milky-way", legendrank=60,
         color="#D9E0E7", opacity=0.28, hoverinfo="skip", showlegend=True,
         lighting={"ambient": 1, "diffuse": 0, "specular": 0, "roughness": 1},
     ))
@@ -323,6 +412,28 @@ def sky_map(data: pd.DataFrame, selected_planet: str | None = None, colour_field
         name="Big Dipper", legendgroup="big-dipper", legendrank=40, hoverinfo="skip",
         text=["✦"] * len(_BIG_DIPPER_STARS), textposition="middle center",
         textfont={"color": "#C58B00", "size": 17}, showlegend=False,
+    ))
+
+    zodiac_lines, zodiac_stars, zodiac_labels, zodiac_names = _zodiac_layer_positions()
+    figure.add_trace(go.Scatter3d(
+        x=_raise_orientation_overlay(zodiac_lines[0], 1.008),
+        y=_raise_orientation_overlay(zodiac_lines[1], 1.008),
+        z=_raise_orientation_overlay(zodiac_lines[2], 1.008),
+        mode="lines", name="Zodiac constellations", legendgroup="zodiac-constellations",
+        legendrank=50, hoverinfo="skip", showlegend=True,
+        line={"color": "rgba(156, 116, 37, 0.62)", "width": 2},
+    ))
+    figure.add_trace(go.Scatter3d(
+        x=zodiac_stars[0] * 1.012, y=zodiac_stars[1] * 1.012, z=zodiac_stars[2] * 1.012,
+        mode="text", name="Zodiac constellations", legendgroup="zodiac-constellations",
+        legendrank=50, hoverinfo="skip", text=["✦"] * len(zodiac_stars[0]),
+        textposition="middle center", textfont={"color": "#9C7425", "size": 11}, showlegend=False,
+    ))
+    figure.add_trace(go.Scatter3d(
+        x=zodiac_labels[0] * 1.018, y=zodiac_labels[1] * 1.018, z=zodiac_labels[2] * 1.018,
+        mode="text", name="Zodiac constellations", legendgroup="zodiac-constellations",
+        legendrank=50, hoverinfo="skip", text=zodiac_names,
+        textposition="middle center", textfont={"color": "#B48A38", "size": 10}, showlegend=False,
     ))
     figure.update_layout(
         margin={"l": 0, "r": 210, "t": 20, "b": 0},
