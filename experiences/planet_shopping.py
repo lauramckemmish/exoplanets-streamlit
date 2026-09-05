@@ -798,11 +798,11 @@ def _render_destination(data: pd.DataFrame) -> None:
         st.success(f"Destination chosen: {destination_name}")
         coordinates = destination.reindex(["x", "y", "z"])
         if coordinates.notna().all():
-            st.write("Here’s your destination among the exoplanets we know about.")
+            st.markdown("#### Where is your planet?")
             st.plotly_chart(
                 sky_map(data, selected_planet=destination_name),
                 width="stretch",
-                height=625,
+                height=540,
             )
             st.info(
                 "**The green dots are detected exoplanets — not stars.**  \n"
