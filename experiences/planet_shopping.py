@@ -799,7 +799,7 @@ def _render_destination(data: pd.DataFrame) -> None:
         coordinates = destination.reindex(["x", "y", "z"])
         if coordinates.notna().all():
             sky_map_revealed = hard_reveal(
-                "Ready to see where your destination appears on the sky?",
+                "",
                 _DESTINATION_SKY_MAP_REVEAL_KEY,
                 reveal_label="Show me on the sky",
             )

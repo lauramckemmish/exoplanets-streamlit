@@ -198,8 +198,9 @@ def hard_reveal(
     """
     del title  # Prerequisite wording belongs to the experience, not the helper.
     with st.container(key=f"hard_reveal_{key}"):
-        st.markdown("<p class='interaction-marker'>REVEAL</p>", unsafe_allow_html=True)
-        st.markdown(prompt)
+        if prompt:
+            st.markdown("<p class='interaction-marker'>REVEAL</p>", unsafe_allow_html=True)
+            st.markdown(prompt)
         if key not in st.session_state:
             st.session_state[key] = False
         if not st.session_state[key]:

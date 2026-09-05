@@ -330,6 +330,7 @@ class SkyMapTests(unittest.TestCase):
         self.assertLess(noticing_index, soft_reveal_index)
         self.assertIn("_DESTINATION_SKY_MAP_REVEAL_KEY", shopping_source)
         self.assertIn("height=625", shopping_source)
+        self.assertNotIn("Ready to see where your destination appears on the sky?", shopping_source)
 
     def test_planet_shopping_ends_the_destination_map_with_the_catalogue_coda(self):
         shopping_source = Path("experiences/planet_shopping.py").read_text()

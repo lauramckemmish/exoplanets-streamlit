@@ -91,6 +91,14 @@ class SharedInteractionContractTests(unittest.TestCase):
         self.assertIn("<p class='interaction-marker'>REVEAL</p>", stub.markdown_calls)
         self.assertNotIn("Pause and predict", " ".join(stub.markdown_calls))
 
+    def test_hard_reveal_can_render_a_button_only_prompt(self):
+        stub = _StreamlitStub()
+        with patch.object(ui_helpers, "st", stub):
+            self.assertFalse(ui_helpers.hard_reveal("", "reveal", reveal_label="Show it"))
+
+        self.assertEqual(stub.markdown_calls, [])
+        self.assertEqual(stub.buttons, ["Show it"])
+
     def test_graph_reading_support_is_nonblocking_and_state_free(self):
         stub = _StreamlitStub()
         with patch.object(ui_helpers, "st", stub):
