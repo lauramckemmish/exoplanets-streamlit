@@ -72,6 +72,8 @@ _DESTINATION_USE_PLANETS_KEY = "planet_shopping_destination_use_planets"
 _DESTINATION_PLANETS_CONTROL_KEY = "planet_shopping_destination_planets_control"
 _BROWSED_PLANET_KEY = "planet_shopping_browsed_planet"
 _BROWSED_PLANET_BUTTON_KEY = "planet_shopping_browsed_planet_button"
+_BROWSED_PLANETS_SEEN_KEY = "planet_shopping_browsed_planets_seen"
+_CATALOGUE_BROWSING_MINIMUM = 3
 _TEMPERATURE_UNKNOWN_REVEAL_KEY = "planet_shopping_temperature_unknown_revealed"
 
 
@@ -175,6 +177,30 @@ def _random_planet_name(data: pd.DataFrame, current: str | None = None, rng=rand
         raise ValueError("The prepared catalogue contains no named planets")
     choices = [name for name in names if name != current] or names
     return rng.choice(choices)
+
+
+def _record_browsed_planet(state: dict, planet_name: str) -> list[str]:
+    """Persist distinct Meet-a-Planet records without treating repeats as progress."""
+    seen = list(state.get(_BROWSED_PLANETS_SEEN_KEY, []))
+    if planet_name not in seen:
+        seen.append(planet_name)
+        state[_BROWSED_PLANETS_SEEN_KEY] = seen
+    return seen
+
+
+def _show_another_browsed_planet(data: pd.DataFrame, state: dict, rng=random) -> str:
+    """Choose an unseen planet until catalogue browsing has been established."""
+    current = state.get(_BROWSED_PLANET_KEY)
+    seen = state.get(_BROWSED_PLANETS_SEEN_KEY, [])
+    available_names = sorted(data["pl_name"].dropna().astype(str).unique())
+    unseen_names = [name for name in available_names if name not in seen]
+    if len(seen) < _CATALOGUE_BROWSING_MINIMUM and unseen_names:
+        planet_name = rng.choice(unseen_names)
+    else:
+        planet_name = _random_planet_name(data, current, rng)
+    state[_BROWSED_PLANET_KEY] = planet_name
+    _record_browsed_planet(state, planet_name)
+    return planet_name
 
 
 def _planet_display_value(value, formatter: callable) -> tuple[str, str]:
@@ -612,13 +638,12 @@ def _render_meet_your_planet(data: pd.DataFrame) -> None:
     st.write("**Pick a planet. Any planet.**")
     if _BROWSED_PLANET_KEY not in st.session_state:
         st.session_state[_BROWSED_PLANET_KEY] = _random_planet_name(data)
+    _record_browsed_planet(st.session_state, st.session_state[_BROWSED_PLANET_KEY])
     st.button(
         "Show me another planet",
         key=_BROWSED_PLANET_BUTTON_KEY,
-        on_click=lambda: st.session_state.__setitem__(
-            _BROWSED_PLANET_KEY,
-            _random_planet_name(data, st.session_state.get(_BROWSED_PLANET_KEY)),
-        ),
+        on_click=_show_another_browsed_planet,
+        args=(data, st.session_state),
     )
     planet_name = st.session_state[_BROWSED_PLANET_KEY]
     planet = data.loc[data["pl_name"].astype(str) == planet_name].iloc[0]
@@ -630,6 +655,13 @@ def _render_meet_your_planet(data: pd.DataFrame) -> None:
         "the later move to systematic filtering a practical reason without requiring learners to understand every "
         "field or unusual planet.",
     )
+
+    seen = st.session_state[_BROWSED_PLANETS_SEEN_KEY]
+    if len(seen) < _CATALOGUE_BROWSING_MINIMUM:
+        st.caption(f"Planets explored: {len(seen)} of {_CATALOGUE_BROWSING_MINIMUM}")
+        st.write("Have a look at a few worlds first — see 3 different planets before revealing the catalogue.")
+        completion_gate(False)
+        return
 
     catalogue_revealed = hard_reveal(
         "**So how many planets like this do we actually know about?**",

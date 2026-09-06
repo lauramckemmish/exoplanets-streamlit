@@ -78,7 +78,12 @@ but must remain compact and readable at ordinary laptop width.
 End with a short transition: there are thousands of planets, so a better way
 to shop is needed.
 
-After learners have browsed individual planets, use the existing catalogue
+The first displayed planet counts as one explored record. Require learners to
+see three distinct real planets before the existing catalogue hard reveal
+becomes available, while leaving **Show me another planet** available before
+and after the reveal. This is a minimum browsing experience, not a cap.
+
+After learners have browsed three distinct planets, use the existing catalogue
 hard reveal and growth display here:
 
 - ask how many planets like this we actually know about;

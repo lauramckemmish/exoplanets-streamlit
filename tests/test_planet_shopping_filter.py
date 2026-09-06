@@ -10,6 +10,8 @@ from experiences.planet_shopping import (
     STAGE_LABELS,
     _APPLIED_DISTANCE_KEY,
     _APPLIED_DESTINATION_KEY,
+    _BROWSED_PLANET_KEY,
+    _BROWSED_PLANETS_SEEN_KEY,
     _DESTINATION_CONTROL_KEY,
     _DISTANCE_CONTROL_KEY,
     _DISTANCE_INTERACTED_KEY,
@@ -21,6 +23,8 @@ from experiences.planet_shopping import (
     _distance_profile,
     _planet_display_value,
     _random_planet_name,
+    _record_browsed_planet,
+    _show_another_browsed_planet,
     _temperature_profile,
     _UNKNOWN_TEMPERATURE_OPTIONS,
     _combine_groups,
@@ -57,6 +61,30 @@ class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
         selected = _random_planet_name(data, current="Planet A")
 
         self.assertEqual(selected, "Planet B")
+
+    def test_browsing_tracks_three_distinct_planets_before_catalogue_progress(self):
+        class Picks:
+            def __init__(self):
+                self.names = iter(["Planet B", "Planet C", "Planet D", "Planet A"])
+
+            def choice(self, options):
+                choice = next(self.names)
+                if choice not in options:
+                    raise AssertionError(f"{choice} was not available")
+                return choice
+
+        data = pd.DataFrame({"pl_name": ["Planet A", "Planet B", "Planet C", "Planet D"]})
+        state = {_BROWSED_PLANET_KEY: "Planet A"}
+        picks = Picks()
+
+        self.assertEqual(_record_browsed_planet(state, "Planet A"), ["Planet A"])
+        self.assertEqual(_show_another_browsed_planet(data, state, picks), "Planet B")
+        self.assertEqual(_show_another_browsed_planet(data, state, picks), "Planet C")
+        self.assertEqual(state[_BROWSED_PLANETS_SEEN_KEY], ["Planet A", "Planet B", "Planet C"])
+        self.assertEqual(_show_another_browsed_planet(data, state, picks), "Planet D")
+        self.assertEqual(_show_another_browsed_planet(data, state, picks), "Planet A")
+        self.assertEqual(state[_BROWSED_PLANETS_SEEN_KEY], ["Planet A", "Planet B", "Planet C", "Planet D"])
+        self.assertEqual(_record_browsed_planet(state, "Planet A"), ["Planet A", "Planet B", "Planet C", "Planet D"])
 
     def test_profile_values_use_learner_facing_units(self):
         self.assertEqual(_temperature_profile(273.15)[0], "0 °C")
