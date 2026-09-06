@@ -923,7 +923,7 @@ def _render_destination(data: pd.DataFrame) -> None:
         coordinates = destination.reindex(["x", "y", "z"])
         if coordinates.notna().all():
             with st.container(horizontal_alignment="center"):
-                with st.container(width=900):
+                with st.container(width=1200):
                     map_column, interpretation_column = st.columns(
                         [3, 2], gap="large", vertical_alignment="bottom"
                     )
@@ -931,7 +931,7 @@ def _render_destination(data: pd.DataFrame) -> None:
                         st.plotly_chart(
                             sky_map(data, selected_planet=destination_name),
                             width="stretch",
-                            height=465,
+                            height=620,
                         )
                     with interpretation_column:
                         st.info(
