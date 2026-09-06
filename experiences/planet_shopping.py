@@ -108,7 +108,7 @@ def _format_travel_years(years: float) -> str:
 
 
 def _render_facilitator_orientation() -> None:
-    """Render the compact, Launch-associated facilitator handover."""
+    """Render the compact, Launch-associated preparation note."""
     with st.container(border=True):
         st.markdown("### Facilitator view")
         st.markdown("#### Before you teach")
@@ -127,62 +127,45 @@ def _render_facilitator_orientation() -> None:
             "Designed for about **50 minutes**. This timing has not yet been validated in live classroom delivery."
         )
         st.markdown(
-            "**Room rhythm**  \n"
-            "Use a short common-room prompt when useful, let learners explore on their own devices or in pairs, "
-            "then regroup for meaningful reasoning before returning to the data. Adapt wording, examples and "
-            "discussion to your group."
+            "**Room and rhythm**  \n"
+            "Learners can work independently or share devices in pairs. Use brief whole-room moments, then let "
+            "learners explore before regrouping for the important reasoning and returning them to the data. "
+            "Adapt wording, examples and discussion to your group."
         )
         st.markdown(
             "**Whole-room reasoning anchors**  \n"
-            "- **Temperature:** incomplete information becomes a real reasoning problem. Unknown temperature is "
-            "not the same as unsuitable.  \n"
-            "- **Combine:** learners bring independent criteria together, predict the known intersection, and compare "
-            "expectation with evidence."
+            "- **Temperature**  \n"
+            "- **Combine**  \n"
+            "These are the two deliberate opportunities to regroup the room."
         )
         st.markdown(
             "**What you need to know**  \n"
             "Scientific literacy is enough; you do not need specialist exoplanet knowledge or an explanation for "
             "every field or unusual planet."
         )
-        st.markdown(
-            "#### Scientific and data-science guardrails\n"
-            "- Equilibrium temperature is an **estimated model quantity**, not a direct measurement of surface climate.\n"
-            "- Unknown temperature means **unknown**, not automatically unsuitable.\n"
-            "- The known overlap is based on the evidence currently available.\n"
-            "- Filtering identifies candidates that meet chosen criteria; it does not prove broader properties such as habitability."
-        )
-        with st.expander("Practical recovery", expanded=False):
-            st.markdown(
-                "- Pair learners when devices or pacing make that useful.\n"
-                "- Regroup when the room has dispersed too far through the experience.\n"
-                "- If time is short, protect the central reasoning progression rather than adding extra discussion.\n"
-                "- An empty shortlist is useful evidence: loosen criteria and ask why their combination left no candidates.\n"
-                "- Unexpected real-data cases can be acknowledged or explored; an immediate expert explanation is not required."
-            )
-        with st.expander("Want to go deeper?", expanded=False):
-            st.markdown(
-                "**Why the catalogue looks historically uneven**  \n"
-                "Exoplanet discoveries did not accumulate uniformly. Kepler produced major increases because it "
-                "systematically observed one region of the sky to learn about exoplanet populations. The conspicuous "
-                "Kepler-era jumps are meaningful scientific context, not random plotting artefacts."
-            )
-            st.markdown(
-                "**Kepler → TESS → Roman: changing scientific questions**  \n"
-                "- **Kepler — How common are different kinds of planets?** It went deep on one patch of sky to build a "
-                "population census.\n"
-                "- **TESS — Where are nearby planetary systems we can investigate in more detail?** It surveys much more "
-                "of the sky, especially bright nearby stars, producing strong targets for follow-up characterisation.\n"
-                "- **Roman — What parts of the planetary population are still poorly sampled?** It will extend the "
-                "statistical census into different regions and planetary parameter space."
-            )
-            st.markdown(
-                "**Where the science goes next**  \n"
-                "This activity is dominated by the physics of finding and counting planets, then reasoning from basic "
-                "planetary properties. "
-                "As researchers characterise exoplanet atmospheres, chemistry becomes more central. Questions about "
-                "habitability and possible biosignatures then draw on chemistry, biology, geology, stellar physics and "
-                "planetary science."
-            )
+
+
+def _render_facilitator_note(
+    essential: str, *, optional_title: str | None = None, optional: str | None = None
+) -> None:
+    """Render a compact, stage-local facilitator note when the view is enabled."""
+    if not st.session_state.get(_FACILITATOR_VIEW_KEY, False):
+        return
+    with st.container(border=True):
+        st.caption("FACILITATOR VIEW")
+        st.markdown(essential)
+        if optional_title and optional:
+            with st.expander(optional_title, expanded=False):
+                st.markdown(optional)
+
+
+def _render_facilitator_optional(title: str, content: str) -> None:
+    """Render stage-local optional facilitator context without adding a required note."""
+    if not st.session_state.get(_FACILITATOR_VIEW_KEY, False):
+        return
+    st.caption("FACILITATOR VIEW")
+    with st.expander(title, expanded=False):
+        st.markdown(content)
 
 
 def _random_planet_name(data: pd.DataFrame, current: str | None = None, rng=random) -> str:
@@ -447,6 +430,11 @@ def _render_overlap_visual(
 def _render_temperature(data: pd.DataFrame) -> None:
     """Render the independent temperature criterion and missing-data decision."""
     st.subheader("🌡️ Temperature")
+    _render_facilitator_note(
+        "**Temperature is a deliberate whole-room reasoning anchor.**  \n"
+        "Unknown temperature is not the same as unsuitable. Equilibrium temperature is an **estimated model "
+        "quantity**, not a direct measurement of surface climate."
+    )
     st.write("Choose an acceptable temperature range for your planet.")
 
     temperature_range_c = st.slider(
@@ -635,6 +623,13 @@ def _render_meet_your_planet(data: pd.DataFrame) -> None:
     planet_name = st.session_state[_BROWSED_PLANET_KEY]
     planet = data.loc[data["pl_name"].astype(str) == planet_name].iloc[0]
     _render_planet_profile(planet_name, planet)
+    _render_facilitator_optional(
+        "Got a keen student?",
+        "**Why browse at all?**  \n"
+        "These are real catalogue objects, but browsing them one at a time is deliberately inefficient. It gives "
+        "the later move to systematic filtering a practical reason without requiring learners to understand every "
+        "field or unusual planet.",
+    )
 
     catalogue_revealed = hard_reveal(
         "**So how many planets like this do we actually know about?**",
@@ -687,6 +682,13 @@ def _render_distance(data: pd.DataFrame) -> None:
 
 def _render_combine(data: pd.DataFrame) -> None:
     st.subheader("🛒 Combine")
+    _render_facilitator_note(
+        "**Combine is the second deliberate whole-room reasoning anchor.**  \n"
+        "Learners are bringing independently chosen criteria together. The revealed intersection is supported by "
+        "the **known** evidence; uncertain cases remain distinct. If groups have spread out, this is a useful "
+        "moment to regroup before releasing them back to the data. If time is short, protect this central "
+        "reasoning progression rather than adding extra discussion."
+    )
     st.write("You want a planet you can reach **AND** a temperature you can live with.")
     st.markdown("#### Your choices")
     _initialise_combine_control(st.session_state, _COMBINE_DISTANCE_CONTROL_KEY, _APPLIED_DISTANCE_KEY, 500)
@@ -764,6 +766,13 @@ def _render_combine(data: pd.DataFrame) -> None:
 
 def _render_destination(data: pd.DataFrame) -> None:
     st.subheader("🪐 Choose Your Destination")
+    _render_facilitator_note(
+        "**A short recovery note for this stage.**  \n"
+        "An empty shortlist is not failure: loosen or change criteria, then consider why that combination produced "
+        "no candidates. Different groups may reach different defensible destinations. Filtering identifies "
+        "promising candidates; it does not prove habitability. Unexpected real-data cases can be acknowledged or "
+        "explored; an immediate expert explanation is not required."
+    )
     st.write("You’ve narrowed the catalogue — but that may still be a lot of planets.")
 
     combine_distance = int(st.session_state.get(_COMBINE_DISTANCE_CONTROL_KEY, st.session_state.get(_APPLIED_DISTANCE_KEY, _DISTANCE_DEFAULT_VALUE)))
@@ -957,6 +966,25 @@ def _render_destination(data: pd.DataFrame) -> None:
                     )
         else:
             st.caption("This planet's position is not available in the map data.")
+        _render_facilitator_optional(
+            "Want to go deeper?",
+            "**Why the catalogue looks historically uneven**  \n"
+            "Exoplanet discoveries did not accumulate uniformly. Kepler repeatedly observed a concentrated patch "
+            "of sky around Cygnus and Lyra to learn about exoplanet populations, so its major catalogue jumps and "
+            "the visible sky clump are meaningful scientific context rather than random plotting artefacts.\n\n"
+            "**Kepler → TESS → Roman: changing scientific questions**  \n"
+            "- **Kepler — How common are different kinds of planets?** It went deep on one patch of sky to build a "
+            "population census.\n"
+            "- **TESS — Where are nearby planetary systems suitable for detailed follow-up?** It surveys much more "
+            "of the sky, especially bright nearby stars.\n"
+            "- **Roman — What parts of the planetary population remain poorly sampled?** It extends the statistical "
+            "census into different regions and planetary parameter space.\n\n"
+            "**Where the science goes next**  \n"
+            "This activity is largely about finding and counting planets, then reasoning from basic planetary "
+            "properties. As researchers characterise exoplanet atmospheres, chemistry becomes much more central. "
+            "Questions about habitability and possible biosignatures then draw on chemistry, biology, geology, "
+            "stellar physics and planetary science."
+        )
     completion_gate(selected)
 
 

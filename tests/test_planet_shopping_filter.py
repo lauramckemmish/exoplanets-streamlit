@@ -140,6 +140,22 @@ class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
             ],
         )
 
+    def test_facilitator_guidance_is_distributed_to_its_relevant_stages(self):
+        source = Path("experiences/planet_shopping.py").read_text()
+
+        launch = source[source.index("def _render_facilitator_orientation"):source.index("def _render_temperature")]
+        temperature = source[source.index("def _render_temperature"):source.index("def _render_launch")]
+        combine = source[source.index("def _render_combine"):source.index("def _render_destination")]
+        destination = source[source.index("def _render_destination"):source.index("def _render_data_science")]
+
+        self.assertIn("Designed for about **50 minutes**", launch)
+        self.assertNotIn("Scientific and data-science guardrails", launch)
+        self.assertNotIn("Kepler → TESS → Roman", launch)
+        self.assertIn("Temperature is a deliberate whole-room reasoning anchor", temperature)
+        self.assertIn("Combine is the second deliberate whole-room reasoning anchor", combine)
+        self.assertIn("An empty shortlist is not failure", destination)
+        self.assertIn("Kepler → TESS → Roman: changing scientific questions", destination)
+
     def test_destination_commitment_is_durable_and_distinct_from_inspection(self):
         names = ["Planet A", "Planet B"]
         state = {}

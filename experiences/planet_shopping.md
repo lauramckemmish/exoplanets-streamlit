@@ -24,9 +24,17 @@ experience in code. Return the question for design review.
 
 ## Facilitator view
 
-At Launch, an optional facilitator view provides a compact before-you-teach
-orientation, scientific/data-science guardrails, lightweight recovery advice
-and expandable scientific context. It supports professional judgement without
+The optional facilitator view puts compact guidance where it is needed. Launch
+contains only before-you-teach orientation: purpose, working timing, room/device
+setup, overall rhythm, the Temperature and Combine regrouping anchors, and the
+assumption of scientific literacy without specialist exoplanet expertise.
+
+Stage-local notes carry the relevant guardrails and recovery advice: Temperature
+for estimated equilibrium temperature and unknown values; Combine for the known
+intersection and distinct uncertain cases; and Destination for empty shortlists,
+different defensible choices and the limit of filtering claims. Optional
+catalogue and mission-purpose context is expandable near Meet-a-Planet and the
+late sky-map/coda material. The view supports professional judgement without
 duplicating the learner journey or becoming a screen-by-screen script.
 
 ## Screen sequence
@@ -127,6 +135,9 @@ missing information.
 - Known non-matches remain available to the calculation but subordinate to the
   main learning job.
 - Unknown never means zero or failed criterion.
+- The facilitator view places its concise guardrail here: equilibrium temperature
+  is an estimated/model quantity rather than a surface-climate measurement, and
+  unknown is not unsuitable.
 
 ### 5. Combine — What happens when your choices have to work together?
 
@@ -178,6 +189,10 @@ choose a destination on this screen.
 
 **Planet size is not a required core filter in the current pathway.**
 
+The facilitator view identifies this as the second whole-room reasoning anchor:
+the revealed intersection is based on known evidence, while uncertain cases
+remain distinct.
+
 ### 6. Choose Your Destination — Which planet would you choose?
 
 The combined shortlist may still be large. Learners choose what else matters
@@ -205,6 +220,13 @@ habitable. This is a concise boundary on the existing inference, not a new
 habitability content strand. A second hard reveal then lets learners
 deliberately transition to the sky map, separating that new reasoning job from
 the claim boundary without introducing additional science content.
+
+The facilitator view provides the local recovery note: empty shortlists can be
+adjusted and investigated, differing destinations can be defensible, and the
+filters identify promising candidates rather than habitability. Expandable late
+context covers Kepler's visible catalogue structure, Kepler → TESS → Roman as
+changing scientific purposes, and the later bridge to atmospheric
+characterisation and broader habitability questions.
 
 ### 7. Data Science — What did you just do?
 
