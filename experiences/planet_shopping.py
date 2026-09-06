@@ -456,6 +456,7 @@ def _render_temperature(data: pd.DataFrame) -> None:
         max_value=2_000,
         value=_TEMPERATURE_DEFAULT_RANGE_C,
         step=10,
+        label_visibility="collapsed",
         key=_TEMPERATURE_CONTROL_KEY,
     )
     temperature_range_c = (int(temperature_range_c[0]), int(temperature_range_c[1]))
