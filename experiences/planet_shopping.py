@@ -574,7 +574,7 @@ def _render_launch(data: pd.DataFrame) -> None:
                 key="planet_shopping_solar_system",
             )
         st.write("Suppose none of those planets works either.")
-        st.write("The Sun is one star. Other stars can have planets too. Those planets are exoplanets.")
+        st.write("The Sun is one star. Other stars can have planets too. Those planets are **exoplanets**.")
 
 
 def _planet_visual_style(planet: pd.Series) -> tuple[int, str, str]:
