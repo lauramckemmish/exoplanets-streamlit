@@ -566,11 +566,13 @@ def _render_launch(data: pd.DataFrame) -> None:
     with st.container(width="content"):
         st.markdown("#### Where can we go?")
         st.write("Earth is unavailable. Could we go somewhere else in our Solar System?")
-        role_image(
-            SOLAR_SYSTEM_IMAGE_PATH,
-            role="context",
-            key="planet_shopping_solar_system",
-        )
+        with st.container(horizontal_alignment="center"):
+            with st.container(width=720):
+                role_image(
+                    SOLAR_SYSTEM_IMAGE_PATH,
+                    role="context",
+                    key="planet_shopping_solar_system",
+                )
         st.write("Suppose none of those planets works either.")
         st.write("The Sun is one star. Other stars can have planets too. Those planets are exoplanets.")
 
