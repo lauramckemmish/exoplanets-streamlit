@@ -231,6 +231,23 @@ def soft_reveal(
         yield
 
 
+@contextmanager
+def facilitator_panel(key: str) -> Iterator[None]:
+    """Render a shared, clearly labelled panel for facilitator-only guidance."""
+    with st.container(key=f"facilitator_panel_{key}"):
+        st.caption("Facilitator")
+        yield
+
+
+@contextmanager
+def facilitator_optional(key: str, title: str) -> Iterator[None]:
+    """Render optional facilitator-only context with lower visual prominence."""
+    with st.container(key=f"facilitator_optional_{key}"):
+        st.caption("Facilitator · optional")
+        with st.expander(title, expanded=False):
+            yield
+
+
 def choice_reveal(
     prompt: str,
     choices: Mapping[str, str],

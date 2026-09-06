@@ -20,6 +20,8 @@ class _StreamlitStub:
         self.buttons = []
         self.expanders = []
         self.markdown_calls = []
+        self.captions = []
+        self.container_keys = []
 
     def info(self, *args, **kwargs):
         pass
@@ -32,6 +34,7 @@ class _StreamlitStub:
         return [_Column(), _Column(), _Column()]
 
     def container(self, **_kwargs):
+        self.container_keys.append(_kwargs.get("key"))
         return _Column()
 
     def expander(self, label, **_kwargs):
@@ -40,6 +43,9 @@ class _StreamlitStub:
 
     def markdown(self, *_args, **_kwargs):
         self.markdown_calls.append(_args[0])
+
+    def caption(self, text, **_kwargs):
+        self.captions.append(text)
 
     def multiselect(self, *_args, **_kwargs):
         return []
@@ -87,6 +93,21 @@ class SharedInteractionContractTests(unittest.TestCase):
                 pass
 
         self.assertEqual(stub.expanders[-2:], ["🧩 Default", "🚀 Rocket"])
+
+    def test_facilitator_helpers_label_essential_and_optional_guidance(self):
+        stub = _StreamlitStub()
+        with patch.object(ui_helpers, "st", stub):
+            with ui_helpers.facilitator_panel("example"):
+                pass
+            with ui_helpers.facilitator_optional("example_detail", "Want to go deeper?"):
+                pass
+
+        self.assertEqual(stub.captions, ["Facilitator", "Facilitator · optional"])
+        self.assertEqual(
+            stub.container_keys,
+            ["facilitator_panel_example", "facilitator_optional_example_detail"],
+        )
+        self.assertEqual(stub.expanders, ["Want to go deeper?"])
 
     def test_think_uses_the_shared_marker_without_a_reveal_or_gate(self):
         stub = _StreamlitStub()

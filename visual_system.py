@@ -19,6 +19,7 @@ UNSW_PALETTE = {
     "pink": "#FA91B6",
     "red": "#FF635D",
     "green": "#1AC987",
+    "facilitator_navy": "#294C70",
 }
 
 SEMANTIC_TOKENS = {
@@ -32,6 +33,7 @@ SEMANTIC_TOKENS = {
     "success": UNSW_PALETTE["green"],
     "warning_error": UNSW_PALETTE["red"],
     "focus_selected": UNSW_PALETTE["yellow"],
+    "facilitator_annotation": UNSW_PALETTE["facilitator_navy"],
 }
 
 
@@ -104,6 +106,7 @@ def apply_visual_system() -> None:
             --unsw-secondary-accent: {SEMANTIC_TOKENS['secondary_accent']};
             --unsw-success: {SEMANTIC_TOKENS['success']};
             --unsw-warning-error: {SEMANTIC_TOKENS['warning_error']};
+            --unsw-facilitator-annotation: {SEMANTIC_TOKENS['facilitator_annotation']};
         }}
 
         [data-testid="stSidebar"] [data-testid="stVerticalBlock"] {{ gap: 0.35rem; }}
@@ -218,6 +221,36 @@ def apply_visual_system() -> None:
             margin: 0.35rem 0 0.55rem;
         }}
         .st-key-graph_reading_support p {{ margin-bottom: 0.2rem; }}
+        /* Facilitator guidance is private annotation, never learner-facing instruction. */
+        [class*="st-key-facilitator_panel_"] {{
+            border: 1px solid rgba(41, 76, 112, 0.48);
+            border-left: 4px solid var(--unsw-facilitator-annotation);
+            border-radius: 0.35rem;
+            background: rgba(41, 76, 112, 0.09);
+            padding: 0.6rem 0.75rem 0.55rem;
+            margin: 0.4rem 0 0.75rem;
+        }}
+        [class*="st-key-facilitator_optional_"] {{
+            border: 1px solid rgba(41, 76, 112, 0.30);
+            border-left: 2px solid var(--unsw-facilitator-annotation);
+            border-radius: 0.3rem;
+            background: rgba(41, 76, 112, 0.045);
+            padding: 0.35rem 0.55rem;
+            margin: 0.35rem 0 0.6rem;
+        }}
+        [class*="st-key-facilitator_panel_"] [data-testid="stCaptionContainer"] p,
+        [class*="st-key-facilitator_optional_"] [data-testid="stCaptionContainer"] p {{
+            color: inherit;
+            font-size: 0.73rem;
+            font-weight: 750;
+            letter-spacing: 0.06em;
+            line-height: 1.1;
+            margin-bottom: 0.3rem;
+            text-transform: uppercase;
+        }}
+        [class*="st-key-facilitator_optional_"] [data-testid="stExpander"] {{
+            border-left-color: var(--unsw-facilitator-annotation);
+        }}
         /* Shared interaction grammar: THINK is a cue, while REVEAL protects evidence. */
         [data-testid="stAlert"][data-baseweb="notification"] {{
             border-left: 3px solid var(--unsw-information);

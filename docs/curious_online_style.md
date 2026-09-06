@@ -70,6 +70,19 @@ This is not a reveal type: pause, hard, soft and choice reveals describe a
 learner's interaction with the digital resource; facilitator-owned moments
 describe who owns communication at that point.
 
+### Facilitator-only guidance
+
+Facilitator-only material must use the shared `facilitator_panel()` treatment
+so an educator can immediately distinguish private guidance from learner-facing
+content. The panel combines a calm muted-navy annotation surface with an
+explicit **Facilitator** label; do not rely on colour alone.
+
+Use `facilitator_optional()` for contextual depth that is useful but not
+required preparation. Shared helpers own this visual semantic; each experience
+owns the facilitator content and decides its pedagogical placement. Keep global
+preparation near an experience's beginning and place stage-specific guidance
+beside the relevant learner reasoning.
+
 ## Learner-interaction grammar
 
 Use the pattern that matches the learning purpose. Hidden content should have
