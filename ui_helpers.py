@@ -432,20 +432,6 @@ def demographics_question(wonder: str, data_question: str, plot_description: str
     st.markdown(f"### What we will plot\n{plot_description}")
 
 
-def mission_navigation(step: int, total: int, position: str) -> None:
-    left, middle, right = st.columns([1, 4, 1])
-    with left:
-        if step > 0 and st.button("← Back", use_container_width=True, key=f"{position}_back_{step}"):
-            st.session_state["mission_step"] = step - 1
-            st.rerun()
-    with middle:
-        st.progress((step + 1) / total, text=f"Mission stage {step + 1} of {total}")
-    with right:
-        if step < total - 1 and st.button("Continue →", use_container_width=True, type="primary", key=f"{position}_continue_{step}"):
-            st.session_state["mission_step"] = step + 1
-            st.rerun()
-
-
 def presenter_notes(step: int, notes_by_step: dict) -> None:
     notes = notes_by_step[step]
     with st.expander("Demonstrator notes", expanded=False):

@@ -87,8 +87,6 @@ def render(data: pd.DataFrame) -> None:
         st.session_state["curious_scroll_to_top"] = True
     scroll_to_top_if_requested("curious_scroll_to_top")
     render_teacher_note(part)
-    allow_next = True
-
     if part == 0:
         st.header("Welcome")
         with media_text_pair(EXOPLANET_IMAGE_PATH, role="context", caption="Artist's concepts of exoplanets. Credit: NASA/JPL-Caltech", key="curious_welcome"):
@@ -131,7 +129,6 @@ def render(data: pd.DataFrame) -> None:
             "curious_log_scale_revealed",
             reveal_label="Reveal a new way to view the same data →",
         )
-        allow_next = log_scale_revealed
         if log_scale_revealed:
             st.subheader("Now compare the log–log view")
             graph_guide("The axes show the same values, but the new spacing spreads out the small planets.", "Find Earth at 1 AU and 1 Earth mass, then compare the positions of the four inner planets.")
@@ -209,5 +206,4 @@ def render(data: pd.DataFrame) -> None:
         "curious_scroll_to_top",
         part,
         "curious",
-        allow_next=allow_next,
     )
