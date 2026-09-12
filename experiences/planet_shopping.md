@@ -22,7 +22,7 @@ experience in code. Return the question for design review.
   combining criteria and making a decision from evidence.
 - This is not primarily a graphing experience.
 
-## Facilitator view
+## Facilitator notes
 
 The optional facilitator view puts compact guidance where it is needed. Launch
 contains only before-you-teach orientation: purpose, working timing, room/device

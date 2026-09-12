@@ -59,7 +59,7 @@ research/scientist story, example, question or live explanation. The
 experience must remain scientifically coherent when no personal story is
 available.
 
-Use these selectively, not on every screen. Flag them in Teacher view with a
+Use these selectively, not on every screen. Flag them in Facilitator notes with a
 `facilitator_moment` note rather than adding another student-facing callout.
 Never invent or script a personal scientist story, require a facilitator to
 disclose personal experience, or make essential science depend only on an

@@ -1067,7 +1067,7 @@ def render(data: pd.DataFrame) -> None:
         st.caption(SUBTITLE)
     with activity_controls:
         st.toggle(
-            "Facilitator view",
+            "Facilitator notes",
             key=_FACILITATOR_VIEW_KEY,
             help="Show concise preparation, facilitation guidance and optional scientific context.",
         )

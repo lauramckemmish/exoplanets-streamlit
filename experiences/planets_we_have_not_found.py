@@ -16,8 +16,8 @@ YEAR_LEVEL = "Year 10"
 PART_COUNT = len(STEP_LABELS)
 
 
-# Year 10 Teacher-view background notes. The shared classroom renderer applies
-# these while the remaining Teacher-note metadata is extracted in later steps.
+# Year 10 Facilitator-notes background. The shared classroom renderer applies
+# these while the remaining Facilitator-notes metadata is extracted in later steps.
 TEACHER_BACKGROUNDS = {
     0: (
         "**What teachers need to know**\n\n"
@@ -274,7 +274,7 @@ TEACHER_NOTE_OVERRIDES = {
 
 
 def render_teacher_note(part):
-    """Render this pathway's complete Teacher view from pathway-owned content."""
+    """Render this pathway's complete Facilitator notes from pathway-owned content."""
     note = dict(TEACHER_NOTE_OVERRIDES[part])
     note["background"] = TEACHER_BACKGROUNDS[part]
     teacher_note(**note)

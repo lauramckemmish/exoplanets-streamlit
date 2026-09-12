@@ -16,7 +16,7 @@ YEAR_LEVEL = "Year 8"
 PART_COUNT = len(STEP_LABELS)
 
 
-# Year 8 Teacher-view background notes. The shared classroom renderer applies
+# Year 8 Facilitator-notes background. The shared classroom renderer applies
 # these to the existing step metadata, preserving the current display.
 TEACHER_BACKGROUNDS = {
     0: "**The pathway's purpose**\n\nThe curriculum learning is in processing and representing data, identifying patterns and communicating a conclusion. Exoplanets provide the motivating scientific context. Students move from familiar Solar System planets, to memorable examples, to annual counts and comparative graphs. Detailed detection bias belongs in the separate Stage 5 pathway and is not required here.",
@@ -68,7 +68,7 @@ TEACHER_BACKGROUNDS = {
 }
 
 
-# Pathway-specific Teacher-view metadata, extracted in small steps so the
+# Pathway-specific Facilitator-notes metadata, extracted in small steps so the
 # existing classroom rendering and Year 10 pathway remain unchanged.
 TEACHER_NOTE_OVERRIDES = {
     0: dict(
@@ -163,7 +163,7 @@ TEACHER_NOTE_OVERRIDES = {
 
 
 def render_teacher_note(part):
-    """Render this pathway's complete Teacher view from pathway-owned content."""
+    """Render this pathway's complete Facilitator notes from pathway-owned content."""
     note = dict(TEACHER_NOTE_OVERRIDES[part])
     note["background"] = TEACHER_BACKGROUNDS[part]
     teacher_note(**note)

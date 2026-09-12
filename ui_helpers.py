@@ -347,7 +347,7 @@ def learn_more_prompt(key_prefix: str) -> None:
     )
     st.text_area("My learn-more question", key=f"{key_prefix}_learn_more", height=90, placeholder="I would like to find out…")
     if st.session_state.get("demographics_teacher_view", False):
-        with st.expander("Teacher guide: helping students follow their interest"):
+        with st.expander("Facilitator notes: helping students follow their interest"):
             st.markdown(
                 "These are optional engagement routes, not additional required curriculum. Invite students to choose "
                 "one question and identify useful search terms or an appropriate source. Possible prompts include:\n\n"
@@ -367,7 +367,7 @@ def guidance_box(mode: str, student_text: str, teacher_text: str | None = None) 
         st.info(student_text)
     elif mode == "Teacher" and teacher_text:
         st.info(student_text)
-        with st.expander("Teacher guidance", expanded=False):
+        with st.expander("Facilitator notes", expanded=False):
             st.write(teacher_text)
 
 
@@ -399,7 +399,7 @@ def teacher_note(
     if not st.session_state.get(teacher_state_key, False):
         return
     with st.container(border=True):
-        st.markdown(f"### 👩‍🏫 Teacher view: {title}")
+        st.markdown(f"### Facilitator notes: {title}")
         if timing:
             st.caption(f"Suggested time: {timing} · Use this as guidance, not a required pace.")
         st.markdown(f"**Learning intention:** {purpose}")
@@ -414,13 +414,13 @@ def teacher_note(
             if facilitator_moment:
                 st.markdown(f"**Facilitator-owned moment:** {facilitator_moment}")
         if background or misconceptions:
-            with st.expander("Teacher background and possible misconceptions"):
+            with st.expander("Facilitator notes: background and possible misconceptions"):
                 if background:
                     st.markdown(background)
                 if misconceptions:
                     st.markdown(f"**Possible misconceptions:** {misconceptions}")
         if resources:
-            with st.expander("Resources and optional extension"):
+            with st.expander("Facilitator notes: resources and optional extension"):
                 for label, url in resources:
                     st.markdown(f"- [{label}]({url})")
                 st.caption("These are optional teacher background or no-equipment research resources; they are not additional required activities.")

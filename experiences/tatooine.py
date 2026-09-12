@@ -107,7 +107,7 @@ def prepare_page():
         st.title(TITLE)
         st.caption(SUBTITLE)
     with controls:
-        presenter_mode = st.toggle("Teacher view", key="tatooine_teacher_view", help="Show facilitation guidance at the top of the experience.")
+        presenter_mode = st.toggle("Facilitator notes", key="tatooine_teacher_view", help="Show facilitation guidance at the top of the experience.")
     if presenter_mode:
         teacher_note(
             TEACHER_GUIDANCE["title"],
@@ -381,7 +381,7 @@ def render(data: pd.DataFrame) -> None:
         st.info(f"Choice 3: keep planets with a radius between {radius_range[0]:.2f} and {radius_range[1]:.2f} Earth radii.")
         st.success(f"Result: {len(earth_like):,} planets remain.")
         if st.session_state.get("tatooine_teacher_view", False):
-            st.info("Teacher note: missing temperature is not evidence that a planet is too hot or too cold. It means the value was not recorded. Temperature also does not prove habitability.")
+            st.info("Facilitator notes: missing temperature is not evidence that a planet is too hot or too cold. It means the value was not recorded. Temperature also does not prove habitability.")
         st.info("These results use evidence that has actually been recorded. We think there are probably hundreds of billions of planets in our galaxy alone.")
         render_candidate_comparison(earth_like, "earth_like_worked", "Which candidate would you investigate further if you wanted to find another world to visit? What would you want to learn next?", include_system=False)
 

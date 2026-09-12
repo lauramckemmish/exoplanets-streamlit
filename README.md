@@ -10,7 +10,7 @@ A Streamlit collection of five astronomy and data-science learning experiences u
 - **Exoplanet Data Laboratory** — explore variables, data representations and patterns.
 - **Find Your Perfect Planet** — turn an imagined world into adjustable data filters.
 
-See [CONTENT_MAP.md](CONTENT_MAP.md) for the current editing map: it identifies where lesson text, Teacher-view notes, shared charts and navigation live.
+See [CONTENT_MAP.md](CONTENT_MAP.md) for the current editing map: it identifies where lesson text, Facilitator notes, shared charts and navigation live.
 
 ## Run locally
 

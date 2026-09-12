@@ -145,7 +145,7 @@ matches that part of the design, while later stages remain prototypes.
 | One variable | Variable selectbox, histogram-bin slider, grouping selectbox and chart-type radio | Learners change a representation and see it update. This is ordinary exploration, not Choice reveal: the settings are the activity itself. | None / ordinary interaction | Bespoke controls plus shared chart helpers | Leave unchanged | clear |
 | Two variables; Three variables | Field selectors, axes/scales/colour controls and graph-reading prompts | Graphs update live; explanatory info asks learners to describe patterns but does not hide later content. | None / ordinary interaction, with embedded Think Q prompts | Bespoke prompts plus shared chart machinery | Review prompts for `think_q()` only | likely |
 | Discoveries | Discovery-method multiselect and empty-selection warning | Learners choose displayed data categories; the graph and warning respond to selection. No progression is gated. | None / ordinary interaction | Bespoke multiselect | Leave unchanged | clear |
-| Dataset; Map | Field/colour selectors, table/map and explanatory captions | Live representation choices; no hidden evidence or required task. Teacher guidance expander is teacher-only. | None / ordinary interaction | Bespoke controls/shared charts | Leave unchanged | clear |
+| Dataset; Map | Field/colour selectors, table/map and explanatory captions | Live representation choices; no hidden evidence or required task. Facilitator notes expander is delivery-facing only. | None / ordinary interaction | Bespoke controls/shared charts | Leave unchanged | clear |
 
 ### Explore resources
 

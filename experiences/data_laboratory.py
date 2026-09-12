@@ -326,7 +326,7 @@ def render_map(data, guidance_mode, sky_map):
     st.plotly_chart(sky_map(map_data, None, colour_field, colour_label), use_container_width=True)
     st.caption("The three directions are a way to display position on the sky. They are not distances or physical axes through space.")
     if guidance_mode == "Teacher":
-        with st.expander("Teacher guidance", expanded=False):
+        with st.expander("Facilitator notes", expanded=False):
             st.write("The points are placed using direction on the celestial sphere. Distance is deliberately not used to position them, so a nearby star and a distant star can appear in the same sky region.")
 
 
@@ -383,7 +383,7 @@ def render(
         st.title(TITLE)
         st.caption(SUBTITLE)
     with activity_controls:
-        st.toggle("Teacher view", key="lab_teacher_view", help="Show additional guidance for teaching and facilitating the investigation.")
+        st.toggle("Facilitator notes", key="lab_teacher_view", help="Show additional guidance for teaching and facilitating the investigation.")
     if guidance_mode == "Teacher":
         teacher_note(
             TEACHER_GUIDANCE["title"],

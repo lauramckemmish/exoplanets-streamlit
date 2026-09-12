@@ -111,5 +111,5 @@ def render_demographics_shell(data, demographics_started, pathway, title, facili
         st.title(pathway)
         st.markdown(f"*{title}*")
     with activity_controls:
-        st.toggle("Teacher view", key="demographics_teacher_view", help="Show learning purpose, facilitation guidance and syllabus connections within each step.")
+        st.toggle("Facilitator notes", key="demographics_teacher_view", help="Show learning purpose, facilitation guidance and syllabus connections within each step.")
     return render_pathway(pathway, data, facilitated_pathway, stage4_pathway, stage5_pathway, curious_render, stage4_render, stage5_render, classroom_implementation)
