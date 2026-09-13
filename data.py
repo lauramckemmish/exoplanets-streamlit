@@ -62,6 +62,10 @@ BUNDLED_SAMPLE_SOURCE = CatalogueSource("bundled", "Bundled notebook sample")
 class LiveCatalogueError(RuntimeError):
     """The live archive could not provide a usable catalogue."""
 
+# Values from NASA NSSDC's Planetary Fact Sheet (accessed 2026-09-13):
+# https://nssdc.gsfc.nasa.gov/planetary/factsheet/
+# Orbital distance is each planet's semimajor axis in AU; mass is relative to
+# Earth. These shared reference values support Solar System comparisons.
 SOLAR_SYSTEM_PLANETS = pd.DataFrame([
     {"Planet": "Mercury", "Orbital distance (AU)": 0.387, "Planet mass (Earth masses)": 0.0553},
     {"Planet": "Venus", "Orbital distance (AU)": 0.723, "Planet mass (Earth masses)": 0.815},

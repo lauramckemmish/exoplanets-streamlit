@@ -5,10 +5,11 @@ from dataclasses import dataclass
 import pandas as pd
 import streamlit as st
 
-from ui_helpers import graph_reading_support, media_text_pair, teacher_note
+from data import SOLAR_SYSTEM_PLANETS
+from ui_helpers import graph_reading_support, media_text_pair, notice_prompt, teacher_note
 
 STEP_LABELS = [
-    "Welcome", "1 · Meet our Solar System", "2 · Planets around other stars",
+    "Welcome", "1 · Our Solar System as data", "2 · Planets around other stars",
     "3 · Discoveries over time", "4 · Compare planet masses", "5 · Strange new worlds",
     "6 · Add orbital distance", "7 · Compare planetary systems", "Conclusion",
 ]
@@ -19,21 +20,18 @@ PART_COUNT = len(STEP_LABELS)
 # Year 8 Facilitator-notes background. The shared classroom renderer applies
 # these to the existing step metadata, preserving the current display.
 TEACHER_BACKGROUNDS = {
-    0: "**The pathway's purpose**\n\nThe curriculum learning is in processing and representing data, identifying patterns and communicating a conclusion. Exoplanets provide the motivating scientific context. Students move from familiar Solar System planets, to memorable examples, to annual counts and comparative graphs. Detailed detection bias belongs in the separate Stage 5 pathway and is not required here.",
+    0: "**The investigation begins with one known system**\n\nOur Solar System is one planetary system. Astronomers have observations and data for thousands of planets orbiting other stars, so students can investigate how different planets and planetary systems can be. Keep the opening focused on the question and the evidence students will use; detection methods and catalogue history are outside this screen.\n\nThe detected catalogue is substantial, but it is not an inventory of every planet that exists.",
     1: (
         "**The Solar System in plain language**\n\n"
-        "- The **Sun is a star**: a very hot sphere of gas that produces light and heat. It contains almost all "
-        "the mass in the Solar System.\n"
-        "- A **planet** is a large, nearly round object orbiting a star. The eight planets orbiting the Sun are "
-        "Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus and Neptune.\n"
-        "- **Mass** describes how much matter an object contains. It is not the same as diameter or visual size. "
-        "A gas-rich planet may have a very different mass and density from a rocky planet.\n"
-        "- One **Earth mass** means the mass of Earth. A planet of 10 Earth masses has ten times Earth's mass; it "
-        "does not necessarily have ten times Earth's diameter.\n"
-        "- The qualitative groups in this activity are deliberately simple data bins, not official astronomical "
-        "planet classes. They make the comparison manageable for younger students.\n\n"
-        "The Solar System image enlarges the planets and places them close together so they can be seen. Real "
-        "planet sizes and the spaces between their orbits differ enormously."
+        "- The table uses **Earth mass** as a comparison unit. Mass describes how much matter a planet contains; it "
+        "is not the same as physical diameter or visual size.\n"
+        "- One **AU** is the average distance from Earth to the Sun. In the table, orbital distance is each planet's "
+        "semimajor axis: the typical size of its orbit, expressed in AU.\n"
+        "- The values use NASA NSSDC's [Planetary Fact Sheet](https://nssdc.gsfc.nasa.gov/planetary/factsheet/) "
+        "reference data (accessed 13 September 2026). They are rounded for reading and comparison, not for unit "
+        "conversion.\n\n"
+        "This is a small, readable dataset about our Solar System. It is a starting point for comparison, not a "
+        "universal rule for planetary systems."
     ),
     2: (
         "**From our Solar System to other planetary systems**\n\n"
@@ -72,23 +70,23 @@ TEACHER_BACKGROUNDS = {
 # existing classroom rendering and Year 10 pathway remain unchanged.
 TEACHER_NOTE_OVERRIDES = {
     0: dict(
-        title="Pathway overview",
-        purpose="Use authentic astronomy examples and data to move from individual discoveries to patterns and an evidence-based conclusion.",
-        timing="3 minutes (Lesson 1)",
-        facilitation="Preview the two-lesson journey as an exploration of strange planetary systems. Students do not need prior astronomy knowledge or detailed detection methods.",
-        alignment="Stage 4 Observing the Universe, Data Science 1 and Working Scientifically.",
-        evidence="Students can state that they will use examples and graphs to learn what planetary systems can be like.",
-        listen_for="Curiosity about other worlds and questions that can later be connected to evidence.",
+        title="Investigation question",
+        purpose="Establish a question that students will investigate using planet data: how different can planetary systems be from our Solar System?",
+        timing="3–5 minutes (Lesson 1)",
+        facilitation="Keep this short. Establish the question and the available evidence without answering it or introducing detection methods and discovery history.",
+        alignment="SC4-DA1-01 and SC4-WS-06: use scientific data to investigate a question and identify patterns.",
+        evidence="Students can state that they will use planet data to investigate how varied planetary systems can be.",
+        listen_for="Questions about what can differ between planets or planetary systems and what evidence could be compared.",
     ),
     1: dict(
-        title="Describe our Solar System",
-        purpose="Use Earth masses and qualitative mass groups to describe familiar planets.",
-        timing="7 minutes (Lesson 1)",
-        facilitation="Treat this as a quick common starting point. Model one bar segment, then let students identify the other groups by hovering. An Earth mass is a comparison unit, not Earth's physical size.",
-        alignment="SC4-WS-05, SC4-WS-06 and SC4-WS-08: process, represent and identify patterns in data.",
-        evidence="Students correctly describe at least one Solar System planet using its qualitative mass group.",
-        listen_for="Comparisons such as ‘Jupiter is much more massive than Earth’ rather than interpreting a wide segment as a physically wider planet.",
-        misconceptions="Mass and size are related but are not the same variable. The illustration also enlarges planets and places them close together; it is not to scale.",
+        title="Our Solar System as data",
+        purpose="Inspect a small table to compare planet mass and orbital distance before a graph is needed.",
+        timing="8–10 minutes (Lesson 1)",
+        facilitation="Anchor Earth at 1 Earth mass and 1 AU, then invite comparisons with Mercury and Jupiter. Ask students to read a value and make one simple comparison; do not turn AU into a conversion exercise.",
+        alignment="SC4-DA1-01, SC4-WS-05 and SC4-WS-06: use a readable data representation to identify comparisons and patterns.",
+        evidence="Students describe at least one planet using both quantities and identify a simple comparison between planets.",
+        listen_for="‘Jupiter is much more massive than Earth’ and ‘Mercury is closer to the Sun than Earth’, with recognition that mass and orbital distance are different variables.",
+        misconceptions="Mass is not physical size; AU is a distance, not a time. The table describes our Solar System, not a universal rule for planetary systems.",
     ),
     2: dict(
         title="Move from our Solar System to memorable examples",
@@ -177,6 +175,33 @@ def render(data, implementation, terminal_action):
     )
 
 
+def _format_solar_system_table() -> pd.DataFrame:
+    """Return learner-friendly display values from the shared NASA reference data."""
+    table = SOLAR_SYSTEM_PLANETS[["Planet", "Planet mass (Earth masses)", "Orbital distance (AU)"]].copy()
+
+    def format_mass(value: float) -> str:
+        if value < 1:
+            return f"{value:.3g}"
+        if value == 1:
+            return "1"
+        if value < 100:
+            return f"{value:.1f}"
+        return f"{value:.0f}"
+
+    def format_distance(value: float) -> str:
+        if value <= 1:
+            return f"{value:.3g}"
+        if value < 10:
+            return f"{value:.2f}"
+        return f"{value:.1f}"
+
+    return pd.DataFrame({
+        "Planet": table["Planet"],
+        "Mass (Earth = 1)": table["Planet mass (Earth masses)"].map(format_mass),
+        "Orbital distance (AU)": table["Orbital distance (AU)"].map(format_distance),
+    })
+
+
 @dataclass(frozen=True)
 class LessonDependencies:
     """Shared charts, helpers and assets supplied by the application shell."""
@@ -205,7 +230,7 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
     """Render the existing Year 8 lesson text and interactions for one step."""
     d = dependencies
     if part == 0:
-        st.header(d.pathway_name)
+        st.header("How different can planets and planetary systems be from our Solar System?")
         with media_text_pair(
             d.exoplanet_image_path,
             role="context",
@@ -215,50 +240,19 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             ),
             key="year8_welcome",
         ):
-            st.markdown(
-                "Other stars have planets too—and some planetary systems are very different from ours. You will "
-                "start with individual discoveries, then use real NASA data to find larger patterns."
-            )
-        st.markdown(
-            "#### Our journey\n"
-            "1. Start with our Solar System.\n"
-            "2. Meet memorable planets and planetary systems.\n"
-            "3. Watch exoplanet discoveries grow over time.\n"
-            "4. Compare planet masses.\n"
-            "5. Add orbital distance and change the graph scale.\n"
-            "6. Explore strange new worlds.\n"
-            "7. Make a claim supported by evidence."
-        )
-    elif part == 1:
-        st.header("Step 1: Meet our Solar System")
-        with media_text_pair(
-            d.solar_system_image_path,
-            role="context",
-            caption="An illustration of our Solar System. Credit: NASA",
-            key="year8_solar_system",
-        ):
             st.write(
-                "Our Solar System contains the Sun and everything held in orbit around it. Eight planets orbit the Sun, "
-                "from small rocky worlds such as Earth to giant planets such as Jupiter."
+                "Our Solar System is one planetary system. Astronomers have observations and data for thousands "
+                "of planets orbiting other stars."
             )
-        st.markdown(
-            "We will group planets by mass: **Very low mass** (less than 1 Earth mass), **Low mass** (1 to <10 Earth masses), "
-            "**Medium mass** (10 to <100 Earth masses), **High mass** (100 to <1,000 Earth masses), and **Very high mass** "
-            "(1,000 Earth masses or more). For example, Earth is **Low mass**, Neptune is **Medium mass**, and Jupiter is "
-            "**High mass**."
-        )
-        graph_reading_support(
-            "The whole bar represents all eight Solar System planets, from 0% to 100%.",
-            "Each coloured section is one planet-mass group. A wider section contains a larger share of the planets.",
-        )
-        solar_figure = d.planet_mass_distribution_chart(data, include_exoplanets=False)
-        if solar_figure is not None:
-            st.plotly_chart(solar_figure, use_container_width=True)
-        st.caption("**Hover over a section—or tap it on a touchscreen—to see the planet names.**")
-        d.key_idea(
-            "The planets in our Solar System have very different masses.",
-            "Which labelled mass group contains the greatest share of our eight planets?",
-        )
+        st.write("We will use data to investigate how different planets and planetary systems can be from our Solar System.")
+        st.caption("The detected catalogue is substantial, but it is not every planet that exists.")
+    elif part == 1:
+        st.header("Step 1: Our Solar System as data")
+        st.write("Our eight planets are a small, readable dataset. This table describes our Solar System, not a universal rule for planetary systems.")
+        st.write("**1 AU is the average distance from Earth to the Sun.** Astronomers use AU to compare distances within planetary systems.")
+        st.write("Mass tells us how much matter a planet contains. It is not the same as physical size.")
+        st.dataframe(_format_solar_system_table(), hide_index=True, width="stretch")
+        notice_prompt("What simple comparisons can you make between the planets' masses and orbital distances?")
     elif part == 2:
         st.header("Step 2: There are planets around other stars")
         st.info(
