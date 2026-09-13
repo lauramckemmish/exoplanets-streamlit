@@ -327,7 +327,7 @@ Screen 3 tests whether this was one unusual orbit or evidence that whole planeta
 ## Screen 3 — It wasn't just one weird planet
 
 **DECISION — Main cognitive job**
-Escalate from one surprising planet to diversity in whole planetary-system arrangements.
+Show that 51 Pegasi b was not merely an isolated curiosity: an entire planetary system can be arranged very differently from ours.
 
 **Transition**
 
@@ -335,36 +335,38 @@ Escalate from one surprising planet to diversity in whole planetary-system arran
 
 **Evidence presented**
 
-Use exactly two systems, each with one conceptual job:
+Use one system-level example:
 
-- **Kepler-16 b:** planets do not have to orbit a single star. Core fact: Kepler-16 b orbits two stars. A dry treatment such as “Two stars. Still a planet. Apparently one star was optional.” is appropriate only if it does not obscure the fact.
 - **TRAPPIST-1:** planetary systems can be packed very differently from ours. Core fact: TRAPPIST-1 has seven known planets, all orbiting closer to their star than Mercury orbits the Sun. Let “Seven planets. All inside Mercury's orbit.” carry most of the scientific strangeness.
 
-Existing NASA/JPL travel-poster assets may be reused if appropriate, with clear labels that they are illustrations rather than photographs.
+The existing NASA/JPL TRAPPIST-1 travel-poster asset may be reused, with a clear label that it is an illustration rather than a photograph.
 
 **Learner action**
 
 COMPARE concrete dimensions rather than abstract “system architecture”:
 
-- How many stars are in the system?
-- How many known planets are in the system?
-- How tightly packed are the planets?
+- How many known planets does TRAPPIST-1 have?
+- How tightly packed are its planets compared with our Solar System?
 
-The examples are not a disconnected collection of novelty facts. They broaden the Screen 2 disruption from one anomalous orbit to whole-system arrangements.
+TRAPPIST-1 broadens the Screen 2 disruption from one anomalous orbit to the organisation of an entire planetary system.
 
 **Evidence of learning**
 
-Students explain that Kepler-16 b orbits two stars and that TRAPPIST-1 is much more tightly packed than our Solar System.
+Students explain that TRAPPIST-1 has seven known planets and that they orbit in a much more tightly packed region than the planets in our Solar System.
 
 **Boundary / facilitator intent**
 
-The examples establish possibility, not frequency. NASA/JPL artwork is illustration, not photography. Do not expand into circumbinary mechanics, formation theory, habitability, detection methods or a gallery of unusual systems.
+This example establishes possibility, not frequency. NASA/JPL artwork is illustration, not photography. Do not expand into habitability, detection methods or a gallery of unusual systems.
 
 Allow approximately 8–10 minutes.
 
-**HYPOTHESIS — Later system-architecture payoff**
+**DECISION — Close the stellar-multiplicity branch**
 
-Later implementation investigation should assess whether Screen 4's real-world browser could include number of stars and number of known planets in the system, and whether star multiplicity could be encoded in a later population representation where scientifically and technically supported. This is not a decision to adopt a particular chart encoding: it requires data-provenance, availability, completeness and visual-complexity review.
+Do not pursue stellar multiplicity in Screen 4 or Screen 7 for this experience. The catalogue's star count describes gravitationally bound stars in a system, not necessarily the stars a planet directly orbits, and it would add clutter without a clean downstream payoff.
+
+**PARKED — Known-planet count context**
+
+A count of known or confirmed planets could potentially provide contextual information in Screen 4, but no implementation is currently warranted. Do not create a new system-compactness hypothesis: it is not currently worth pursuing.
 
 **Connection forward**
 
@@ -727,7 +729,7 @@ The lesson break follows **cognitive jobs**, not old screen numbering or arbitra
 > → expectation about another system
 > → mass-and-distance table and brief formation story
 > → 51 Pegasi b prediction, observation and revision
-> → Kepler-16 b and TRAPPIST-1 arrangements
+> → TRAPPIST-1 shows a different whole-system arrangement
 > → browse at least three real worlds
 > → persisted prediction about a mass × orbital-distance population
 
@@ -840,10 +842,10 @@ These are intentionally unresolved and should not be silently decided during mec
 - exact visual treatment;
 - exact data values and comparison wording.
 
-**OPEN — Screen 3**
+**RESOLVED — Screen 3**
 
-- final two additional planetary-system examples;
-- which existing NASA/JPL poster assets are core versus optional enrichment.
+- TRAPPIST-1 is the single additional system-level example;
+- the existing NASA/JPL TRAPPIST-1 poster is the relevant optional/context asset.
 
 **OPEN — implementation architecture**
 
