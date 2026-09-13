@@ -70,15 +70,17 @@ TEACHER_BACKGROUNDS = {
     ),
     3: (
         "**Two arrangements that broaden the comparison**\n\n"
-        "- **Kepler-16 b** is a circumbinary planet: it orbits two stars. Its conceptual job is simply to show that "
-        "planets do not have to orbit a single star.\n"
+        "- Use Screen 2's transition: one strange planet could have been an exception, so astronomers kept looking. "
+        "**Kepler-16 b** then makes one simple point: it orbits two stars.\n"
         "- **TRAPPIST-1** has seven known planets in a much more compact arrangement than our Solar System. All seven "
         "orbit closer to their star than Mercury orbits the Sun. Its conceptual job is compact orbital spacing, not "
         "habitability.\n"
         "- The NASA/JPL travel posters are illustrations, not photographs. The examples show what is possible; they "
         "do not tell us how common either arrangement is.\n\n"
-        "Keep the comparison concrete and avoid circumbinary mechanics, formation theory, detection methods, or a "
-        "long catalogue of unusual systems."
+        "Invite comparison before explaining: ask about the number of stars, the number of known planets and how closely "
+        "the planets orbit. No specialist binary-star or TRAPPIST-1 knowledge is needed. Do not expand into binary orbits, "
+        "formation theory, habitability, detection methods or a long catalogue of unusual systems. Star and known-planet "
+        "counts may become useful later, but they are not new browser or graph fields here."
     ),
     4: (
         "**Why browse a few real worlds?**\n\n"
@@ -174,13 +176,13 @@ TEACHER_NOTE_OVERRIDES = {
     ),
     3: dict(
         title="Our Solar System isn't the only arrangement",
-        purpose="Compare two real planetary-system arrangements with our Solar System: two stars for Kepler-16 b and a compact orbital arrangement for TRAPPIST-1.",
+        purpose="Broaden from one surprising planet to two unfamiliar whole-system layouts: Kepler-16 b orbits two stars, while TRAPPIST-1 has seven known planets in a compact region inside Mercury's orbital distance.",
         timing="8–10 minutes (Lesson 1)",
-        facilitation="Give each example one clear conceptual job, then ask students to name the contrast. Treat the posters as context after the real-system description, not as photographs or as evidence of how common either arrangement is.",
+        facilitation="Open with the idea that one strange planet could have been an exception, then invite comparison before lecturing. Give each example one clear job: Kepler-16 b orbits two stars; TRAPPIST-1 has seven known planets all closer to its star than Mercury is to the Sun. No specialist binary-star or TRAPPIST-1 knowledge is needed. Treat the posters as context after the real-system description, not as photographs or as evidence of how common either arrangement is.",
         alignment="SC4-DA1-01 and SC4-WS-06: compare observations and distinguish what examples establish from what would require broader data.",
-        evidence="Students identify that Kepler-16 b orbits two stars and that TRAPPIST-1 is far more compactly arranged than our Solar System.",
-        listen_for="Comparisons about number of stars and compact orbital arrangement, rather than habitability speculation or a claim that every planetary system is unusual.",
-        misconceptions="The NASA/JPL artwork is illustration, not photography. These two examples establish possibility, not frequency; do not expand into circumbinary mechanics, formation theory or detection methods.",
+        evidence="Students identify that Kepler-16 b orbits two stars and that TRAPPIST-1's seven known planets all orbit inside Mercury's orbital distance.",
+        listen_for="Concrete comparisons about the number of stars, the number of known planets and how tightly packed the orbits are, rather than habitability speculation or a claim that every planetary system is unusual.",
+        misconceptions="The NASA/JPL artwork is illustration, not photography. These two examples establish possibility, not frequency; do not expand into binary-orbit details, formation theory, habitability or detection methods. Star and known-planet counts may matter later, but are not new learner data fields here.",
     ),
     4: dict(
         title="Meet some real worlds",
@@ -490,21 +492,23 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             revise_prompt("What does 51 Pegasi b make you reconsider about where giant planets can be?")
     elif part == 3:
         st.header("Step 3: Our Solar System isn't the only arrangement")
-        st.write("Two real planetary systems show different ways that an arrangement can vary from our Solar System.")
+        st.write("One strange planet could have been an exception. Astronomers kept looking.")
+        st.write("They found planetary systems that were unfamiliar in more than one way.")
         kepler_16, trappist_1 = st.columns(2)
         with kepler_16:
             st.image(d.nasa_kepler_16b_poster_path, width="stretch")
             st.caption("NASA/JPL artist's illustration of Kepler-16 b; it is not a photograph.")
             st.subheader("Kepler-16 b: two stars")
-            st.write("Kepler-16 b orbits two stars. Planets do not have to orbit a single star.")
+            st.write("Kepler-16 b orbits two stars. Two stars. Still a planet. Apparently one star was optional.")
         with trappist_1:
             st.image(d.nasa_trappist_1e_poster_path, width="stretch")
             st.caption("NASA/JPL artist's illustration of the TRAPPIST-1 system; it is not a photograph.")
             st.subheader("TRAPPIST-1: compact orbits")
             st.write("TRAPPIST-1 has seven known planets. All seven orbit closer to their star than Mercury orbits the Sun.")
-        compare_prompt("How does each system differ from our Solar System: Kepler-16 b in its stars, and TRAPPIST-1 in its orbital arrangement?")
+            st.write("Seven planets. All inside Mercury's orbit.")
+        compare_prompt("What is different from our Solar System here? Look at the number of stars, the number of known planets and how closely packed the planets are.")
         with self_check("Check your comparison"):
-            st.write("Kepler-16 b shows that a planet can orbit two stars. TRAPPIST-1 shows that many planets can be packed into a much smaller orbital region than in our Solar System.")
+            st.write("Kepler-16 b shows that a planet can orbit two stars. TRAPPIST-1 shows that seven planets can be packed into a region inside Mercury's orbit—much smaller than the inner Solar System.")
         st.caption("These individual systems show what is possible. They do not tell us how common either arrangement is.")
     elif part == 4:
         st.header("Step 4: Meet some real worlds")

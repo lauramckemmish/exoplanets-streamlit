@@ -55,6 +55,13 @@ class StrangeNewWorldsSystemExamplesTests(unittest.TestCase):
         self.assertNotIn("Kepler-90", learner_text)
         self.assertIn("not a photograph", learner_text)
         self.assertIn("possible", learner_text)
+        self.assertIn("One strange planet could have been an exception", learner_text)
+        self.assertIn("Two stars. Still a planet.", learner_text)
+        self.assertIn("Seven planets. All inside Mercury's orbit.", learner_text)
+        compare = next(event[1][0] for event in events if event[0] == "compare")
+        self.assertIn("number of stars", compare)
+        self.assertIn("number of known planets", compare)
+        self.assertIn("closely packed", compare)
 
     def test_facilitator_note_matches_the_two_example_contrasts(self):
         note = strange_new_worlds.TEACHER_NOTE_OVERRIDES[3]
@@ -65,6 +72,8 @@ class StrangeNewWorldsSystemExamplesTests(unittest.TestCase):
         self.assertIn("compact", note["purpose"])
         self.assertIn("illustration", note["misconceptions"])
         self.assertIn("possibility, not frequency", note["misconceptions"])
+        self.assertIn("No specialist binary-star", note["facilitation"])
+        self.assertIn("all closer", note["facilitation"])
         self.assertIn("Kepler-16 b", background)
         self.assertIn("TRAPPIST-1", background)
 
