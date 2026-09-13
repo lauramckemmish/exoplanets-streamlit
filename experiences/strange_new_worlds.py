@@ -21,7 +21,7 @@ from ui_helpers import (
 )
 
 STEP_LABELS = [
-    "The system we knew", "1 · Our Solar System as evidence", "2 · Could Jupiter be here?",
+    "The system we knew", "1 · Our Solar System as evidence", "2 · And then astronomers found this",
     "3 · Our Solar System isn't the only arrangement", "4 · Meet some real worlds", "5 · From individual planets to population patterns",
     "6 · How can we show both variables?", "7 · Now add the detected population", "Conclusion",
 ]
@@ -54,17 +54,19 @@ TEACHER_BACKGROUNDS = {
         "does not teach detailed formation physics."
     ),
     2: (
-        "**A prediction meets a real observation**\n\n"
-        "- Let students make their prediction from the familiar Solar System evidence before revealing 51 Pegasi b. "
-        "The purpose is to make scientific revision visible, not to catch students out.\n"
+        "**A reasonable expectation meets a disruptive observation**\n\n"
+        "- Introduce the ordinary idea first: astronomers began finding planets around other stars. Then earn the word "
+        "**exoplanet** and use the 1995 announcement of **51 Pegasi b**, the first exoplanet found around a Sun-like "
+        "star, as a concise historical anchor. This is not a general lesson in exoplanet history.\n"
+        "- Establish that 51 Pegasi b is a giant planet, then preserve the prediction before its orbital distance is "
+        "revealed. Let the contradiction land and allow a short moment for surprise or discussion before REVISE. The "
+        "point is scientific revision, not catching students out.\n"
         "- **51 Pegasi b** is a hot Jupiter: a giant planet on a very close orbit. Its mass is an estimate, not a "
         "physical-size measurement. The displayed value is about 146 Earth masses (about 0.46 Jupiter masses), and "
-        "its orbital semimajor axis is about 0.052 AU.\n"
-        "- The comparison uses NASA Exoplanet Archive reference values. Its best mass field can represent a measured "
-        "mass or a minimum mass; describe the value here as an estimate.\n\n"
-        "Keep the science point concise: giant planets can exist very close to their stars, so the Solar System is "
-        "not the only possible arrangement. Do not expand into migration, planet formation, detection methods or "
-        "discovery chronology."
+        "its orbital semimajor axis is about 0.052 AU. The comparison uses NASA Exoplanet Archive reference values.\n\n"
+        "Link briefly back to Screen 1: scientists had sensible explanations from the Solar System, and hot Jupiters "
+        "meant parts of that story needed rethinking. Do not expand into migration, formation mechanisms, detection "
+        "methods or detailed discovery history."
     ),
     3: (
         "**Two arrangements that broaden the comparison**\n\n"
@@ -161,14 +163,14 @@ TEACHER_NOTE_OVERRIDES = {
         misconceptions="Mass is not physical size; AU is a distance, not a time. Do not introduce orbital-distance, variable, dataset or population jargon before the ideas are useful.",
     ),
     2: dict(
-        title="Could Jupiter be here?",
-        purpose="Use familiar Solar System evidence to make a prediction, then revise it after a real hot-Jupiter observation.",
+        title="And then astronomers found this",
+        purpose="Introduce exoplanets through the 1995 51 Pegasi b observation, then use its actual orbit to revise a Solar-System-based expectation.",
         timing="8–10 minutes (Lesson 1)",
-        facilitation="Let the prediction exist before revealing the counterexample. Ask what the observation changes about a Solar-System-based expectation; the point is visible scientific revision, not a surprise quiz.",
+        facilitation="Define exoplanet in ordinary language, use the 1995 Sun-like-star anchor briefly, then establish the giant planet before revealing its orbit. Preserve prediction-before-reveal, allow a beat for the surprise, and ask what the evidence changes about a Solar-System-based expectation. Link back to the simple formation story without teaching migration or detection methods.",
         alignment="SC4-DA1-01, SC4-WS-02 and SC4-WS-06: generate an expectation, compare it with evidence and revise thinking when warranted.",
-        evidence="Students explain that a giant planet can orbit unexpectedly close to its star and that this is not what they would infer from our Solar System alone.",
-        listen_for="‘I expected giant planets to be farther out because of our Solar System’ and ‘this real planet shows that is not a general rule’, including the intuitive idea that a close-in giant would be hot.",
-        misconceptions="51 Pegasi b's mass is an estimate and does not describe its physical size. ‘Hot Jupiter’ is a useful category, not a reason to introduce migration, formation theory, detection methods or discovery chronology.",
+        evidence="Students explain that 51 Pegasi b is a giant planet much closer to its star than Mercury is to the Sun, and revise where giant planets can exist.",
+        listen_for="‘I expected a giant planet to be farther out’, ‘51 Pegasi b is closer than Mercury’, and recognition that new observations can make scientific explanations richer.",
+        misconceptions="51 Pegasi b's mass is an estimate and does not describe physical size. A hot Jupiter is a useful category, not a reason to introduce migration, formation mechanisms, detection methods or broader exoplanet history.",
     ),
     3: dict(
         title="Our Solar System isn't the only arrangement",
@@ -283,7 +285,7 @@ def _format_solar_system_table() -> pd.DataFrame:
 FIFTY_ONE_PEGASI_B = {
     "Planet": "51 Pegasi b",
     "Mass (Earth = 1)": "≈146 (estimate)",
-    "Orbital distance (AU)": "0.052",
+    "Distance from star (AU)": "0.052",
 }
 
 
@@ -393,8 +395,8 @@ def _render_browser_profile(planet: pd.Series) -> None:
 def _hot_jupiter_comparison_table() -> pd.DataFrame:
     """Return the compact, static comparison used for the Screen 2 observation."""
     return pd.DataFrame([
-        {"Planet and star": "Jupiter — Sun", "Mass (Earth = 1)": "318", "Orbital distance (AU)": "5.20"},
-        {"Planet and star": "Mercury — Sun", "Mass (Earth = 1)": "0.0553", "Orbital distance (AU)": "0.387"},
+        {"Planet and star": "Jupiter — Sun", "Mass (Earth = 1)": "318", "Distance from star (AU)": "5.20"},
+        {"Planet and star": "Mercury — Sun", "Mass (Earth = 1)": "0.0553", "Distance from star (AU)": "0.387"},
         {"Planet and star": "51 Pegasi b — 51 Pegasi", **{
             key: value for key, value in FIFTY_ONE_PEGASI_B.items() if key != "Planet"
         }},
@@ -460,24 +462,32 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             )
             st.caption("Brief formation visual placeholder: this will show that explanation without adding detailed formation physics.")
     elif part == 2:
-        st.header("Step 2: Could Jupiter be here?")
-        st.write("In our Solar System, the giant planet Jupiter is far from the Sun, while Mercury is much closer.")
-        predict_prompt("Could a Jupiter-like giant planet orbit even closer to its star than Mercury does to the Sun?")
+        st.header("Step 2: And then astronomers found this")
+        st.write("Astronomers began finding planets around other stars.")
+        st.write("A planet orbiting another star is called an **exoplanet**.")
+        st.write("In 1995, astronomers announced the first exoplanet found orbiting a Sun-like star: **51 Pegasi b**.")
+        st.write("51 Pegasi b is a giant planet.")
+        st.write("In our Solar System, Jupiter stays far from the Sun while Mercury is close.")
+        predict_prompt("Based on what you've seen so far, where would you expect 51 Pegasi b to orbit?")
         hot_jupiter_revealed = d.hard_reveal(
-            "Make your prediction from the Solar System table first. Then reveal a real planet orbiting another star.",
+            "Make your prediction first. Then reveal 51 Pegasi b's actual distance from its star.",
             "year8_51_pegasi_b_revealed",
-            reveal_label="Reveal the real planet →",
-            revealed_message="A real giant planet can orbit far closer to its star than Mercury orbits the Sun.",
+            reveal_label="Reveal the actual orbit →",
+            revealed_message="51 Pegasi b is a giant planet orbiting much closer to its star than Mercury orbits the Sun.",
         )
         if hot_jupiter_revealed:
-            st.subheader("A real observation: 51 Pegasi b")
+            st.subheader("The actual orbit: 51 Pegasi b")
             st.dataframe(_hot_jupiter_comparison_table(), hide_index=True, width="stretch")
             st.write(
-                "51 Pegasi b has a mass estimate of about 146 Earth masses—nearly half Jupiter's mass—but orbits "
-                "at 0.052 AU. That is much closer to its star than Mercury's 0.387 AU orbit."
+                "Well. Our Solar System had not prepared us for that. 51 Pegasi b has a mass estimate of about 146 "
+                "Earth masses—nearly half Jupiter's mass—but orbits at 0.052 AU."
             )
-            st.write("A giant planet on such a close orbit is called a **hot Jupiter**. Mass is not the same as physical size.")
-            revise_prompt("What should you revise about where giant planets can orbit?")
+            st.write(
+                "A giant planet on such a close orbit is called a **hot Jupiter**. Scientists had built sensible "
+                "explanations from the Solar System; hot Jupiters meant parts of that story needed rethinking."
+            )
+            st.caption("Mass is not physical size.")
+            revise_prompt("What does 51 Pegasi b make you reconsider about where giant planets can be?")
     elif part == 3:
         st.header("Step 3: Our Solar System isn't the only arrangement")
         st.write("Two real planetary systems show different ways that an arrangement can vary from our Solar System.")

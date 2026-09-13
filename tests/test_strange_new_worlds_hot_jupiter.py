@@ -43,8 +43,16 @@ class StrangeNewWorldsHotJupiterTests(unittest.TestCase):
     def test_prediction_precedes_hidden_evidence(self):
         events = self._render(revealed=False)
         names = [event[0] for event in events]
+        rendered_before_reveal = " ".join(
+            str(event[1]) for event in events[:names.index("hard_reveal")]
+        ).lower()
 
         self.assertLess(names.index("predict"), names.index("hard_reveal"))
+        self.assertIn("planets around other stars", rendered_before_reveal)
+        self.assertIn("called an **exoplanet**", rendered_before_reveal)
+        self.assertIn("1995", rendered_before_reveal)
+        self.assertIn("sun-like star", rendered_before_reveal)
+        self.assertIn("giant planet", rendered_before_reveal)
         self.assertNotIn("dataframe", names)
         self.assertNotIn("revise", names)
 
@@ -55,20 +63,26 @@ class StrangeNewWorldsHotJupiterTests(unittest.TestCase):
         self.assertLess(names.index("predict"), names.index("hard_reveal"))
         self.assertLess(names.index("hard_reveal"), names.index("dataframe"))
         self.assertLess(names.index("dataframe"), names.index("revise"))
+        reveal_write_text = " ".join(
+            str(event[1]) for event in events[names.index("dataframe") + 1:]
+        )
+        self.assertIn("Well. Our Solar System had not prepared us for that.", reveal_write_text)
+        self.assertIn("needed rethinking", reveal_write_text)
 
     def test_static_comparison_uses_expected_rounded_values(self):
         self.assertEqual(strange_new_worlds._hot_jupiter_comparison_table().to_dict("records"), [
-            {"Planet and star": "Jupiter — Sun", "Mass (Earth = 1)": "318", "Orbital distance (AU)": "5.20"},
-            {"Planet and star": "Mercury — Sun", "Mass (Earth = 1)": "0.0553", "Orbital distance (AU)": "0.387"},
-            {"Planet and star": "51 Pegasi b — 51 Pegasi", "Mass (Earth = 1)": "≈146 (estimate)", "Orbital distance (AU)": "0.052"},
+            {"Planet and star": "Jupiter — Sun", "Mass (Earth = 1)": "318", "Distance from star (AU)": "5.20"},
+            {"Planet and star": "Mercury — Sun", "Mass (Earth = 1)": "0.0553", "Distance from star (AU)": "0.387"},
+            {"Planet and star": "51 Pegasi b — 51 Pegasi", "Mass (Earth = 1)": "≈146 (estimate)", "Distance from star (AU)": "0.052"},
         ])
 
     def test_facilitator_note_matches_the_prediction_and_revision_sequence(self):
         note = strange_new_worlds.TEACHER_NOTE_OVERRIDES[2]
 
-        self.assertEqual(note["title"], "Could Jupiter be here?")
-        self.assertIn("prediction", note["purpose"])
-        self.assertIn("before revealing", note["facilitation"])
+        self.assertEqual(note["title"], "And then astronomers found this")
+        self.assertIn("1995", note["purpose"])
+        self.assertIn("prediction-before-reveal", note["facilitation"])
+        self.assertIn("Sun-like-star", note["facilitation"])
         self.assertIn("mass is an estimate", note["misconceptions"])
 
 

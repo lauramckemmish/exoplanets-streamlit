@@ -46,7 +46,7 @@ class StrangeNewWorldsOpeningTests(unittest.TestCase):
         self.assertEqual(strange_new_worlds.STEP_LABELS[:3], [
             "The system we knew",
             "1 · Our Solar System as evidence",
-            "2 · Could Jupiter be here?",
+            "2 · And then astronomers found this",
         ])
 
     def test_opening_invites_an_expectation_without_exoplanet_or_template_language(self):
