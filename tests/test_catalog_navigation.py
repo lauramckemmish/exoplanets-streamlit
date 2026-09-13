@@ -9,7 +9,12 @@ class PublicDestinationCatalogueTests(unittest.TestCase):
     def test_release_surface_exposes_only_curious_routes(self):
         self.assertEqual(
             catalog.enabled_experience_names(),
-            ("Planet Shopping Outside Our Solar System",),
+            (
+                "Is Our Solar System Normal?",
+                "Strange New Worlds",
+                "The Planets We Haven't Found",
+                "Planet Shopping Outside Our Solar System",
+            ),
         )
         self.assertEqual(catalog.enabled_explore_resource_names(), ("Exoplanet Data Lab",))
 
@@ -17,7 +22,15 @@ class PublicDestinationCatalogueTests(unittest.TestCase):
         experience_names = {entry["name"] for entry in catalog.experience_catalog()}
         explore_names = {entry["name"] for entry in catalog.explore_catalog()}
 
-        self.assertEqual(experience_names, {"Planet Shopping Outside Our Solar System"})
+        self.assertEqual(
+            experience_names,
+            {
+                "Is Our Solar System Normal?",
+                "Strange New Worlds",
+                "The Planets We Haven't Found",
+                "Planet Shopping Outside Our Solar System",
+            },
+        )
         self.assertEqual(explore_names, {"Exoplanet Data Lab"})
 
     def test_data_lab_explore_resource_reuses_the_existing_route_without_thumbnail(self):
@@ -40,6 +53,24 @@ class PublicDestinationCatalogueTests(unittest.TestCase):
         self.assertEqual(experience["card_button_label"], "Start →")
         self.assertEqual(experience["app_experience"], "Planet Shopping Outside Our Solar System")
         self.assertEqual(experience["thumbnail"], "assets/planet-shopping-thumbnail.png")
+
+    def test_experience_cards_define_thumbnail_and_audience_badge_metadata(self):
+        expected_cards = {
+            "Is Our Solar System Normal?": (
+                "assets/exoplanets-artists-concept-nasa.jpeg",
+                "CURIOUS · Facilitated",
+            ),
+            "Strange New Worlds": ("assets/planetary-systems.svg", "Year 8"),
+            "The Planets We Haven't Found": (
+                "assets/exoplanet-detection-methods.svg",
+                "Year 10",
+            ),
+        }
+
+        for name, (thumbnail, audience_badge) in expected_cards.items():
+            experience = catalog.get_experience(name)
+            self.assertEqual(experience["thumbnail"], thumbnail)
+            self.assertEqual(experience["audience_badge"], audience_badge)
 
     def test_all_explore_resources_are_available(self):
         for resource in catalog.EXPLORE_RESOURCES:

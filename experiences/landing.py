@@ -24,6 +24,9 @@ def _render_cards(entries, *, button_label, button_key_prefix, open_item):
             card_button_label = entry.get("card_button_label", button_label)
             thumbnail = entry.get("thumbnail")
             if thumbnail:
+                audience_badge = entry.get("audience_badge")
+                if audience_badge:
+                    st.badge(audience_badge, color="gray")
                 semantic_heading(card_title, "subsection")
                 if card_summary:
                     st.write(card_summary)
