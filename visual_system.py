@@ -251,17 +251,25 @@ def apply_visual_system() -> None:
         [class*="st-key-facilitator_optional_"] [data-testid="stExpander"] {{
             border-left-color: var(--unsw-facilitator-annotation);
         }}
-        /* Shared interaction grammar: THINK is a cue, while REVEAL protects evidence. */
+        /* Shared interaction grammar: named cognitive prompts never gate progress. */
         [data-testid="stAlert"][data-baseweb="notification"] {{
             border-left: 3px solid var(--unsw-information);
             background: rgba(63, 97, 196, 0.08);
         }}
-        .st-key-think_q {{
-            border-left: 3px solid currentColor;
-            padding-left: 0.65rem;
-            margin: 0.5rem 0;
+        .st-key-notice_prompt, .st-key-compare_prompt, .st-key-predict_prompt,
+        .st-key-explain_prompt, .st-key-conclude_prompt, .st-key-revise_prompt,
+        .st-key-recall_prompt {{
+            border-left: 2px solid currentColor;
+            padding: 0.1rem 0 0.1rem 0.65rem;
+            margin: 0.5rem 0 0.7rem;
         }}
-        .st-key-think_q .interaction-marker,
+        .st-key-notice_prompt .cognitive-prompt__label,
+        .st-key-compare_prompt .cognitive-prompt__label,
+        .st-key-predict_prompt .cognitive-prompt__label,
+        .st-key-explain_prompt .cognitive-prompt__label,
+        .st-key-conclude_prompt .cognitive-prompt__label,
+        .st-key-revise_prompt .cognitive-prompt__label,
+        .st-key-recall_prompt .cognitive-prompt__label,
         [class*="st-key-hard_reveal_"] .interaction-marker {{
             font-size: 0.72rem;
             font-weight: 750;
@@ -269,7 +277,13 @@ def apply_visual_system() -> None:
             line-height: 1;
             margin: 0.05rem 0 0.35rem;
         }}
-        .st-key-think_q [data-testid="stMarkdownContainer"] {{ background: transparent; }}
+        .st-key-notice_prompt [data-testid="stMarkdownContainer"],
+        .st-key-compare_prompt [data-testid="stMarkdownContainer"],
+        .st-key-predict_prompt [data-testid="stMarkdownContainer"],
+        .st-key-explain_prompt [data-testid="stMarkdownContainer"],
+        .st-key-conclude_prompt [data-testid="stMarkdownContainer"],
+        .st-key-revise_prompt [data-testid="stMarkdownContainer"],
+        .st-key-recall_prompt [data-testid="stMarkdownContainer"] {{ background: transparent; }}
         [class*="st-key-hard_reveal_"] {{
             border-left: 3px solid var(--unsw-active-emphasis);
             padding-left: 0.65rem;

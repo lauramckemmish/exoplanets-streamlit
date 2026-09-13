@@ -90,17 +90,23 @@ a clear reason: deliberate withholding, optionality or learner choice. The share
 API lives in `ui_helpers.py`; shared presentation belongs in
 `visual_system.py`.
 
-### Think Q
+### Semantic prompts
 
-Use when learners should stop mentally to notice, predict, compare, decide,
-wonder or reason.
+Use a shared semantic prompt when learners should stop for one clear cognitive
+job: `notice_prompt()`, `compare_prompt()`, `predict_prompt()`,
+`explain_prompt()`, `conclude_prompt()`, `revise_prompt()` or, only for real
+retrieval of prior learning, `recall_prompt()`.
 
-- Use the shared `think_q()` helper and its visually distinctive reasoning cue.
-- It hides nothing, requires no answer submission and never suppresses
-  **Continue**.
+- A semantic prompt hides nothing, requires no answer submission and never
+  suppresses **Continue**.
 - It works for individual thinking, partner discussion or facilitator-led
-  discussion. Do not prescribe “Pause and discuss” as the generic learner
-  behaviour; `pause_cue()` is retained in code as a compatibility wrapper.
+  discussion. Name the actual intellectual action rather than using a generic
+  Think or pause cue.
+
+### Self-check
+
+Use `self_check()` for collapsed, non-gating formative feedback or comparison.
+It is distinct from optional supporting material in a soft reveal.
 
 ### Graph-reading support
 
@@ -111,7 +117,7 @@ position or scale represents. It should appear directly with the relevant graph
 and normally contain only one to three useful cues. Use the standard
 student-facing signal **👀 Read the graph**. Do not use it to supply the
 interpretation or conclusion; when learners should reason from the graph, use a
-separate `think_q()` prompt.
+separate semantic prompt.
 
 ### Hard reveal
 

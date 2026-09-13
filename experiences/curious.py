@@ -12,18 +12,21 @@ from charts import (
     solar_system_demographics_chart,
 )
 from ui_helpers import (
+    compare_prompt,
+    conclude_prompt,
     data_detective_challenge,
     graph_guide,
     graph_reading_support,
     hard_reveal,
     key_idea,
     media_text_pair,
+    notice_prompt,
+    predict_prompt,
     scroll_to_top_if_requested,
     soft_reveal,
     step_buttons,
     step_tabs,
     teacher_note,
-    think_q,
 )
 
 PATHWAY_TITLE = "Is Our Solar System Normal?"
@@ -102,19 +105,19 @@ def render(data: pd.DataFrame, terminal_action) -> None:
         figure = planet_mass_distribution_chart(data, include_exoplanets=False)
         if figure is not None:
             st.plotly_chart(figure, use_container_width=True)
-        think_q("Which mass groups contain the Solar System planets?")
+        notice_prompt("Which mass groups contain the Solar System planets?")
         key_idea("Planet mass gives us one measurable way to compare planets.", "Which labelled mass groups contain our eight planets, and which group contains the most?")
     elif part == 2:
         st.header("Step 2: Meet exoplanets")
         st.info("An **exoplanet** is a planet that orbits a star other than the Sun. The first confirmed exoplanets were discovered in 1992; now astronomers have a catalogue containing thousands.")
         with media_text_pair(PLANETARY_SYSTEMS_IMAGE_PATH, role="context", caption="The Sun is a star, and our Solar System is one planetary system. Exoplanets belong to other planetary systems.", key="curious_planetary_systems"):
-            think_q("What might another planetary system look like? Could it have more planets, fewer planets, or even two stars?", key="curious_exoplanet_systems_think")
+            predict_prompt("What might another planetary system look like? Could it have more planets, fewer planets, or even two stars?")
             st.write("A few decades ago, astronomers had almost no planets around other stars to compare. Now we can start to ask what the detected population looks like.")
         graph_guide("The top bar is our Solar System; the bottom bar is detected exoplanets.", "Compare sections with the same label. Each complete bar represents 100% of its group.")
         figure = planet_mass_distribution_chart(data)
         if figure is not None:
             st.plotly_chart(figure, use_container_width=True)
-        think_q("Which planet-mass group looks most different between the two bars?", key="curious_exoplanet_comparison_think")
+        compare_prompt("Which planet-mass group looks most different between the two bars?")
         key_idea("Detected exoplanets give us a population to compare with our Solar System.", "Compare the widest labelled section in the top bar with the widest section in the bottom bar.")
     elif part == 3:
         st.header("Step 3: Mass and orbital distance")
@@ -132,7 +135,7 @@ def render(data: pd.DataFrame, terminal_action) -> None:
             st.subheader("Now compare the log–log view")
             graph_guide("The axes show the same values, but the new spacing spreads out the small planets.", "Find Earth at 1 AU and 1 Earth mass, then compare the positions of the four inner planets.")
             st.plotly_chart(solar_system_demographics_chart(True), use_container_width=True)
-            think_q(
+            notice_prompt(
                 "What can you see now that was difficult to see before? Where are the small inner planets and the giant outer planets?"
             )
             st.info("**What changed?** These are the same planets, variables and values. A log scale changes the spacing so small and large values can be seen on the same graph. You do not need to calculate logarithms to use it.")
@@ -144,7 +147,7 @@ def render(data: pd.DataFrame, terminal_action) -> None:
         graph_guide("The bottom axis shows orbital distance and the side axis shows planet mass. Both use a log scale.", "Hover over a blue point to inspect one detected exoplanet. Compare its position with the pink Solar System planets.")
         st.plotly_chart(current_demographics_chart(data), use_container_width=True)
         data_detective_challenge()
-        think_q("What did the Earth challenge show? What did your chosen challenge show? Does this evidence make our planetary system seem typical—or unusual?")
+        conclude_prompt("What did the Earth challenge show? What did your chosen challenge show? Does this evidence make our planetary system seem typical—or unusual?")
         key_idea("This graph gives us clues about how our planets compare with detected exoplanets.", "A blue point near Earth is not automatically another Earth: this graph shows mass and orbital distance, not every planetary property.")
     elif part == 5:
         st.header("Step 5: How do we find exoplanets?")
@@ -160,10 +163,9 @@ def render(data: pd.DataFrame, terminal_action) -> None:
                 st.image(TRANSIT_DETECTION_IMAGE_PATH, use_container_width=True)
                 st.markdown("### Transit detection")
                 st.write("A planet passes in front of its star, causing a tiny dip in starlight.")
-        think_q(
+        predict_prompt(
             "Before looking at the graphs, which planets might each method find more easily? "
             "Think about planet size and distance from the star.",
-            title="Pause and predict:",
         )
         with soft_reveal("Watch transit detection in motion"):
             st.video("https://www.youtube.com/watch?v=BFi4HBUdWkk")
@@ -178,10 +180,9 @@ def render(data: pd.DataFrame, terminal_action) -> None:
         key_idea("Different discovery methods find different kinds of planets.", "Toggle the method views and compare where their points appear on the graph.")
     elif part == 6:
         st.header("Conclusion: Our view is still changing")
-        think_q(
+        conclude_prompt(
             "What does the evidence allow us to conclude about planetary systems and whether "
             "ours is normal?",
-            title="Pause and discuss:",
         )
         st.markdown("### A cautious conclusion\nThe detected catalogue contains real patterns: planetary systems contain worlds with many different masses and orbital distances, and different graph scales can help us see them. But the catalogue is shaped by how astronomers find planets, so it is not a complete census of every planetary system that exists.\n\nWe can compare our Solar System with the detected planets, but mass and orbital distance alone cannot decide whether a whole planetary system is ‘normal’.")
         with soft_reveal("How planetary systems form"):

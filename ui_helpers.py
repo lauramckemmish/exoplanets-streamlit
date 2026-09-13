@@ -2,6 +2,7 @@
 
 from collections.abc import Callable, Iterator, Mapping
 from contextlib import contextmanager
+from html import escape
 
 import streamlit as st
 import streamlit.components.v1 as components
@@ -174,17 +175,54 @@ def persistent_reveal(
     )
 
 
-def think_q(prompt: str, *, title: str = "Think", key: str = "think_q") -> None:
-    """Render a visible, non-blocking reasoning cue."""
-    del title  # Retained for compatibility; THINK is the shared visual marker.
-    with st.container(key=key):
-        st.markdown("<p class='interaction-marker'>THINK</p>", unsafe_allow_html=True)
-        st.markdown(prompt)
+def _cognitive_prompt(kind: str, prompt: str) -> None:
+    """Render a visible, non-blocking prompt for one named cognitive job."""
+    with st.container(key=f"{kind.lower()}_prompt"):
+        st.markdown(
+            f'<span class="cognitive-prompt__label">{escape(kind)}</span>',
+            unsafe_allow_html=True,
+        )
+        st.write(prompt)
 
 
-def pause_cue(prompt: str, *, title: str = "Pause and discuss") -> None:
-    """Backward-compatible wrapper for :func:`think_q`."""
-    think_q(prompt, title=title)
+def notice_prompt(prompt: str) -> None:
+    """Ask learners to inspect evidence and identify something they notice."""
+    _cognitive_prompt("Notice", prompt)
+
+
+def compare_prompt(prompt: str) -> None:
+    """Ask learners to compare evidence, representations, or cases."""
+    _cognitive_prompt("Compare", prompt)
+
+
+def predict_prompt(prompt: str) -> None:
+    """Ask learners to commit to an expectation before seeing new evidence."""
+    _cognitive_prompt("Predict", prompt)
+
+
+def explain_prompt(prompt: str) -> None:
+    """Ask learners to account for a pattern or result."""
+    _cognitive_prompt("Explain", prompt)
+
+
+def conclude_prompt(prompt: str) -> None:
+    """Ask learners to state what the available evidence supports."""
+    _cognitive_prompt("Conclude", prompt)
+
+
+def revise_prompt(prompt: str) -> None:
+    """Ask learners to reconsider an earlier idea in light of new evidence."""
+    _cognitive_prompt("Revise", prompt)
+
+
+def recall_prompt(prompt: str) -> None:
+    """Ask learners to retrieve genuinely relevant prior learning."""
+    _cognitive_prompt("Recall", prompt)
+
+
+def self_check(label: str = "Check your thinking", *, expanded: bool = False):
+    """Return a collapsed, non-gating space for formative feedback."""
+    return st.expander(f"Self-check: {label}", expanded=expanded)
 
 
 def completion_gate(is_complete: bool) -> bool:

@@ -20,7 +20,9 @@ class _StreamlitStub:
         self.buttons = []
         self.button_kwargs = []
         self.expanders = []
+        self.expander_kwargs = []
         self.markdown_calls = []
+        self.write_calls = []
         self.captions = []
         self.container_keys = []
 
@@ -41,10 +43,14 @@ class _StreamlitStub:
 
     def expander(self, label, **_kwargs):
         self.expanders.append(label)
+        self.expander_kwargs.append(_kwargs)
         return _Column()
 
     def markdown(self, *_args, **_kwargs):
         self.markdown_calls.append(_args[0])
+
+    def write(self, text, **_kwargs):
+        self.write_calls.append(text)
 
     def caption(self, text, **_kwargs):
         self.captions.append(text)
@@ -133,8 +139,15 @@ class SharedInteractionContractTests(unittest.TestCase):
     def test_nonblocking_helpers_do_not_gate_continue(self):
         stub = _StreamlitStub()
         with patch.object(ui_helpers, "st", stub):
-            ui_helpers.think_q("Think")
-            ui_helpers.pause_cue("Pause")
+            ui_helpers.notice_prompt("Notice")
+            ui_helpers.compare_prompt("Compare")
+            ui_helpers.predict_prompt("Predict")
+            ui_helpers.explain_prompt("Explain")
+            ui_helpers.conclude_prompt("Conclude")
+            ui_helpers.revise_prompt("Revise")
+            ui_helpers.recall_prompt("Recall")
+            with ui_helpers.self_check("Compare your answer"):
+                pass
             with ui_helpers.soft_reveal("More"):
                 pass
             ui_helpers.choice_reveal("Explore", {"A": "Detail"}, "choice")
@@ -165,21 +178,31 @@ class SharedInteractionContractTests(unittest.TestCase):
         )
         self.assertEqual(stub.expanders, ["Want to go deeper?"])
 
-    def test_think_uses_the_shared_marker_without_a_reveal_or_gate(self):
+    def test_semantic_prompt_uses_a_named_marker_without_a_reveal_or_gate(self):
         stub = _StreamlitStub()
         with patch.object(ui_helpers, "st", stub):
-            ui_helpers.think_q("Consider the evidence.")
+            ui_helpers.notice_prompt("Consider the evidence.")
             self.assertTrue(self._navigation(stub))
-        self.assertIn("<p class='interaction-marker'>THINK</p>", stub.markdown_calls)
-        self.assertIn("Consider the evidence.", stub.markdown_calls)
+        self.assertIn('<span class="cognitive-prompt__label">Notice</span>', stub.markdown_calls)
+        self.assertNotIn("THINK", " ".join(stub.markdown_calls))
 
-    def test_think_accepts_a_unique_container_key(self):
+    def test_semantic_prompts_use_distinct_shared_container_keys(self):
         stub = _StreamlitStub()
         with patch.object(ui_helpers, "st", stub):
-            ui_helpers.think_q("First prompt", key="first_think")
-            ui_helpers.think_q("Second prompt", key="second_think")
+            ui_helpers.notice_prompt("First prompt")
+            ui_helpers.compare_prompt("Second prompt")
 
-        self.assertEqual(stub.container_keys, ["first_think", "second_think"])
+        self.assertEqual(stub.container_keys, ["notice_prompt", "compare_prompt"])
+
+    def test_self_check_is_collapsed_and_nonblocking(self):
+        stub = _StreamlitStub()
+        with patch.object(ui_helpers, "st", stub):
+            with ui_helpers.self_check("Compare your reading"):
+                pass
+            self.assertTrue(self._navigation(stub))
+
+        self.assertEqual(stub.expanders, ["Self-check: Compare your reading"])
+        self.assertEqual(stub.expander_kwargs, [{"expanded": False}])
 
     def test_hard_reveal_uses_a_neutral_reveal_marker(self):
         stub = _StreamlitStub()

@@ -22,7 +22,7 @@ from ui_helpers import (
     soft_reveal,
     step_buttons,
     step_tabs,
-    think_q,
+    predict_prompt,
 )
 
 TITLE = "Planet Shopping Outside Our Solar System"
@@ -762,7 +762,7 @@ def _render_combine(data: pd.DataFrame) -> None:
         st.metric("Known temperature matches", f"{len(temperature_matches):,}")
     if not st.session_state.get(_COMBINE_REVEAL_KEY, False):
         _render_overlap_visual(len(distance_matches), len(temperature_matches))
-    think_q("How many planets do you think are in both groups?", title="Think")
+    predict_prompt("How many planets do you think are in both groups?")
     if not hard_reveal(
         "",
         _COMBINE_REVEAL_KEY,
