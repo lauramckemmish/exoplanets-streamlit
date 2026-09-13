@@ -84,6 +84,8 @@ TEACHER_BACKGROUNDS = {
     ),
     4: (
         "**Why browse a few real worlds?**\n\n"
+        "- Bridge from Screen 3: those systems showed that planetary systems can surprise us. Now invite students to "
+        "inspect a few real detected planets themselves and see what else turns up.\n"
         "- Each compact profile is a real detected exoplanet record. Students meet at least three distinct planets before "
         "making a tentative population prediction, so that prediction has real objects behind it.\n"
         "- The browser deliberately shows only mass and orbital distance: the two quantities that the next population "
@@ -188,7 +190,7 @@ TEACHER_NOTE_OVERRIDES = {
         title="Meet some real worlds",
         purpose="Browse at least three distinct real exoplanet records, then make a tentative prediction about a larger mass-and-orbital-distance population.",
         timing="13–15 minutes (end of Lesson 1)",
-        facilitation="Name the Lesson 1 arc: understand the variables → encounter evidence that changes expectations → see different system arrangements → inspect several real paired records → commit to a tentative prediction. Keep browsing playful but bounded, then invite the prediction from all Lesson 1 evidence; it is not a destination choice, filtering task or formal sample.",
+        facilitation="Bridge from Screen 3 by reminding students that several systems have now surprised them, then invite them to inspect individual detected planets for themselves. Name the Lesson 1 arc: understand the variables → encounter evidence that changes expectations → see different system arrangements → inspect several real paired records → commit to a tentative prediction. Keep browsing playful but bounded, then invite the prediction from all Lesson 1 evidence; it is not a destination choice, filtering task or formal sample.",
         alignment="SC4-DA1-01 and SC4-WS-06: use individual data records to describe objects and compare observations.",
         evidence="Students describe how two encountered planets differ using mass and/or orbital distance, then record a defensible prediction that can later be tested.",
         listen_for="Surprise at the range of values, direct comparisons such as ‘this planet is much more massive’ or ‘this one orbits closer to its star’, and a prediction tied to the two variables.",
@@ -512,7 +514,8 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
         st.caption("These individual systems show what is possible. They do not tell us how common either arrangement is.")
     elif part == 4:
         st.header("Step 4: Meet some real worlds")
-        st.write("Each profile is a real detected exoplanet. Meet a few worlds, then notice how their mass and orbital distance can vary.")
+        st.write("Those systems showed us that planetary systems can surprise us. Now inspect a few real detected planets yourself and see what else turns up.")
+        st.write("Use mass and orbital distance to notice how these worlds differ.")
         st.caption("Mass is not physical size. AU compares orbital distance with the Earth–Sun distance.")
         eligible = _eligible_browser_planets(data)
         if eligible.empty:

@@ -111,6 +111,8 @@ class StrangeNewWorldsRealWorldBrowserTests(unittest.TestCase):
 
         source = Path("experiences/strange_new_worlds.py").read_text()
         screen_four = source.split("elif part == 4:", 1)[1].split("elif part == 5:", 1)[0].lower()
+        self.assertIn("those systems showed us that planetary systems can surprise us", screen_four)
+        self.assertIn("inspect a few real detected planets yourself", screen_four)
         self.assertNotIn("holiday", screen_four)
         self.assertNotIn("destination", screen_four)
         self.assertNotIn("filter", screen_four)
