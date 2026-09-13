@@ -21,7 +21,7 @@ from ui_helpers import (
 )
 
 STEP_LABELS = [
-    "Welcome", "1 · Our Solar System as data", "2 · Could Jupiter be here?",
+    "The system we knew", "1 · Our Solar System as evidence", "2 · Could Jupiter be here?",
     "3 · Our Solar System isn't the only arrangement", "4 · Meet some real worlds", "5 · From individual planets to population patterns",
     "6 · How can we show both variables?", "7 · Now add the detected population", "Conclusion",
 ]
@@ -32,18 +32,26 @@ PART_COUNT = len(STEP_LABELS)
 # Year 8 Facilitator-notes background. The shared classroom renderer applies
 # these to the existing step metadata, preserving the current display.
 TEACHER_BACKGROUNDS = {
-    0: "**The investigation begins with one known system**\n\nOur Solar System is one planetary system. Astronomers have observations and data for thousands of planets orbiting other stars, so students can investigate how different planets and planetary systems can be. Keep the opening focused on the question and the evidence students will use; detection methods and catalogue history are outside this screen.\n\nThe detected catalogue is substantial, but it is not an inventory of every planet that exists.",
+    0: (
+        "**The system we knew**\n\n"
+        "For most of human history, our Solar System was the only planetary system people could study properly. Let students "
+        "treat its small rocky inner planets and giant outer planets as a sensible, orderly starting point and articulate what "
+        "they would expect another system to look like. Do not foreshadow that this expectation will fail.\n\n"
+        "Keep the opening concrete and short: no exoplanets, catalogue counts, data-science jargon, detection methods or "
+        "claims about later diversity yet."
+    ),
     1: (
         "**The Solar System in plain language**\n\n"
         "- The table uses **Earth mass** as a comparison unit. Mass describes how much matter a planet contains; it "
         "is not the same as physical diameter or visual size.\n"
-        "- One **AU** is the average distance from Earth to the Sun. In the table, orbital distance is each planet's "
-        "semimajor axis: the typical size of its orbit, expressed in AU.\n"
+        "- Introduce distance from the Sun before the later term **orbital distance**. One **AU** is the average distance "
+        "from Earth to the Sun; Earth is 1 AU from the Sun.\n"
         "- The values use NASA NSSDC's [Planetary Fact Sheet](https://nssdc.gsfc.nasa.gov/planetary/factsheet/) "
         "reference data (accessed 13 September 2026). They are rounded for reading and comparison, not for unit "
         "conversion.\n\n"
-        "This is a small, readable dataset about our Solar System. It is a starting point for comparison, not a "
-        "universal rule for planetary systems."
+        "Let students first notice that the rocky planets are nearer the Sun and the giant planets farther out. The brief "
+        "formation-story placeholder establishes that scientists had a sensible explanation for this orderly pattern; it "
+        "does not teach detailed formation physics."
     ),
     2: (
         "**A prediction meets a real observation**\n\n"
@@ -134,23 +142,23 @@ TEACHER_BACKGROUNDS = {
 # existing classroom rendering and Year 10 pathway remain unchanged.
 TEACHER_NOTE_OVERRIDES = {
     0: dict(
-        title="Investigation question",
-        purpose="Establish a question that students will investigate using planet data: how different can planetary systems be from our Solar System?",
+        title="The system we knew",
+        purpose="Establish the Solar System as the legitimate familiar basis for an expectation about another planetary system.",
         timing="3–5 minutes (Lesson 1)",
-        facilitation="Keep this short. Establish the question and the available evidence without answering it or introducing detection methods and discovery history.",
-        alignment="SC4-DA1-01 and SC4-WS-06: use scientific data to investigate a question and identify patterns.",
-        evidence="Students can state that they will use planet data to investigate how varied planetary systems can be.",
-        listen_for="Questions about what can differ between planets or planetary systems and what evidence could be compared.",
+        facilitation="Keep this short. Let students articulate what looks normal from the one familiar system they know; do not foreshadow that later evidence will challenge this expectation.",
+        alignment="SC4-WS-02: use familiar observations to form a reasonable expectation.",
+        evidence="Students make a plausible expectation about how another planetary system might be arranged.",
+        listen_for="Small rocky planets closer to the Sun, giant planets farther out, and a reasonable expectation that another system could look similar.",
     ),
     1: dict(
-        title="Our Solar System as data",
-        purpose="Inspect a small table to compare planet mass and orbital distance before a graph is needed.",
+        title="Our Solar System as evidence",
+        purpose="Use the eight-planet table to inspect mass and distance from the Sun, then establish why scientists had a sensible formation story for the familiar arrangement.",
         timing="8–10 minutes (Lesson 1)",
-        facilitation="Anchor Earth at 1 Earth mass and 1 AU, then invite comparisons with Mercury and Jupiter. Ask students to read a value and make one simple comparison; do not turn AU into a conversion exercise.",
-        alignment="SC4-DA1-01, SC4-WS-05 and SC4-WS-06: use a readable data representation to identify comparisons and patterns.",
-        evidence="Students describe at least one planet using both quantities and identify a simple comparison between planets.",
-        listen_for="‘Jupiter is much more massive than Earth’ and ‘Mercury is closer to the Sun than Earth’, with recognition that mass and orbital distance are different variables.",
-        misconceptions="Mass is not physical size; AU is a distance, not a time. The table describes our Solar System, not a universal rule for planetary systems.",
+        facilitation="Anchor Earth at 1 Earth mass and 1 AU, then invite students to notice which planets are heavy, near and far before naming the rocky-near/giant-far pattern. Do not turn AU into a conversion exercise. Use the bounded formation-story slot only to establish why scientists had a sensible explanation before later evidence complicated it.",
+        alignment="SC4-DA1-01 and SC4-WS-05: use a readable table of familiar observations to identify a pattern and form an expectation.",
+        evidence="Students identify a heavy, near or far planet and notice the broad rocky-near/giant-far arrangement.",
+        listen_for="‘Jupiter is much heavier than Earth’, ‘Mercury is close to the Sun’, and a comparison between the small inner planets and giant outer planets.",
+        misconceptions="Mass is not physical size; AU is a distance, not a time. Do not introduce orbital-distance, variable, dataset or population jargon before the ideas are useful.",
     ),
     2: dict(
         title="Could Jupiter be here?",
@@ -263,7 +271,7 @@ def _format_solar_system_table() -> pd.DataFrame:
     return pd.DataFrame({
         "Planet": table["Planet"],
         "Mass (Earth = 1)": table["Planet mass (Earth masses)"].map(format_mass),
-        "Orbital distance (AU)": table["Orbital distance (AU)"].map(format_distance),
+        "Distance from the Sun (AU)": table["Orbital distance (AU)"].map(format_distance),
     })
 
 
@@ -422,29 +430,35 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
     """Render the existing Year 8 lesson text and interactions for one step."""
     d = dependencies
     if part == 0:
-        st.header("How different can planets and planetary systems be from our Solar System?")
+        st.header("The system we knew")
         with media_text_pair(
-            d.exoplanet_image_path,
+            d.solar_system_image_path,
             role="context",
-            caption=(
-                "Artist's concepts imagining the variety of exoplanets. These are illustrations, not photographs. "
-                "Credit: NASA/JPL-Caltech"
-            ),
+            caption="Our Solar System. Credit: NASA/JPL-Caltech",
             key="year8_welcome",
         ):
             st.write(
-                "Our Solar System is one planetary system. Astronomers have observations and data for thousands "
-                "of planets orbiting other stars."
+                "For most of human history, there was only one planetary system we could study properly: ours."
             )
-        st.write("We will use data to investigate how different planets and planetary systems can be from our Solar System.")
-        st.caption("The detected catalogue is substantial, but it is not every planet that exists.")
+        st.write(
+            "It has small rocky planets close to the Sun and giant planets farther out. Rather organised, really—"
+            "so it was sensible to expect another planetary system might look similar."
+        )
+        predict_prompt("Looking at our Solar System, what would you expect another planetary system to look like?")
     elif part == 1:
-        st.header("Step 1: Our Solar System as data")
-        st.write("Our eight planets are a small, readable dataset. This table describes our Solar System, not a universal rule for planetary systems.")
-        st.write("**1 AU is the average distance from Earth to the Sun.** Astronomers use AU to compare distances within planetary systems.")
+        st.header("Step 1: Our Solar System as evidence")
+        st.write("Start with two quantities we can use to describe the planets: planet mass and distance from the Sun.")
+        st.write("**Astronomers use AU to compare distances in planetary systems. Earth is 1 AU from the Sun.**")
         st.write("Mass tells us how much matter a planet contains. It is not the same as physical size.")
         st.dataframe(_format_solar_system_table(), hide_index=True, width="stretch")
-        notice_prompt("What simple comparisons can you make between the planets' masses and orbital distances?")
+        notice_prompt("What do you notice? Which planets are heavy? Which are close to the Sun? Which are far away?")
+        with st.container(border=True):
+            st.subheader("A reasonable formation story")
+            st.write(
+                "Scientists developed a sensible explanation for why the small rocky planets are nearer the Sun and "
+                "the giant planets are farther out."
+            )
+            st.caption("Brief formation visual placeholder: this will show that explanation without adding detailed formation physics.")
     elif part == 2:
         st.header("Step 2: Could Jupiter be here?")
         st.write("In our Solar System, the giant planet Jupiter is far from the Sun, while Mercury is much closer.")
