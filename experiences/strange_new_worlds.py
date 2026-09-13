@@ -22,7 +22,7 @@ from ui_helpers import (
 STEP_LABELS = [
     "Welcome", "1 · Our Solar System as data", "2 · Could Jupiter be here?",
     "3 · Our Solar System isn't the only arrangement", "4 · Meet some real worlds", "5 · From individual planets to population patterns",
-    "6 · Add orbital distance", "7 · Compare planetary systems", "Conclusion",
+    "6 · How can we show both variables?", "7 · Compare planetary systems", "Conclusion",
 ]
 YEAR_LEVEL = "Year 8"
 PART_COUNT = len(STEP_LABELS)
@@ -91,7 +91,18 @@ TEACHER_BACKGROUNDS = {
         "This is the first move in increasing representational complexity: individual records → one-variable population "
         "representation → later two-variable representation."
     ),
-    6: "**Two variables and two scales**\n\nOrbital distance describes the typical size of a planet's orbit; one AU is the average Earth–Sun distance. A scatter plot locates one planet using mass and orbital distance. Linear axes use equal additions, while logarithmic axes use equal multiplications. The log–log version spreads out small values while retaining the giant planets. Students read ordinary labels and do not calculate logarithms.",
+    6: (
+        "**Why start with familiar data?**\n\n"
+        "- The Solar System keeps the first two-variable scatter plot scientifically familiar. A point locates each planet "
+        "using mass in Earth masses and orbital distance in AU.\n"
+        "- On linear axes, equal spaces mean equal additions. The wide range of these values makes some planets hard to "
+        "distinguish. The log–log view has the same planets, variables and values, but different spacing: equal spaces "
+        "mean equal multiplication.\n"
+        "- Students do not calculate logarithms. The job is to compare representations and decide which one makes all "
+        "eight planets easier to compare.\n\n"
+        "Listen for ‘same data, different spacing’ and for observations that the inner planets become easier to separate. "
+        "Do not expand into logarithm calculations, detailed maths notation, planet formation or detected-population patterns yet."
+    ),
     7: "**Checking the initial claim**\n\nThe final comparison graph puts thousands of detected exoplanets on the same axes as our Solar System. It offers stronger evidence than a few individual examples, but it is still a detected sample rather than an inventory of every planet that exists. Students should use a visible pattern to support, challenge or revise their Lesson 1 prediction.",
     8: "**A deliberately open ending**\n\nStudents should leave with an evidence-based understanding that planetary systems can be diverse and with a question worth pursuing. Optional interests may lead towards astronomy, planetary formation, atmospheres, spectra, astrobiology, philosophy, culture or science communication. These are engagement routes rather than additional Stage 4 requirements.",
 }
@@ -160,14 +171,14 @@ TEACHER_NOTE_OVERRIDES = {
         misconceptions="Each bar is 100% of its own group. The detected-exoplanet bar includes planets with relevant mass data, not every planet that exists; do not overinterpret it as the full underlying population.",
     ),
     6: dict(
-        title="Add orbital distance and change representation",
-        purpose="Interpret a two-variable scatter plot and explain why a log–log representation makes a wide range easier to see.",
+        title="How can we show both variables?",
+        purpose="Use familiar Solar System data to compare linear and log–log scatter representations, then explain which is more useful for comparing all eight planets.",
         timing="12 minutes (Lesson 2)",
-        facilitation="Use the linear graph to create a genuine visibility problem, then reveal the log–log graph as a representation choice. No logarithm calculations are required.",
-        alignment="SC4-DA1-01, SC4-WS-05 and SC4-WS-06: use representations to identify relationships in data.",
-        evidence="Students identify what becomes easier to distinguish after the scale changes.",
-        listen_for="The variables and values stay the same; only the spacing changes.",
-        misconceptions="The graph has not changed the planets or their real locations.",
+        facilitation="Use the linear graph to create a genuine visibility problem, then reveal the log–log graph as a representation choice. Linear spacing uses equal additions; logarithmic spacing uses equal multiplication. No logarithm calculations are required.",
+        alignment="SC4-DA1-01 and SC4-WS-05: use data representations to process and compare two quantitative variables, preparing students to communicate a conclusion on the next screen.",
+        evidence="Students identify that the same planets, variables and values are shown with different spacing, and explain what becomes easier to distinguish.",
+        listen_for="The inner planets are easier to separate on the log–log view, while the data themselves have not changed.",
+        misconceptions="The graph has not changed the planets or their real locations. Do not overclaim that the scatter plot is itself a full scientific model or expand into logarithm calculations.",
     ),
     7: dict(
         title="Compare planetary systems and check a claim",
@@ -252,6 +263,7 @@ _BROWSER_BUTTON_KEY = "year8_strange_new_worlds_browser_another"
 _BROWSER_SEEN_KEY = "year8_strange_new_worlds_browser_seen"
 _BROWSER_MINIMUM = 3
 _POPULATION_PREDICTION_KEY = "year8_strange_new_worlds_population_prediction"
+_SOLAR_SYSTEM_SCALE_REVEAL_KEY = "year8_strange_new_worlds_solar_system_log_scale_revealed"
 
 
 def _eligible_browser_planets(data: pd.DataFrame) -> pd.DataFrame:
@@ -511,26 +523,26 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             st.write("Compare the same labelled section in each complete bar. A wider section means a larger proportion of that group, not a larger planet or a larger raw total.")
         st.caption("This detected sample is not every planet that exists. Lesson 2 will later add orbital distance to the comparison.")
     elif part == 6:
-        st.header("Step 6: Add orbital distance")
-        st.write("Mass is not the only way to describe a planet. We can also ask how far it is from the star it orbits. One astronomical unit (AU) is the average distance from Earth to the Sun.")
-        st.subheader("First, try ordinary linear axes")
+        st.header("Step 6: How can we show both variables?")
+        st.write("A scatter plot can show each Solar System planet using both mass in Earth masses and orbital distance in AU.")
+        st.subheader("First: ordinary linear spacing")
         graph_reading_support("The horizontal axis shows orbital distance in AU. The vertical axis shows planet mass in Earth masses.", "Each labelled point is one Solar System planet. Farther right means farther from the Sun; higher means more massive.")
-        st.plotly_chart(d.solar_system_demographics_chart(False), use_container_width=True)
-        st.markdown("### Before you change the graph")
+        st.plotly_chart(d.solar_system_demographics_chart(False), width="stretch")
+        notice_prompt("Which planets are hard to distinguish on this graph? What makes them difficult to compare?")
         log_scale_revealed = d.hard_reveal(
-            "Jupiter and the distant outer planets set the scale, so the small inner planets bunch together near the bottom-left corner. How could we spread them out without losing the giant planets? Make a prediction, then reveal a second view of the **same data**.",
-            "year8_log_scale_revealed",
-            reveal_label="Reveal a new way to view the same data →",
-            revealed_message="**Same planets. Same variables. Different spacing.** A log scale spreads out the small values while keeping the giant planets on the same graph.",
-            explanation="The variables do not change: the graph still shows planet mass and orbital distance. On a log scale, equal spaces represent multiplication. For example, the gap from **0.1 to 1** is the same size as the gap from **1 to 10**. You do not need to calculate logarithms to read the graph.",
+            "The wide range of values makes the small inner planets bunch together. How could we spread them out without changing the data? Reveal a second view of the **same planets, variables and values**.",
+            _SOLAR_SYSTEM_SCALE_REVEAL_KEY,
+            reveal_label="Reveal a different spacing →",
+            revealed_message="**Same planets. Same variables. Same values. Different spacing.**",
+            explanation="On the log–log view, equal spaces represent multiplication rather than addition. You do not need to calculate logarithms to read the graph.",
         )
         if log_scale_revealed:
-            st.subheader("Now compare the log–log view")
-            d.graph_guide("The variables are the same, but equal spaces now represent multiplication rather than addition.", "Compare the positions of the inner planets and the outer giants.")
-            st.plotly_chart(d.solar_system_demographics_chart(True), use_container_width=True)
-            d.graph_questions("Which planets are easiest to compare on the log–log graph?", "What can you see on the log–log graph that was difficult to see on the linear graph?")
-            d.response_box(6, "What does the log–log graph help you say about the planets?", "“The linear graph shows…, but the log–log graph shows…” or “I can now see…”")
-            d.key_idea("Changing the graph scale can make patterns easier to see.", "Compare the inner planets before and after the scale changes: which view separates them most clearly?")
+            st.subheader("Now: log–log spacing")
+            st.write("The axes still show orbital distance in AU and mass in Earth masses. The values are unchanged; only the spacing is different.")
+            st.plotly_chart(d.solar_system_demographics_chart(True), width="stretch")
+            compare_prompt("Which version is more useful if you want to compare all eight planets? What becomes easier to see?")
+            with self_check("Check the representation choice"):
+                st.write("Both graphs show the same data. The log–log spacing makes the small inner planets easier to separate while keeping the giant outer planets visible.")
     elif part == 7:
         st.header("Step 7: Compare planetary systems")
         st.write("This graph adds detected exoplanets to the same mass-and-orbital-distance view as the Solar System planets. Use this larger dataset to support, challenge or change your Lesson 1 prediction.")
