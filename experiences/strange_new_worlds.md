@@ -160,13 +160,13 @@ Where relevant, learner/facilitator wording should distinguish recorded observat
 
 The representation sequence is deliberate:
 
-> understandable numerical/table data  
-> → individual scientific examples  
-> → one-variable population representation  
-> → individual catalogue records  
-> → prediction about a two-variable population  
-> → two-variable Solar System representation  
-> → larger detected exoplanet population  
+> understandable numerical/table data
+> → individual scientific examples
+> → individual catalogue records
+> → prediction about a two-variable population
+> → one-variable population representation
+> → two-variable Solar System representation
+> → larger detected exoplanet population
 > → evidence-based revision/conclusion
 
 The graph should appear because learners need a representation capable of showing many planets and/or two variables, not merely because this is a “data science” lesson.
@@ -175,7 +175,7 @@ Early screens should therefore carry **low representation load**. Learners first
 
 ---
 
-# Lesson 1 — Our Solar System is not the only blueprint
+# Lesson 1 — Understand the evidence and make a prediction
 
 ## Screen 0 — Welcome: How different can planetary systems be?
 
@@ -459,14 +459,80 @@ Illustration/poster + concise real data/context is appropriate because the cogni
 
 **Connection forward**
 
-Screen 4 asks a new epistemic question: a few memorable examples tell us what is possible, but what does a larger dataset show?
+Screen 4 reconnects the earlier examples to several individual catalogue records, then asks learners to make a prediction from all of the Lesson 1 evidence.
 
 ---
 
-## Screen 4 — From examples to data
+## Screen 4 — Meet some real worlds
 
 **Main cognitive job**  
-Move from individual examples to a larger population representation and make an evidence-based comparison.
+Use the two established variables to interpret individual real observations, then commit to a tentative prediction before seeing the larger two-variable population.
+
+**Science learning**
+
+Each catalogue record corresponds to a real detected exoplanet with recorded mass and orbital distance. Real worlds vary substantially in both quantities.
+
+**Data-science / Working Scientifically learning**
+
+- individual records are the objects from which population representations are built;
+- observations can be used to form an expectation that later evidence can test.
+
+**Evidence presented**
+
+A lightweight real-planet browser adapted from the useful Planet Shopping interaction pattern. Eligible records have usable values for **both** planet mass and orbital distance. Learners encounter at least three distinct planets.
+
+Each compact profile shows only:
+
+- planet name;
+- mass in Earth masses and a plain-language mass interpretation;
+- orbital distance in AU and a plain-language orbital-distance interpretation.
+
+Mass is not physical size. AU compares orbital distance with the Earth–Sun scale. Missing values are not learner content here: records missing either core value are excluded rather than treated as zero.
+
+**Learner action**
+
+NOTICE variation while browsing at least three distinct real worlds. Then PREDICT:
+
+> If we plotted lots of detected exoplanets by mass and orbital distance, what do you think the pattern would look like?
+
+The prediction draws on **all** Lesson 1 evidence—the Solar System table, the hot-Jupiter observation, the two system arrangements, and the real-world browser—not merely the three browsed records. Persist it for recall in Lesson 2. There is no single correct prediction.
+
+**Evidence of learning**
+
+Students describe how encountered planets differ using mass and/or orbital distance, then make a short evidence-informed expectation that can be supported, challenged or revised later.
+
+**Facilitator move**
+
+Keep browsing playful but bounded. It is not a destination choice, filtering task or formal sampling lesson. Keep the prediction tied to the two variables and forthcoming population representation rather than the vague claim that “planets are diverse”.
+
+**Listen for**
+
+Surprise at the range of real values, direct comparisons between records, and predictions about spread, clusters, massive close-in planets, overlap with Solar System planets, or sparse/dense regions.
+
+**Likely misconception / boundary**
+
+The few planets encountered are not a representative sample of all planets. Do not introduce detection-bias explanations to justify predictions.
+
+**Representation / interaction**
+
+Compact individual record/profile followed by a short persisted prediction. Reuse shared machinery where appropriate, but do not import Planet Shopping’s filtering or choice pedagogy.
+
+**Approximate timing**
+
+13–15 minutes.
+
+**Lesson boundary**
+
+This is the planned **end of Lesson 1**. The learner should understand the variables, have used them to interpret real observations, and have committed to an evidence-informed expectation that Lesson 2 can test.
+
+---
+
+# Lesson 2 — Turn lots of data into evidence
+
+## Screen 5 — From individual planets to population patterns
+
+**Main cognitive job**  
+Move from individual records and examples to a one-variable population representation and make an evidence-based comparison.
 
 **Science learning**
 
@@ -475,7 +541,7 @@ Detected exoplanets include a different mix of planet masses from our eight Sola
 **Data-science learning**
 
 - individual examples establish possibility;
-- a larger dataset is needed to investigate broader patterns;
+- population data allow broader patterns to be investigated;
 - proportions allow comparison between groups with very different numbers of records.
 
 **Evidence presented**
@@ -510,162 +576,19 @@ One-variable population representation.
 
 **Why it belongs here**
 
-Students have enough scientific context to care about the population, but the representation still asks them to reason about one variable at a time.
+The former end-of-Lesson-1 mass comparison now begins Lesson 2 because its cognitive job is population evidence, not individual-observation interpretation.
 
 **Approximate timing**
 
 10–12 minutes.
 
-**Lesson boundary**
-
-This is the planned **end of Lesson 1**.
-
-### Lesson 1 arc
-
-> familiar Solar System data  
-> → prediction  
-> → surprising observation  
-> → broadened planetary-system examples  
-> → population evidence
-
-The learner should leave Lesson 1 knowing that our Solar System is not a universal blueprint and that larger datasets provide stronger evidence about broad patterns than memorable examples alone.
-
----
-
-# Lesson 2 — What does the larger dataset show?
-
-## Screen 5 — Meet some real worlds
-
-**Main cognitive job**  
-Reconnect abstract catalogue data to real objects before increasing representational complexity.
-
-**Science learning**
-
-Each catalogue record corresponds to a real detected exoplanet with recorded properties. Real worlds vary substantially in mass and orbital distance.
-
-**Data-science learning**
-
-Individual records are the objects from which population representations are built.
-
-**Evidence presented**
-
-A lightweight real-planet browser adapted from the useful Planet Shopping interaction pattern. Learners should encounter several distinct real catalogue planets.
-
-Core profile fields:
-
-- mass;
-- orbital distance.
-
-Additional properties are optional only if they materially support the learning goal and are scientifically/data-wise reliable.
-
-**Learner action**
-
-Browse several real worlds and NOTICE variation in the core quantities.
-
-**Evidence of learning**
-
-Students can describe how two encountered planets differ using mass and/or orbital distance.
-
-**Facilitator move**
-
-Keep the browsing playful but bounded. The purpose is not to choose a destination and not to teach formal random sampling.
-
-**Listen for**
-
-Surprise at the range of real values and comparisons between planets.
-
-**Likely misconception / boundary**
-
-The few planets encountered are not a representative sample of all planets. Do not turn this into formal sampling instruction; simply avoid claims based on the handful alone.
-
-**Facilitator background**
-
-The implementation should preserve missing values honestly. Unknown data must not be treated as zero or as evidence that a property is absent.
-
-**Representation / interaction**
-
-Compact individual record/profile. Reuse shared machinery where appropriate, but do not import Planet Shopping’s filtering or choice pedagogy.
-
-**Approximate timing**
-
-8–10 minutes.
-
-**OPEN — implementation detail**
-
-- minimum number of distinct planets to browse;
-- exact profile fields beyond mass and orbital distance;
-- whether any small interpretation text accompanies values.
-
 **Connection forward**
 
-Screen 6 converts these encounters into an explicit prediction that the larger two-variable population can later test.
+Screen 6 introduces the two-variable representation needed to test the earlier prediction.
 
 ---
 
-## Screen 6 — What do you expect the larger dataset to look like?
-
-**Main cognitive job**  
-Commit to a tentative evidence-informed prediction before seeing the larger two-variable population.
-
-**Science learning**
-
-Planetary diversity can be expressed through combinations of mass and orbital distance.
-
-**Data-science / Working Scientifically learning**
-
-Generate a prediction that can be checked against a larger dataset.
-
-**Evidence presented**
-
-Learners draw on:
-
-- the Solar System table;
-- the hot-Jupiter counterexample;
-- the additional planetary systems;
-- the mass-distribution comparison;
-- several individual real planet records.
-
-**Learner action**
-
-PREDICT what they expect to see when many detected exoplanets are represented using both mass and orbital distance.
-
-There is no single correct prediction.
-
-**Evidence of learning**
-
-A short prediction or expectation that can later be supported, challenged or revised.
-
-**Facilitator move**
-
-Keep the prediction tied to the variables and forthcoming representation. Avoid the vague claim “planets are diverse”.
-
-**Listen for**
-
-Predictions about spread, clusters, massive close-in planets, overlap with Solar System planets, or regions learners expect to be sparse/dense.
-
-**Boundary**
-
-Do not introduce detection-bias explanations to justify predictions.
-
-**Representation**
-
-No new graph yet. The intellectual point is to make thinking visible before the evidence appears.
-
-**Approximate timing**
-
-5 minutes.
-
-**OPEN — implementation detail**
-
-Exact prompt and response persistence mechanism.
-
-**Connection forward**
-
-Screen 7 introduces the representation needed to plot both variables together.
-
----
-
-## Screen 7 — How can we show both variables?
+## Screen 6 — How can we show both variables?
 
 **Main cognitive job**  
 Understand why a two-variable representation and a change of axis scale are useful for these data.
@@ -686,7 +609,7 @@ Solar System mass × orbital distance data only, first on ordinary linear axes a
 
 **Learner action**
 
-NOTICE the visibility problem on linear axes, predict/consider how it might be improved, reveal the log–log representation, and compare what becomes easier to distinguish.
+NOTICE the visibility problem on linear axes, predict/consider how it might be improved, reveal the log–log representation, and compare which view is more useful and what becomes easier to distinguish.
 
 **Evidence of learning**
 
@@ -726,11 +649,11 @@ Learners already know both variables and have made a prediction about their join
 
 **Connection forward**
 
-Screen 8 keeps the same representation and adds the larger detected-exoplanet population to test the earlier prediction.
+Screen 7 keeps the same representation and adds the larger detected-exoplanet population to test the Lesson 1 prediction.
 
 ---
 
-## Screen 8 — Now add the detected population
+## Screen 7 — Now add the detected population
 
 **Main cognitive job**  
 Use a larger dataset to test, support, challenge or revise the earlier prediction.
@@ -763,7 +686,7 @@ Students connect a visible feature of the larger dataset to an explicit change, 
 
 **Facilitator move**
 
-Return students to their Screen 6 prediction. The intellectual payoff is revision, not merely looking at a dense scatter plot.
+Return students to their Lesson 1 prediction from Screen 4. The intellectual payoff is revision, not merely looking at a dense scatter plot.
 
 **Listen for**
 
@@ -799,7 +722,7 @@ The conclusion connects the evidence/revision story back to how observations cha
 
 ---
 
-## Conclusion — New observations changed the picture
+## Screen 8 — Conclusion: New observations changed the picture
 
 **Main cognitive job**  
 Communicate the evidence-based scientific/data-science story of the experience.
@@ -841,30 +764,50 @@ Do not turn the close into a preview lecture on detection bias, habitability or 
 
 # Lesson architecture summary
 
-## Lesson 1 — Our Solar System is not the only blueprint
+The lesson break follows **cognitive jobs**, not old screen numbering or arbitrary timing. It makes the change from understanding and predicting from observations to testing with increasingly powerful representations explicit.
 
-> question  
-> → familiar Solar System data  
-> → prediction  
-> → hot-Jupiter counterexample  
-> → additional system arrangements  
-> → larger one-variable population evidence
+## Lesson 1 — Understand the evidence and make a prediction
+
+> investigation question
+> → Solar System mass and orbital-distance table
+> → hot-Jupiter prediction, observation and revision
+> → Kepler-16 b and TRAPPIST-1 arrangements
+> → browse at least three real worlds
+> → persisted prediction about a mass × orbital-distance population
+
+Lesson 1 emphasises:
+
+- understanding scientific variables and data;
+- interpreting individual observations;
+- questioning and predicting;
+- revising expectations from new evidence.
 
 Primary payoff:
 
-> **Our Solar System is useful evidence, but it is not a universal blueprint. A few examples show what is possible; a larger dataset begins to show broader patterns.**
+> **Students understand the variables, have used them to interpret real observations, and have committed to an evidence-informed expectation that can later be tested.**
 
-## Lesson 2 — What does the larger dataset show?
+## Lesson 2 — Turn lots of data into evidence
 
-> individual real catalogue records  
-> → prediction about the two-variable population  
-> → representation problem/solution  
-> → larger detected population  
+> one-variable Solar System versus detected-population comparison
+> → two-variable Solar System representation problem and log–log solution
+> → detected population on the same representation
 > → test/revise conclusion
+> → short synthesis
+
+Lesson 2 emphasises:
+
+- moving from records to population evidence;
+- representing one and then two quantitative variables;
+- representation choice;
+- identifying patterns;
+- testing an earlier prediction against a larger dataset;
+- revising and communicating a conclusion.
+
+Graphs support representation, comparison and pattern reasoning here. Do not overclaim that graphs automatically constitute scientific models; retain the conservative DA1 framing of using observations and data to identify patterns and communicate evidence-based conclusions.
 
 Primary payoff:
 
-> **Scientists use representations and larger datasets to test expectations and build a richer picture from observations.**
+> **New observations changed expectations about planetary systems; organising observations as data allowed scientists to identify patterns, test predictions and develop a richer understanding.**
 
 ---
 
@@ -946,17 +889,6 @@ These are intentionally unresolved and should not be silently decided during mec
 - final two additional planetary-system examples;
 - which existing NASA/JPL poster assets are core versus optional enrichment.
 
-**OPEN — Screen 5**
-
-- minimum number of distinct real planets learners should browse;
-- exact profile fields beyond mass and orbital distance;
-- treatment of missing mass/distance for the browsing pool.
-
-**OPEN — Screen 6**
-
-- exact prediction prompt;
-- how the learner’s prediction is persisted/recalled on Screen 8.
-
 **OPEN — implementation architecture**
 
 - which Planet Shopping helpers should be generalised/reused rather than duplicated;
@@ -983,12 +915,12 @@ Preferred sequence:
    - Solar System table/data;
    - hot-Jupiter prediction/reveal;
    - additional system examples;
-   - mass population comparison;
+   - real-world browser;
+   - persisted two-variable population prediction;
    - matching live facilitator notes.
 
 3. **Lesson 2 rebuild**
-   - real-world browser;
-   - explicit population prediction;
+   - mass population comparison;
    - two-variable representation / linear→log transition;
    - larger population test/revision;
    - conclusion;
