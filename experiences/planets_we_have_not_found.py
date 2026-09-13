@@ -435,7 +435,7 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
         st.caption("Running total of confirmed exoplanets in the NASA Exoplanet Archive.")
         st.markdown(
             "### Our question\n"
-            "How do the sizes of detected exoplanets compare with planets in our Solar System?"
+            "How do the masses of detected exoplanets compare with planets in our Solar System?"
         )
         graph_reading_support(
             "The top bar is our Solar System. The bottom bar is the detected exoplanets that can be placed in these mass groups.",
@@ -448,15 +448,15 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             st.plotly_chart(figure, use_container_width=True)
         st.caption("**Hover over a section—or tap it on a touchscreen—to see its percentage and planet count.**")
         d.graph_questions(
-            "Which planet-size group takes up the most space in each bar?",
-            "Which planet-size group looks most different between the two bars?",
+            "Which planet-mass group takes up the most space in each bar?",
+            "Which planet-mass group looks most different between the two bars?",
         )
         d.response_box(
             2,
             "What do the bars tell us about how the two planet groups are similar or different?",
             "“The two bars are similar because…” or “They are different because…”",
         )
-        d.key_idea("Detected exoplanets have a different mix of sizes from the planets in our Solar System.", "Compare the same labelled section in the two bars, especially the widest section in each.")
+        d.key_idea("Detected exoplanets have a different mix of masses from the planets in our Solar System.", "Compare the same labelled section in the two bars, especially the widest section in each.")
     # YEAR 10 STEP 4 — Are our planets typical?
     elif part == 4:
         st.header("Step 4: Are planets in other systems like ours?")

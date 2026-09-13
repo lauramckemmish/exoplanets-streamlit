@@ -102,7 +102,7 @@ def render(data: pd.DataFrame, terminal_action) -> None:
         figure = planet_mass_distribution_chart(data, include_exoplanets=False)
         if figure is not None:
             st.plotly_chart(figure, use_container_width=True)
-        think_q("Which size groups contain the Solar System planets?")
+        think_q("Which mass groups contain the Solar System planets?")
         key_idea("Planet mass gives us one measurable way to compare planets.", "Which labelled mass groups contain our eight planets, and which group contains the most?")
     elif part == 2:
         st.header("Step 2: Meet exoplanets")
@@ -114,7 +114,7 @@ def render(data: pd.DataFrame, terminal_action) -> None:
         figure = planet_mass_distribution_chart(data)
         if figure is not None:
             st.plotly_chart(figure, use_container_width=True)
-        think_q("Which planet-size group looks most different between the two bars?", key="curious_exoplanet_comparison_think")
+        think_q("Which planet-mass group looks most different between the two bars?", key="curious_exoplanet_comparison_think")
         key_idea("Detected exoplanets give us a population to compare with our Solar System.", "Compare the widest labelled section in the top bar with the widest section in the bottom bar.")
     elif part == 3:
         st.header("Step 3: Mass and orbital distance")

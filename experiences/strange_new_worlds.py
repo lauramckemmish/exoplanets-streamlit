@@ -114,7 +114,7 @@ TEACHER_NOTE_OVERRIDES = {
         title="Compare planet-mass distributions",
         purpose="Compare two 100% bar representations and communicate a similarity or difference supported by the graph.",
         timing="15 minutes (Lesson 1)",
-        facilitation="Remind students that each complete bar represents a different-sized group. Model comparing the same labelled section across the two bars.",
+        facilitation="Remind students that each complete bar represents a different planet group. Model comparing the same labelled mass section across the two bars.",
         alignment="SC4-WS-05, SC4-WS-06 and SC4-WS-08: represent data, identify patterns and communicate conclusions.",
         evidence="Students make a comparison and refer to a labelled mass group as evidence.",
         listen_for="A comparison of proportions rather than raw totals, because one group has eight planets and the other has thousands.",
@@ -249,7 +249,7 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
         )
         graph_reading_support(
             "The whole bar represents all eight Solar System planets, from 0% to 100%.",
-            "Each coloured section is one planet-size group. A wider section contains a larger share of the planets.",
+            "Each coloured section is one planet-mass group. A wider section contains a larger share of the planets.",
         )
         solar_figure = d.planet_mass_distribution_chart(data, include_exoplanets=False)
         if solar_figure is not None:
