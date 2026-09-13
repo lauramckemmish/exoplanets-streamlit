@@ -12,7 +12,6 @@ from charts import (
     solar_system_demographics_chart,
 )
 from ui_helpers import (
-    choice_reveal,
     data_detective_challenge,
     graph_guide,
     graph_reading_support,
@@ -185,19 +184,17 @@ def render(data: pd.DataFrame) -> None:
             title="Pause and discuss:",
         )
         st.markdown("### A cautious conclusion\nThe detected catalogue contains real patterns: planetary systems contain worlds with many different masses and orbital distances, and different graph scales can help us see them. But the catalogue is shaped by how astronomers find planets, so it is not a complete census of every planetary system that exists.\n\nWe can compare our Solar System with the detected planets, but mass and orbital distance alone cannot decide whether a whole planetary system is ‘normal’.")
-        next_directions = {
-            "How planetary systems form": "What processes might make one planetary system look very different from another?",
-            "How astronomers search for life": "What extra evidence, beyond mass and orbital distance, would scientists need to investigate a planet’s atmosphere or possible conditions for life?",
-            "Future telescopes and missions": "Which new observations could help find planets that are currently difficult to detect?",
-            "Other worlds in culture and imagination": "How have people imagined worlds beyond our Solar System in stories, art or film?",
-        }
-        choice_reveal(
-            "Choose a direction to explore next\nPick any option that interests you. You do not "
-            "need to explore them all.",
-            next_directions,
-            "curious_next_directions",
-            label="Choose one or more directions",
-        )
+        with soft_reveal("How planetary systems form"):
+            st.write("What processes might make one planetary system look very different from another?")
+        with soft_reveal("How astronomers search for life"):
+            st.write(
+                "What extra evidence, beyond mass and orbital distance, would scientists need to investigate a "
+                "planet’s atmosphere or possible conditions for life?"
+            )
+        with soft_reveal("Future telescopes and missions"):
+            st.write("Which new observations could help find planets that are currently difficult to detect?")
+        with soft_reveal("Other worlds in culture and imagination"):
+            st.write("How have people imagined worlds beyond our Solar System in stories, art or film?")
 
     step_buttons(
         STEP_LABELS,
