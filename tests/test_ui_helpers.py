@@ -117,6 +117,14 @@ class SharedInteractionContractTests(unittest.TestCase):
         self.assertIn("<p class='interaction-marker'>THINK</p>", stub.markdown_calls)
         self.assertIn("Consider the evidence.", stub.markdown_calls)
 
+    def test_think_accepts_a_unique_container_key(self):
+        stub = _StreamlitStub()
+        with patch.object(ui_helpers, "st", stub):
+            ui_helpers.think_q("First prompt", key="first_think")
+            ui_helpers.think_q("Second prompt", key="second_think")
+
+        self.assertEqual(stub.container_keys, ["first_think", "second_think"])
+
     def test_hard_reveal_uses_a_neutral_reveal_marker(self):
         stub = _StreamlitStub()
         with patch.object(ui_helpers, "st", stub):

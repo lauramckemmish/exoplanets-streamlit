@@ -160,10 +160,10 @@ def persistent_reveal(
     )
 
 
-def think_q(prompt: str, *, title: str = "Think") -> None:
+def think_q(prompt: str, *, title: str = "Think", key: str = "think_q") -> None:
     """Render a visible, non-blocking reasoning cue."""
     del title  # Retained for compatibility; THINK is the shared visual marker.
-    with st.container(key="think_q"):
+    with st.container(key=key):
         st.markdown("<p class='interaction-marker'>THINK</p>", unsafe_allow_html=True)
         st.markdown(prompt)
 

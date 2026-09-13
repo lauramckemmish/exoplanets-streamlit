@@ -109,13 +109,13 @@ def render(data: pd.DataFrame) -> None:
         st.header("Step 2: Meet exoplanets")
         st.info("An **exoplanet** is a planet that orbits a star other than the Sun. The first confirmed exoplanets were discovered in 1992; now astronomers have a catalogue containing thousands.")
         with media_text_pair(PLANETARY_SYSTEMS_IMAGE_PATH, role="context", caption="The Sun is a star, and our Solar System is one planetary system. Exoplanets belong to other planetary systems.", key="curious_planetary_systems"):
-            think_q("What might another planetary system look like? Could it have more planets, fewer planets, or even two stars?")
+            think_q("What might another planetary system look like? Could it have more planets, fewer planets, or even two stars?", key="curious_exoplanet_systems_think")
             st.write("A few decades ago, astronomers had almost no planets around other stars to compare. Now we can start to ask what the detected population looks like.")
         graph_guide("The top bar is our Solar System; the bottom bar is detected exoplanets.", "Compare sections with the same label. Each complete bar represents 100% of its group.")
         figure = planet_mass_distribution_chart(data)
         if figure is not None:
             st.plotly_chart(figure, use_container_width=True)
-        think_q("Which planet-size group looks most different between the two bars?")
+        think_q("Which planet-size group looks most different between the two bars?", key="curious_exoplanet_comparison_think")
         key_idea("Detected exoplanets give us a population to compare with our Solar System.", "Compare the widest labelled section in the top bar with the widest section in the bottom bar.")
     elif part == 3:
         st.header("Step 3: Mass and orbital distance")
