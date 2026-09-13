@@ -19,7 +19,7 @@ from ui_helpers import (
 
 STEP_LABELS = [
     "Welcome", "1 · Our Solar System as data", "2 · Could Jupiter be here?",
-    "3 · Our Solar System isn't the only arrangement", "4 · Compare planet masses", "5 · Strange new worlds",
+    "3 · Our Solar System isn't the only arrangement", "4 · From examples to data", "5 · Strange new worlds",
     "6 · Add orbital distance", "7 · Compare planetary systems", "Conclusion",
 ]
 YEAR_LEVEL = "Year 8"
@@ -67,7 +67,16 @@ TEACHER_BACKGROUNDS = {
         "Keep the comparison concrete and avoid circumbinary mechanics, formation theory, detection methods, or a "
         "long catalogue of unusual systems."
     ),
-    4: "**Why use 100% bars?**\n\nOur Solar System has only eight planets, while the detected sample contains thousands. Raw counts would make direct comparison difficult. Converting each group to percentages asks a fairer question: what proportion of each group falls into each mass category? The categories are instructional bins rather than official planet classes, and planets without the required mass estimate cannot be placed in them.",
+    4: (
+        "**From memorable examples to population evidence**\n\n"
+        "- The earlier systems showed what is possible. This 100% bar chart asks a broader question about the detected "
+        "exoplanets that have the mass data needed for these established bins.\n"
+        "- Our Solar System has eight planets while the detected sample has many more. Percentages make the comparison "
+        "fair: each full bar represents its own group, and matching mass groups can be compared directly.\n"
+        "- The graph is not a census of every planet that exists. Do not turn this boundary into a detection-bias lesson.\n\n"
+        "This is the conceptual end of Lesson 1: familiar Solar System data → prediction → surprising observation → "
+        "other possible arrangements → population evidence."
+    ),
     5: "**Strange worlds as a starting point**\n\nThe NASA/JPL travel poster is an artist's illustration based on a real planetary system. Kepler-16 b orbits two stars, while 51 Pegasi b is a giant planet close to its star and TRAPPIST-1 is a compact multi-planet system. These examples are intended to spark an initial claim, not to prove how common each arrangement is.",
     6: "**Two variables and two scales**\n\nOrbital distance describes the typical size of a planet's orbit; one AU is the average Earth–Sun distance. A scatter plot locates one planet using mass and orbital distance. Linear axes use equal additions, while logarithmic axes use equal multiplications. The log–log version spreads out small values while retaining the giant planets. Students read ordinary labels and do not calculate logarithms.",
     7: "**Checking the initial claim**\n\nThe final comparison graph puts thousands of detected exoplanets on the same axes as our Solar System. It offers stronger evidence than a few individual examples, but it is still a detected sample rather than an inventory of every planet that exists. Students should use a visible pattern to support, challenge or revise their Step 5 claim.",
@@ -118,14 +127,14 @@ TEACHER_NOTE_OVERRIDES = {
         misconceptions="The NASA/JPL artwork is illustration, not photography. These two examples establish possibility, not frequency; do not expand into circumbinary mechanics, formation theory or detection methods.",
     ),
     4: dict(
-        title="Compare planet-mass distributions",
-        purpose="Compare two 100% bar representations and communicate a similarity or difference supported by the graph.",
-        timing="15 minutes (Lesson 1)",
-        facilitation="Remind students that each complete bar represents a different planet group. Model comparing the same labelled mass section across the two bars.",
-        alignment="SC4-WS-05, SC4-WS-06 and SC4-WS-08: represent data, identify patterns and communicate conclusions.",
-        evidence="Students make a comparison and refer to a labelled mass group as evidence.",
-        listen_for="A comparison of proportions rather than raw totals, because one group has eight planets and the other has thousands.",
-        misconceptions="A wider section represents a larger proportion of that group, not a physically wider planet.",
+        title="From examples to data",
+        purpose="Compare matching mass groups in two proportional bars and use the population evidence to make one supported similarity or difference statement.",
+        timing="10–12 minutes (end of Lesson 1)",
+        facilitation="Name the Lesson 1 arc: familiar Solar System data → prediction → surprising observation → other possible arrangements → population evidence. Model one comparison between matching mass groups, then invite evidence-supported statements without treating the graph as a census of all planets.",
+        alignment="SC4-DA1-01, SC4-WS-05 and SC4-WS-06: use a proportional representation to compare a detected population and communicate a conclusion.",
+        evidence="Students make at least one similarity or difference statement supported by matching mass groups in the graph.",
+        listen_for="Comparisons of proportions rather than raw totals, and recognition that the earlier examples showed possibilities while the graph supports a broader pattern claim.",
+        misconceptions="Each bar is 100% of its own group. The detected-exoplanet bar includes planets with relevant mass data, not every planet that exists; do not overinterpret it as the full underlying population.",
     ),
     5: dict(
         title="Generate an initial claim from strange worlds",
@@ -324,8 +333,9 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             st.write("Kepler-16 b shows that a planet can orbit two stars. TRAPPIST-1 shows that many planets can be packed into a much smaller orbital region than in our Solar System.")
         st.caption("These individual systems show what is possible. They do not tell us how common either arrangement is.")
     elif part == 4:
-        st.header("Step 4: Compare planet masses")
-        st.write("We have met a few individual planetary systems. Now we can use the larger NASA dataset to ask whether the detected exoplanets have the same mix of planet masses as our Solar System.")
+        st.header("Step 4: From examples to data")
+        st.write("The systems we met show what is possible. A larger dataset lets us look for broader patterns.")
+        st.write("This chart compares our Solar System with detected exoplanets that have the mass data needed for these groups.")
         graph_reading_support(
             "The top bar is our Solar System. The bottom bar is the detected exoplanets that can be placed in these mass groups.",
             "Each bar represents 100% of its group. Compare sections carrying the same label.",
@@ -334,11 +344,11 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
         if figure is None:
             st.warning("No planets have the mass data needed for this graph.")
         else:
-            st.plotly_chart(figure, use_container_width=True)
-        d.graph_questions("Which planet-mass group takes up the most space in each bar?", "Which group looks most different between our Solar System and the detected exoplanets?")
-        d.response_box(4, "What is one similarity or difference between the two groups?", "“The groups are similar because…” or “They are different because…”")
-        d.key_idea("A larger dataset helps us move from individual examples to patterns across many planets.", "Compare the widths of matching mass groups, not the raw number of planets in each group.")
-        st.info("### Suggested end of Lesson 1\nLesson 2 adds orbital distance and asks how strange planetary systems can be.")
+            st.plotly_chart(figure, width="stretch")
+        compare_prompt("Compare matching mass groups. What is one similarity or difference between our Solar System and the detected exoplanets that the bars support?")
+        with self_check("Check your comparison"):
+            st.write("Compare the same labelled section in each complete bar. A wider section means a larger proportion of that group, not a larger planet or a larger raw total.")
+        st.caption("This detected sample is not every planet that exists. Lesson 2 will add orbital distance to the comparison.")
     elif part == 5:
         st.header("Step 5: Strange new worlds")
         st.caption("Lesson 2 starts here")

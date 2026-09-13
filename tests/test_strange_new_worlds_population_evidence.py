@@ -1,0 +1,71 @@
+"""Focused checks for the Screen 4 population-evidence transition."""
+
+import unittest
+from contextlib import nullcontext
+from pathlib import Path
+from unittest.mock import patch
+
+import pandas as pd
+
+from experiences import strange_new_worlds
+
+
+class _StreamlitRecorder:
+    def __init__(self, events):
+        self.events = events
+
+    def __getattr__(self, name):
+        def record(*args, **kwargs):
+            self.events.append((name, args, kwargs))
+        return record
+
+
+class _Dependencies:
+    def __init__(self, events):
+        self.events = events
+
+    def planet_mass_distribution_chart(self, data):
+        self.events.append(("mass_chart", (data,), {}))
+        return "mass-distribution-figure"
+
+
+class StrangeNewWorldsPopulationEvidenceTests(unittest.TestCase):
+    def test_screen_reuses_mass_chart_with_compare_and_self_check(self):
+        events = []
+        data = pd.DataFrame({"Planet mass (Earth masses)": [1.0]})
+        with (
+            patch.object(strange_new_worlds, "st", _StreamlitRecorder(events)),
+            patch.object(strange_new_worlds, "compare_prompt", lambda prompt: events.append(("compare", (prompt,), {}))),
+            patch.object(strange_new_worlds, "self_check", lambda label: nullcontext()),
+        ):
+            strange_new_worlds.render_lesson(data, 4, _Dependencies(events))
+
+        names = [event[0] for event in events]
+        self.assertIn("mass_chart", names)
+        self.assertIn("compare", names)
+        self.assertIn("plotly_chart", names)
+        self.assertLess(names.index("mass_chart"), names.index("compare"))
+        self.assertNotIn("response_box", names)
+
+    def test_discovery_chart_is_preserved_but_not_rendered_in_year8_screen_three(self):
+        charts_source = Path("charts.py").read_text()
+        experience_source = Path("experiences/strange_new_worlds.py").read_text()
+
+        self.assertIn("def discoveries_by_year_chart", charts_source)
+        screen_three = experience_source.split("elif part == 3:", 1)[1].split("elif part == 4:", 1)[0]
+        self.assertNotIn("discoveries_by_year_chart", screen_three)
+        self.assertNotIn("Discoveries over time", strange_new_worlds.STEP_LABELS)
+
+    def test_facilitator_note_marks_lesson_one_population_evidence(self):
+        note = strange_new_worlds.TEACHER_NOTE_OVERRIDES[4]
+        background = strange_new_worlds.TEACHER_BACKGROUNDS[4]
+
+        self.assertEqual(note["title"], "From examples to data")
+        self.assertIn("end of Lesson 1", note["timing"])
+        self.assertIn("proportions", note["listen_for"])
+        self.assertIn("not every planet", note["misconceptions"])
+        self.assertIn("population evidence", background)
+
+
+if __name__ == "__main__":
+    unittest.main()
