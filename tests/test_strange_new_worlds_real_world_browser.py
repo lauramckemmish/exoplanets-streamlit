@@ -25,6 +25,10 @@ class _StreamlitRecorder:
             self.events.append((name, args, kwargs))
         return record
 
+    def text_area(self, *args, **kwargs):
+        self.events.append(("text_area", args, kwargs))
+        return self.session_state.get(kwargs["key"], "")
+
 
 class StrangeNewWorldsRealWorldBrowserTests(unittest.TestCase):
     def setUp(self):
@@ -76,10 +80,11 @@ class StrangeNewWorldsRealWorldBrowserTests(unittest.TestCase):
             patch.object(strange_new_worlds, "notice_prompt", lambda prompt: events.append(("notice", (prompt,), {}))),
             patch.object(strange_new_worlds, "completion_gate", lambda complete: events.append(("gate", (complete,), {}))),
         ):
-            strange_new_worlds.render_lesson(eligible_data, 5, object())
+            strange_new_worlds.render_lesson(eligible_data, 4, object())
 
         self.assertIn(("gate", (False,), {}), events)
         self.assertIn("notice", [event[0] for event in events])
+        self.assertNotIn("text_area", [event[0] for event in events])
         self.assertEqual(len(state[strange_new_worlds._BROWSER_SEEN_KEY]), 1)
 
     def test_profile_is_limited_to_the_two_core_variables(self):
@@ -96,8 +101,8 @@ class StrangeNewWorldsRealWorldBrowserTests(unittest.TestCase):
         self.assertNotIn("year length", rendered.lower())
 
     def test_facilitator_guidance_matches_the_browser_boundary(self):
-        note = strange_new_worlds.TEACHER_NOTE_OVERRIDES[5]
-        background = strange_new_worlds.TEACHER_BACKGROUNDS[5]
+        note = strange_new_worlds.TEACHER_NOTE_OVERRIDES[4]
+        background = strange_new_worlds.TEACHER_BACKGROUNDS[4]
 
         self.assertEqual(note["title"], "Meet some real worlds")
         self.assertIn("three distinct", note["purpose"])
@@ -105,10 +110,43 @@ class StrangeNewWorldsRealWorldBrowserTests(unittest.TestCase):
         self.assertIn("only mass and orbital distance", background)
 
         source = Path("experiences/strange_new_worlds.py").read_text()
-        screen_five = source.split("elif part == 5:", 1)[1].split("elif part == 6:", 1)[0].lower()
-        self.assertNotIn("holiday", screen_five)
-        self.assertNotIn("destination", screen_five)
-        self.assertNotIn("filter", screen_five)
+        screen_four = source.split("elif part == 4:", 1)[1].split("elif part == 5:", 1)[0].lower()
+        self.assertNotIn("holiday", screen_four)
+        self.assertNotIn("destination", screen_four)
+        self.assertNotIn("filter", screen_four)
+
+    def test_prediction_is_required_after_three_distinct_planets_and_uses_session_state(self):
+        events = []
+        state = {
+            strange_new_worlds._BROWSER_PLANET_KEY: "A b",
+            strange_new_worlds._BROWSER_SEEN_KEY: ["A b", "B b", "C b"],
+        }
+        data = pd.DataFrame(
+            {"pl_name": ["A b"], "pl_bmasse": [1.0], "pl_orbsmax": [1.0]}
+        )
+        with (
+            patch.object(strange_new_worlds, "st", _StreamlitRecorder(events, state)),
+            patch.object(strange_new_worlds, "notice_prompt", lambda prompt: events.append(("notice", (prompt,), {}))),
+            patch.object(strange_new_worlds, "completion_gate", lambda complete: events.append(("gate", (complete,), {}))),
+        ):
+            strange_new_worlds.render_lesson(data, 4, object())
+
+        text_area = next(event for event in events if event[0] == "text_area")
+        self.assertEqual(text_area[2]["key"], strange_new_worlds._POPULATION_PREDICTION_KEY)
+        self.assertEqual(text_area[2]["persist_state"], "session")
+        self.assertIn(("gate", (False,), {}), events)
+
+        state[strange_new_worlds._POPULATION_PREDICTION_KEY] = "I expect a wide spread of planets."
+        events.clear()
+        with (
+            patch.object(strange_new_worlds, "st", _StreamlitRecorder(events, state)),
+            patch.object(strange_new_worlds, "notice_prompt", lambda prompt: events.append(("notice", (prompt,), {}))),
+            patch.object(strange_new_worlds, "completion_gate", lambda complete: events.append(("gate", (complete,), {}))),
+        ):
+            strange_new_worlds.render_lesson(data, 4, object())
+
+        self.assertNotIn(("gate", (False,), {}), events)
+        self.assertEqual(state[strange_new_worlds._POPULATION_PREDICTION_KEY], "I expect a wide spread of planets.")
 
 
 if __name__ == "__main__":

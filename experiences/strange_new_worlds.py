@@ -21,7 +21,7 @@ from ui_helpers import (
 
 STEP_LABELS = [
     "Welcome", "1 · Our Solar System as data", "2 · Could Jupiter be here?",
-    "3 · Our Solar System isn't the only arrangement", "4 · From examples to data", "5 · Meet some real worlds",
+    "3 · Our Solar System isn't the only arrangement", "4 · Meet some real worlds", "5 · From individual planets to population patterns",
     "6 · Add orbital distance", "7 · Compare planetary systems", "Conclusion",
 ]
 YEAR_LEVEL = "Year 8"
@@ -70,28 +70,29 @@ TEACHER_BACKGROUNDS = {
         "long catalogue of unusual systems."
     ),
     4: (
-        "**From memorable examples to population evidence**\n\n"
-        "- The earlier systems showed what is possible. This 100% bar chart asks a broader question about the detected "
-        "exoplanets that have the mass data needed for these established bins.\n"
-        "- Our Solar System has eight planets while the detected sample has many more. Percentages make the comparison "
-        "fair: each full bar represents its own group, and matching mass groups can be compared directly.\n"
-        "- The graph is not a census of every planet that exists. Do not turn this boundary into a detection-bias lesson.\n\n"
-        "This is the conceptual end of Lesson 1: familiar Solar System data → prediction → surprising observation → "
-        "other possible arrangements → population evidence."
-    ),
-    5: (
         "**Why browse a few real worlds?**\n\n"
         "- Each compact profile is a real detected exoplanet record. Students meet at least three distinct planets before "
-        "moving on, so the later population prediction has real objects behind it.\n"
+        "making a tentative population prediction, so that prediction has real objects behind it.\n"
         "- The browser deliberately shows only mass and orbital distance: the two quantities that the next population "
         "representation will combine. Mass is not physical size, and AU compares orbital distance with the Earth–Sun scale.\n"
         "- Three records are enough for noticing variation, not for claiming what all planets are like. The pool excludes "
         "records without usable values for either core quantity.\n\n"
-        "Listen for comparisons such as ‘more massive’ or ‘closer to its star’. Do not expand into destination choices, "
-        "filtering, formal sampling, detection methods, temperature, size or year length."
+        "Name the Lesson 1 arc: understand the variables → encounter evidence that changes expectations → see different "
+        "system arrangements → inspect several real paired records → commit to a tentative prediction. Do not expand into "
+        "destination choices, filtering, formal sampling, detection methods, temperature, size or year length."
+    ),
+    5: (
+        "**From individual records to population evidence**\n\n"
+        "- The earlier examples and profiles showed real possibilities. This 100% bar chart begins Lesson 2 by asking a "
+        "broader question about the detected exoplanets that have the mass data needed for these established bins.\n"
+        "- Our Solar System has eight planets while the detected sample has many more. Percentages make the comparison "
+        "fair: each full bar represents its own group, and matching mass groups can be compared directly.\n"
+        "- The graph is not a census of every planet that exists. Do not turn this boundary into a detection-bias lesson.\n\n"
+        "This is the first move in increasing representational complexity: individual records → one-variable population "
+        "representation → later two-variable representation."
     ),
     6: "**Two variables and two scales**\n\nOrbital distance describes the typical size of a planet's orbit; one AU is the average Earth–Sun distance. A scatter plot locates one planet using mass and orbital distance. Linear axes use equal additions, while logarithmic axes use equal multiplications. The log–log version spreads out small values while retaining the giant planets. Students read ordinary labels and do not calculate logarithms.",
-    7: "**Checking the initial claim**\n\nThe final comparison graph puts thousands of detected exoplanets on the same axes as our Solar System. It offers stronger evidence than a few individual examples, but it is still a detected sample rather than an inventory of every planet that exists. Students should use a visible pattern to support, challenge or revise their Step 5 claim.",
+    7: "**Checking the initial claim**\n\nThe final comparison graph puts thousands of detected exoplanets on the same axes as our Solar System. It offers stronger evidence than a few individual examples, but it is still a detected sample rather than an inventory of every planet that exists. Students should use a visible pattern to support, challenge or revise their Lesson 1 prediction.",
     8: "**A deliberately open ending**\n\nStudents should leave with an evidence-based understanding that planetary systems can be diverse and with a question worth pursuing. Optional interests may lead towards astronomy, planetary formation, atmospheres, spectra, astrobiology, philosophy, culture or science communication. These are engagement routes rather than additional Stage 4 requirements.",
 }
 
@@ -139,24 +140,24 @@ TEACHER_NOTE_OVERRIDES = {
         misconceptions="The NASA/JPL artwork is illustration, not photography. These two examples establish possibility, not frequency; do not expand into circumbinary mechanics, formation theory or detection methods.",
     ),
     4: dict(
-        title="From examples to data",
-        purpose="Compare matching mass groups in two proportional bars and use the population evidence to make one supported similarity or difference statement.",
-        timing="10–12 minutes (end of Lesson 1)",
-        facilitation="Name the Lesson 1 arc: familiar Solar System data → prediction → surprising observation → other possible arrangements → population evidence. Model one comparison between matching mass groups, then invite evidence-supported statements without treating the graph as a census of all planets.",
+        title="Meet some real worlds",
+        purpose="Browse at least three distinct real exoplanet records, then make a tentative prediction about a larger mass-and-orbital-distance population.",
+        timing="13–15 minutes (end of Lesson 1)",
+        facilitation="Name the Lesson 1 arc: understand the variables → encounter evidence that changes expectations → see different system arrangements → inspect several real paired records → commit to a tentative prediction. Keep browsing playful but bounded, then invite the prediction from all Lesson 1 evidence; it is not a destination choice, filtering task or formal sample.",
+        alignment="SC4-DA1-01 and SC4-WS-06: use individual data records to describe objects and compare observations.",
+        evidence="Students describe how two encountered planets differ using mass and/or orbital distance, then record a defensible prediction that can later be tested.",
+        listen_for="Surprise at the range of values, direct comparisons such as ‘this planet is much more massive’ or ‘this one orbits closer to its star’, and a prediction tied to the two variables.",
+        misconceptions="The three records are not a representative sample of all planets. Profiles deliberately show only mass and orbital distance; mass is not physical size, and AU is an orbital-distance comparison unit. Different defensible predictions are expected.",
+    ),
+    5: dict(
+        title="From individual planets to population patterns",
+        purpose="Move from individual records and examples to a proportional one-variable population comparison before the later two-variable representation.",
+        timing="10–12 minutes (start of Lesson 2)",
+        facilitation="Open Lesson 2 with the question ‘What can a larger dataset tell us?’ Model one comparison between matching mass groups, then invite evidence-supported statements without treating the graph as a census of all planets. Name the progression: individual records → one-variable population representation → later two-variable representation.",
         alignment="SC4-DA1-01, SC4-WS-05 and SC4-WS-06: use a proportional representation to compare a detected population and communicate a conclusion.",
         evidence="Students make at least one similarity or difference statement supported by matching mass groups in the graph.",
         listen_for="Comparisons of proportions rather than raw totals, and recognition that the earlier examples showed possibilities while the graph supports a broader pattern claim.",
         misconceptions="Each bar is 100% of its own group. The detected-exoplanet bar includes planets with relevant mass data, not every planet that exists; do not overinterpret it as the full underlying population.",
-    ),
-    5: dict(
-        title="Meet some real worlds",
-        purpose="Browse at least three distinct real exoplanet records and notice variation in mass and orbital distance before the next prediction.",
-        timing="8–10 minutes (Lesson 2)",
-        facilitation="Keep the browsing playful but bounded: each student needs three distinct records, then invite a brief comparison using mass and/or orbital distance. Explain that the browser reconnects the earlier population chart to individual objects; it is not a destination choice or filtering task.",
-        alignment="SC4-DA1-01 and SC4-WS-06: use individual data records to describe objects and compare observations.",
-        evidence="Students describe how two encountered planets differ using mass and/or orbital distance.",
-        listen_for="Surprise at the range of values and direct comparisons such as ‘this planet is much more massive’ or ‘this one orbits closer to its star’.",
-        misconceptions="The three records are not a representative sample of all planets. Profiles deliberately show only mass and orbital distance; mass is not physical size, and AU is an orbital-distance comparison unit.",
     ),
     6: dict(
         title="Add orbital distance and change representation",
@@ -170,9 +171,9 @@ TEACHER_NOTE_OVERRIDES = {
     ),
     7: dict(
         title="Compare planetary systems and check a claim",
-        purpose="Use the larger exoplanet dataset to support, challenge or revise the initial claim from Step 5.",
+        purpose="Use the larger exoplanet dataset to support, challenge or revise the Lesson 1 prediction.",
         timing="18 minutes (Lesson 2)",
-        facilitation="Bring students back to their Step 5 response. Everyone first investigates Earth; then pairs choose one further data-detective challenge. Model one comparison between a Solar System planet and nearby detected points, then ask students to decide whether their first claim is supported, challenged or needs revision.",
+        facilitation="Bring students back to their Lesson 1 prediction. Everyone first investigates Earth; then pairs choose one further data-detective challenge. Model one comparison between a Solar System planet and nearby detected points, then ask students to decide whether their first claim is supported, challenged or needs revision.",
         alignment="SC4-WS-06 and SC4-WS-08: draw and communicate conclusions from data.",
         evidence="Students revise or support a claim by referring to a visible pattern in the graph.",
         listen_for="A clear connection between an initial idea, the Earth or chosen-planet challenge, graph evidence and a revised conclusion.",
@@ -244,16 +245,17 @@ FIFTY_ONE_PEGASI_B = {
 }
 
 
-# Screen 5 owns a small browsing state. Keep it separate from Planet Shopping:
+# Screen 4 owns a small browsing state. Keep it separate from Planet Shopping:
 # this sequence is for meeting real catalogue records, not making a choice.
 _BROWSER_PLANET_KEY = "year8_strange_new_worlds_browser_planet"
 _BROWSER_BUTTON_KEY = "year8_strange_new_worlds_browser_another"
 _BROWSER_SEEN_KEY = "year8_strange_new_worlds_browser_seen"
 _BROWSER_MINIMUM = 3
+_POPULATION_PREDICTION_KEY = "year8_strange_new_worlds_population_prediction"
 
 
 def _eligible_browser_planets(data: pd.DataFrame) -> pd.DataFrame:
-    """Return one usable record per named planet for the Screen 5 browser."""
+    """Return one usable record per named planet for the Screen 4 browser."""
     required_columns = ["pl_name", "pl_bmasse", "pl_orbsmax"]
     if any(column not in data.columns for column in required_columns):
         return pd.DataFrame(columns=required_columns)
@@ -285,7 +287,7 @@ def _choose_browser_planet(
     """Choose an unseen record until the required three distinct encounters."""
     names = eligible["pl_name"].astype(str).tolist()
     if not names:
-        raise ValueError("The Screen 5 browser needs at least one eligible planet")
+        raise ValueError("The Screen 4 browser needs at least one eligible planet")
     seen = seen or []
     unseen = [name for name in names if name not in seen]
     choices = unseen if len(seen) < _BROWSER_MINIMUM and unseen else [name for name in names if name != current]
@@ -332,7 +334,7 @@ def _orbital_distance_interpretation(distance: float) -> str:
 
 
 def _render_browser_profile(planet: pd.Series) -> None:
-    """Render the compact, two-variable profile used by the Screen 5 browser."""
+    """Render the compact, two-variable profile used by the Screen 4 browser."""
     mass = float(planet["pl_bmasse"])
     distance = float(planet["pl_orbsmax"])
     with st.container(border=True):
@@ -445,25 +447,7 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             st.write("Kepler-16 b shows that a planet can orbit two stars. TRAPPIST-1 shows that many planets can be packed into a much smaller orbital region than in our Solar System.")
         st.caption("These individual systems show what is possible. They do not tell us how common either arrangement is.")
     elif part == 4:
-        st.header("Step 4: From examples to data")
-        st.write("The systems we met show what is possible. A larger dataset lets us look for broader patterns.")
-        st.write("This chart compares our Solar System with detected exoplanets that have the mass data needed for these groups.")
-        graph_reading_support(
-            "The top bar is our Solar System. The bottom bar is the detected exoplanets that can be placed in these mass groups.",
-            "Each bar represents 100% of its group. Compare sections carrying the same label.",
-        )
-        figure = d.planet_mass_distribution_chart(data)
-        if figure is None:
-            st.warning("No planets have the mass data needed for this graph.")
-        else:
-            st.plotly_chart(figure, width="stretch")
-        compare_prompt("Compare matching mass groups. What is one similarity or difference between our Solar System and the detected exoplanets that the bars support?")
-        with self_check("Check your comparison"):
-            st.write("Compare the same labelled section in each complete bar. A wider section means a larger proportion of that group, not a larger planet or a larger raw total.")
-        st.caption("This detected sample is not every planet that exists. Lesson 2 will add orbital distance to the comparison.")
-    elif part == 5:
-        st.header("Step 5: Meet some real worlds")
-        st.caption("Lesson 2 starts here")
+        st.header("Step 4: Meet some real worlds")
         st.write("Each profile is a real detected exoplanet. Meet a few worlds, then notice how their mass and orbital distance can vary.")
         st.caption("Mass is not physical size. AU compares orbital distance with the Earth–Sun distance.")
         eligible = _eligible_browser_planets(data)
@@ -495,7 +479,37 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             st.write("Meet three different planets before moving on.")
             completion_gate(False)
         else:
-            st.caption("You have met three different planets. You can keep browsing or continue to the next step.")
+            st.caption("You have met three different planets. Use the whole first lesson to make a tentative prediction.")
+            prediction = st.text_area(
+                "Thinking about all the evidence you've seen so far: if we plotted lots of detected exoplanets by mass and orbital distance, what do you think the pattern would look like?",
+                key=_POPULATION_PREDICTION_KEY,
+                placeholder="I think the pattern will…",
+                height=100,
+                persist_state="session",
+            )
+            if not prediction.strip():
+                st.caption("Record a tentative prediction before starting Lesson 2. Different defensible predictions are possible.")
+                completion_gate(False)
+            else:
+                st.caption("Your prediction is saved for Lesson 2. You can keep browsing or continue.")
+    elif part == 5:
+        st.header("Step 5: From individual planets to population patterns")
+        st.caption("Lesson 2 starts here")
+        st.write("What can a larger dataset tell us? The planets you met show what is possible; this chart lets us look for broader patterns.")
+        st.write("This chart compares our Solar System with detected exoplanets that have the mass data needed for these groups.")
+        graph_reading_support(
+            "The top bar is our Solar System. The bottom bar is the detected exoplanets that can be placed in these mass groups.",
+            "Each bar represents 100% of its group. Compare sections carrying the same label.",
+        )
+        figure = d.planet_mass_distribution_chart(data)
+        if figure is None:
+            st.warning("No planets have the mass data needed for this graph.")
+        else:
+            st.plotly_chart(figure, width="stretch")
+        compare_prompt("Compare matching mass groups. What is one similarity or difference between our Solar System and the detected exoplanets that the bars support?")
+        with self_check("Check your comparison"):
+            st.write("Compare the same labelled section in each complete bar. A wider section means a larger proportion of that group, not a larger planet or a larger raw total.")
+        st.caption("This detected sample is not every planet that exists. Lesson 2 will later add orbital distance to the comparison.")
     elif part == 6:
         st.header("Step 6: Add orbital distance")
         st.write("Mass is not the only way to describe a planet. We can also ask how far it is from the star it orbits. One astronomical unit (AU) is the average distance from Earth to the Sun.")
@@ -519,7 +533,7 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             d.key_idea("Changing the graph scale can make patterns easier to see.", "Compare the inner planets before and after the scale changes: which view separates them most clearly?")
     elif part == 7:
         st.header("Step 7: Compare planetary systems")
-        st.write("This graph adds detected exoplanets to the same mass-and-orbital-distance view as the Solar System planets. Use this larger dataset to support, challenge or change your Step 5 claim.")
+        st.write("This graph adds detected exoplanets to the same mass-and-orbital-distance view as the Solar System planets. Use this larger dataset to support, challenge or change your Lesson 1 prediction.")
         d.graph_guide("The bottom axis is orbital distance from a star; the side axis is planet mass. Both use log scales.", "Blue circles are detected exoplanets. Pink labelled diamonds are the Solar System planets.", "Look for places where the Solar System planets are surrounded by many blue points—and places where they are not.")
         st.plotly_chart(d.current_demographics_chart(data), use_container_width=True)
         d.data_detective_challenge()

@@ -1,4 +1,4 @@
-"""Focused checks for the Screen 4 population-evidence transition."""
+"""Focused checks for the Screen 5 population-evidence transition."""
 
 import unittest
 from contextlib import nullcontext
@@ -38,7 +38,7 @@ class StrangeNewWorldsPopulationEvidenceTests(unittest.TestCase):
             patch.object(strange_new_worlds, "compare_prompt", lambda prompt: events.append(("compare", (prompt,), {}))),
             patch.object(strange_new_worlds, "self_check", lambda label: nullcontext()),
         ):
-            strange_new_worlds.render_lesson(data, 4, _Dependencies(events))
+            strange_new_worlds.render_lesson(data, 5, _Dependencies(events))
 
         names = [event[0] for event in events]
         self.assertIn("mass_chart", names)
@@ -56,15 +56,15 @@ class StrangeNewWorldsPopulationEvidenceTests(unittest.TestCase):
         self.assertNotIn("discoveries_by_year_chart", screen_three)
         self.assertNotIn("Discoveries over time", strange_new_worlds.STEP_LABELS)
 
-    def test_facilitator_note_marks_lesson_one_population_evidence(self):
-        note = strange_new_worlds.TEACHER_NOTE_OVERRIDES[4]
-        background = strange_new_worlds.TEACHER_BACKGROUNDS[4]
+    def test_facilitator_note_marks_lesson_two_population_evidence(self):
+        note = strange_new_worlds.TEACHER_NOTE_OVERRIDES[5]
+        background = strange_new_worlds.TEACHER_BACKGROUNDS[5]
 
-        self.assertEqual(note["title"], "From examples to data")
-        self.assertIn("end of Lesson 1", note["timing"])
+        self.assertEqual(note["title"], "From individual planets to population patterns")
+        self.assertIn("start of Lesson 2", note["timing"])
         self.assertIn("proportions", note["listen_for"])
         self.assertIn("not every planet", note["misconceptions"])
-        self.assertIn("population evidence", background)
+        self.assertIn("individual records", background)
 
 
 if __name__ == "__main__":
