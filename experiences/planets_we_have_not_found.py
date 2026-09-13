@@ -5,7 +5,7 @@ from dataclasses import dataclass
 import pandas as pd
 import streamlit as st
 
-from ui_helpers import graph_reading_support, soft_reveal, teacher_note
+from ui_helpers import graph_reading_support, media_text_pair, soft_reveal, teacher_note
 
 STEP_LABELS = [
     "Welcome", "1 · Our Solar System", "2 · Meet exoplanets", "3 · Mass and distance",
@@ -319,19 +319,20 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
     # CLASSROOM STEP 0 — Welcome
     if part == 0:
         st.header(d.pathway_name)
-        st.image(
+        with media_text_pair(
             d.exoplanet_image_path,
+            role="context",
             caption=(
                 "Artist's concepts imagining the variety of exoplanets. These are illustrations, not photographs. "
                 "Credit: NASA/JPL-Caltech"
             ),
-            use_container_width=True,
-        )
-        st.markdown(
-            "The planets we have detected form a scientific dataset—but does that dataset show every kind of "
-            "planet that exists? You will make an initial claim, investigate how the evidence was collected, and "
-            "then decide whether your claim needs to change."
-        )
+            key="year10_welcome",
+        ):
+            st.markdown(
+                "The planets we have detected form a scientific dataset—but does that dataset show every kind of "
+                "planet that exists? You will make an initial claim, investigate how the evidence was collected, and "
+                "then decide whether your claim needs to change."
+            )
         st.markdown(
             "#### Our journey\n"
             "1. Establish our Solar System as a reference.\n"
@@ -397,20 +398,21 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             "An **exoplanet** is a planet that orbits a star other than the Sun. Astronomers have detected thousands "
             "of exoplanets, although we do not have every measurement for every planet."
         )
-        st.image(
+        with media_text_pair(
             d.planetary_systems_image_path,
+            role="context",
             caption=(
                 "The Sun is a star, and our Solar System is one planetary system. Exoplanets belong to other "
                 "planetary systems."
             ),
-            use_container_width=True,
-        )
-        st.info(
-            "### How far away are they?\n"
-            "The nearest known exoplanet is about **4 light-years** away. Many of the stars searched by space "
-            "telescopes are **hundreds to thousands of light-years** away—still inside our Milky Way galaxy. A "
-            "light-year is a distance: how far light travels in one year."
-        )
+            key="year10_planetary_systems",
+        ):
+            st.info(
+                "### How far away are they?\n"
+                "The nearest known exoplanet is about **4 light-years** away. Many of the stars searched by space "
+                "telescopes are **hundreds to thousands of light-years** away—still inside our Milky Way galaxy. A "
+                "light-year is a distance: how far light travels in one year."
+            )
         st.markdown(
             "### Imagine another planetary system\n"
             "Could it have more planets, fewer planets, two stars, or planets arranged very differently? Describe "
@@ -460,18 +462,19 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
         st.header("Step 4: Are planets in other systems like ours?")
         st.markdown("### Question we can answer with data\nHow similar are detected exoplanets to Solar System planets in mass and orbital distance?")
         st.markdown("### What we will plot\nA log–log scatter plot of planet mass against orbital distance, with the Solar System planets highlighted.")
-        st.write(
-            "We will compare thousands of individual exoplanets with our eight Solar System planets. Each point "
-            "will be placed using its mass and its orbital distance from its star."
-        )
-        st.image(
+        with media_text_pair(
             d.exoplanet_quadrants_image_path,
+            role="context",
             caption=(
                 "Four possible combinations of planet mass and orbital distance. The example systems are simplified "
                 "and are not to scale."
             ),
-            use_container_width=True,
-        )
+            key="year10_quadrants",
+        ):
+            st.write(
+                "We will compare thousands of individual exoplanets with our eight Solar System planets. Each point "
+                "will be placed using its mass and its orbital distance from its star."
+            )
         st.markdown("### Make a prediction")
         st.text_area(
             "Write your hypothesis",
@@ -509,15 +512,16 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
     elif part == 5:
         st.header("Step 5: Direct imaging")
         st.caption("Lesson 2 starts here")
-        st.write(
-            "**Direct imaging** means taking a picture of light from a planet. It works best when a planet is bright "
-            "and far from its star."
-        )
-        st.image(
+        with media_text_pair(
             d.direct_imaging_image_path,
+            role="context",
             caption="A planet that appears bright and far from its star is easier to see directly.",
-            use_container_width=True,
-        )
+            key="year10_direct_imaging",
+        ):
+            st.write(
+                "**Direct imaging** means taking a picture of light from a planet. It works best when a planet is bright "
+                "and far from its star."
+            )
         st.markdown("### Our question\nWhich kinds of planets are easiest to find using direct imaging?")
         graph_reading_support(
             "The bottom axis shows orbital distance and the side axis shows planet mass. Both use a log scale.",

@@ -5,7 +5,7 @@ from dataclasses import dataclass
 import pandas as pd
 import streamlit as st
 
-from ui_helpers import graph_reading_support, teacher_note
+from ui_helpers import graph_reading_support, media_text_pair, teacher_note
 
 STEP_LABELS = [
     "Welcome", "1 · Meet our Solar System", "2 · Planets around other stars",
@@ -206,18 +206,19 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
     d = dependencies
     if part == 0:
         st.header(d.pathway_name)
-        st.image(
+        with media_text_pair(
             d.exoplanet_image_path,
+            role="context",
             caption=(
                 "Artist's concepts imagining the variety of exoplanets. These are illustrations, not photographs. "
                 "Credit: NASA/JPL-Caltech"
             ),
-            use_container_width=True,
-        )
-        st.markdown(
-            "Other stars have planets too—and some planetary systems are very different from ours. You will "
-            "start with individual discoveries, then use real NASA data to find larger patterns."
-        )
+            key="year8_welcome",
+        ):
+            st.markdown(
+                "Other stars have planets too—and some planetary systems are very different from ours. You will "
+                "start with individual discoveries, then use real NASA data to find larger patterns."
+            )
         st.markdown(
             "#### Our journey\n"
             "1. Start with our Solar System.\n"
@@ -230,15 +231,16 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
         )
     elif part == 1:
         st.header("Step 1: Meet our Solar System")
-        st.image(
+        with media_text_pair(
             d.solar_system_image_path,
+            role="context",
             caption="An illustration of our Solar System. Credit: NASA",
-            use_container_width=True,
-        )
-        st.write(
-            "Our Solar System contains the Sun and everything held in orbit around it. Eight planets orbit the Sun, "
-            "from small rocky worlds such as Earth to giant planets such as Jupiter."
-        )
+            key="year8_solar_system",
+        ):
+            st.write(
+                "Our Solar System contains the Sun and everything held in orbit around it. Eight planets orbit the Sun, "
+                "from small rocky worlds such as Earth to giant planets such as Jupiter."
+            )
         st.markdown(
             "We will group planets by mass: **Very small** (less than 1 Earth mass), **Small** (1–10 Earth masses), "
             "**Medium** (10–100 Earth masses), **Large** (100–1,000 Earth masses), and **Very large** "
@@ -263,17 +265,18 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             "An **exoplanet** is a planet orbiting a star other than the Sun. We will start with a few individual "
             "stories before looking at the whole dataset."
         )
-        st.image(
+        with media_text_pair(
             d.planetary_systems_image_path,
+            role="context",
             caption="Our Solar System is one planetary system; other stars can have their own planetary systems.",
-            use_container_width=True,
-        )
-        st.info(
-            "### A sense of scale\n"
-            "The nearest known exoplanet is about **4 light-years** away. Many of the stars searched by telescopes "
-            "are **hundreds to thousands of light-years** away, but they are still in our Milky Way. A light-year "
-            "measures distance: it is how far light travels in one year."
-        )
+            key="year8_planetary_systems",
+        ):
+            st.info(
+                "### A sense of scale\n"
+                "The nearest known exoplanet is about **4 light-years** away. Many of the stars searched by telescopes "
+                "are **hundreds to thousands of light-years** away, but they are still in our Milky Way. A light-year "
+                "measures distance: it is how far light travels in one year."
+            )
         st.subheader("Three discoveries to meet")
         case_studies = st.columns(3)
         with case_studies[0]:
