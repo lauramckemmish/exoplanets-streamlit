@@ -1,6 +1,7 @@
 """Year 8 Strange New Worlds entry point and lesson-step content."""
 
 from dataclasses import dataclass
+import random
 
 import pandas as pd
 import streamlit as st
@@ -8,6 +9,7 @@ import streamlit as st
 from data import SOLAR_SYSTEM_PLANETS
 from ui_helpers import (
     compare_prompt,
+    completion_gate,
     graph_reading_support,
     media_text_pair,
     notice_prompt,
@@ -19,7 +21,7 @@ from ui_helpers import (
 
 STEP_LABELS = [
     "Welcome", "1 · Our Solar System as data", "2 · Could Jupiter be here?",
-    "3 · Our Solar System isn't the only arrangement", "4 · From examples to data", "5 · Strange new worlds",
+    "3 · Our Solar System isn't the only arrangement", "4 · From examples to data", "5 · Meet some real worlds",
     "6 · Add orbital distance", "7 · Compare planetary systems", "Conclusion",
 ]
 YEAR_LEVEL = "Year 8"
@@ -77,7 +79,17 @@ TEACHER_BACKGROUNDS = {
         "This is the conceptual end of Lesson 1: familiar Solar System data → prediction → surprising observation → "
         "other possible arrangements → population evidence."
     ),
-    5: "**Strange worlds as a starting point**\n\nThe NASA/JPL travel poster is an artist's illustration based on a real planetary system. Kepler-16 b orbits two stars, while 51 Pegasi b is a giant planet close to its star and TRAPPIST-1 is a compact multi-planet system. These examples are intended to spark an initial claim, not to prove how common each arrangement is.",
+    5: (
+        "**Why browse a few real worlds?**\n\n"
+        "- Each compact profile is a real detected exoplanet record. Students meet at least three distinct planets before "
+        "moving on, so the later population prediction has real objects behind it.\n"
+        "- The browser deliberately shows only mass and orbital distance: the two quantities that the next population "
+        "representation will combine. Mass is not physical size, and AU compares orbital distance with the Earth–Sun scale.\n"
+        "- Three records are enough for noticing variation, not for claiming what all planets are like. The pool excludes "
+        "records without usable values for either core quantity.\n\n"
+        "Listen for comparisons such as ‘more massive’ or ‘closer to its star’. Do not expand into destination choices, "
+        "filtering, formal sampling, detection methods, temperature, size or year length."
+    ),
     6: "**Two variables and two scales**\n\nOrbital distance describes the typical size of a planet's orbit; one AU is the average Earth–Sun distance. A scatter plot locates one planet using mass and orbital distance. Linear axes use equal additions, while logarithmic axes use equal multiplications. The log–log version spreads out small values while retaining the giant planets. Students read ordinary labels and do not calculate logarithms.",
     7: "**Checking the initial claim**\n\nThe final comparison graph puts thousands of detected exoplanets on the same axes as our Solar System. It offers stronger evidence than a few individual examples, but it is still a detected sample rather than an inventory of every planet that exists. Students should use a visible pattern to support, challenge or revise their Step 5 claim.",
     8: "**A deliberately open ending**\n\nStudents should leave with an evidence-based understanding that planetary systems can be diverse and with a question worth pursuing. Optional interests may lead towards astronomy, planetary formation, atmospheres, spectra, astrobiology, philosophy, culture or science communication. These are engagement routes rather than additional Stage 4 requirements.",
@@ -137,14 +149,14 @@ TEACHER_NOTE_OVERRIDES = {
         misconceptions="Each bar is 100% of its own group. The detected-exoplanet bar includes planets with relevant mass data, not every planet that exists; do not overinterpret it as the full underlying population.",
     ),
     5: dict(
-        title="Generate an initial claim from strange worlds",
-        purpose="Use memorable examples to make an initial claim about how similar planetary systems may be.",
-        timing="12 minutes (Lesson 2)",
-        facilitation="Use the NASA/JPL travel-poster image as an invitation to imagine, not as a scientific photograph. Students should make a tentative claim here; Step 7 will test it against the larger dataset.",
-        alignment="SC4-OTU-01 and SC4-WS-06: observations increase understanding of the Universe and support scientific conclusions.",
-        evidence="Students make a claim that other systems can differ from ours, supported by one example.",
-        listen_for="Specific comparisons such as two stars, a giant planet close to a star, or a compact group of planets.",
-        misconceptions="The travel poster is an illustration of a real system, not a photograph or a prediction that humans could currently visit it.",
+        title="Meet some real worlds",
+        purpose="Browse at least three distinct real exoplanet records and notice variation in mass and orbital distance before the next prediction.",
+        timing="8–10 minutes (Lesson 2)",
+        facilitation="Keep the browsing playful but bounded: each student needs three distinct records, then invite a brief comparison using mass and/or orbital distance. Explain that the browser reconnects the earlier population chart to individual objects; it is not a destination choice or filtering task.",
+        alignment="SC4-DA1-01 and SC4-WS-06: use individual data records to describe objects and compare observations.",
+        evidence="Students describe how two encountered planets differ using mass and/or orbital distance.",
+        listen_for="Surprise at the range of values and direct comparisons such as ‘this planet is much more massive’ or ‘this one orbits closer to its star’.",
+        misconceptions="The three records are not a representative sample of all planets. Profiles deliberately show only mass and orbital distance; mass is not physical size, and AU is an orbital-distance comparison unit.",
     ),
     6: dict(
         title="Add orbital distance and change representation",
@@ -230,6 +242,106 @@ FIFTY_ONE_PEGASI_B = {
     "Mass (Earth = 1)": "≈146 (estimate)",
     "Orbital distance (AU)": "0.052",
 }
+
+
+# Screen 5 owns a small browsing state. Keep it separate from Planet Shopping:
+# this sequence is for meeting real catalogue records, not making a choice.
+_BROWSER_PLANET_KEY = "year8_strange_new_worlds_browser_planet"
+_BROWSER_BUTTON_KEY = "year8_strange_new_worlds_browser_another"
+_BROWSER_SEEN_KEY = "year8_strange_new_worlds_browser_seen"
+_BROWSER_MINIMUM = 3
+
+
+def _eligible_browser_planets(data: pd.DataFrame) -> pd.DataFrame:
+    """Return one usable record per named planet for the Screen 5 browser."""
+    required_columns = ["pl_name", "pl_bmasse", "pl_orbsmax"]
+    if any(column not in data.columns for column in required_columns):
+        return pd.DataFrame(columns=required_columns)
+
+    eligible = data[required_columns].copy()
+    eligible["pl_bmasse"] = pd.to_numeric(eligible["pl_bmasse"], errors="coerce")
+    eligible["pl_orbsmax"] = pd.to_numeric(eligible["pl_orbsmax"], errors="coerce")
+    eligible = eligible.dropna(subset=required_columns)
+    eligible = eligible.loc[(eligible["pl_bmasse"] > 0) & (eligible["pl_orbsmax"] > 0)]
+    return eligible.drop_duplicates("pl_name").sort_values("pl_name").reset_index(drop=True)
+
+
+def _record_browsed_planet(state: dict, planet_name: str) -> list[str]:
+    """Persist distinct Screen 5 encounters without treating repeats as progress."""
+    seen = list(state.get(_BROWSER_SEEN_KEY, []))
+    if planet_name not in seen:
+        seen.append(planet_name)
+        state[_BROWSER_SEEN_KEY] = seen
+    return seen
+
+
+def _choose_browser_planet(
+    eligible: pd.DataFrame,
+    *,
+    current: str | None = None,
+    seen: list[str] | None = None,
+    rng=random,
+) -> str:
+    """Choose an unseen record until the required three distinct encounters."""
+    names = eligible["pl_name"].astype(str).tolist()
+    if not names:
+        raise ValueError("The Screen 5 browser needs at least one eligible planet")
+    seen = seen or []
+    unseen = [name for name in names if name not in seen]
+    choices = unseen if len(seen) < _BROWSER_MINIMUM and unseen else [name for name in names if name != current]
+    return rng.choice(choices or names)
+
+
+def _show_another_browser_planet(eligible: pd.DataFrame, state: dict, rng=random) -> str:
+    """Advance the local browser while preferring a new planet before completion."""
+    planet_name = _choose_browser_planet(
+        eligible,
+        current=state.get(_BROWSER_PLANET_KEY),
+        seen=state.get(_BROWSER_SEEN_KEY, []),
+        rng=rng,
+    )
+    state[_BROWSER_PLANET_KEY] = planet_name
+    _record_browsed_planet(state, planet_name)
+    return planet_name
+
+
+def _format_browser_value(value: float) -> str:
+    """Use readable precision for the two learner-facing Screen 5 values."""
+    value = float(value)
+    if value < 1:
+        return f"{value:.3g}"
+    if value < 100:
+        return f"{value:.2g}"
+    return f"{value:.0f}"
+
+
+def _mass_interpretation(mass: float) -> str:
+    if mass < 0.5:
+        return "Less massive than Earth."
+    if mass <= 2:
+        return "About the mass of Earth."
+    return "Much more massive than Earth."
+
+
+def _orbital_distance_interpretation(distance: float) -> str:
+    if distance < 0.5:
+        return "Orbits much closer to its star than Earth does."
+    if distance <= 2:
+        return "Orbits at about Earth's distance from its star."
+    return "Orbits much farther from its star than Earth does."
+
+
+def _render_browser_profile(planet: pd.Series) -> None:
+    """Render the compact, two-variable profile used by the Screen 5 browser."""
+    mass = float(planet["pl_bmasse"])
+    distance = float(planet["pl_orbsmax"])
+    with st.container(border=True):
+        st.subheader(str(planet["pl_name"]))
+        st.write(f"**Mass:** {_format_browser_value(mass)} Earth masses — {_mass_interpretation(mass)}")
+        st.write(
+            f"**Orbital distance:** {_format_browser_value(distance)} AU — "
+            f"{_orbital_distance_interpretation(distance)}"
+        )
 
 
 def _hot_jupiter_comparison_table() -> pd.DataFrame:
@@ -350,24 +462,40 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             st.write("Compare the same labelled section in each complete bar. A wider section means a larger proportion of that group, not a larger planet or a larger raw total.")
         st.caption("This detected sample is not every planet that exists. Lesson 2 will add orbital distance to the comparison.")
     elif part == 5:
-        st.header("Step 5: Strange new worlds")
+        st.header("Step 5: Meet some real worlds")
         st.caption("Lesson 2 starts here")
-        st.caption("NASA/JPL Exoplanet Travel Bureau posters: artists' illustrations based on real exoplanet systems.")
-        poster_columns = st.columns(3)
-        posters = [
-            (d.nasa_kepler_16b_poster_path, "Kepler-16 b: two suns"),
-            (d.nasa_51_pegasi_b_poster_path, "51 Pegasi b: hot Jupiter"),
-            (d.nasa_kepler_186f_poster_path, "Kepler-186 f: Earth-size world"),
-        ]
-        for column, (poster_path, caption) in zip(poster_columns, posters):
-            with column:
-                st.image(poster_path, use_container_width=True)
-                st.caption(caption)
-        st.info("### Seven worlds around one tiny star\nTRAPPIST-1 has seven known planets, all roughly the size of Earth. They are packed incredibly close together: all seven orbit closer to their star than Mercury orbits the Sun. The planets are so close together that, from one world, neighbouring planets could sometimes appear larger in the sky than our Moon does from Earth.")
-        st.markdown("## Pick your holiday planet")
-        st.write("If you could visit an exoplanet, what kind of world would you choose? Would you choose a small rocky world like Earth or a much more massive planet? Would you visit a planet with two suns? Would you choose a system where other planets loom large in the sky?")
-        st.text_area("How massive would your planet be?", key="demographics_response_Strange New Worlds_5", height=90, placeholder="Describe your holiday planet and its mass…")
-        st.markdown("### But mass isn't the whole story\nWhere would your planet be? Would it orbit very close to its star, or much farther away?\n\n**How can we describe how far a planet is from its star?**")
+        st.write("Each profile is a real detected exoplanet. Meet a few worlds, then notice how their mass and orbital distance can vary.")
+        st.caption("Mass is not physical size. AU compares orbital distance with the Earth–Sun distance.")
+        eligible = _eligible_browser_planets(data)
+        if eligible.empty:
+            st.warning("No planets with both mass and orbital-distance data are available right now.")
+            completion_gate(False)
+            return None
+
+        available_names = set(eligible["pl_name"].astype(str))
+        if st.session_state.get(_BROWSER_PLANET_KEY) not in available_names:
+            st.session_state[_BROWSER_PLANET_KEY] = _choose_browser_planet(
+                eligible,
+                seen=st.session_state.get(_BROWSER_SEEN_KEY, []),
+            )
+        planet_name = st.session_state[_BROWSER_PLANET_KEY]
+        seen = _record_browsed_planet(st.session_state, planet_name)
+        st.button(
+            "Show me another planet",
+            key=_BROWSER_BUTTON_KEY,
+            on_click=_show_another_browser_planet,
+            args=(eligible, st.session_state),
+        )
+        planet = eligible.loc[eligible["pl_name"].astype(str) == planet_name].iloc[0]
+        _render_browser_profile(planet)
+        notice_prompt("As you browse, what differences do you notice in the planets' masses or orbital distances?")
+
+        if len(seen) < _BROWSER_MINIMUM:
+            st.caption(f"Distinct planets encountered: {len(seen)} of {_BROWSER_MINIMUM}")
+            st.write("Meet three different planets before moving on.")
+            completion_gate(False)
+        else:
+            st.caption("You have met three different planets. You can keep browsing or continue to the next step.")
     elif part == 6:
         st.header("Step 6: Add orbital distance")
         st.write("Mass is not the only way to describe a planet. We can also ask how far it is from the star it orbits. One astronomical unit (AU) is the average distance from Earth to the Sun.")
