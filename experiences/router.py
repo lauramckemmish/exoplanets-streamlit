@@ -43,6 +43,11 @@ def open_experience(name: str) -> None:
     select_catalog_experience(name)
 
 
+def return_to_experiences() -> None:
+    """Return a completed staged experience to the landing route."""
+    select_experience("Introduction")
+
+
 def select_explore_resource(name: str) -> None:
     """Open an enabled independent Explore resource from the shared catalogue."""
     resource = catalog.get_explore_resource(name)
@@ -88,16 +93,16 @@ def normalise_pathway(pathway, facilitated_pathway, stage4_pathway, stage5_pathw
     return pathway if pathway in catalog.enabled_pathway_names() else None
 
 
-def render_pathway(pathway, data, facilitated_pathway, stage4_pathway, stage5_pathway, curious_render, stage4_render, stage5_render, classroom_implementation):
+def render_pathway(pathway, data, facilitated_pathway, stage4_pathway, stage5_pathway, curious_render, stage4_render, stage5_render, classroom_implementation, terminal_action):
     """Dispatch a selected pathway to its independent experience entry point."""
     if pathway == facilitated_pathway:
-        return curious_render(data)
+        return curious_render(data, terminal_action)
     if pathway == stage4_pathway:
-        return stage4_render(data, classroom_implementation)
-    return stage5_render(data, classroom_implementation)
+        return stage4_render(data, classroom_implementation, terminal_action)
+    return stage5_render(data, classroom_implementation, terminal_action)
 
 
-def render_demographics_shell(data, demographics_started, pathway, title, facilitated_pathway, stage4_pathway, stage5_pathway, landing, curious_render, stage4_render, stage5_render, classroom_implementation):
+def render_demographics_shell(data, demographics_started, pathway, title, facilitated_pathway, stage4_pathway, stage5_pathway, landing, curious_render, stage4_render, stage5_render, classroom_implementation, terminal_action):
     """Render the common demographics heading, toggle and pathway dispatch."""
     if not demographics_started:
         return landing(data)
@@ -112,4 +117,4 @@ def render_demographics_shell(data, demographics_started, pathway, title, facili
         st.markdown(f"*{title}*")
     with activity_controls:
         st.toggle("Facilitator notes", key="demographics_teacher_view", help="Show learning purpose, facilitation guidance and syllabus connections within each step.")
-    return render_pathway(pathway, data, facilitated_pathway, stage4_pathway, stage5_pathway, curious_render, stage4_render, stage5_render, classroom_implementation)
+    return render_pathway(pathway, data, facilitated_pathway, stage4_pathway, stage5_pathway, curious_render, stage4_render, stage5_render, classroom_implementation, terminal_action)

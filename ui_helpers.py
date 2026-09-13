@@ -1,6 +1,6 @@
 """Small, reusable presentation helpers shared by the teaching experiences."""
 
-from collections.abc import Iterator, Mapping
+from collections.abc import Callable, Iterator, Mapping
 from contextlib import contextmanager
 
 import streamlit as st
@@ -101,8 +101,14 @@ def step_buttons(
     step: int,
     button_prefix: str,
     allow_next: bool = True,
+    *,
+    terminal_action: Callable[[], None] | None = None,
+    terminal_label: str | None = None,
 ) -> None:
-    """Render navigation, withholding Continue while shared gating is active."""
+    """Render staged navigation with an optional final-step action."""
+    if terminal_action is not None and terminal_label is None:
+        raise ValueError("terminal_label is required when terminal_action is supplied")
+
     continue_blocked = st.session_state.pop(_CONTINUE_BLOCKED_KEY, False)
     back, _, next_step = st.columns([1, 4, 1])
     with back:
@@ -123,6 +129,14 @@ def step_buttons(
                 key=f"{button_prefix}_continue",
                 on_click=select_tab_step,
                 args=(tab_key, labels, step_key, scroll_key, step + 1),
+            )
+        elif step == len(labels) - 1 and terminal_action is not None:
+            st.button(
+                terminal_label,
+                type="primary",
+                use_container_width=True,
+                key=f"{button_prefix}_terminal",
+                on_click=terminal_action,
             )
 
 

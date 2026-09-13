@@ -214,7 +214,11 @@ apply_visual_system()
 # this shared renderer. The `part` branches below are the individual steps.
 # ============================================================================
 
-def render_demographics_classroom(data: pd.DataFrame, teacher_note_renderer=None) -> None:
+def render_demographics_classroom(
+    data: pd.DataFrame,
+    teacher_note_renderer=None,
+    terminal_action=None,
+) -> None:
     """Render a classroom pathway through the shared classroom infrastructure."""
     classroom_shell.render_pathway(
         data,
@@ -227,6 +231,7 @@ def render_demographics_classroom(data: pd.DataFrame, teacher_note_renderer=None
         planets_we_have_not_found.PART_COUNT,
         teacher_note_renderer,
         CLASSROOM_RESOURCES,
+        terminal_action,
     )
 
 
@@ -254,6 +259,7 @@ def render_demographics(data: pd.DataFrame, source) -> None:
         strange_new_worlds.render,
         planets_we_have_not_found.render,
         render_demographics_classroom,
+        router.return_to_experiences,
     )
 
 
@@ -336,9 +342,9 @@ if experience == "Exoplanet Data Laboratory":
     guidance_mode = "Teacher" if st.session_state.get("lab_teacher_view", False) else "Student"
 
 if experience == "Guided Tatooine Mission":
-    tatooine.render(data)
+    tatooine.render(data, router.return_to_experiences)
 elif experience == planet_shopping.TITLE:
-    planet_shopping.render(data)
+    planet_shopping.render(data, router.return_to_experiences)
 elif experience == "Exoplanet Demographics":
     render_demographics(data, source)
 elif experience == "Exoplanet Data Laboratory":
@@ -355,6 +361,7 @@ elif experience == "Exoplanet Data Laboratory":
         variable_card=variable_card,
         scale_guidance=shared_scale_guidance,
         sky_map=sky_map,
+        terminal_action=router.return_to_experiences,
     )
 else:
     explore_resource = catalog.get_explore_resource_for_route(experience)

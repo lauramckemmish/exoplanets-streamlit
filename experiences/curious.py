@@ -72,7 +72,7 @@ def render_teacher_note(part: int) -> None:
     teacher_note(**notes[part])
 
 
-def render(data: pd.DataFrame) -> None:
+def render(data: pd.DataFrame, terminal_action) -> None:
     """Render the shorter, discussion-led CURIOUS pathway."""
     if st.session_state.get("demographics_pathway") != PATHWAY_TITLE:
         return
@@ -203,4 +203,6 @@ def render(data: pd.DataFrame) -> None:
         "curious_scroll_to_top",
         part,
         "curious",
+        terminal_action=terminal_action,
+        terminal_label="Back to experiences",
     )

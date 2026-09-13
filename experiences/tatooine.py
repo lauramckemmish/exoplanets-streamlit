@@ -312,7 +312,7 @@ def render_candidate_comparison(candidates: pd.DataFrame, key_prefix: str, promp
     st.text_area(prompt, key=f"{key_prefix}_response", height=110)
 
 
-def render(data: pd.DataFrame) -> None:
+def render(data: pd.DataFrame, terminal_action) -> None:
     """Render the complete Find Your Perfect Planet experience."""
     step = prepare_page()
     candidates, _, _ = mission_candidates(data)
@@ -431,4 +431,6 @@ def render(data: pd.DataFrame) -> None:
         "mission_scroll_to_top",
         step,
         "mission",
+        terminal_action=terminal_action,
+        terminal_label="Back to experiences",
     )

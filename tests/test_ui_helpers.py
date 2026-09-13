@@ -18,6 +18,7 @@ class _StreamlitStub:
     def __init__(self):
         self.session_state = {}
         self.buttons = []
+        self.button_kwargs = []
         self.expanders = []
         self.markdown_calls = []
         self.captions = []
@@ -28,6 +29,7 @@ class _StreamlitStub:
 
     def button(self, label, **kwargs):
         self.buttons.append(label)
+        self.button_kwargs.append((label, kwargs))
         return False
 
     def columns(self, *_args, **_kwargs):
@@ -73,6 +75,60 @@ class SharedInteractionContractTests(unittest.TestCase):
             self.assertFalse(self._navigation(stub))
             self.assertTrue(ui_helpers.completion_gate(True))
             self.assertTrue(self._navigation(stub))
+
+    def test_intermediate_step_keeps_the_continue_action(self):
+        stub = _StreamlitStub()
+        with patch.object(ui_helpers, "st", stub):
+            ui_helpers.step_buttons(
+                ["One", "Two"],
+                "tab",
+                "step",
+                "scroll",
+                0,
+                "test",
+                terminal_action=lambda: None,
+                terminal_label="Back to experiences",
+            )
+
+        self.assertEqual(stub.buttons, ["Continue →"])
+
+    def test_final_step_uses_the_supplied_terminal_action(self):
+        stub = _StreamlitStub()
+
+        def return_to_experiences():
+            pass
+
+        with patch.object(ui_helpers, "st", stub):
+            ui_helpers.step_buttons(
+                ["One", "Two"],
+                "tab",
+                "step",
+                "scroll",
+                1,
+                "test",
+                terminal_action=return_to_experiences,
+                terminal_label="Back to experiences",
+            )
+
+        self.assertEqual(stub.buttons, ["← Back", "Back to experiences"])
+        label, kwargs = stub.button_kwargs[-1]
+        self.assertEqual(label, "Back to experiences")
+        self.assertIs(kwargs["on_click"], return_to_experiences)
+        self.assertEqual(kwargs["key"], "test_terminal")
+
+    def test_terminal_action_requires_a_label(self):
+        stub = _StreamlitStub()
+        with patch.object(ui_helpers, "st", stub):
+            with self.assertRaisesRegex(ValueError, "terminal_label"):
+                ui_helpers.step_buttons(
+                    ["One", "Two"],
+                    "tab",
+                    "step",
+                    "scroll",
+                    1,
+                    "test",
+                    terminal_action=lambda: None,
+                )
 
     def test_nonblocking_helpers_do_not_gate_continue(self):
         stub = _StreamlitStub()

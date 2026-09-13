@@ -376,6 +376,7 @@ def render(
     variable_card,
     scale_guidance,
     sky_map,
+    terminal_action,
 ):
     """Render the complete Data Laboratory experience using shared services."""
     heading, activity_controls = st.columns([4, 2])
@@ -420,4 +421,13 @@ def render(
     else:
         with tabs[6]:
             render_map(data, guidance_mode, sky_map)
-    step_buttons(TAB_LABELS, "lab_tab", "lab_tab_step", "lab_scroll_to_top", current_tab, "lab")
+    step_buttons(
+        TAB_LABELS,
+        "lab_tab",
+        "lab_tab_step",
+        "lab_scroll_to_top",
+        current_tab,
+        "lab",
+        terminal_action=terminal_action,
+        terminal_label="Back to experiences",
+    )

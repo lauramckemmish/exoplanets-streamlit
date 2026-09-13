@@ -1055,7 +1055,7 @@ def _render_data_science() -> None:
         )
 
 
-def render(data: pd.DataFrame) -> None:
+def render(data: pd.DataFrame, terminal_action) -> None:
     """Render the seven-stage workshop using the shared prepared dataset."""
     if _STAGE_KEY not in st.session_state:
         st.session_state[_STAGE_KEY] = 0
@@ -1103,4 +1103,6 @@ def render(data: pd.DataFrame) -> None:
         _SCROLL_KEY,
         stage,
         "planet_shopping",
+        terminal_action=terminal_action,
+        terminal_label="Back to experiences",
     )

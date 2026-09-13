@@ -15,6 +15,7 @@ def render(
     stage5_part_count,
     teacher_note_renderer,
     render_lesson_body,
+    terminal_action,
 ):
     """Resolve a classroom pathway, render shared controls, then render its body."""
     if pathway == stage4_pathway:
@@ -38,6 +39,8 @@ def render(
         part,
         "demographics",
         allow_next=True if allow_next is None else allow_next,
+        terminal_action=terminal_action,
+        terminal_label="Back to experiences",
     )
 
 
@@ -52,6 +55,7 @@ def render_pathway(
     stage5_part_count,
     teacher_note_renderer,
     resources,
+    terminal_action,
 ):
     """Render a classroom pathway using shared navigation and dependencies."""
     return render(
@@ -72,4 +76,5 @@ def render_pathway(
             stage5_pathway,
             resources,
         ),
+        terminal_action,
     )
