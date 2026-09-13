@@ -25,7 +25,7 @@ class StrangeNewWorldsOpeningTests(unittest.TestCase):
         self.assertEqual(STEP_LABELS[:3], [
             "Welcome",
             "1 · Our Solar System as data",
-            "2 · Planets around other stars",
+            "2 · Could Jupiter be here?",
         ])
 
 

@@ -6,10 +6,17 @@ import pandas as pd
 import streamlit as st
 
 from data import SOLAR_SYSTEM_PLANETS
-from ui_helpers import graph_reading_support, media_text_pair, notice_prompt, teacher_note
+from ui_helpers import (
+    graph_reading_support,
+    media_text_pair,
+    notice_prompt,
+    predict_prompt,
+    revise_prompt,
+    teacher_note,
+)
 
 STEP_LABELS = [
-    "Welcome", "1 · Our Solar System as data", "2 · Planets around other stars",
+    "Welcome", "1 · Our Solar System as data", "2 · Could Jupiter be here?",
     "3 · Discoveries over time", "4 · Compare planet masses", "5 · Strange new worlds",
     "6 · Add orbital distance", "7 · Compare planetary systems", "Conclusion",
 ]
@@ -34,28 +41,17 @@ TEACHER_BACKGROUNDS = {
         "universal rule for planetary systems."
     ),
     2: (
-        "**From our Solar System to other planetary systems**\n\n"
-        "- Our **Sun** is one star. A **star** produces its own light; a planet does not and is visible mainly "
-        "because it reflects or absorbs and re-emits light from its star.\n"
-        "- The **Solar System** is the Sun and the objects gravitationally bound to it. A **planetary system** is "
-        "the general name for planets and other material orbiting any star.\n"
-        "- An **exoplanet**—short for extrasolar planet—is a planet orbiting a star other than the Sun. Known "
-        "exoplanets are in our galaxy, the **Milky Way**; they are not normally planets in other galaxies.\n"
-        "- A **light-year is a distance**, not a time: it is the distance light travels in one year. Light from "
-        "the Sun takes about 8 minutes to reach Earth. Light from the nearest star system takes more than 4 years.\n"
-        "- **Alpha Centauri** is the nearest star system to our Solar System. It contains three stars. The closest "
-        "of these is called **Proxima Centauri**, and a planet called Proxima Centauri b orbits it about 4.2 "
-        "light-years from us. The name is an example, not assumed knowledge for students or teachers.\n"
-        "- **Kepler** was a NASA space telescope, operating from 2009 to 2018, that repeatedly measured the "
-        "brightness of more than 100,000 stars in one patch of sky. Many of those stars are roughly 500–3,000 "
-        "light-years away. Kepler found thousands of planet candidates by detecting transits.\n"
-        "- The Milky Way is about **100,000 light-years across** and contains roughly **100–400 billion stars**. "
-        "Andromeda, the nearest major galaxy, is about **2.5 million light-years away**. We have therefore sampled "
-        "only a small part of our own galaxy for exoplanets.\n\n"
-        "If students ask about the **Big Bang**, acknowledge that it concerns the early development of the whole "
-        "Universe. The more relevant explanation for different planets is **planet formation**: stars form with "
-        "rotating discs of gas and dust; grains collide and accumulate into larger bodies, and those bodies evolve "
-        "into planetary systems. No senior physics is required here."
+        "**A prediction meets a real observation**\n\n"
+        "- Let students make their prediction from the familiar Solar System evidence before revealing 51 Pegasi b. "
+        "The purpose is to make scientific revision visible, not to catch students out.\n"
+        "- **51 Pegasi b** is a hot Jupiter: a giant planet on a very close orbit. Its mass is an estimate, not a "
+        "physical-size measurement. The displayed value is about 146 Earth masses (about 0.46 Jupiter masses), and "
+        "its orbital semimajor axis is about 0.052 AU.\n"
+        "- The comparison uses NASA Exoplanet Archive reference values. Its best mass field can represent a measured "
+        "mass or a minimum mass; describe the value here as an estimate.\n\n"
+        "Keep the science point concise: giant planets can exist very close to their stars, so the Solar System is "
+        "not the only possible arrangement. Do not expand into migration, planet formation, detection methods or "
+        "discovery chronology."
     ),
     3: "**Reading the annual chart**\n\nEach bar counts confirmed exoplanets assigned to one discovery year; the chart is not cumulative. Large releases can create spikes because teams may validate many candidates together after years of observation and analysis. Kepler contributed 715 newly validated planets in 2014 and a further large validated collection in 2016. Keep the student explanation focused on how scientific knowledge can grow through coordinated observation, analysis and publication.",
     4: "**Why use 100% bars?**\n\nOur Solar System has only eight planets, while the detected sample contains thousands. Raw counts would make direct comparison difficult. Converting each group to percentages asks a fairer question: what proportion of each group falls into each mass category? The categories are instructional bins rather than official planet classes, and planets without the required mass estimate cannot be placed in them.",
@@ -89,14 +85,14 @@ TEACHER_NOTE_OVERRIDES = {
         misconceptions="Mass is not physical size; AU is a distance, not a time. The table describes our Solar System, not a universal rule for planetary systems.",
     ),
     2: dict(
-        title="Move from our Solar System to memorable examples",
-        purpose="Use individual exoplanet examples to recognise that other stars host varied planetary systems.",
-        timing="10 minutes (Lesson 1)",
-        facilitation="Define star, planetary system and exoplanet before introducing the three cases. Students do not need to memorise the names; use each story as evidence that systems can be arranged differently.",
-        alignment="SC4-OTU-01 and SC4-WS-08: use observations and examples to build and communicate understanding of the Universe.",
-        evidence="Students explain that the Sun is one star and identify one way another planetary system differs from ours.",
-        listen_for="Comparisons involving number, type or arrangement of planets rather than recall of proper names.",
-        misconceptions="‘Solar System’ names our own system; ‘planetary system’ is the general term.",
+        title="Could Jupiter be here?",
+        purpose="Use familiar Solar System evidence to make a prediction, then revise it after a real hot-Jupiter observation.",
+        timing="8–10 minutes (Lesson 1)",
+        facilitation="Let the prediction exist before revealing the counterexample. Ask what the observation changes about a Solar-System-based expectation; the point is visible scientific revision, not a surprise quiz.",
+        alignment="SC4-DA1-01, SC4-WS-02 and SC4-WS-06: generate an expectation, compare it with evidence and revise thinking when warranted.",
+        evidence="Students explain that a giant planet can orbit unexpectedly close to its star and that this is not what they would infer from our Solar System alone.",
+        listen_for="‘I expected giant planets to be farther out because of our Solar System’ and ‘this real planet shows that is not a general rule’, including the intuitive idea that a close-in giant would be hot.",
+        misconceptions="51 Pegasi b's mass is an estimate and does not describe its physical size. ‘Hot Jupiter’ is a useful category, not a reason to introduce migration, formation theory, detection methods or discovery chronology.",
     ),
     3: dict(
         title="Move from examples to an annual dataset",
@@ -202,6 +198,29 @@ def _format_solar_system_table() -> pd.DataFrame:
     })
 
 
+# NASA Exoplanet Archive, 51 Pegasi b overview (accessed 2026-09-13):
+# https://exoplanetarchive.ipac.caltech.edu/overview/51%20Pegasi%20b
+# The archive reports an orbital semimajor axis of 0.052 AU and a best mass
+# estimate of 0.46 Jupiter masses (about 146 Earth masses). Its best mass can
+# be a measured mass or a minimum mass, so learner-facing text calls it an estimate.
+FIFTY_ONE_PEGASI_B = {
+    "Planet": "51 Pegasi b",
+    "Mass (Earth = 1)": "≈146 (estimate)",
+    "Orbital distance (AU)": "0.052",
+}
+
+
+def _hot_jupiter_comparison_table() -> pd.DataFrame:
+    """Return the compact, static comparison used for the Screen 2 observation."""
+    return pd.DataFrame([
+        {"Planet and star": "Jupiter — Sun", "Mass (Earth = 1)": "318", "Orbital distance (AU)": "5.20"},
+        {"Planet and star": "Mercury — Sun", "Mass (Earth = 1)": "0.0553", "Orbital distance (AU)": "0.387"},
+        {"Planet and star": "51 Pegasi b — 51 Pegasi", **{
+            key: value for key, value in FIFTY_ONE_PEGASI_B.items() if key != "Planet"
+        }},
+    ])
+
+
 @dataclass(frozen=True)
 class LessonDependencies:
     """Shared charts, helpers and assets supplied by the application shell."""
@@ -254,41 +273,24 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
         st.dataframe(_format_solar_system_table(), hide_index=True, width="stretch")
         notice_prompt("What simple comparisons can you make between the planets' masses and orbital distances?")
     elif part == 2:
-        st.header("Step 2: There are planets around other stars")
-        st.info(
-            "An **exoplanet** is a planet orbiting a star other than the Sun. We will start with a few individual "
-            "stories before looking at the whole dataset."
+        st.header("Step 2: Could Jupiter be here?")
+        st.write("In our Solar System, the giant planet Jupiter is far from the Sun, while Mercury is much closer.")
+        predict_prompt("Could a Jupiter-like giant planet orbit even closer to its star than Mercury does to the Sun?")
+        hot_jupiter_revealed = d.hard_reveal(
+            "Make your prediction from the Solar System table first. Then reveal a real planet orbiting another star.",
+            "year8_51_pegasi_b_revealed",
+            reveal_label="Reveal the real planet →",
+            revealed_message="A real giant planet can orbit far closer to its star than Mercury orbits the Sun.",
         )
-        with media_text_pair(
-            d.planetary_systems_image_path,
-            role="context",
-            caption="Our Solar System is one planetary system; other stars can have their own planetary systems.",
-            key="year8_planetary_systems",
-        ):
-            st.info(
-                "### A sense of scale\n"
-                "The nearest known exoplanet is about **4 light-years** away. Many of the stars searched by telescopes "
-                "are **hundreds to thousands of light-years** away, but they are still in our Milky Way. A light-year "
-                "measures distance: it is how far light travels in one year."
+        if hot_jupiter_revealed:
+            st.subheader("A real observation: 51 Pegasi b")
+            st.dataframe(_hot_jupiter_comparison_table(), hide_index=True, width="stretch")
+            st.write(
+                "51 Pegasi b has a mass estimate of about 146 Earth masses—nearly half Jupiter's mass—but orbits "
+                "at 0.052 AU. That is much closer to its star than Mercury's 0.387 AU orbit."
             )
-        st.subheader("Three discoveries to meet")
-        case_studies = st.columns(3)
-        with case_studies[0]:
-            st.markdown("**51 Pegasi b**")
-            st.write("The first planet found orbiting a Sun-like star, announced in 1995. It is a gas giant very close to its star, completing an orbit in only a few days.")
-        with case_studies[1]:
-            st.markdown("**Kepler-90**")
-            st.write("A planetary system with eight known planets— the same number as our Solar System, but packed much more closely around its star.")
-        with case_studies[2]:
-            st.markdown("**TRAPPIST-1**")
-            st.write("A nearby star with seven roughly Earth-sized planets. Several orbit closer to their star than Mercury orbits the Sun.")
-        st.markdown(
-            "### What do these stories suggest?\n"
-            "Planetary systems can be arranged in ways that are familiar, surprising or completely different from "
-            "our own. We will now look at the larger collection of discoveries."
-        )
-        d.response_box(2, "Choose one system. What makes it similar to or different from our Solar System?", "“This system is different because…” or “It is similar to ours because…”")
-        d.key_idea("Individual discoveries show that other planetary systems can be very different from ours.", "Choose one case study and identify its unusual star, planet size or arrangement.")
+            st.write("A giant planet on such a close orbit is called a **hot Jupiter**. Mass is not the same as physical size.")
+            revise_prompt("What should you revise about where giant planets can orbit?")
     elif part == 3:
         st.header("Step 3: Exoplanet discoveries over time")
         st.write(
