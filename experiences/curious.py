@@ -23,6 +23,7 @@ from ui_helpers import (
     notice_prompt,
     predict_prompt,
     scroll_to_top_if_requested,
+    self_check,
     soft_reveal,
     step_buttons,
     step_tabs,
@@ -106,6 +107,11 @@ def render(data: pd.DataFrame, terminal_action) -> None:
         if figure is not None:
             st.plotly_chart(figure, use_container_width=True)
         notice_prompt("Which mass groups contain the Solar System planets?")
+        with self_check("Check your reading"):
+            st.write(
+                "The Solar System planets appear in the very low, low, medium and high mass groups. "
+                "The wider a section of the bar is, the larger the share of planets in that group."
+            )
         key_idea("Planet mass gives us one measurable way to compare planets.", "Which labelled mass groups contain our eight planets, and which group contains the most?")
     elif part == 2:
         st.header("Step 2: Meet exoplanets")
@@ -118,6 +124,11 @@ def render(data: pd.DataFrame, terminal_action) -> None:
         if figure is not None:
             st.plotly_chart(figure, use_container_width=True)
         compare_prompt("Which planet-mass group looks most different between the two bars?")
+        with self_check("Check your comparison"):
+            st.write(
+                "Compare sections with the same label. The detected-exoplanet bar has a much larger very low mass section, "
+                "while the Solar System bar has a larger medium mass section."
+            )
         key_idea("Detected exoplanets give us a population to compare with our Solar System.", "Compare the widest labelled section in the top bar with the widest section in the bottom bar.")
     elif part == 3:
         st.header("Step 3: Mass and orbital distance")
@@ -138,7 +149,11 @@ def render(data: pd.DataFrame, terminal_action) -> None:
             notice_prompt(
                 "What can you see now that was difficult to see before? Where are the small inner planets and the giant outer planets?"
             )
-            st.info("**What changed?** These are the same planets, variables and values. A log scale changes the spacing so small and large values can be seen on the same graph. You do not need to calculate logarithms to use it.")
+            with self_check("Check what changed"):
+                st.write(
+                    "The planets, variables and values did not change. Logarithmic spacing spreads a very wide range of "
+                    "values across the graph, making the inner planets easier to distinguish while the giant outer planets remain visible."
+                )
             key_idea("A log scale helps us see small and large planets on the same graph.", "The four inner planets are easier to separate without losing Jupiter and the outer planets.")
     elif part == 4:
         st.header("Step 4: Is our planetary system normal?")
@@ -148,6 +163,11 @@ def render(data: pd.DataFrame, terminal_action) -> None:
         st.plotly_chart(current_demographics_chart(data), use_container_width=True)
         data_detective_challenge()
         conclude_prompt("What did the Earth challenge show? What did your chosen challenge show? Does this evidence make our planetary system seem typical—or unusual?")
+        with self_check("Check what the graph can support"):
+            st.write(
+                "Blue points near Earth do not prove that we have found another Earth. This graph supports comparisons of planet "
+                "mass and orbital distance, so any conclusion about whether a whole planetary system is normal should remain cautious."
+            )
         key_idea("This graph gives us clues about how our planets compare with detected exoplanets.", "A blue point near Earth is not automatically another Earth: this graph shows mass and orbital distance, not every planetary property.")
     elif part == 5:
         st.header("Step 5: How do we find exoplanets?")
@@ -173,11 +193,20 @@ def render(data: pd.DataFrame, terminal_action) -> None:
         method_view = st.radio("Choose a data view", ["Direct Imaging", "Transit", "Transit + Direct Imaging", "All methods"], horizontal=True, key="curious_method_view")
         graph_guide("Choose a method, then compare where its points appear on the graph.", "Look for patterns in planet mass and orbital distance before opening the explanation.")
         st.plotly_chart(demographics_methods_chart(data, method_view), use_container_width=True)
-        with soft_reveal("What pattern does the evidence support?"):
-            st.write("Direct imaging most often finds bright, massive planets far from their stars. Transit detection most often finds planets close to their stars, especially larger planets. These are real patterns in the detected data, shaped by what each method can measure.")
-        st.markdown("### Discuss")
-        st.write("What changed when we changed the way we searched?")
-        key_idea("Different discovery methods find different kinds of planets.", "Toggle the method views and compare where their points appear on the graph.")
+        method_pattern_revealed = hard_reveal(
+            "After inspecting the method views, reveal an interpretation of the evidence pattern.",
+            "curious_method_pattern_revealed",
+            reveal_label="Reveal the evidence interpretation →",
+            revealed_message=(
+                "Direct imaging most often finds bright, massive planets far from their stars. Transit detection most often "
+                "finds planets close to their stars, especially larger planets."
+            ),
+            explanation="These are real patterns in the detected data, shaped by what each method can measure.",
+        )
+        if method_pattern_revealed:
+            st.markdown("### Discuss")
+            st.write("What changed when we changed the way we searched?")
+            key_idea("Different discovery methods find different kinds of planets.", "Toggle the method views and compare where their points appear on the graph.")
     elif part == 6:
         st.header("Conclusion: Our view is still changing")
         conclude_prompt(
