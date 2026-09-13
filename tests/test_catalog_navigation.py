@@ -53,6 +53,7 @@ class PublicDestinationCatalogueTests(unittest.TestCase):
             experience["card_summary"],
             "Use real exoplanet data to filter worlds and find your perfect planet.",
         )
+        self.assertEqual(experience["audience_badge"], "CURIOUS · Facilitated")
         self.assertEqual(experience["card_button_label"], "Start →")
         self.assertEqual(experience["app_experience"], "Planet Shopping Outside Our Solar System")
         self.assertEqual(experience["thumbnail"], "assets/planet-shopping-thumbnail.png")

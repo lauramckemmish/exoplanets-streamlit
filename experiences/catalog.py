@@ -12,6 +12,7 @@ EXPERIENCES = (
         "card_title": "Planet Shopping",
         "card_summary": "Use real exoplanet data to filter worlds and find your perfect planet.",
         "card_button_label": "Start →",
+        "audience_badge": "CURIOUS · Facilitated",
         "enabled": True,
         "icon": "🛒",
         "thumbnail": "assets/planet-shopping-thumbnail.png",
