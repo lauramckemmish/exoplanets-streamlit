@@ -10,6 +10,7 @@ from data import SOLAR_SYSTEM_PLANETS
 from ui_helpers import (
     compare_prompt,
     completion_gate,
+    conclude_prompt,
     graph_reading_support,
     media_text_pair,
     notice_prompt,
@@ -114,7 +115,18 @@ TEACHER_BACKGROUNDS = {
         "Listen for an observation, a comparison with the earlier prediction, and a cautious addition or change supported by "
         "a visible feature of the graph."
     ),
-    8: "**A deliberately open ending**\n\nStudents should leave with an evidence-based understanding that planetary systems can be diverse and with a question worth pursuing. Optional interests may lead towards astronomy, planetary formation, atmospheres, spectra, astrobiology, philosophy, culture or science communication. These are engagement routes rather than additional Stage 4 requirements.",
+    8: (
+        "**Synthesis, not new content**\n\n"
+        "- Return briefly to the opening question: our Solar System was the familiar reference point, but new observations "
+        "showed that planetary systems can differ from that expectation.\n"
+        "- Emphasise the reasoning journey: observations and data → expectation → representation → larger population evidence "
+        "→ tested or revised conclusion. A useful conclusion can name something the evidence changed or strengthened; it "
+        "does not need to be the same for every student.\n"
+        "- This supports SC4-DA1-01 and SC4-OTU-01: organising observations as data helped scientists identify patterns, "
+        "test expectations and build a richer understanding.\n\n"
+        "Keep the boundary concise: this detected, measured sample is not every planet that exists. Do not introduce detailed "
+        "detection bias, habitability or planet formation in the close."
+    ),
 }
 
 
@@ -201,13 +213,14 @@ TEACHER_NOTE_OVERRIDES = {
         misconceptions="These are detected planets with the measurements needed for this graph, not every planet that exists. Do not explain detailed detection bias or why sparse regions occur; that reasoning belongs primarily in the Year 10 experience.",
     ),
     8: dict(
-        title="Consolidate diversity and generate questions",
-        purpose="Communicate what the evidence shows about planetary diversity and identify a productive next question.",
-        timing="8 minutes (Lesson 2)",
-        facilitation="Invite several claims before summarising. Use the learn-more prompt to value astronomy, astrobiology and broader human questions without adding required content.",
-        alignment="SC4-WS-06 and SC4-WS-08: draw conclusions and communicate scientific ideas.",
-        evidence="Students support one claim about planetary systems with an example or pattern from the activity.",
-        listen_for="A clear connection between evidence and the conclusion that planetary systems can be diverse.",
+        title="Conclusion: new observations changed the picture",
+        purpose="Close the two-lesson reasoning arc by synthesising how observations, representations and larger population evidence tested or refined an expectation.",
+        timing="3–5 minutes (Lesson 2 close)",
+        facilitation="Return to the opening question and invite one brief statement about what the evidence changed or strengthened. This is synthesis, not new content: a defensible conclusion may refer to the hot Jupiter, another system arrangement, the graph or a revised prediction.",
+        alignment="SC4-DA1-01 and SC4-OTU-01: use observations organised as data to identify patterns, test expectations and communicate a richer scientific understanding.",
+        evidence="Students communicate one cautious change or strengthening in their thinking based on an observation or representation from the experience.",
+        listen_for="‘I expected …, but the evidence showed …’, ‘the graph helped me see …’, or another evidence-linked recognition that planetary systems can be diverse.",
+        misconceptions="The detected planets with the measurements used here are not every planet that exists. Do not add detailed detection bias, habitability or planet-formation content during this short close.",
     ),
 }
 
@@ -577,13 +590,17 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             st.write("Use a visible feature of this detected dataset as evidence. More evidence can support, challenge or add detail to an earlier prediction; it does not create one final rule for every planetary system.")
     elif part == 8:
         st.header("Conclusion")
-        st.markdown("### Looking forward: other planetary systems are weird—and wonderful")
-        st.info("Our Solar System is one example, not the only possible design. As astronomers discover more systems, they keep finding giant planets close to their stars, compact groups of planets and worlds unlike anything in our neighbourhood. What else might be waiting to be found?")
-        st.markdown("### What have we learned?\n- Other stars can have their own planetary systems.\n- The number of known exoplanets has grown rapidly as observations and data analysis improve.\n- Planetary systems can be very different from our own.\n- Graphs help us connect individual discoveries with larger patterns.")
-        st.markdown("### Keep wondering")
-        st.write("Scientists do not finish with all the answers—they finish with new questions. What do you now wonder about planets or planetary systems? Try turning your idea into a **why** question.")
-        st.caption("**Question starters:** “Why does…?”, “Why are…?”, or “Why do scientists…?”")
-        st.text_area("My next question is…", key="demographics_conclusion_question", height=100, placeholder="Why…?")
-        d.learn_more_prompt("classroom")
+        conclude_prompt("What is one thing the evidence changed or strengthened in your thinking about planetary systems?")
+        st.info(
+            "Our Solar System was a familiar starting point, not a rule. New observations showed that planetary systems "
+            "can differ from that expectation. Organising many observations as data made broader patterns visible, so "
+            "scientists could test expectations and build a richer picture of planetary diversity."
+        )
+        st.write(
+            "The graphs did not change the planets or the data. They helped us inspect patterns in a larger dataset and "
+            "compare that evidence with an earlier prediction. Scientific understanding can change or become more nuanced "
+            "as evidence accumulates."
+        )
+        st.caption("These conclusions describe detected planets with the measurements needed for the graphs—not every planet that exists.")
 
     return None
