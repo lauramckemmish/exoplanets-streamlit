@@ -22,7 +22,7 @@ from ui_helpers import (
 STEP_LABELS = [
     "Welcome", "1 · Our Solar System as data", "2 · Could Jupiter be here?",
     "3 · Our Solar System isn't the only arrangement", "4 · Meet some real worlds", "5 · From individual planets to population patterns",
-    "6 · How can we show both variables?", "7 · Compare planetary systems", "Conclusion",
+    "6 · How can we show both variables?", "7 · Now add the detected population", "Conclusion",
 ]
 YEAR_LEVEL = "Year 8"
 PART_COUNT = len(STEP_LABELS)
@@ -103,7 +103,17 @@ TEACHER_BACKGROUNDS = {
         "Listen for ‘same data, different spacing’ and for observations that the inner planets become easier to separate. "
         "Do not expand into logarithm calculations, detailed maths notation, planet formation or detected-population patterns yet."
     ),
-    7: "**Checking the initial claim**\n\nThe final comparison graph puts thousands of detected exoplanets on the same axes as our Solar System. It offers stronger evidence than a few individual examples, but it is still a detected sample rather than an inventory of every planet that exists. Students should use a visible pattern to support, challenge or revise their Lesson 1 prediction.",
+    7: (
+        "**Test the earlier prediction with more evidence**\n\n"
+        "- Recall the Lesson 1 prediction before showing the larger detected population so students can compare their earlier "
+        "thinking with new evidence. Revision is a normal scientific response to more evidence, not a failure.\n"
+        "- The graph keeps the same log–log mass × orbital-distance representation used in Screen 6. The evidence population "
+        "changes: detected exoplanets with the measurements needed for this graph are added alongside the Solar System.\n"
+        "- Keep claims limited to this detected/measured dataset. It is not every planet that exists. Do not drift into detailed "
+        "detection bias, why sparse regions occur, or Year 10's detection-method work.\n\n"
+        "Listen for an observation, a comparison with the earlier prediction, and a cautious addition or change supported by "
+        "a visible feature of the graph."
+    ),
     8: "**A deliberately open ending**\n\nStudents should leave with an evidence-based understanding that planetary systems can be diverse and with a question worth pursuing. Optional interests may lead towards astronomy, planetary formation, atmospheres, spectra, astrobiology, philosophy, culture or science communication. These are engagement routes rather than additional Stage 4 requirements.",
 }
 
@@ -181,14 +191,14 @@ TEACHER_NOTE_OVERRIDES = {
         misconceptions="The graph has not changed the planets or their real locations. Do not overclaim that the scatter plot is itself a full scientific model or expand into logarithm calculations.",
     ),
     7: dict(
-        title="Compare planetary systems and check a claim",
-        purpose="Use the larger exoplanet dataset to support, challenge or revise the Lesson 1 prediction.",
-        timing="18 minutes (Lesson 2)",
-        facilitation="Bring students back to their Lesson 1 prediction. Everyone first investigates Earth; then pairs choose one further data-detective challenge. Model one comparison between a Solar System planet and nearby detected points, then ask students to decide whether their first claim is supported, challenged or needs revision.",
-        alignment="SC4-WS-06 and SC4-WS-08: draw and communicate conclusions from data.",
-        evidence="Students revise or support a claim by referring to a visible pattern in the graph.",
-        listen_for="A clear connection between an initial idea, the Earth or chosen-planet challenge, graph evidence and a revised conclusion.",
-        misconceptions="Students do not need to decide whether our Solar System is statistically normal.",
+        title="Now add the detected population",
+        purpose="Test the persisted Lesson 1 prediction against the larger detected mass-and-orbital-distance dataset using NOTICE → COMPARE → REVISE reasoning.",
+        timing="12–15 minutes (Lesson 2 discussion and revision)",
+        facilitation="Show the earlier prediction first, then let students inspect the graph before discussing what is supported, different or worth adding. A defensible response names a visible pattern and cautiously connects it to the earlier prediction; do not prescribe one exact answer or frame revision as failure.",
+        alignment="SC4-DA1-01 and SC4-WS-06: use a data representation to identify patterns, test an earlier expectation and communicate a cautious evidence-based conclusion.",
+        evidence="Students identify a visible feature of the detected population and use it to support, challenge or qualify their earlier prediction.",
+        listen_for="A NOTICE about a cluster, range or close-in massive planets; a comparison with the earlier prediction; and a cautious revision based on the detected dataset.",
+        misconceptions="These are detected planets with the measurements needed for this graph, not every planet that exists. Do not explain detailed detection bias or why sparse regions occur; that reasoning belongs primarily in the Year 10 experience.",
     ),
     8: dict(
         title="Consolidate diversity and generate questions",
@@ -264,6 +274,7 @@ _BROWSER_SEEN_KEY = "year8_strange_new_worlds_browser_seen"
 _BROWSER_MINIMUM = 3
 _POPULATION_PREDICTION_KEY = "year8_strange_new_worlds_population_prediction"
 _SOLAR_SYSTEM_SCALE_REVEAL_KEY = "year8_strange_new_worlds_solar_system_log_scale_revealed"
+_POPULATION_REVISION_KEY = "year8_strange_new_worlds_population_revision"
 
 
 def _eligible_browser_planets(data: pd.DataFrame) -> pd.DataFrame:
@@ -544,13 +555,26 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             with self_check("Check the representation choice"):
                 st.write("Both graphs show the same data. The log–log spacing makes the small inner planets easier to separate while keeping the giant outer planets visible.")
     elif part == 7:
-        st.header("Step 7: Compare planetary systems")
-        st.write("This graph adds detected exoplanets to the same mass-and-orbital-distance view as the Solar System planets. Use this larger dataset to support, challenge or change your Lesson 1 prediction.")
-        d.graph_guide("The bottom axis is orbital distance from a star; the side axis is planet mass. Both use log scales.", "Blue circles are detected exoplanets. Pink labelled diamonds are the Solar System planets.", "Look for places where the Solar System planets are surrounded by many blue points—and places where they are not.")
-        st.plotly_chart(d.current_demographics_chart(data), use_container_width=True)
-        d.data_detective_challenge()
-        d.response_box(7, "Check your claim and your chosen planet: is there a detected exoplanet nearby? What can you now say about whether other planetary systems need to look like ours?", "“My first claim was…, but the graph shows…” or “Near ___, I found…”")
-        d.key_idea("A larger dataset helps us test an idea that began with a few memorable examples.", "Return to Earth and your chosen Solar System planet: where are nearby blue points, and where are there few?")
+        st.header("Step 7: Now add the detected population")
+        prediction = st.session_state.get(_POPULATION_PREDICTION_KEY, "").strip()
+        with st.container(border=True):
+            st.write("**Earlier, you predicted:**")
+            st.write(f"“{prediction}”" if prediction else "No saved prediction is available in this session. Use the earlier evidence as your starting point.")
+        st.write("Now test that earlier thinking against a larger detected population on the same mass-and-orbital-distance representation.")
+        st.plotly_chart(d.current_demographics_chart(data), width="stretch")
+        st.caption("These are detected planets with the measurements needed for this graph — not every planet that exists.")
+        notice_prompt("What patterns or clusters do you notice in the detected planets?")
+        compare_prompt("Which parts of your prediction are supported by this dataset? What looks different from what you expected?")
+        revise_prompt("What would you change or add to your prediction now?")
+        st.text_area(
+            "Revise your prediction using one visible feature of the graph",
+            key=_POPULATION_REVISION_KEY,
+            placeholder="My earlier prediction was…, and this graph shows…",
+            height=90,
+            persist_state="session",
+        )
+        with self_check("Keep the conclusion cautious"):
+            st.write("Use a visible feature of this detected dataset as evidence. More evidence can support, challenge or add detail to an earlier prediction; it does not create one final rule for every planetary system.")
     elif part == 8:
         st.header("Conclusion")
         st.markdown("### Looking forward: other planetary systems are weird—and wonderful")
