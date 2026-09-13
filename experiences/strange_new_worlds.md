@@ -36,7 +36,7 @@ The learner moves from one familiar planetary system, to surprising individual o
 to increasingly useful data representations and finally to a larger detected exoplanet
 population. The central intellectual move is:
 
-> familiar evidence → prediction → surprising observation → broader evidence → richer representation → test/revise conclusion
+> familiar system → expectation → evidence/data → explanatory confidence → surprising observation → revision → broader system diversity → richer representation → test/revise conclusion
 
 This experience is not primarily about:
 
@@ -177,289 +177,244 @@ Early screens should therefore carry **low representation load**. Learners first
 
 # Lesson 1 — Understand the evidence and make a prediction
 
-## Screen 0 — Welcome: How different can planetary systems be?
+## Screen 0 — The system we knew
 
-**Main cognitive job**  
-Establish a scientific question that can be investigated using observations and data.
+**DECISION — Main cognitive job**
+Establish our Solar System as the legitimate, familiar starting point for a reasonable expectation about another planetary system.
 
-**Science learning**
+**Core perspective**
 
-- Our Solar System is one planetary system.
-- Astronomers now have observations/data for thousands of planets around other stars.
+> For most of human history, there was only one planetary system we could study properly: ours.
 
-**Data-science learning**
-
-- Scientific questions can be investigated by organising and comparing observations as data.
-
-**Evidence presented**
-
-A concise orientation to the Solar System as one known example and the existence of a large exoplanet catalogue.
+Learners first notice its broad, familiar arrangement: small rocky planets relatively close to the Sun and giant planets farther out. It looks reasonably orderly, so it was sensible for scientists to try to explain why it looked that way.
 
 **Learner action**
 
-Understand the investigation question. Do not require a “normal/not normal” prediction here.
+Invite an expectation without signalling that it will fail:
 
-**Evidence of learning**
+> Looking at our Solar System, what would you expect another planetary system to look like?
 
-Students can state that the lesson will use planet data to investigate how varied planetary systems can be.
+**Facilitator intent**
 
-**Facilitator move**
+Keep this short. Establish a legitimate Solar-System-based expectation, not the later conclusion. A dry, conversational observation that the arrangement looks rather organised is welcome, but must not undermine the expectation before learners form it.
 
-Keep this short. Establish the question, not the answer.
+**Do not introduce yet**
 
-**Listen for**
+- thousands of exoplanets;
+- the claim that the Solar System is only one example or not a universal template;
+- the conclusion that planetary systems are diverse;
+- data-science jargon;
+- detection methods or catalogue history.
 
-Questions about what can differ between planets/systems and what evidence might be compared.
+**Representation and timing**
 
-**Boundary / misconception**
-
-Do not imply that the detected catalogue is a complete inventory of all planets.
-
-**Representation**
-
-No substantial graph is required.
-
-**Approximate timing**
-
-3–5 minutes.
-
-**Do not expand into**
-
-- detection methods;
-- catalogue history;
-- detailed astronomy vocabulary beyond what the investigation needs.
+No substantial graph is required. Allow approximately 3–5 minutes.
 
 **Connection forward**
 
-Screen 1 asks what our own familiar planetary system looks like when treated as data.
+Screen 1 turns the familiar arrangement into usable evidence and introduces why scientists had a sensible explanation for it.
 
 ---
 
-## Screen 1 — Our Solar System as data
+## Screen 1 — Turn the familiar system into data
 
-**Main cognitive job**  
-Establish a familiar data reference and introduce the two core quantitative properties: mass and orbital distance.
+**DECISION — Main cognitive job**
+Turn familiar planets into a small set of usable quantities, then establish why the Solar System's tidy arrangement supported a reasonable formation story.
 
 **Science learning**
 
 - planets differ in mass;
-- planets orbit at different distances from the Sun;
-- Earth mass and AU are comparison units.
-
-**Data-science learning**
-
-- a table/data display can be an appropriate representation when the dataset is small and readable;
-- scientific quantities can be compared directly before a graph is necessary.
+- planets are at different distances from the Sun;
+- in our Solar System, small rocky planets are relatively close to the Sun and giant planets farther out;
+- Earth mass and AU are useful comparison units.
 
 **Evidence presented**
 
-A simple readable Solar System data presentation, likely using all eight planets if the final layout remains clear. Core fields:
+Use the established readable table of all eight planets. Core fields are:
 
 - planet name;
 - mass in Earth masses;
-- orbital distance in AU.
+- distance from the Sun, later named **orbital distance**, in AU.
+
+**Vocabulary progression**
+
+Use ordinary language first: *distance from the Sun* and, later, *distance from the star*. Introduce **orbital distance** only after learners have the concrete idea. Introduce AU when it is immediately useful:
+
+> Astronomers use AU to compare distances within planetary systems. Earth is 1 AU from the Sun.
+
+Mass remains in Earth masses. Do not assume learners already understand *variable*, *dataset*, *population*, *representation* or curriculum-language uses of *comparison*.
 
 **Learner action**
 
-NOTICE accessible features in the data. Learners might compare Earth, Jupiter, Mercury and the outer giants, but should not be taught Solar System patterns as universal rules.
+NOTICE in ordinary language before abstract labels:
 
-**Evidence of learning**
+> What do you notice? Which planets are heavy? Which are close to the Sun? Which are far away?
 
-Students can correctly describe at least one planet using both quantities and identify a simple comparison between planets.
+Do not state the inner-small/outer-giant pattern before learners have had an opportunity to notice it.
 
-**Facilitator move**
+**DECISION — Brief formation visual**
 
-Anchor Earth at 1 Earth mass and 1 AU. Use Jupiter and Mercury as intuitive contrasts that prepare the next prediction.
+Include a brief visual or video that explains the tidy Solar-System formation story scientists developed from this familiar arrangement. Its job is not detailed planet-formation teaching; it establishes that scientists had a reasonable explanation for why the Solar System looked this way, so the later hot-Jupiter observation has genuine scientific consequence.
 
-**Listen for**
+Keep it Year 8 conceptual and approximately 30–60 seconds if video, or equivalently brief if static or animated. Do not teach detailed migration mechanisms, competing modern formation models or specialist disk physics.
 
-- “Jupiter is much more massive than Earth.”
-- “Mercury is closer to the Sun than Earth.”
-- recognition that mass and orbital distance are different variables.
+**HYPOTHESIS — Formation visual implementation**
 
-**Likely misconceptions**
+The exact asset, video, animation or static implementation must be selected after later inspection for scientific accuracy, accessibility, duration and classroom reliability.
 
-- mass is not the same as physical diameter/visual size;
-- AU is a distance, not a time;
-- the table describes our Solar System, not a universal rule for planetary systems.
+**Facilitator intent**
 
-**Facilitator background**
+Anchor Earth at 1 Earth mass and 1 AU. Let learners make the initial pattern observation, then use the formation visual to establish explanatory confidence rather than to teach specialist theory.
 
-Earth mass and AU are useful relative units. Students do not need unit conversions or precise astronomical distances in kilometres.
+**Boundary / misconceptions**
 
-**Representation**
-
-Table/data presentation rather than a graph.
-
-**Why this representation belongs here**
-
-Eight familiar planets are small enough to inspect directly. The purpose is to understand the variables, not yet to teach graph interpretation.
-
-**Approximate timing**
-
-8–10 minutes.
-
-**Do not expand into**
-
-- log scales;
-- scatter plots;
-- planet-formation theory.
-
-**OPEN — implementation detail**
-
-- exact table layout;
-- whether Earth/Jupiter/Mercury receive subtle visual emphasis;
-- exact level of rounding.
+- Mass is not physical diameter or visual size.
+- AU is a distance, not a time.
+- Do not introduce log scales, scatter plots or population language here.
 
 **Connection forward**
 
-Screen 2 uses this familiar evidence to create a prediction about where a giant planet could orbit.
+Screen 2 introduces a giant planet around another star and asks learners to use this familiar evidence to predict where it should be.
 
 ---
 
-## Screen 2 — Could Jupiter be here?
+## Screen 2 — And then astronomers found this
 
-**Main cognitive job**  
-Make a genuine prediction from familiar evidence, then revise it after a real observation that breaks the Solar-System-based expectation.
+**DECISION — Main cognitive job**
+Introduce exoplanets through 51 Pegasi b, which breaks the expectation learners have just built from the Solar System and its tidy formation story.
+
+**Story sequence**
+
+1. Learners already know the Solar System pattern.
+2. Introduce the new observational development: astronomers began finding planets around other stars.
+3. Earn the vocabulary: a planet orbiting another star is called an **exoplanet**.
+4. Use the historical anchor: in 1995, astronomers announced the first exoplanet found around a Sun-like star, **51 Pegasi b**. Do not detour into earlier pulsar planets or spectral classification.
+5. Establish that 51 Pegasi b is a giant planet.
+6. Before showing its orbital location, ask learners to predict where a giant should be from the Solar System evidence:
+
+   > In our Solar System, Jupiter stays far out while Mercury is close to the Sun. If this planet is a giant, where would you expect it to be?
+
+7. Reveal the comparable evidence: 51 Pegasi b has an estimated mass of about 146 Earth masses and an orbital distance of about 0.052 AU, substantially closer to its star than Mercury is to the Sun.
+8. Allow the contradiction to land before explaining further. A dry reaction such as “Well. Our Solar System had not prepared us for that.” is appropriate.
+9. Use REVISE to ask what this observation makes learners reconsider about where giant planets can exist.
 
 **Science learning**
 
-Giant planets can exist very close to their stars. The Solar System is not the only possible arrangement.
+An observation can appear that a neat Solar-System-based expectation does not explain well. That does not mean scientists were foolish or “wrong”; it means scientific understanding needed to become richer.
 
-**Data-science / Working Scientifically learning**
-
-- generate an expectation from available evidence;
-- compare the expectation with a new observation;
-- revise thinking when the evidence warrants it.
-
-**Evidence presented**
-
-A clear comparison between Jupiter/Mercury in our Solar System and a canonical real hot Jupiter, likely **51 Pegasi b** if the final scientific/data audit confirms it is the best case.
-
-The learner-facing evidence should use comparable quantities rather than relying only on a label such as “hot Jupiter”.
-
-**Learner action**
-
-PREDICT:
-
-> Could a Jupiter-like giant planet orbit even closer to its star than Mercury does to the Sun?
-
-Then reveal the real exoplanet evidence and REVISE / discuss what changed.
+A short link back to the Screen 1 formation visual is appropriate: hot Jupiters forced scientists to rethink parts of the formation story. Do not teach the detailed modern explanation.
 
 **Evidence of learning**
 
-Students can explain that a massive planet can orbit unexpectedly close to its star and identify that this observation changes what they should expect planetary systems to look like.
+Students explain that a giant planet can orbit unexpectedly close to its star and identify what they should revise about where giant planets can exist.
 
-**Facilitator move**
+**Scientific boundaries**
 
-Let the prediction exist before supplying the counterexample. The point is not to catch students out; it is to make the scientific revision visible.
+- Describe the 51 Pegasi b mass as an estimate; it is not physical size.
+- Do not imply all close-in giant planets are identical to Jupiter.
+- Do not expand into migration, formation mechanisms, detection methods or discovery chronology beyond the 1995 historical anchor.
 
-**Listen for**
+**Representation and timing**
 
-- “I expected giant planets to be farther out because that is what our Solar System shows.”
-- “This real planet shows that is not a general rule.”
-- intuitive recognition that a giant planet close to its star would be hot.
-
-**Likely misconceptions / boundaries**
-
-- do not imply all giant close-in planets are identical to Jupiter;
-- do not turn the screen into a lesson on migration/planet formation;
-- “hot Jupiter” is a useful descriptive category, not the core learning objective.
-
-**Facilitator background**
-
-The first hot-Jupiter discoveries were scientifically surprising because they contradicted the then-familiar Solar-System-based expectation of giant planets on wider orbits. Detailed formation and migration mechanisms are optional background, not required learner content.
-
-**Representation**
-
-Simple comparable values/visual evidence. No population plot required.
-
-**Approximate timing**
-
-8–10 minutes.
-
-**OPEN — implementation detail**
-
-- exact hot-Jupiter example;
-- exact visual treatment;
-- exact comparable values and wording.
+Use a protected prediction followed by simple comparable values/visual evidence. No population plot is required. Allow approximately 8–10 minutes.
 
 **Connection forward**
 
-Screen 3 broadens the lesson from one surprising mass–distance arrangement to other kinds of planetary-system diversity.
+Screen 3 tests whether this was one unusual orbit or evidence that whole planetary-system arrangements can differ.
 
 ---
 
-## Screen 3 — Our Solar System isn’t the only arrangement
+## Screen 3 — It wasn't just one weird planet
 
-**Main cognitive job**  
-Recognise that planetary systems can differ from ours in more than one way.
+**DECISION — Main cognitive job**
+Escalate from one surprising planet to diversity in whole planetary-system arrangements.
 
-**Science learning**
+**Transition**
 
-Whole-system arrangement can vary as well as individual planet properties.
-
-**Data-science learning**
-
-Individual observations/case studies can establish what is possible, but they do not establish how common an arrangement is.
+> One strange planet could have been an exception. Astronomers kept looking.
 
 **Evidence presented**
 
-A small number of carefully chosen real planetary systems, probably **two** additional examples. Candidate conceptual contrasts:
+Use exactly two systems, each with one conceptual job:
 
-- a circumbinary/two-star planetary system;
-- a compact multi-planet system such as TRAPPIST-1.
+- **Kepler-16 b:** planets do not have to orbit a single star. Core fact: Kepler-16 b orbits two stars. A dry treatment such as “Two stars. Still a planet. Apparently one star was optional.” is appropriate only if it does not obscure the fact.
+- **TRAPPIST-1:** planetary systems can be packed very differently from ours. Core fact: TRAPPIST-1 has seven known planets, all orbiting closer to their star than Mercury orbits the Sun. Let “Seven planets. All inside Mercury's orbit.” carry most of the scientific strangeness.
 
-Existing NASA/JPL travel-poster assets may be reused if they remain scientifically and visually appropriate.
+Existing NASA/JPL travel-poster assets may be reused if appropriate, with clear labels that they are illustrations rather than photographs.
 
 **Learner action**
 
-COMPARE each example with our Solar System and identify the specific feature that differs.
+COMPARE concrete dimensions rather than abstract “system architecture”:
+
+- How many stars are in the system?
+- How many known planets are in the system?
+- How tightly packed are the planets?
+
+The examples are not a disconnected collection of novelty facts. They broaden the Screen 2 disruption from one anomalous orbit to whole-system arrangements.
 
 **Evidence of learning**
 
-Students can explain at least one way another real planetary system differs from ours.
+Students explain that Kepler-16 b orbits two stars and that TRAPPIST-1 is much more tightly packed than our Solar System.
 
-**Facilitator move**
+**Boundary / facilitator intent**
 
-Give each example one conceptual job. Do not turn this into a gallery of astronomy trivia.
+The examples establish possibility, not frequency. NASA/JPL artwork is illustration, not photography. Do not expand into circumbinary mechanics, formation theory, habitability, detection methods or a gallery of unusual systems.
 
-**Listen for**
+Allow approximately 8–10 minutes.
 
-- number of stars;
-- compactness / orbital arrangement;
-- differences in the kinds or positions of planets.
+**HYPOTHESIS — Later system-architecture payoff**
 
-**Likely misconception / boundary**
-
-Artist posters/illustrations are not photographs of planetary surfaces. The examples establish possibility, not frequency.
-
-**Facilitator background**
-
-Provide enough system-specific context for the chosen examples to answer likely student questions, but keep specialist details optional.
-
-**Representation**
-
-Illustration/poster + concise real data/context is appropriate because the cognitive job is to recognise qualitatively different system arrangements.
-
-**Approximate timing**
-
-8–10 minutes.
-
-**Do not expand into**
-
-- a long catalogue of “weird planets”;
-- habitability speculation;
-- detection-method explanations.
-
-**OPEN — implementation detail**
-
-- exact two examples;
-- which existing posters are core versus optional enrichment.
+Later implementation investigation should assess whether Screen 4's real-world browser could include number of stars and number of known planets in the system, and whether star multiplicity could be encoded in a later population representation where scientifically and technically supported. This is not a decision to adopt a particular chart encoding: it requires data-provenance, availability, completeness and visual-complexity review.
 
 **Connection forward**
 
-Screen 4 reconnects the earlier examples to several individual catalogue records, then asks learners to make a prediction from all of the Lesson 1 evidence.
+Screen 4 reconnects these examples to several individual catalogue records, then asks learners to make a prediction from all Lesson 1 evidence.
+
+---
+
+## Facilitator learning arc for Screens 0–3
+
+**DECISION — Opening arc**
+
+- **Screen 0:** establish the legitimate Solar-System-based expectation.
+- **Screen 1:** turn familiar planets into usable evidence and show why scientists had a sensible formation story.
+- **Screen 2:** let 51 Pegasi b violate that expectation and prompt revision.
+- **Screen 3:** show that the disruption extends beyond one anomalous orbit to whole-system arrangements.
+
+The resulting arc is:
+
+> familiar system → expectation → evidence/data → explanatory confidence → surprising observation → revision → broader system diversity
+
+This feeds naturally into Screen 4's real-world browser and the later population evidence.
+
+---
+
+## Vocabulary and reading-register principle
+
+**DECISION — Earn the jargon**
+
+Use this progression throughout the experience:
+
+> experience the idea → introduce the useful scientific or data-science word → reuse it so the learner gains ownership of the vocabulary
+
+Examples:
+
+- distance from the star → orbital distance;
+- planet around another star → exoplanet;
+- quantities being compared → variable, only when useful later;
+- many records together → dataset/population, when learners reach the population-evidence job.
+
+Use deliberately accessible ordinary prose. Scientific ideas may be challenging; interface language should not add avoidable reading difficulty. Do not imitate teenage slang, and do not avoid genuine scientific vocabulary once it has been earned.
+
+**HYPOTHESIS — Later readability review**
+
+A future readability/register pass should check whether ordinary learner-facing prose is accessible below the maximum reading capability of a typical Year 8 learner, so cognitive effort can be spent on the science. Do not establish a rigid automated reading-age score.
+
+## Voice and personality
+
+**DECISION — Provisional Strange New Worlds voice**
+
+Use dry attitude as the baseline, conversational guidance for reasoning, stronger mischievous reaction only when the science earns it, and calm/plain language while learners inspect evidence. The personality must not reveal conclusions prematurely: learners experience the Solar-System expectation before the experience reacts to its limits. Humour and reaction therefore intensify particularly on Screens 2–3.
 
 ---
 
@@ -768,9 +723,10 @@ The lesson break follows **cognitive jobs**, not old screen numbering or arbitra
 
 ## Lesson 1 — Understand the evidence and make a prediction
 
-> investigation question
-> → Solar System mass and orbital-distance table
-> → hot-Jupiter prediction, observation and revision
+> familiar Solar System
+> → expectation about another system
+> → mass-and-distance table and brief formation story
+> → 51 Pegasi b prediction, observation and revision
 > → Kepler-16 b and TRAPPIST-1 arrangements
 > → browse at least three real worlds
 > → persisted prediction about a mass × orbital-distance population
