@@ -144,7 +144,7 @@ def render(data: pd.DataFrame, terminal_action) -> None:
         )
         if log_scale_revealed:
             st.subheader("Now compare the log–log view")
-            graph_guide("The axes show the same values, but the new spacing spreads out the small planets.", "Find Earth at 1 AU and 1 Earth mass, then compare the positions of the four inner planets.")
+            graph_guide("The axes show the same variables and values, but use different spacing.", "Find Earth at 1 AU and 1 Earth mass, then compare the positions of the four inner planets.")
             st.plotly_chart(solar_system_demographics_chart(True), use_container_width=True)
             notice_prompt(
                 "What can you see now that was difficult to see before? Where are the small inner planets and the giant outer planets?"
