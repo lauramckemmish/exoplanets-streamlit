@@ -7,17 +7,19 @@ import streamlit as st
 
 from data import SOLAR_SYSTEM_PLANETS
 from ui_helpers import (
+    compare_prompt,
     graph_reading_support,
     media_text_pair,
     notice_prompt,
     predict_prompt,
     revise_prompt,
+    self_check,
     teacher_note,
 )
 
 STEP_LABELS = [
     "Welcome", "1 · Our Solar System as data", "2 · Could Jupiter be here?",
-    "3 · Discoveries over time", "4 · Compare planet masses", "5 · Strange new worlds",
+    "3 · Our Solar System isn't the only arrangement", "4 · Compare planet masses", "5 · Strange new worlds",
     "6 · Add orbital distance", "7 · Compare planetary systems", "Conclusion",
 ]
 YEAR_LEVEL = "Year 8"
@@ -53,7 +55,18 @@ TEACHER_BACKGROUNDS = {
         "not the only possible arrangement. Do not expand into migration, planet formation, detection methods or "
         "discovery chronology."
     ),
-    3: "**Reading the annual chart**\n\nEach bar counts confirmed exoplanets assigned to one discovery year; the chart is not cumulative. Large releases can create spikes because teams may validate many candidates together after years of observation and analysis. Kepler contributed 715 newly validated planets in 2014 and a further large validated collection in 2016. Keep the student explanation focused on how scientific knowledge can grow through coordinated observation, analysis and publication.",
+    3: (
+        "**Two arrangements that broaden the comparison**\n\n"
+        "- **Kepler-16 b** is a circumbinary planet: it orbits two stars. Its conceptual job is simply to show that "
+        "planets do not have to orbit a single star.\n"
+        "- **TRAPPIST-1** has seven known planets in a much more compact arrangement than our Solar System. All seven "
+        "orbit closer to their star than Mercury orbits the Sun. Its conceptual job is compact orbital spacing, not "
+        "habitability.\n"
+        "- The NASA/JPL travel posters are illustrations, not photographs. The examples show what is possible; they "
+        "do not tell us how common either arrangement is.\n\n"
+        "Keep the comparison concrete and avoid circumbinary mechanics, formation theory, detection methods, or a "
+        "long catalogue of unusual systems."
+    ),
     4: "**Why use 100% bars?**\n\nOur Solar System has only eight planets, while the detected sample contains thousands. Raw counts would make direct comparison difficult. Converting each group to percentages asks a fairer question: what proportion of each group falls into each mass category? The categories are instructional bins rather than official planet classes, and planets without the required mass estimate cannot be placed in them.",
     5: "**Strange worlds as a starting point**\n\nThe NASA/JPL travel poster is an artist's illustration based on a real planetary system. Kepler-16 b orbits two stars, while 51 Pegasi b is a giant planet close to its star and TRAPPIST-1 is a compact multi-planet system. These examples are intended to spark an initial claim, not to prove how common each arrangement is.",
     6: "**Two variables and two scales**\n\nOrbital distance describes the typical size of a planet's orbit; one AU is the average Earth–Sun distance. A scatter plot locates one planet using mass and orbital distance. Linear axes use equal additions, while logarithmic axes use equal multiplications. The log–log version spreads out small values while retaining the giant planets. Students read ordinary labels and do not calculate logarithms.",
@@ -95,14 +108,14 @@ TEACHER_NOTE_OVERRIDES = {
         misconceptions="51 Pegasi b's mass is an estimate and does not describe its physical size. ‘Hot Jupiter’ is a useful category, not a reason to introduce migration, formation theory, detection methods or discovery chronology.",
     ),
     3: dict(
-        title="Move from examples to an annual dataset",
-        purpose="Interpret an annual bar chart and describe how the recorded exoplanet population has changed over time.",
-        timing="15 minutes (Lesson 1)",
-        facilitation="Model the axes and one bar, then ask students to describe the overall pattern before discussing the 2014 and 2016 Kepler releases.",
-        alignment="SC4-OTU-01, SC4-DA1-01, SC4-WS-05 and SC4-WS-06: represent and interpret changing scientific knowledge.",
-        evidence="Students use the annual bars to describe growth and explain that a spike can reflect a large scientific release.",
-        listen_for="The graph counts confirmations recorded in each year, not planets physically forming or all being noticed on one night.",
-        misconceptions="The vertical axis is an annual count, not a running cumulative total.",
+        title="Our Solar System isn't the only arrangement",
+        purpose="Compare two real planetary-system arrangements with our Solar System: two stars for Kepler-16 b and a compact orbital arrangement for TRAPPIST-1.",
+        timing="8–10 minutes (Lesson 1)",
+        facilitation="Give each example one clear conceptual job, then ask students to name the contrast. Treat the posters as context after the real-system description, not as photographs or as evidence of how common either arrangement is.",
+        alignment="SC4-DA1-01 and SC4-WS-06: compare observations and distinguish what examples establish from what would require broader data.",
+        evidence="Students identify that Kepler-16 b orbits two stars and that TRAPPIST-1 is far more compactly arranged than our Solar System.",
+        listen_for="Comparisons about number of stars and compact orbital arrangement, rather than habitability speculation or a claim that every planetary system is unusual.",
+        misconceptions="The NASA/JPL artwork is illustration, not photography. These two examples establish possibility, not frequency; do not expand into circumbinary mechanics, formation theory or detection methods.",
     ),
     4: dict(
         title="Compare planet-mass distributions",
@@ -230,6 +243,7 @@ class LessonDependencies:
     solar_system_image_path: object
     planetary_systems_image_path: object
     nasa_kepler_16b_poster_path: object
+    nasa_trappist_1e_poster_path: object
     nasa_51_pegasi_b_poster_path: object
     nasa_kepler_186f_poster_path: object
     solar_system_demographics_chart: object
@@ -292,25 +306,23 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             st.write("A giant planet on such a close orbit is called a **hot Jupiter**. Mass is not the same as physical size.")
             revise_prompt("What should you revise about where giant planets can orbit?")
     elif part == 3:
-        st.header("Step 3: Exoplanet discoveries over time")
-        st.write(
-            "The first confirmed exoplanets were announced in 1992. Since then, the number of confirmed planets has "
-            "grown rapidly. A tall bar can mean that a large observing project released or confirmed many results at "
-            "once; it does not mean all those planets were first noticed in that single year."
-        )
-        graph_reading_support(
-            "The horizontal axis shows the year a planet was recorded as discovered or confirmed.",
-            "The vertical axis shows how many confirmed planets were recorded in that year.",
-        )
-        discovery_figure = d.discoveries_by_year_chart(data)
-        if discovery_figure is None:
-            st.warning("No discovery-year data are available for this graph.")
-        else:
-            st.plotly_chart(discovery_figure, use_container_width=True)
-        st.info("NASA's Kepler mission contributed a particularly large group of results in 2014. Another large release followed in 2016 as scientists analysed more of the mission's data.")
-        d.graph_questions("What pattern do you notice in the number of discoveries over time?", "What might a large group of results released in one year tell us about how science works?")
-        d.response_box(3, "Describe one pattern in the annual discovery graph and give a possible explanation.", "“I notice that…” or “One possible reason is…”")
-        d.key_idea("Astronomy is a rapidly growing science, and new analyses can add many confirmed planets to the record.", "Look for years with unusually tall bars and consider why a large group of discoveries might appear together.")
+        st.header("Step 3: Our Solar System isn't the only arrangement")
+        st.write("Two real planetary systems show different ways that an arrangement can vary from our Solar System.")
+        kepler_16, trappist_1 = st.columns(2)
+        with kepler_16:
+            st.image(d.nasa_kepler_16b_poster_path, width="stretch")
+            st.caption("NASA/JPL artist's illustration of Kepler-16 b; it is not a photograph.")
+            st.subheader("Kepler-16 b: two stars")
+            st.write("Kepler-16 b orbits two stars. Planets do not have to orbit a single star.")
+        with trappist_1:
+            st.image(d.nasa_trappist_1e_poster_path, width="stretch")
+            st.caption("NASA/JPL artist's illustration of the TRAPPIST-1 system; it is not a photograph.")
+            st.subheader("TRAPPIST-1: compact orbits")
+            st.write("TRAPPIST-1 has seven known planets. All seven orbit closer to their star than Mercury orbits the Sun.")
+        compare_prompt("How does each system differ from our Solar System: Kepler-16 b in its stars, and TRAPPIST-1 in its orbital arrangement?")
+        with self_check("Check your comparison"):
+            st.write("Kepler-16 b shows that a planet can orbit two stars. TRAPPIST-1 shows that many planets can be packed into a much smaller orbital region than in our Solar System.")
+        st.caption("These individual systems show what is possible. They do not tell us how common either arrangement is.")
     elif part == 4:
         st.header("Step 4: Compare planet masses")
         st.write("We have met a few individual planetary systems. Now we can use the larger NASA dataset to ask whether the detected exoplanets have the same mix of planet masses as our Solar System.")

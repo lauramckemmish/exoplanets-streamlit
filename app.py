@@ -64,6 +64,7 @@ TRANSIT_DETECTION_IMAGE_PATH = ASSETS_DIR / "transit-detection.png"
 PLANETARY_SYSTEMS_IMAGE_PATH = ASSETS_DIR / "planetary-systems.svg"
 EXOPLANET_QUADRANTS_IMAGE_PATH = ASSETS_DIR / "exoplanet-mass-distance-quadrants.svg"
 NASA_KEPLER_16B_POSTER_PATH = ASSETS_DIR / "nasa-kepler-16b-travel-poster.jpg"
+NASA_TRAPPIST_1E_POSTER_PATH = ASSETS_DIR / "nasa-trappist-1e-travel-poster.jpg"
 NASA_51_PEGASI_B_POSTER_PATH = ASSETS_DIR / "nasa-51-pegasi-b-travel-poster.jpg"
 NASA_KEPLER_186F_POSTER_PATH = ASSETS_DIR / "nasa-kepler-186f-travel-poster.jpg"
 # Add the public teacher-feedback form URL here when it is ready.
@@ -165,6 +166,7 @@ CLASSROOM_RESOURCES = {
     "direct_imaging_image_path": DIRECT_IMAGING_IMAGE_PATH,
     "transit_detection_image_path": TRANSIT_DETECTION_IMAGE_PATH,
     "nasa_kepler_16b_poster_path": NASA_KEPLER_16B_POSTER_PATH,
+    "nasa_trappist_1e_poster_path": NASA_TRAPPIST_1E_POSTER_PATH,
     "nasa_51_pegasi_b_poster_path": NASA_51_PEGASI_B_POSTER_PATH,
     "nasa_kepler_186f_poster_path": NASA_KEPLER_186F_POSTER_PATH,
     "solar_system_demographics_chart": solar_system_demographics_chart,
