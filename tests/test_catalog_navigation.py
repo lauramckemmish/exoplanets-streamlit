@@ -10,10 +10,10 @@ class PublicDestinationCatalogueTests(unittest.TestCase):
         self.assertEqual(
             catalog.enabled_experience_names(),
             (
+                "Planet Shopping Outside Our Solar System",
                 "Is Our Solar System Normal?",
                 "Strange New Worlds",
                 "The Planets We Haven't Found",
-                "Planet Shopping Outside Our Solar System",
             ),
         )
         self.assertEqual(catalog.enabled_explore_resource_names(), ("Exoplanet Data Lab",))
@@ -49,7 +49,10 @@ class PublicDestinationCatalogueTests(unittest.TestCase):
     def test_planet_shopping_card_presentation_preserves_internal_destination(self):
         experience = catalog.get_experience("Planet Shopping Outside Our Solar System")
         self.assertEqual(experience["card_title"], "Planet Shopping")
-        self.assertIsNone(experience["card_summary"])
+        self.assertEqual(
+            experience["card_summary"],
+            "Use real exoplanet data to filter worlds and find your perfect planet.",
+        )
         self.assertEqual(experience["card_button_label"], "Start →")
         self.assertEqual(experience["app_experience"], "Planet Shopping Outside Our Solar System")
         self.assertEqual(experience["thumbnail"], "assets/planet-shopping-thumbnail.png")
@@ -71,6 +74,20 @@ class PublicDestinationCatalogueTests(unittest.TestCase):
             experience = catalog.get_experience(name)
             self.assertEqual(experience["thumbnail"], thumbnail)
             self.assertEqual(experience["audience_badge"], audience_badge)
+
+    def test_landing_card_summaries_are_concise_and_exact(self):
+        expected_summaries = {
+            "Planet Shopping Outside Our Solar System": "Use real exoplanet data to filter worlds and find your perfect planet.",
+            "Is Our Solar System Normal?": "Compare our Solar System planets with thousands of exoplanets.",
+            "Strange New Worlds": "Explore the variety of planets and planetary systems beyond our own.",
+            "The Planets We Haven't Found": "Investigate how the way we find planets shapes what we discover.",
+        }
+        visible = catalog.experience_catalog()
+        self.assertEqual(tuple(entry["card_title"] if "card_title" in entry else entry["name"] for entry in visible), ("Planet Shopping", "Is Our Solar System Normal?", "Strange New Worlds", "The Planets We Haven't Found"))
+        self.assertEqual(
+            {entry["name"]: entry["card_summary"] for entry in visible},
+            expected_summaries,
+        )
 
     def test_all_explore_resources_are_available(self):
         for resource in catalog.EXPLORE_RESOURCES:
