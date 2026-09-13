@@ -61,12 +61,12 @@ class PublicDestinationCatalogueTests(unittest.TestCase):
     def test_experience_cards_define_thumbnail_and_audience_badge_metadata(self):
         expected_cards = {
             "Is Our Solar System Normal?": (
-                "assets/exoplanets-artists-concept-nasa.jpeg",
+                "assets/is-our-solar-system-normal-thumbnail.png",
                 "CURIOUS · Facilitated",
             ),
-            "Strange New Worlds": ("assets/planetary-systems.svg", "Year 8"),
+            "Strange New Worlds": ("assets/strange-new-worlds-thumbnail.png", "Year 8"),
             "The Planets We Haven't Found": (
-                "assets/exoplanet-detection-methods.svg",
+                "assets/planets-we-havent-found-thumbnail.png",
                 "Year 10",
             ),
         }
