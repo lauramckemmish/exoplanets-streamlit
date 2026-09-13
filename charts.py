@@ -576,8 +576,8 @@ def planet_mass_distribution_chart(data: pd.DataFrame, include_exoplanets: bool 
     masses = masses[masses > 0]
     if masses.empty:
         return None
-    mass_labels = ["Very small", "Small", "Medium", "Large", "Very large"]
-    mass_ranges = ["Less than 1", "1–10", "10–100", "100–1,000", "More than 1,000"]
+    mass_labels = ["Very low mass", "Low mass", "Medium mass", "High mass", "Very high mass"]
+    mass_ranges = ["Less than 1", "1 to <10", "10 to <100", "100 to <1,000", "1,000 or more"]
     mass_colours = ["#4C78A8", "#72B7B2", "#F2CF5B", "#F58518", "#B279A2"]
     bins = [0, 1, 10, 100, 1000, np.inf]
     exoplanet_groups = pd.cut(masses, bins=bins, labels=mass_labels, right=False)

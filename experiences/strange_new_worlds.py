@@ -242,10 +242,10 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
                 "from small rocky worlds such as Earth to giant planets such as Jupiter."
             )
         st.markdown(
-            "We will group planets by mass: **Very small** (less than 1 Earth mass), **Small** (1–10 Earth masses), "
-            "**Medium** (10–100 Earth masses), **Large** (100–1,000 Earth masses), and **Very large** "
-            "(more than 1,000 Earth masses). For example, Earth is **Small**, Neptune is **Medium**, and Jupiter is "
-            "**Large**."
+            "We will group planets by mass: **Very low mass** (less than 1 Earth mass), **Low mass** (1 to <10 Earth masses), "
+            "**Medium mass** (10 to <100 Earth masses), **High mass** (100 to <1,000 Earth masses), and **Very high mass** "
+            "(1,000 Earth masses or more). For example, Earth is **Low mass**, Neptune is **Medium mass**, and Jupiter is "
+            "**High mass**."
         )
         graph_reading_support(
             "The whole bar represents all eight Solar System planets, from 0% to 100%.",

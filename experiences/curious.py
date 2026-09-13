@@ -97,7 +97,7 @@ def render(data: pd.DataFrame, terminal_action) -> None:
         st.header("Step 1: Meet our Solar System")
         with media_text_pair(SOLAR_SYSTEM_IMAGE_PATH, role="context", caption="An illustration of our Solar System. Credit: NASA", key="curious_solar_system"):
             st.write("One planetary system cannot tell us what is normal. It can give us a familiar starting point. First, choose one measurable property: **planet mass**.")
-        st.write("The eight planets have very different masses. We will group them as **Very small**, **Small**, **Medium**, **Large**, or **Very large**.")
+        st.write("The eight planets have very different masses. We will group them as **Very low mass**, **Low mass**, **Medium mass**, **High mass**, or **Very high mass**.")
         graph_reading_support("The whole bar represents all eight planets.", "A wider labelled section contains a larger share of the planets.")
         figure = planet_mass_distribution_chart(data, include_exoplanets=False)
         if figure is not None:
