@@ -139,16 +139,20 @@ TEACHER_BACKGROUNDS = {
         "bias, why sparse regions occur, or Year 10's detection-method work."
     ),
     8: (
-        "**Synthesis, not new content**\n\n"
-        "- Return briefly to the opening question: our Solar System was the familiar reference point, but new observations "
-        "showed that planetary systems can differ from that expectation.\n"
-        "- Emphasise the reasoning journey: observations and data → expectation → representation → larger population evidence "
-        "→ tested or revised conclusion. A useful conclusion can name something the evidence changed or strengthened; it "
-        "does not need to be the same for every student.\n"
-        "- This supports SC4-DA1-01 and SC4-OTU-01: organising observations as data helped scientists identify patterns, "
-        "test expectations and build a richer understanding.\n\n"
-        "Keep the boundary concise: this detected, measured sample is not every planet that exists. Do not introduce detailed "
-        "detection bias, habitability or planet formation in the close."
+        "**A short history of growing evidence**\n\n"
+        "- Screen 7 already contains the learner's evidence-supported conclusion. Screen 8 does not ask for another written "
+        "reflection; it reveals the parallel between the learner's reasoning journey and the history of exoplanet science.\n"
+        "- Name the Solar System retrospectively as an initial sample of one planetary system. Five planets were visible in "
+        "antiquity and Uranus and Neptune were found later, but every known planet still belonged to the same system. Earlier "
+        "scientists therefore built sensible ideas from the evidence available.\n"
+        "- Keep 1995 and 51 Pegasi b as the concise turning point. A larger detected sample gives richer evidence but remains "
+        "incomplete: some planets are easier to find and measure than others. New observations broaden what scientists can test; "
+        "they do not make the sample complete.\n\n"
+        "The optional Pluto parallel is a familiar example of discoveries changing a category, not a debate about whether Pluto "
+        "should be a planet. NASA's [Pluto overview](https://science.nasa.gov/dwarf-planets/pluto/) and the IAU's "
+        "[2006 resolution](https://www.iau.org/static/resolutions/Resolution_GA26-5-6.pdf) confirm the provenance: discoveries "
+        "of Pluto-like worlds including Eris contributed to the 2006 dwarf-planet classification. Avoid the 1992 pulsar-planet "
+        "detour, detailed detection methods, habitability and planet formation."
     ),
 }
 
@@ -237,13 +241,13 @@ TEACHER_NOTE_OVERRIDES = {
     ),
     8: dict(
         title="Conclusion: new observations changed the picture",
-        purpose="Close the two-lesson reasoning arc by synthesising how observations, representations and larger population evidence tested or refined an expectation.",
+        purpose="Connect the learner's just-completed reasoning journey with how astronomers' picture of planetary systems changed as evidence expanded.",
         timing="3–5 minutes (Lesson 2 close)",
-        facilitation="Return to the opening question and invite one brief statement about what the evidence changed or strengthened. This is synthesis, not new content: a defensible conclusion may refer to the hot Jupiter, another system arrangement, the graph or a revised prediction.",
+        facilitation="Do not ask for another written conclusion: Screen 7 has already done that work. Show that beginning from one familiar system and revising ideas after new evidence was sensible scientific reasoning, not an earlier mistake. Use 1995 and 51 Pegasi b as the historical exoplanet anchor. If it helps, open the optional Pluto parallel to reinforce discoveries → a less adequate category → revised classification; do not turn it into a Pluto debate.",
         alignment="SC4-DA1-01 and SC4-OTU-01: use observations organised as data to identify patterns, test expectations and communicate a richer scientific understanding.",
-        evidence="Students communicate one cautious change or strengthening in their thinking based on an observation or representation from the experience.",
-        listen_for="‘I expected …, but the evidence showed …’, ‘the graph helped me see …’, or another evidence-linked recognition that planetary systems can be diverse.",
-        misconceptions="The detected planets with the measurements used here are not every planet that exists. Do not add detailed detection bias, habitability or planet-formation content during this short close.",
+        evidence="Students recognise that conclusions depend on the evidence available: a larger detected sample strengthened and complicated the picture without becoming a complete census.",
+        listen_for="The Solar System was a reasonable starting point; more planetary systems changed what scientists could conclude; and new observations can test the picture again.",
+        misconceptions="Here, sample size means planetary systems and evidence available to science, not merely a count of Solar System planets. The detected sample is incomplete; acknowledge that some planets are easier to find and measure without teaching detailed detection bias. Do not detour into 1992 pulsar planets, habitability or planet formation.",
     ),
 }
 
@@ -680,17 +684,30 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             st.write("It only shows detected planets with the measurements needed for this graph. A careful conclusion says ‘In this detected dataset…’ rather than making a rule about every planet that exists.")
     elif part == 8:
         st.header("Conclusion")
-        conclude_prompt("What is one thing the evidence changed or strengthened in your thinking about planetary systems?")
-        st.info(
-            "Our Solar System was a familiar starting point, not a rule. New observations showed that planetary systems "
-            "can differ from that expectation. Organising many observations as data made broader patterns visible, so "
-            "scientists could test expectations and build a richer picture of planetary diversity."
-        )
+        st.write("The journey you just made is very close to the one astronomers made.")
+        st.write("For most of human history, our sample size was one planetary system: the Solar System.")
         st.write(
-            "The graphs did not change the planets or the data. They helped us inspect patterns in a larger dataset and "
-            "compare that evidence with an earlier prediction. Scientific understanding can change or become more nuanced "
-            "as evidence accumulates."
+            "Five planets were visible to people in ancient times. Uranus and Neptune were discovered later. But every "
+            "planet we knew still belonged to the same planetary system."
         )
-        st.caption("These conclusions describe detected planets with the measurements needed for the graphs—not every planet that exists.")
+        st.write("So scientists built sensible ideas from the evidence they had.")
+        st.write("Then, in 1995, 51 Pegasi b helped change the game: now we had evidence from another planetary system.")
+        st.write(
+            "As more planets were found around other stars, the sample grew — and so did our picture of what planetary "
+            "systems can be like. A larger sample includes more kinds of systems and lets scientists look for broader patterns."
+        )
+        st.write("But even a much bigger sample is not a complete one. Some planets are much easier for us to find and measure than others.")
+        st.write("New telescopes and observations let us detect planets we could not see before, giving scientists more evidence to test the picture again.")
+        with st.container(border=True):
+            st.write("**That is how science changes: not because the earlier reasoning was silly, but because the evidence got better.**")
+        with soft_reveal("Wait — hasn’t this happened in our Solar System too?"):
+            st.write(
+                "Pluto was called a planet for decades. Then astronomers found more Pluto-like worlds, including objects such as Eris. "
+                "Suddenly the old category was getting awkward."
+            )
+            st.write(
+                "In 2006, astronomers agreed on a new definition of a planet, and Pluto was classified as a dwarf planet."
+            )
+            st.write("More discoveries changed the way scientists organised the evidence.")
 
     return None

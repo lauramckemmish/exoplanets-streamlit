@@ -716,40 +716,49 @@ The conclusion connects the evidence/revision story back to how observations cha
 ## Screen 8 — Conclusion: New observations changed the picture
 
 **Main cognitive job**  
-Communicate the evidence-based scientific/data-science story of the experience.
+Connect the learner's own reasoning journey to the historical development of exoplanet science: scientists built sensible expectations from the evidence available, then revised and qualified them as the evidence grew.
+
+**DECISION — no repeated written conclusion**
+
+Screen 7 already asks learners to compare their prediction with the detected population, update their thinking using visible evidence and qualify that conclusion using the limits of the dataset. Screen 8 does not repeat that written reflection or add another learner gate.
 
 **Core synthesis**
 
-- Our Solar System provided one familiar example of a planetary system.
-- Exoplanet observations revealed planets and systems scientists had not expected from that one example alone.
-- Organising many observations as data allows scientists to identify patterns, test predictions and develop a richer understanding of planetary diversity.
-- The detected catalogue is substantial but incomplete.
+- Open with: “The journey you just made is very close to the one astronomers made.” This reveals the structure of the experience; it is not a new question.
+- Retrospectively name the Solar System as an initial **sample size of one planetary system**. The term is earned here, not used to undermine the opening expectation.
+- Keep the history concrete but brief: five planets were visible without telescopes in antiquity; Uranus and Neptune were found later; every planet known still belonged to the same planetary system.
+- State that scientists built sensible ideas from the evidence they had. Earlier reasoning was conditional on the available evidence, not foolish or simply wrong.
+- Keep **1995 / 51 Pegasi b** as the pathway's historical exoplanet anchor: evidence now came from another planetary system.
+- As planets around other stars were found, the sample grew, representing more kinds of systems and allowing broader population patterns to be examined.
+- The modern detected sample remains incomplete. Some planets are easier to find and measure than others; do not use learner-facing “bias” language or teach detailed detection mechanisms.
+- New telescopes and observations broaden the evidence available to test the picture again. They do not make the sample complete.
+- Land on: **“That is how science changes: not because the earlier reasoning was silly, but because the evidence got better.”**
 
-**Learner action**
+**Optional Pluto coda — DECISION**
 
-CONCLUDE using evidence from at least one representation or observation, and communicate what changed in their thinking.
+After the main conclusion, retain a collapsed soft reveal labelled: **“Wait — hasn’t this happened in our Solar System too?”** It is a familiar optional parallel, not part of the required exoplanet story and has no learner task or gate.
 
-**Evidence of learning**
+Inside it, explain concisely that Pluto was called a planet for decades; discoveries of additional Pluto-like worlds, including Eris, made the old category inadequate; and in 2006 astronomers agreed on a new planet definition and Pluto was classified as a dwarf planet. The epistemic parallel is: more discoveries → a category no longer fits the evidence well → scientists revise the classification.
 
-A cautious statement that links evidence to the conclusion that planetary systems can be diverse and that new observations can change scientific expectations.
+NASA's [Pluto overview](https://science.nasa.gov/dwarf-planets/pluto/) and [Eris overview](https://science.nasa.gov/dwarf-planets/eris/), together with the IAU's [2006 Resolution B5](https://www.iau.org/static/resolutions/Resolution_GA26-5-6.pdf), are the provenance for this bounded account. Do not make the coda a debate about whether Pluto “should” be a planet, enumerate dwarf planets, or claim classification changed merely because there would otherwise be too many planets.
 
 **Facilitator move**
 
-Emphasise the reasoning journey rather than reciting planet names.
+Emphasise the parallel between the learner's reasoning and astronomy's evidence history. The point is not that earlier astronomers reasoned badly: conclusions are conditional on available evidence. Here, sample size means planetary systems/evidence available to science, not merely counting Solar System planets. Pluto is optional and should be opened only if it strengthens the evidence → classification connection.
 
 **Listen for**
 
-- “I used to expect…, but the hot Jupiter / graph showed…”
-- “The larger dataset shows…”
-- recognition that observations/data changed the scientific picture.
+- The Solar System was a reasonable place to begin.
+- More planetary systems changed what scientists could conclude.
+- New evidence can test and improve a scientific picture without making earlier reasoning silly.
 
 **Boundary**
 
-Do not turn the close into a preview lecture on detection bias, habitability or planet formation. Those can be follow-up questions or links, not additional required content.
+Do not add a 1992 pulsar-planet detour, a discovery timeline, eight-versus-nine counting, detailed detection-method bias, habitability or planet formation. The detected sample is incomplete, but the Stage 4 job is only to understand that it is not identical to everything that exists.
 
 **Approximate timing**
 
-5–8 minutes.
+3–5 minutes, plus optional Pluto discussion if useful.
 
 ---
 
