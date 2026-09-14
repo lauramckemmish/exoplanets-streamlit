@@ -129,14 +129,14 @@ TEACHER_BACKGROUNDS = {
     ),
     7: (
         "**Test the earlier prediction with more evidence**\n\n"
-        "- Recall the Lesson 1 prediction before showing the larger detected population so students can compare their earlier "
-        "thinking with new evidence. Revision is a normal scientific response to more evidence, not a failure.\n"
-        "- The graph keeps the same log–log mass × orbital-distance representation used in Screen 6. The evidence population "
-        "changes: detected exoplanets with the measurements needed for this graph are added alongside the Solar System.\n"
-        "- Keep claims limited to this detected/measured dataset. It is not every planet that exists. Do not drift into detailed "
-        "detection bias, why sparse regions occur, or Year 10's detection-method work.\n\n"
-        "Listen for an observation, a comparison with the earlier prediction, and a cautious addition or change supported by "
-        "a visible feature of the graph."
+        "- Recall the Lesson 1 prediction, let students keep or sharpen it, then gate the population graph until they deliberately "
+        "commit. The examples in the optional support show possible forms of prediction, not correct answers.\n"
+        "- The graph keeps the same log–log mass × orbital-distance representation used in Screen 6. The evidence population changes: "
+        "detected exoplanets with the measurements needed for this graph are added alongside the Solar System.\n"
+        "- After evidence, learners update their thinking rather than retroactively revising a prediction. Ask for one visible graph "
+        "feature, then use the limitation self-check to model careful language: ‘In this detected dataset…’\n\n"
+        "Keep claims limited to this detected/measured dataset. It is not every planet that exists. Do not drift into detailed detection "
+        "bias, why sparse regions occur, or Year 10's detection-method work."
     ),
     8: (
         "**Synthesis, not new content**\n\n"
@@ -227,13 +227,13 @@ TEACHER_NOTE_OVERRIDES = {
     ),
     7: dict(
         title="Now add the detected population",
-        purpose="Test the persisted Lesson 1 prediction against the larger detected mass-and-orbital-distance dataset using NOTICE → COMPARE → REVISE reasoning.",
+        purpose="Reactivate and commit the persisted Lesson 1 prediction before testing it against the larger detected mass-and-orbital-distance dataset, then update thinking within the evidence boundary.",
         timing="12–15 minutes (Lesson 2 discussion and revision)",
-        facilitation="Show the earlier prediction first, then let students inspect the graph before discussing what is supported, different or worth adding. A defensible response names a visible pattern and cautiously connects it to the earlier prediction; do not prescribe one exact answer or frame revision as failure.",
+        facilitation="Students may have forgotten what they wrote in Lesson 1, so reactivate it and let them keep or sharpen it before opening the graph. Prediction examples scaffold form, not correctness; a learner may keep the original prediction unchanged. After the graph, ask for a visible feature and frame updated thinking as normal science, not a verdict that the original prediction was wrong. Reinforce careful language such as ‘In this detected dataset…’ without expanding into detailed detection bias.",
         alignment="SC4-DA1-01 and SC4-WS-06: use a data representation to identify patterns, test an earlier expectation and communicate a cautious evidence-based conclusion.",
-        evidence="Students identify a visible feature of the detected population and use it to support, challenge or qualify their earlier prediction.",
-        listen_for="A NOTICE about a cluster, range or close-in massive planets; a comparison with the earlier prediction; and a cautious revision based on the detected dataset.",
-        misconceptions="These are detected planets with the measurements needed for this graph, not every planet that exists. Do not explain detailed detection bias or why sparse regions occur; that reasoning belongs primarily in the Year 10 experience.",
+        evidence="Students identify a visible feature of the detected population and use it to keep, change or add to their earlier thinking, qualified as a claim about the detected dataset.",
+        listen_for="A NOTICE about a cluster, range or close-in massive planets; a comparison with the earlier prediction; an updated claim based on visible evidence; and a limitation about the detected dataset.",
+        misconceptions="These are detected planets with the measurements needed for this graph, not every planet that exists. A changed conclusion does not make the earlier prediction a failure. Do not explain detailed detection bias or why sparse regions occur; that reasoning belongs primarily in the Year 10 experience.",
     ),
     8: dict(
         title="Conclusion: new observations changed the picture",
@@ -309,6 +309,7 @@ _BROWSER_BUTTON_KEY = "year8_strange_new_worlds_browser_another"
 _BROWSER_SEEN_KEY = "year8_strange_new_worlds_browser_seen"
 _BROWSER_MINIMUM = 3
 _POPULATION_PREDICTION_KEY = "year8_strange_new_worlds_population_prediction"
+_POPULATION_PREDICTION_COMMITTED_KEY = "year8_strange_new_worlds_population_prediction_committed"
 _SOLAR_SYSTEM_SCALE_REVEAL_KEY = "year8_strange_new_worlds_solar_system_log_scale_revealed"
 _POPULATION_REVISION_KEY = "year8_strange_new_worlds_population_revision"
 
@@ -633,24 +634,50 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
     elif part == 7:
         st.header("Step 7: Now add the detected population")
         prediction = st.session_state.get(_POPULATION_PREDICTION_KEY, "").strip()
+        st.write("Earlier, you made a prediction about what lots of detected planets might look like on a mass-and-orbital-distance graph.")
         with st.container(border=True):
             st.write("**Earlier, you predicted:**")
             st.write(f"“{prediction}”" if prediction else "No saved prediction is available in this session. Use the earlier evidence as your starting point.")
-        st.write("Now test that earlier thinking against a larger detected population on the same mass-and-orbital-distance representation.")
+        with soft_reveal("Need help putting your prediction into words?"):
+            st.write("These are examples of how a prediction could be phrased, not hints about which answer is correct:")
+            st.write("- “I think most detected planets will follow a similar pattern to our Solar System: lighter planets closer in and heavier planets farther out.”")
+            st.write("- “I think the planets will be spread across the graph, with lots of exceptions to the Solar System pattern.”")
+            st.write("- “I think there will be a broad pattern, but not every planet will follow it.”")
+        prediction = st.text_area(
+            "Keep or sharpen your prediction before seeing the larger dataset",
+            key=_POPULATION_PREDICTION_KEY,
+            placeholder="I think the pattern will…",
+            height=100,
+            persist_state="session",
+        )
+        if not prediction.strip():
+            st.caption("Record a prediction before revealing the larger dataset. Different defensible predictions are possible.")
+            completion_gate(False)
+            return None
+        prediction_committed = d.hard_reveal(
+            "Commit your prediction, then reveal the larger dataset.",
+            _POPULATION_PREDICTION_COMMITTED_KEY,
+            reveal_label="Commit prediction and reveal the dataset →",
+            revealed_message="You made a prediction. Now the dataset gets a say.",
+        )
+        if not prediction_committed:
+            return None
+        st.write("Same graph. Many more planets.")
+        st.warning("Caution: these are detected planets with the measurements needed for this graph. The Universe has not handed us a complete list.")
         st.plotly_chart(d.current_demographics_chart(data), width="stretch")
-        st.caption("These are detected planets with the measurements needed for this graph — not every planet that exists.")
         notice_prompt("What patterns or clusters do you notice in the detected planets?")
-        compare_prompt("Which parts of your prediction are supported by this dataset? What looks different from what you expected?")
-        revise_prompt("What would you change or add to your prediction now?")
+        compare_prompt("Which parts of your prediction fit what you see? What looks different from what you expected?")
+        conclude_prompt("What would you keep, change or add to your earlier thinking after seeing this graph?")
         st.text_area(
-            "Revise your prediction using one visible feature of the graph",
+            "Update your thinking using one visible feature of the graph.",
             key=_POPULATION_REVISION_KEY,
-            placeholder="My earlier prediction was…, and this graph shows…",
+            placeholder="I predicted…, but the graph shows…, so now I think…",
             height=90,
             persist_state="session",
         )
-        with self_check("Keep the conclusion cautious"):
-            st.write("Use a visible feature of this detected dataset as evidence. More evidence can support, challenge or add detail to an earlier prediction; it does not create one final rule for every planetary system.")
+        st.write("One more thing before you settle on your conclusion: what can this graph not tell us?")
+        with self_check("Check the limit of the evidence"):
+            st.write("It only shows detected planets with the measurements needed for this graph. A careful conclusion says ‘In this detected dataset…’ rather than making a rule about every planet that exists.")
     elif part == 8:
         st.header("Conclusion")
         conclude_prompt("What is one thing the evidence changed or strengthened in your thinking about planetary systems?")

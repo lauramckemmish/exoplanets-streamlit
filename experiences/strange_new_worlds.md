@@ -638,7 +638,15 @@ Screen 7 keeps the same representation and adds the larger detected-exoplanet po
 ## Screen 7 — Now add the detected population
 
 **Main cognitive job**  
-Use a larger dataset to test, support, challenge or revise the earlier prediction.
+Use a larger dataset to test an earlier prediction, then update scientific thinking within the limits of the evidence.
+
+**DECISION — Prediction before population evidence**
+
+Reactivate the Screen 4 prediction and let learners keep or sharpen it before they see the larger population. The graph is gated until a non-empty prediction is deliberately committed. After evidence, learners update their thinking rather than retroactively “revising the prediction”. The final reasoning sequence is:
+
+> prediction → evidence → updated conclusion → limitation
+
+Use a collapsed optional scaffold with contrasting examples of the *form* a reasonable prediction can take. These are not clues about the correct answer and Stage 4 learner-facing language remains **prediction**, not hypothesis.
 
 **Science learning**
 
@@ -656,11 +664,12 @@ Detected exoplanets with the required mass and orbital-distance data, shown on t
 
 **Learner action**
 
-NOTICE / COMPARE the visible population, then REVISE or CONCLUDE:
+1. Recall and sharpen the earlier prediction, then commit it before revealing the graph.
+2. Inspect the same graph with many more planets and NOTICE / COMPARE the evidence.
+3. Update thinking using one visible feature: “I predicted…, but the graph shows…, so now I think…”.
+4. Before settling on a conclusion, use a short self-check to establish that a careful claim says “In this detected dataset…” rather than making a rule about every planet that exists.
 
-- What does the larger dataset support from your prediction?
-- What does it challenge or complicate?
-- What can you now say about how varied detected planets/planetary systems can be?
+Do not ask learners to revise a prediction after seeing the data; its scientific job has already been done.
 
 **Evidence of learning**
 
@@ -668,7 +677,7 @@ Students connect a visible feature of the larger dataset to an explicit change, 
 
 **Facilitator move**
 
-Return students to their Lesson 1 prediction from Screen 4. The intellectual payoff is revision, not merely looking at a dense scatter plot.
+Students may have forgotten what they wrote in Lesson 1, so deliberately reactivate it. Prediction examples scaffold form, not correctness, and learners may keep their original prediction unchanged. After the graph, ask students to cite something visible before they keep, change or add to their thinking. A changed conclusion does not mean the original prediction was “wrong”. Reinforce careful language such as “In this detected dataset…” without expanding into detailed detection bias.
 
 **Listen for**
 
@@ -676,11 +685,11 @@ Evidence-linked statements about range, clusters, overlap, close-in massive plan
 
 **Stage 4 sample boundary**
 
-State clearly but briefly:
+State clearly before interpretation:
 
-> These are detected planets with the measurements needed for this graph. They are not every planet that exists.
+> Caution: these are detected planets with the measurements needed for this graph. The Universe has not handed us a complete list.
 
-Do not explain the detailed causes of observational selection here.
+After the updated-thinking response, reveal the concise scientific-writing limit: this graph only shows detected planets with the required measurements. Do not explain the detailed causes of observational selection here.
 
 **Likely misconception / boundary**
 
