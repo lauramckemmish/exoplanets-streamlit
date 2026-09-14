@@ -64,6 +64,11 @@ TEACHER_BACKGROUNDS = {
         "- **51 Pegasi b** is a hot Jupiter: a giant planet on a very close orbit. Its mass is an estimate, not a "
         "physical-size measurement. The displayed value is about 146 Earth masses (about 0.46 Jupiter masses), and "
         "its orbital semimajor axis is about 0.052 AU. The comparison uses NASA Exoplanet Archive reference values.\n\n"
+        "- Add the compact temperature scale only after the orbit reveal: Mercury daytime maximum (~430 °C), Venus mean "
+        "surface temperature (~460 °C), aluminium melting point (~660 °C), 51 Pegasi b's approximate atmospheric/equilibrium "
+        "temperature (~1000 °C) and fresh basaltic lava (~1150–1200 °C). These are not identical measurement types; explain "
+        "that 51 Pegasi b is a gas giant without a solid surface temperature. Temperature is context for the close orbit, not "
+        "a third data-science variable.\n\n"
         "Link briefly back to Screen 1: scientists had sensible explanations from the Solar System, and hot Jupiters "
         "meant parts of that story needed rethinking. Do not expand into migration, formation mechanisms, detection "
         "methods or detailed discovery history."
@@ -172,7 +177,7 @@ TEACHER_NOTE_OVERRIDES = {
         alignment="SC4-DA1-01, SC4-WS-02 and SC4-WS-06: generate an expectation, compare it with evidence and revise thinking when warranted.",
         evidence="Students explain that 51 Pegasi b is a giant planet much closer to its star than Mercury is to the Sun, and revise where giant planets can exist.",
         listen_for="‘I expected a giant planet to be farther out’, ‘51 Pegasi b is closer than Mercury’, and recognition that new observations can make scientific explanations richer.",
-        misconceptions="51 Pegasi b's mass is an estimate and does not describe physical size. A hot Jupiter is a useful category, not a reason to introduce migration, formation mechanisms, detection methods or broader exoplanet history.",
+        misconceptions="51 Pegasi b's mass is an estimate and does not describe physical size. Its ~1000 °C value is an estimated atmospheric temperature for a gas giant, not a measured solid surface temperature like Mercury or Venus. The comparison quantities are not identical measurement types. A hot Jupiter is a useful category, not a reason to introduce migration, formation mechanisms, stellar-type dependence, atmospheric modelling, detection methods or broader exoplanet history.",
     ),
     3: dict(
         title="Our Solar System isn't the only arrangement",
@@ -405,6 +410,20 @@ def _hot_jupiter_comparison_table() -> pd.DataFrame:
     ])
 
 
+def _hot_jupiter_temperature_scale() -> pd.DataFrame:
+    """Return the ordered contextual temperature comparison for Screen 2."""
+    return pd.DataFrame(
+        {"Temperature (°C)": [430, 460, 660, 1000, 1175]},
+        index=[
+            "1 · Mercury — daytime surface maximum",
+            "2 · Venus — mean surface temperature",
+            "3 · Aluminium — melting point",
+            "4 · 51 Pegasi b — approximate atmosphere",
+            "5 · Fresh basaltic lava — typical range",
+        ],
+    )
+
+
 @dataclass(frozen=True)
 class LessonDependencies:
     """Shared charts, helpers and assets supplied by the application shell."""
@@ -483,6 +502,16 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             st.write(
                 "Well. Our Solar System had not prepared us for that. 51 Pegasi b has a mass estimate of about 146 "
                 "Earth masses—nearly half Jupiter's mass—but orbits at 0.052 AU."
+            )
+            st.write("51 Pegasi b is roughly around a thousand degrees Celsius.")
+            st.bar_chart(_hot_jupiter_temperature_scale(), y_label="Temperature (°C)", x_label="Reference", width="stretch")
+            st.caption(
+                "These reference points are not identical measurements: 51 Pegasi b is a gas giant, so this is an estimated "
+                "atmospheric temperature, not a solid surface temperature like Mercury or Venus."
+            )
+            st.write(
+                "So ‘very close to its star’ is not just a number. This giant planet is in furnace territory—hotter than "
+                "aluminium's melting point and getting into the range of glowing rock and fresh lava."
             )
             st.write(
                 "A giant planet on such a close orbit is called a **hot Jupiter**. Scientists had built sensible "

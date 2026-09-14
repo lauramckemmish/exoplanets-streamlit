@@ -296,7 +296,8 @@ Introduce exoplanets through 51 Pegasi b, which breaks the expectation learners 
 
 7. Reveal the comparable evidence: 51 Pegasi b has an estimated mass of about 146 Earth masses and an orbital distance of about 0.052 AU, substantially closer to its star than Mercury is to the Sun.
 8. Allow the contradiction to land before explaining further. A dry reaction such as “Well. Our Solar System had not prepared us for that.” is appropriate.
-9. Use REVISE to ask what this observation makes learners reconsider about where giant planets can exist.
+9. Add a compact ordered temperature comparison: Mercury daytime maximum (~430 °C), Venus mean surface temperature (~460 °C), aluminium melting point (~660 °C), 51 Pegasi b's approximate atmospheric/equilibrium temperature (~1000 °C), and fresh basaltic lava (~1150–1200 °C).
+10. Explain that 51 Pegasi b is a gas giant, so its value is an estimated atmospheric temperature rather than a solid surface temperature like Mercury or Venus. Use the physical consequence to make the close orbit vivid, then use REVISE to ask what this observation makes learners reconsider about where giant planets can exist.
 
 **Science learning**
 
@@ -311,8 +312,13 @@ Students explain that a giant planet can orbit unexpectedly close to its star an
 **Scientific boundaries**
 
 - Describe the 51 Pegasi b mass as an estimate; it is not physical size.
+- Temperature is contextual explanatory evidence only, not a third analytical variable in the Year 8 data-science sequence. The comparison points are not identical measurement types.
 - Do not imply all close-in giant planets are identical to Jupiter.
-- Do not expand into migration, formation mechanisms, detection methods or discovery chronology beyond the 1995 historical anchor.
+- Do not expand into stellar-type dependence, heat redistribution, atmospheric modelling, migration, formation mechanisms, detection methods or discovery chronology beyond the 1995 historical anchor.
+
+**DECISION — Local temperature context**
+
+Use temperature only after the 51 Pegasi b orbit reveal to make the physical consequence vivid. It remains explanatory context for the close orbit and does not enter the browser, population plots or prediction state; the analytical pathway remains mass plus orbital distance.
 
 **Representation and timing**
 

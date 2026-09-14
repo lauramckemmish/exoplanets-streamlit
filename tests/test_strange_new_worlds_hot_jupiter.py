@@ -1,6 +1,7 @@
 """Focused checks for the Screen 2 hot-Jupiter prediction and reveal."""
 
 import unittest
+import inspect
 from unittest.mock import patch
 
 import pandas as pd
@@ -68,6 +69,28 @@ class StrangeNewWorldsHotJupiterTests(unittest.TestCase):
         )
         self.assertIn("Well. Our Solar System had not prepared us for that.", reveal_write_text)
         self.assertIn("needed rethinking", reveal_write_text)
+
+    def test_temperature_scale_appears_only_after_reveal(self):
+        hidden = self._render(revealed=False)
+        self.assertNotIn("bar_chart", [event[0] for event in hidden])
+
+        revealed = self._render(revealed=True)
+        names = [event[0] for event in revealed]
+        self.assertIn("bar_chart", names)
+        self.assertLess(names.index("dataframe"), names.index("bar_chart"))
+        scale = next(event[1][0] for event in revealed if event[0] == "bar_chart")
+        self.assertEqual(scale["Temperature (°C)"].tolist(), [430, 460, 660, 1000, 1175])
+        rendered = " ".join(str(event[1]) for event in revealed)
+        self.assertIn("roughly around a thousand degrees Celsius", rendered)
+        self.assertIn("gas giant", rendered)
+        self.assertIn("not a solid surface temperature", rendered)
+        self.assertNotIn("exactly 1000", rendered)
+
+    def test_temperature_context_is_not_added_to_browser_or_population_state(self):
+        screen4_source = inspect.getsource(strange_new_worlds.render_lesson).split("elif part == 4:", 1)[1].split("elif part == 5:", 1)[0]
+        self.assertNotIn("temperature", screen4_source.lower())
+        self.assertNotIn("temperature", strange_new_worlds.TEACHER_NOTE_OVERRIDES[4]["purpose"].lower())
+        self.assertNotIn("temperature", strange_new_worlds.TEACHER_NOTE_OVERRIDES[5]["purpose"].lower())
 
     def test_static_comparison_uses_expected_rounded_values(self):
         self.assertEqual(strange_new_worlds._hot_jupiter_comparison_table().to_dict("records"), [
