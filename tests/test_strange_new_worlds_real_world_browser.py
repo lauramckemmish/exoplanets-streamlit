@@ -77,13 +77,13 @@ class StrangeNewWorldsRealWorldBrowserTests(unittest.TestCase):
         )
         with (
             patch.object(strange_new_worlds, "st", _StreamlitRecorder(events, state)),
-            patch.object(strange_new_worlds, "notice_prompt", lambda prompt: events.append(("notice", (prompt,), {}))),
+            patch.object(strange_new_worlds, "compare_prompt", lambda prompt: events.append(("compare", (prompt,), {}))),
             patch.object(strange_new_worlds, "completion_gate", lambda complete: events.append(("gate", (complete,), {}))),
         ):
             strange_new_worlds.render_lesson(eligible_data, 4, object())
 
         self.assertIn(("gate", (False,), {}), events)
-        self.assertIn("notice", [event[0] for event in events])
+        self.assertIn("compare", [event[0] for event in events])
         self.assertNotIn("text_area", [event[0] for event in events])
         self.assertEqual(len(state[strange_new_worlds._BROWSER_SEEN_KEY]), 1)
 
@@ -111,8 +111,10 @@ class StrangeNewWorldsRealWorldBrowserTests(unittest.TestCase):
 
         source = Path("experiences/strange_new_worlds.py").read_text()
         screen_four = source.split("elif part == 4:", 1)[1].split("elif part == 5:", 1)[0].lower()
-        self.assertIn("those systems showed us that planetary systems can surprise us", screen_four)
-        self.assertIn("inspect a few real detected planets yourself", screen_four)
+        self.assertIn("so far, we chose the examples. now meet a few other real detected planets", screen_four)
+        self.assertIn("how do these planets compare with the solar system planets you started with", screen_four)
+        self.assertNotIn("catalogue surprise", screen_four)
+        self.assertNotIn("mass and orbital distance are connected", screen_four)
         self.assertNotIn("holiday", screen_four)
         self.assertNotIn("destination", screen_four)
         self.assertNotIn("filter", screen_four)
@@ -128,7 +130,7 @@ class StrangeNewWorldsRealWorldBrowserTests(unittest.TestCase):
         )
         with (
             patch.object(strange_new_worlds, "st", _StreamlitRecorder(events, state)),
-            patch.object(strange_new_worlds, "notice_prompt", lambda prompt: events.append(("notice", (prompt,), {}))),
+            patch.object(strange_new_worlds, "compare_prompt", lambda prompt: events.append(("compare", (prompt,), {}))),
             patch.object(strange_new_worlds, "completion_gate", lambda complete: events.append(("gate", (complete,), {}))),
         ):
             strange_new_worlds.render_lesson(data, 4, object())
@@ -142,13 +144,20 @@ class StrangeNewWorldsRealWorldBrowserTests(unittest.TestCase):
         events.clear()
         with (
             patch.object(strange_new_worlds, "st", _StreamlitRecorder(events, state)),
-            patch.object(strange_new_worlds, "notice_prompt", lambda prompt: events.append(("notice", (prompt,), {}))),
+            patch.object(strange_new_worlds, "compare_prompt", lambda prompt: events.append(("compare", (prompt,), {}))),
             patch.object(strange_new_worlds, "completion_gate", lambda complete: events.append(("gate", (complete,), {}))),
         ):
             strange_new_worlds.render_lesson(data, 4, object())
 
         self.assertNotIn(("gate", (False,), {}), events)
         self.assertEqual(state[strange_new_worlds._POPULATION_PREDICTION_KEY], "I expect a wide spread of planets.")
+
+    def test_prediction_recalls_the_whole_lesson_without_a_redundant_caption(self):
+        source = Path("experiences/strange_new_worlds.py").read_text()
+        screen_four = source.split("elif part == 4:", 1)[1].split("elif part == 5:", 1)[0]
+
+        self.assertIn("You’ve seen our Solar System, 51 Pegasi b, TRAPPIST-1 and a few random real planets.", screen_four)
+        self.assertNotIn("You have met three different planets. Use the whole first lesson", screen_four)
 
 
 if __name__ == "__main__":

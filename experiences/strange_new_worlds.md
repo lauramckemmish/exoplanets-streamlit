@@ -454,11 +454,13 @@ Mass is not physical size. AU compares orbital distance with the Earth–Sun sca
 
 **Learner action**
 
-NOTICE variation while browsing at least three distinct real worlds. Then PREDICT:
+Begin by making the continuity clear: “So far, we chose the examples. Now meet a few other real detected planets.” Do not pre-label the random records as surprising or tell learners what outcome to expect.
 
-> If we plotted lots of detected exoplanets by mass and orbital distance, what do you think the pattern would look like?
+COMPARE the browsed records with the Solar System planets learners started with. After at least three distinct real worlds, PREDICT:
 
-The prediction draws on **all** Lesson 1 evidence—the Solar System table, the hot-Jupiter observation, the two system arrangements, and the real-world browser—not merely the three browsed records. Persist it for recall in Lesson 2. There is no single correct prediction.
+> You’ve seen our Solar System, 51 Pegasi b, TRAPPIST-1 and a few random real planets. If we plotted lots of detected exoplanets by mass and orbital distance, what do you think we’d see?
+
+The prediction draws on **all** Lesson 1 evidence—the Solar System table, the hot-Jupiter observation, the TRAPPIST-1 system arrangement, and the real-world browser—not merely the three browsed records. The prompt itself supplies the transition; do not add a second procedural caption once the three-record minimum is met. Persist it for recall in Lesson 2. There is no single correct prediction.
 
 **Evidence of learning**
 
@@ -466,7 +468,7 @@ Students describe how encountered planets differ using mass and/or orbital dista
 
 **Facilitator move**
 
-Keep browsing playful but bounded. It is not a destination choice, filtering task or formal sampling lesson. Keep the prediction tied to the two variables and forthcoming population representation rather than the vague claim that “planets are diverse”.
+Keep browsing playful but bounded. It is not a destination choice, filtering task or formal sampling lesson. Three records support a tentative prediction, not a population inference. Keep the prediction tied to the two variables and forthcoming population representation rather than the vague claim that “planets are diverse”.
 
 **Listen for**
 
@@ -497,6 +499,10 @@ This is the planned **end of Lesson 1**. The learner should understand the varia
 **Main cognitive job**  
 Move from individual records and examples to a one-variable population representation and make an evidence-based comparison.
 
+**DECISION — Optional Lesson 2 memory reactivation**
+
+Begin with a collapsed optional recap using the shared soft-reveal pattern. It recalls the Solar-System expectation, the heavy close-in and scorching-hot 51 Pegasi b, the compact TRAPPIST-1 system, the browsed records and the saved prediction. It reactivates Lesson 1 memory without reteaching it or adding temperature as a variable.
+
 **Science learning**
 
 Detected exoplanets include a different mix of planet masses from our eight Solar System planets.
@@ -513,7 +519,11 @@ Solar System versus detected-exoplanet planet-mass distribution, using the estab
 
 **Learner action**
 
-COMPARE matching mass groups and make at least one evidence-supported statement about similarity or difference.
+First establish the epistemic move: “A few planets can show us what is possible. They cannot tell us what is typical. For that, we need more planets.”
+
+Introduce the existing chart as comparing mass patterns in our Solar System with detected exoplanets that have the measurements needed for the groups. Then COMPARE:
+
+> Choose one mass group. How does its share differ between our Solar System and the detected exoplanets?
 
 **Evidence of learning**
 
@@ -531,7 +541,7 @@ Comparisons of proportions rather than raw totals.
 
 **Likely misconception / boundary**
 
-The detected-exoplanet bar represents planets that can be placed in the relevant mass groups, not every planet that exists.
+Use this learner-facing boundary prominently: “This is a much bigger dataset, but it is not the Universe handing us a complete list. These are detected planets with the measurements we need for this graph.” The detected-exoplanet bar represents planets that can be placed in the relevant mass groups, not every planet that exists. Do not turn this into a detailed detection-bias lesson.
 
 **Representation**
 
