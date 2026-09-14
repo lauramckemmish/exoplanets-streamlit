@@ -12,6 +12,7 @@ def render_lesson(data, pathway, part, stage4_pathway, stage5_pathway, resources
             solar_system_image_path=resources["solar_system_image_path"],
             planetary_systems_image_path=resources["planetary_systems_image_path"],
             exoplanet_quadrants_image_path=resources["exoplanet_quadrants_image_path"],
+            planet_formation_image_path=resources["planet_formation_image_path"],
             nasa_kepler_16b_poster_path=resources["nasa_kepler_16b_poster_path"],
             nasa_trappist_1e_poster_path=resources["nasa_trappist_1e_poster_path"],
             nasa_51_pegasi_b_poster_path=resources["nasa_51_pegasi_b_poster_path"],

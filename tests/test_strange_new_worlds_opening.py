@@ -52,7 +52,10 @@ class StrangeNewWorldsOpeningTests(unittest.TestCase):
 
     def test_opening_invites_an_expectation_without_exoplanet_or_template_language(self):
         events = []
-        dependencies = SimpleNamespace(solar_system_image_path="solar-system-image")
+        dependencies = SimpleNamespace(
+            solar_system_image_path="solar-system-image",
+            planet_formation_image_path="planet-formation-image",
+        )
         with (
             patch.object(strange_new_worlds, "st", _StreamlitRecorder(events)),
             patch.object(strange_new_worlds, "media_text_pair", lambda *args, **kwargs: nullcontext()),
@@ -78,12 +81,18 @@ class StrangeNewWorldsOpeningTests(unittest.TestCase):
             patch.object(strange_new_worlds, "st", _StreamlitRecorder(events)),
             patch.object(strange_new_worlds, "notice_prompt", lambda prompt: events.append(("notice", (prompt,), {}))),
         ):
-            strange_new_worlds.render_lesson(pd.DataFrame(), 1, object())
+            strange_new_worlds.render_lesson(
+                pd.DataFrame(),
+                1,
+                SimpleNamespace(planet_formation_image_path="planet-formation-image"),
+            )
 
         rendered = " ".join(str(event[1]) for event in events).lower()
         self.assertIn("earth is 1 au from the sun", rendered)
         self.assertIn("which planets are heavy", rendered)
-        self.assertIn("formation visual placeholder", rendered)
+        image = next(event for event in events if event[0] == "image")
+        self.assertEqual(image[1][0], "planet-formation-image")
+        self.assertIn("Four-panel planet-formation schematic", str(image[2]["caption"]))
         self.assertIn("a young star forms with a disk of gas and dust", rendered)
         self.assertIn("closer to the star, it is hotter; farther out, it is colder", rendered)
         self.assertIn("more material can exist as solid particles", rendered)

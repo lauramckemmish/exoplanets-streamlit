@@ -63,6 +63,7 @@ DIRECT_IMAGING_IMAGE_PATH = ASSETS_DIR / "direct-imaging.png"
 TRANSIT_DETECTION_IMAGE_PATH = ASSETS_DIR / "transit-detection.png"
 PLANETARY_SYSTEMS_IMAGE_PATH = ASSETS_DIR / "planetary-systems.svg"
 EXOPLANET_QUADRANTS_IMAGE_PATH = ASSETS_DIR / "exoplanet-mass-distance-quadrants.svg"
+PLANET_FORMATION_IMAGE_PATH = ASSETS_DIR / "planet-formation-from-disk-to-system.png"
 NASA_KEPLER_16B_POSTER_PATH = ASSETS_DIR / "nasa-kepler-16b-travel-poster.jpg"
 NASA_TRAPPIST_1E_POSTER_PATH = ASSETS_DIR / "nasa-trappist-1e-travel-poster.jpg"
 NASA_51_PEGASI_B_POSTER_PATH = ASSETS_DIR / "nasa-51-pegasi-b-travel-poster.jpg"
@@ -163,6 +164,7 @@ CLASSROOM_RESOURCES = {
     "solar_system_image_path": SOLAR_SYSTEM_IMAGE_PATH,
     "planetary_systems_image_path": PLANETARY_SYSTEMS_IMAGE_PATH,
     "exoplanet_quadrants_image_path": EXOPLANET_QUADRANTS_IMAGE_PATH,
+    "planet_formation_image_path": PLANET_FORMATION_IMAGE_PATH,
     "direct_imaging_image_path": DIRECT_IMAGING_IMAGE_PATH,
     "transit_detection_image_path": TRANSIT_DETECTION_IMAGE_PATH,
     "nasa_kepler_16b_poster_path": NASA_KEPLER_16B_POSTER_PATH,

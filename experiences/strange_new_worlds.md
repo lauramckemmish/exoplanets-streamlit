@@ -269,9 +269,9 @@ Keep condensation/availability of solid material distinct from the later gravita
 
 Learner-facing language avoids “ice”, “snow line”, “frost line” and detailed volatile chemistry. Do not teach gravitational instability, pebble accretion, planetesimal physics, runaway gas accretion, disk chemistry or competing formation models.
 
-**HYPOTHESIS — Formation visual implementation**
+**DECISION — Formation visual implemented**
 
-The future visual is a causal explanatory schematic rather than decorative context. Its exact asset and format remain open: use either a compact static schematic or a short animation if later judged pedagogically superior. It should support the full chain above and terminate in **our Solar System**, not imply a universal arrangement. No image generation or temporary decorative asset is required now.
+The approved static causal schematic is implemented at `assets/planet-formation-from-disk-to-system.png`. It supports the full chain above and terminates in **our Solar System**, not a universal arrangement. The image is rendered in the existing Screen 1 explanation panel with accessible descriptive captioning. No image generation or alternate visual format is required for this implementation.
 
 **Facilitator intent**
 

@@ -450,6 +450,7 @@ class LessonDependencies:
     solar_system_image_path: object
     planetary_systems_image_path: object
     exoplanet_quadrants_image_path: object
+    planet_formation_image_path: object
     nasa_kepler_16b_poster_path: object
     nasa_trappist_1e_poster_path: object
     nasa_51_pegasi_b_poster_path: object
@@ -505,9 +506,14 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             st.write(
                 "That gives us a sensible explanation for what we see in our Solar System: small rocky planets closer to the Sun, and giant planets farther out."
             )
-            st.caption(
-                "Formation visual placeholder: a future compact schematic or short animation will show young star + gas-and-dust disk → "
-                "hotter closer / colder farther out → more solid material → larger cores → gas capture → our Solar System."
+            st.image(
+                d.planet_formation_image_path,
+                width="stretch",
+                caption=(
+                    "Four-panel planet-formation schematic showing a young star with a gas-and-dust disk, hotter conditions close to the star "
+                    "and colder conditions farther out, larger planetary cores forming more easily in colder outer regions and collecting gas, "
+                    "and the broad Solar System pattern of rocky inner planets and giant outer planets."
+                ),
             )
         st.write("And this arrangement made scientific sense. If this were the only planetary system you knew, expecting another system to look similar would be reasonable.")
     elif part == 2:
