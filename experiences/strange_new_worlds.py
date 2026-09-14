@@ -50,9 +50,13 @@ TEACHER_BACKGROUNDS = {
         "- The values use NASA NSSDC's [Planetary Fact Sheet](https://nssdc.gsfc.nasa.gov/planetary/factsheet/) "
         "reference data (accessed 13 September 2026). They are rounded for reading and comparison, not for unit "
         "conversion.\n\n"
-        "Let students first notice that the rocky planets are nearer the Sun and the giant planets farther out. The brief "
-        "formation-story placeholder establishes that scientists had a sensible explanation for this orderly pattern; it "
-        "does not teach detailed formation physics."
+        "Let students first notice that the rocky planets are nearer the Sun and the giant planets farther out. Then use the "
+        "main-path formation model: a young star has a disk of gas and dust; it is hotter close in and colder farther out; "
+        "more material can exist as solid particles in the colder region; larger cores can grow there; and sufficiently massive "
+        "cores can collect gas. This explains the broad pattern in **our** Solar System, not a universal arrangement.\n\n"
+        "The visual remains a clearly labelled future causal schematic, not a decorative placeholder: young star and disk → "
+        "temperature difference → solid material → larger cores → gas capture → our Solar System. Its exact static or animated "
+        "format is still open. Avoid snow-line language, detailed chemistry, competing models and migration until Screen 2."
     ),
     2: (
         "**A reasonable expectation meets a disruptive observation**\n\n"
@@ -70,9 +74,11 @@ TEACHER_BACKGROUNDS = {
         "temperature (~1000 °C) and fresh basaltic lava (~1150–1200 °C). These are not identical measurement types; explain "
         "that 51 Pegasi b is a gas giant without a solid surface temperature. Temperature is context for the close orbit, not "
         "a third data-science variable.\n\n"
-        "Link briefly back to Screen 1: scientists had sensible explanations from the Solar System, and hot Jupiters "
-        "meant parts of that story needed rethinking. Do not expand into migration, formation mechanisms, detection "
-        "methods or detailed discovery history."
+        "After the anomaly lands, ask why a giant planet is so close if larger cores are easier to build farther out. Introduce "
+        "one important possibility, **migration**: a giant can form farther out and move inward while the system develops. "
+        "This is a possible missing ingredient, not a mechanism lesson or a claim about every giant planet. Retain the payoff: "
+        "‘The Solar System had given scientists a sensible story. Hot Jupiters meant that story needed some work.’ Do not expand "
+        "into migration mechanisms, detection methods or detailed discovery history."
     ),
     3: (
         "**A whole system can be arranged differently**\n\n"
@@ -171,23 +177,23 @@ TEACHER_NOTE_OVERRIDES = {
     ),
     1: dict(
         title="Our Solar System as evidence",
-        purpose="Use the eight-planet table to inspect mass and distance from the Sun, then establish why scientists had a sensible formation story for the familiar arrangement.",
+        purpose="Use the eight-planet table to inspect mass and distance from the Sun, then use a simple formation model to explain why the broad pattern in our Solar System made sense.",
         timing="8–10 minutes (Lesson 1)",
-        facilitation="Anchor Earth at 1 Earth mass and 1 AU, then invite students to notice which planets are heavy, near and far before naming the rocky-near/giant-far pattern. Do not turn AU into a conversion exercise. Use the bounded formation-story slot only to establish why scientists had a sensible explanation before later evidence complicated it.",
+        facilitation="Anchor Earth at 1 Earth mass and 1 AU, then invite students to notice which planets are heavy, near and far before naming the rocky-near/giant-far pattern. Do not turn AU into a conversion exercise. After that observation, trace one causal chain: young star and gas-and-dust disk → hotter close in / colder farther out → more solid material → larger cores → later gas capture. This is a simplified mainstream core-accretion explanation of our Solar System, not a universal rule or a detailed formation lesson.",
         alignment="SC4-DA1-01 and SC4-WS-05: use a readable table of familiar observations to identify a pattern and form an expectation.",
         evidence="Students identify a heavy, near or far planet and notice the broad rocky-near/giant-far arrangement.",
         listen_for="‘Jupiter is much heavier than Earth’, ‘Mercury is close to the Sun’, and a comparison between the small inner planets and giant outer planets.",
-        misconceptions="Mass is not physical size; AU is a distance, not a time. Do not introduce orbital-distance, variable, dataset or population jargon before the ideas are useful.",
+        misconceptions="Mass is not physical size; AU is a distance, not a time. More available solid material supports larger cores; later gravitational gas capture is a distinct step. Avoid ice, snow-line, frost-line and detailed volatile-chemistry language. Do not introduce orbital-distance, variable, dataset or population jargon before the ideas are useful.",
     ),
     2: dict(
         title="And then astronomers found this",
         purpose="Introduce exoplanets through the 1995 51 Pegasi b observation, then use its actual orbit to revise a Solar-System-based expectation.",
         timing="8–10 minutes (Lesson 1)",
-        facilitation="Define exoplanet in ordinary language, use the 1995 Sun-like-star anchor briefly, then establish the giant planet before revealing its orbit. Preserve prediction-before-reveal, allow a beat for the surprise, and ask what the evidence changes about a Solar-System-based expectation. Link back to the simple formation story without teaching migration or detection methods.",
+        facilitation="Define exoplanet in ordinary language, use the 1995 Sun-like-star anchor briefly, then establish the giant planet before revealing its orbit. Preserve prediction-before-reveal and allow a beat for the surprise. Only after the anomaly, ask why a giant planet is so close if larger cores are easier to build farther out; introduce migration as one important possibility, without mechanisms or a claim that every giant planet migrates.",
         alignment="SC4-DA1-01, SC4-WS-02 and SC4-WS-06: generate an expectation, compare it with evidence and revise thinking when warranted.",
         evidence="Students explain that 51 Pegasi b is a giant planet much closer to its star than Mercury is to the Sun, and revise where giant planets can exist.",
         listen_for="‘I expected a giant planet to be farther out’, ‘51 Pegasi b is closer than Mercury’, and recognition that new observations can make scientific explanations richer.",
-        misconceptions="51 Pegasi b's mass is an estimate and does not describe physical size. Its ~1000 °C value is an estimated atmospheric temperature for a gas giant, not a measured solid surface temperature like Mercury or Venus. The comparison quantities are not identical measurement types. A hot Jupiter is a useful category, not a reason to introduce migration, formation mechanisms, stellar-type dependence, atmospheric modelling, detection methods or broader exoplanet history.",
+        misconceptions="51 Pegasi b's mass is an estimate and does not describe physical size. Its ~1000 °C value is an estimated atmospheric temperature for a gas giant, not a measured solid surface temperature like Mercury or Venus. The comparison quantities are not identical measurement types. Migration is one important possible explanation for a hot Jupiter's close orbit; do not teach mechanisms, imply all giant planets migrate, or expand into stellar-type dependence, atmospheric modelling, detection methods or broader exoplanet history.",
     ),
     3: dict(
         title="Our Solar System isn't the only arrangement",
@@ -482,18 +488,28 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
         predict_prompt("Looking at our Solar System, what would you expect another planetary system to look like?")
     elif part == 1:
         st.header("Step 1: Our Solar System as evidence")
-        st.write("Start with two quantities we can use to describe the planets: planet mass and distance from the Sun.")
+        st.write("Let’s put some numbers on that tidy arrangement: how massive each planet is, and how far it is from the Sun.")
         st.write("**Astronomers use AU to compare distances in planetary systems. Earth is 1 AU from the Sun.**")
         st.write("Mass tells us how much matter a planet contains. It is not the same as physical size.")
         st.dataframe(_format_solar_system_table(), hide_index=True, width="stretch")
         notice_prompt("What do you notice? Which planets are heavy? Which are close to the Sun? Which are far away?")
         with st.container(border=True):
-            st.subheader("A reasonable formation story")
+            st.subheader("Does that pattern mean anything?")
             st.write(
-                "Scientists developed a sensible explanation for why the small rocky planets are nearer the Sun and "
-                "the giant planets are farther out."
+                "A young star forms with a disk of gas and dust around it. Closer to the star, it is hotter; farther out, it is colder."
             )
-            st.caption("Brief formation visual placeholder: this will show that explanation without adding detailed formation physics.")
+            st.write(
+                "In the colder parts of the disk, more material can exist as solid particles. That makes it easier to build larger planetary cores."
+            )
+            st.write("Once a core becomes massive enough, its gravity can collect large amounts of gas.")
+            st.write(
+                "That gives us a sensible explanation for what we see in our Solar System: small rocky planets closer to the Sun, and giant planets farther out."
+            )
+            st.caption(
+                "Formation visual placeholder: a future compact schematic or short animation will show young star + gas-and-dust disk → "
+                "hotter closer / colder farther out → more solid material → larger cores → gas capture → our Solar System."
+            )
+        st.write("And this arrangement made scientific sense. If this were the only planetary system you knew, expecting another system to look similar would be reasonable.")
     elif part == 2:
         st.header("Step 2: And then astronomers found this")
         st.write("Astronomers began finding planets around other stars.")
@@ -525,10 +541,13 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
                 "So ‘very close to its star’ is not just a number. This giant planet is in furnace territory—hotter than "
                 "aluminium's melting point and getting into the range of glowing rock and fresh lava."
             )
+            st.write("If giant planets are easier to build farther from their star, what is this one doing here?")
             st.write(
-                "A giant planet on such a close orbit is called a **hot Jupiter**. Scientists had built sensible "
-                "explanations from the Solar System; hot Jupiters meant parts of that story needed rethinking."
+                "One important possibility is **migration**: a giant planet can form farther out and then move inward while the planetary system is developing."
             )
+            st.write("Planetary systems are not necessarily frozen in the arrangement in which their planets formed.")
+            st.write("A giant planet on such a close orbit is called a **hot Jupiter**.")
+            st.write("The Solar System had given scientists a sensible story. Hot Jupiters meant that story needed some work.")
             st.caption("Mass is not physical size.")
             revise_prompt("What does 51 Pegasi b make you reconsider about where giant planets can be?")
     elif part == 3:

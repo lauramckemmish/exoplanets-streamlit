@@ -68,7 +68,14 @@ class StrangeNewWorldsHotJupiterTests(unittest.TestCase):
             str(event[1]) for event in events[names.index("dataframe") + 1:]
         )
         self.assertIn("Well. Our Solar System had not prepared us for that.", reveal_write_text)
-        self.assertIn("needed rethinking", reveal_write_text)
+        self.assertIn("If giant planets are easier to build farther from their star, what is this one doing here?", reveal_write_text)
+        self.assertIn("One important possibility is **migration**", reveal_write_text)
+        self.assertIn("not necessarily frozen", reveal_write_text)
+        self.assertIn("The Solar System had given scientists a sensible story. Hot Jupiters meant that story needed some work.", reveal_write_text)
+        self.assertLess(
+            reveal_write_text.index("what is this one doing here?"),
+            reveal_write_text.index("One important possibility is **migration**"),
+        )
 
     def test_temperature_scale_appears_only_after_reveal(self):
         hidden = self._render(revealed=False)
@@ -107,6 +114,16 @@ class StrangeNewWorldsHotJupiterTests(unittest.TestCase):
         self.assertIn("prediction-before-reveal", note["facilitation"])
         self.assertIn("Sun-like-star", note["facilitation"])
         self.assertIn("mass is an estimate", note["misconceptions"])
+        self.assertIn("migration as one important possibility", note["facilitation"])
+        self.assertIn("do not teach mechanisms", note["misconceptions"])
+
+    def test_migration_is_only_introduced_after_the_anomaly(self):
+        source = inspect.getsource(strange_new_worlds.render_lesson)
+        screen_two = source.split("elif part == 2:", 1)[1].split("elif part == 3:", 1)[0]
+
+        self.assertLess(screen_two.index("Well. Our Solar System had not prepared us for that."), screen_two.index("**migration**"))
+        before_reveal = screen_two.split("if hot_jupiter_revealed:", 1)[0].lower()
+        self.assertNotIn("migration", before_reveal)
 
 
 if __name__ == "__main__":

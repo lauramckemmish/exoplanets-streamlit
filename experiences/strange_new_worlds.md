@@ -254,17 +254,28 @@ Do not state the inner-small/outer-giant pattern before learners have had an opp
 
 **DECISION — Brief formation visual**
 
-Include a brief visual or video that explains the tidy Solar-System formation story scientists developed from this familiar arrangement. Its job is not detailed planet-formation teaching; it establishes that scientists had a reasonable explanation for why the Solar System looked this way, so the later hot-Jupiter observation has genuine scientific consequence.
+Planet formation is part of the main learning journey, not optional enrichment. After learners notice the broad rocky-inner / giant-outer pattern, it gives them a causal model they can use to understand why expecting another system to look broadly similar would be reasonable.
 
-Keep it Year 8 conceptual and approximately 30–60 seconds if video, or equivalently brief if static or animated. Do not teach detailed migration mechanisms, competing modern formation models or specialist disk physics.
+Use this simplified mainstream core-accretion chain, at a Year 8 level:
+
+> young star with a disk of gas and dust
+> → hotter closer to the star / colder farther out
+> → more material can exist as solid particles in the colder region
+> → larger planetary cores are easier to build
+> → sufficiently massive cores can collect large amounts of gas
+> → a sensible explanation for **our Solar System's** small rocky inner planets and giant outer planets
+
+Keep condensation/availability of solid material distinct from the later gravitational capture of gas. The final arrangement explains our Solar System; it is not a universal planetary-system rule.
+
+Learner-facing language avoids “ice”, “snow line”, “frost line” and detailed volatile chemistry. Do not teach gravitational instability, pebble accretion, planetesimal physics, runaway gas accretion, disk chemistry or competing formation models.
 
 **HYPOTHESIS — Formation visual implementation**
 
-The exact asset, video, animation or static implementation must be selected after later inspection for scientific accuracy, accessibility, duration and classroom reliability.
+The future visual is a causal explanatory schematic rather than decorative context. Its exact asset and format remain open: use either a compact static schematic or a short animation if later judged pedagogically superior. It should support the full chain above and terminate in **our Solar System**, not imply a universal arrangement. No image generation or temporary decorative asset is required now.
 
 **Facilitator intent**
 
-Anchor Earth at 1 Earth mass and 1 AU. Let learners make the initial pattern observation, then use the formation visual to establish explanatory confidence rather than to teach specialist theory.
+Anchor Earth at 1 Earth mass and 1 AU. Let learners make the initial pattern observation, then introduce the causal model to establish explanatory confidence rather than to teach specialist theory. Close with the bridge: if this were the only planetary system known, expecting another to look broadly similar would be reasonable.
 
 **Boundary / misconceptions**
 
@@ -274,7 +285,7 @@ Anchor Earth at 1 Earth mass and 1 AU. Let learners make the initial pattern obs
 
 **Connection forward**
 
-Screen 2 introduces a giant planet around another star and asks learners to use this familiar evidence to predict where it should be.
+Screen 2 introduces a giant planet around another star and asks learners to use this evidence-supported expectation to predict where it should be. Screen 0 remains the only initial-expectation prompt; do not add a duplicate response here.
 
 ---
 
@@ -299,11 +310,23 @@ Introduce exoplanets through 51 Pegasi b, which breaks the expectation learners 
 9. Add a compact ordered temperature comparison: Mercury daytime maximum (~430 °C), Venus mean surface temperature (~460 °C), aluminium melting point (~660 °C), 51 Pegasi b's approximate atmospheric/equilibrium temperature (~1000 °C), and fresh basaltic lava (~1150–1200 °C).
 10. Explain that 51 Pegasi b is a gas giant, so its value is an estimated atmospheric temperature rather than a solid surface temperature like Mercury or Venus. Use the physical consequence to make the close orbit vivid, then use REVISE to ask what this observation makes learners reconsider about where giant planets can exist.
 
-**Science learning**
+**DECISION — formation conflict and migration**
 
-An observation can appear that a neat Solar-System-based expectation does not explain well. That does not mean scientists were foolish or “wrong”; it means scientific understanding needed to become richer.
+After the close orbit is revealed and allowed to land, make the causal conflict explicit:
 
-A short link back to the Screen 1 formation visual is appropriate: hot Jupiters forced scientists to rethink parts of the formation story. Do not teach the detailed modern explanation.
+> If giant planets are easier to build farther from their star, what is this one doing here?
+
+Then introduce one important possibility:
+
+> A giant planet can form farther out and later move inward while the planetary system is developing.
+
+Name this possibility **migration** only after the anomaly creates the need for it. Planetary systems are not necessarily frozen in the arrangement in which their planets formed. This is one important explanation, not a mechanism lesson or a claim that every giant planet migrates.
+
+Retain the model-revision payoff:
+
+> The Solar System had given scientists a sensible story. Hot Jupiters meant that story needed some work.
+
+An observation can appear that a neat Solar-System-based expectation does not explain well. That does not mean scientists were foolish or “wrong”; it means the earlier model explained something real but was incomplete. Explicit circa-1990 history remains backstage design justification, not a learner-facing history lesson.
 
 **Evidence of learning**
 
@@ -314,7 +337,7 @@ Students explain that a giant planet can orbit unexpectedly close to its star an
 - Describe the 51 Pegasi b mass as an estimate; it is not physical size.
 - Temperature is contextual explanatory evidence only, not a third analytical variable in the Year 8 data-science sequence. The comparison points are not identical measurement types.
 - Do not imply all close-in giant planets are identical to Jupiter.
-- Do not expand into stellar-type dependence, heat redistribution, atmospheric modelling, migration, formation mechanisms, detection methods or discovery chronology beyond the 1995 historical anchor.
+- Do not teach migration mechanisms, disk torques, stellar-type dependence, heat redistribution, atmospheric modelling, detection methods or discovery chronology beyond the 1995 historical anchor.
 
 **DECISION — Local temperature context**
 

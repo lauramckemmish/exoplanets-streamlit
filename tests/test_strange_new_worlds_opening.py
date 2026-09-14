@@ -2,6 +2,7 @@
 
 import unittest
 from contextlib import nullcontext
+import inspect
 from types import SimpleNamespace
 from unittest.mock import patch
 
@@ -67,7 +68,11 @@ class StrangeNewWorldsOpeningTests(unittest.TestCase):
         self.assertNotIn("sample size", rendered)
         self.assertNotIn("universal template", rendered)
 
-    def test_screen_one_keeps_table_values_and_uses_plain_language_with_bounded_placeholder(self):
+        source = inspect.getsource(strange_new_worlds.render_lesson)
+        screen_zero = source.split("if part == 0:", 1)[1].split("elif part == 1:", 1)[0]
+        self.assertEqual(screen_zero.count("predict_prompt("), 1)
+
+    def test_screen_one_keeps_table_values_and_teaches_one_bounded_causal_formation_model(self):
         events = []
         with (
             patch.object(strange_new_worlds, "st", _StreamlitRecorder(events)),
@@ -79,11 +84,24 @@ class StrangeNewWorldsOpeningTests(unittest.TestCase):
         self.assertIn("earth is 1 au from the sun", rendered)
         self.assertIn("which planets are heavy", rendered)
         self.assertIn("formation visual placeholder", rendered)
+        self.assertIn("a young star forms with a disk of gas and dust", rendered)
+        self.assertIn("closer to the star, it is hotter; farther out, it is colder", rendered)
+        self.assertIn("more material can exist as solid particles", rendered)
+        self.assertIn("easier to build larger planetary cores", rendered)
+        self.assertIn("collect large amounts of gas", rendered)
+        self.assertIn("what we see in our solar system", rendered)
+        self.assertIn("expecting another system to look similar would be reasonable", rendered)
         self.assertNotIn("exoplanet", rendered)
         self.assertNotIn("variable", rendered)
         self.assertNotIn("dataset", rendered)
         self.assertNotIn("population", rendered)
         self.assertIn("dataframe", [event[0] for event in events])
+
+        source = inspect.getsource(strange_new_worlds.render_lesson)
+        screen_one = source.split("elif part == 1:", 1)[1].split("elif part == 2:", 1)[0].lower()
+        self.assertNotIn("snow line", screen_one)
+        self.assertNotIn("frost line", screen_one)
+        self.assertNotRegex(screen_one, r"\\bice\\b")
 
     def test_opening_facilitator_notes_preserve_expectation_and_formation_purpose(self):
         opening = strange_new_worlds.TEACHER_NOTE_OVERRIDES[0]
@@ -91,8 +109,9 @@ class StrangeNewWorldsOpeningTests(unittest.TestCase):
 
         self.assertIn("expectation", opening["purpose"])
         self.assertIn("do not foreshadow", opening["facilitation"])
-        self.assertIn("formation story", evidence["purpose"])
-        self.assertIn("formation-story slot", evidence["facilitation"])
+        self.assertIn("formation model", evidence["purpose"])
+        self.assertIn("gas-and-dust disk", evidence["facilitation"])
+        self.assertIn("solid material", evidence["misconceptions"])
 
 
 if __name__ == "__main__":
