@@ -578,7 +578,16 @@ A planet can be located using both mass and orbital distance.
 
 **Evidence presented**
 
-Solar System mass × orbital distance data only, first on ordinary linear axes and then on log–log axes.
+Use familiar Solar System mass × orbital distance data only, first on ordinary linear axes and then on log–log axes. Reuse the existing mass × orbital-distance support infographic: each dot represents one planet, with horizontal position showing orbital distance and vertical position showing mass, including the close/far and lower/higher mass combinations.
+
+**Settled representation sequence**
+
+1. Introduce the two-variable problem conversationally, then use the familiar Solar System graph.
+2. Let learners use the support infographic and NOTICE what is hard to distinguish on the linear view.
+3. React briefly: several planets are squashed into the corner, which is not helpful for comparison.
+4. Ask whether the planets can be spread out without changing the data, then preserve the hard-reveal anchor: “Same planets. Same variables. Same values. Different spacing.”
+5. Explain only that log spacing uses equal multiplication rather than equal addition; no calculations are required.
+6. Show the log–log view and let learners judge what is now possible to compare. Stop there; do not add a repeating self-check.
 
 **Learner action**
 
@@ -590,7 +599,7 @@ Students can explain that the planets/variables/values are unchanged and identif
 
 **Facilitator move**
 
-Teach representation choice, not logarithm calculation. Let learners experience the linear-graph problem before giving the solution.
+Teach representation choice, not logarithm calculation. A representation can be scientifically correct but still poor for comparison, and students may accept a crowded graph unless asked what is hard to distinguish. Let learners experience the linear-graph problem before giving the solution, then stop after their comparison rather than adding another summary.
 
 **Listen for**
 

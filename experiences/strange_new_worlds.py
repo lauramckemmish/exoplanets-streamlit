@@ -117,15 +117,15 @@ TEACHER_BACKGROUNDS = {
     ),
     6: (
         "**Why start with familiar data?**\n\n"
-        "- The Solar System keeps the first two-variable scatter plot scientifically familiar. A point locates each planet "
-        "using mass in Earth masses and orbital distance in AU.\n"
-        "- On linear axes, equal spaces mean equal additions. The wide range of these values makes some planets hard to "
-        "distinguish. The log–log view has the same planets, variables and values, but different spacing: equal spaces "
-        "mean equal multiplication.\n"
-        "- Students do not calculate logarithms. The job is to compare representations and decide which one makes all "
-        "eight planets easier to compare.\n\n"
-        "Listen for ‘same data, different spacing’ and for observations that the inner planets become easier to separate. "
-        "Do not expand into logarithm calculations, detailed maths notation, planet formation or detected-population patterns yet."
+        "- The Solar System keeps the first two-variable scatter plot scientifically familiar. Reuse the shared mass × orbital-distance "
+        "support graphic: each dot represents one planet, with horizontal position for orbital distance and vertical position for mass.\n"
+        "- Let students name what is difficult on the linear graph before the brief reaction that several planets are squashed into the corner. "
+        "A representation can be scientifically correct and still poor for comparison.\n"
+        "- The log–log view has the same planets, variables and values, but different spacing: linear axes use equal additions; log axes use "
+        "equal multiplication. Students do not calculate logarithms.\n\n"
+        "The job is representation choice, not logarithm mathematics. Listen for the inner planets becoming easier to distinguish, then stop after "
+        "the learner compares the two representations. Do not add another summary or expand into detailed maths notation, planet formation or "
+        "detected-population patterns yet."
     ),
     7: (
         "**Test the earlier prediction with more evidence**\n\n"
@@ -219,11 +219,11 @@ TEACHER_NOTE_OVERRIDES = {
         title="How can we show both variables?",
         purpose="Use familiar Solar System data to compare linear and log–log scatter representations, then explain which is more useful for comparing all eight planets.",
         timing="12 minutes (Lesson 2)",
-        facilitation="Use the linear graph to create a genuine visibility problem, then reveal the log–log graph as a representation choice. Linear spacing uses equal additions; logarithmic spacing uses equal multiplication. No logarithm calculations are required.",
+        facilitation="Use the shared mass-and-orbital-distance support graphic, then let students identify what is difficult on the technically correct but crowded linear graph before reacting. Reveal the log–log graph as a representation choice: linear spacing uses equal additions; logarithmic spacing uses equal multiplication. No logarithm calculations are required. Stop after learners compare the two representations rather than adding another summary.",
         alignment="SC4-DA1-01 and SC4-WS-05: use data representations to process and compare two quantitative variables, preparing students to communicate a conclusion on the next screen.",
-        evidence="Students identify that the same planets, variables and values are shown with different spacing, and explain what becomes easier to distinguish.",
+        evidence="Students identify that the same planets, variables and values are shown with different spacing, and judge which planets become easier to distinguish.",
         listen_for="The inner planets are easier to separate on the log–log view, while the data themselves have not changed.",
-        misconceptions="The graph has not changed the planets or their real locations. Do not overclaim that the scatter plot is itself a full scientific model or expand into logarithm calculations.",
+        misconceptions="The graph has not changed the planets or their real locations. A scientifically correct representation can still be poor for comparison. Do not overclaim that the scatter plot is itself a full scientific model or expand into logarithm calculations.",
     ),
     7: dict(
         title="Now add the detected population",
@@ -438,6 +438,7 @@ class LessonDependencies:
     exoplanet_image_path: object
     solar_system_image_path: object
     planetary_systems_image_path: object
+    exoplanet_quadrants_image_path: object
     nasa_kepler_16b_poster_path: object
     nasa_trappist_1e_poster_path: object
     nasa_51_pegasi_b_poster_path: object
@@ -610,25 +611,25 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
         st.write("This is a much bigger dataset, but it is not the Universe handing us a complete list. These are detected planets with the measurements we need for this graph.")
     elif part == 6:
         st.header("Step 6: How can we show both variables?")
-        st.write("A scatter plot can show each Solar System planet using both mass in Earth masses and orbital distance in AU.")
+        st.write("What if we want to compare mass and orbital distance at the same time? A scatter plot can do both.")
         st.subheader("First: ordinary linear spacing")
-        graph_reading_support("The horizontal axis shows orbital distance in AU. The vertical axis shows planet mass in Earth masses.", "Each labelled point is one Solar System planet. Farther right means farther from the Sun; higher means more massive.")
+        st.image(d.exoplanet_quadrants_image_path, width="stretch")
+        st.caption("Four possible combinations of planet mass and orbital distance. The example systems are simplified and are not to scale.")
         st.plotly_chart(d.solar_system_demographics_chart(False), width="stretch")
         notice_prompt("Which planets are hard to distinguish on this graph? What makes them difficult to compare?")
+        st.write("Several planets are squashed into the corner. Not very helpful.")
         log_scale_revealed = d.hard_reveal(
-            "The wide range of values makes the small inner planets bunch together. How could we spread them out without changing the data? Reveal a second view of the **same planets, variables and values**.",
+            "Surely we can do better than this. Can we spread those planets out without changing the data?",
             _SOLAR_SYSTEM_SCALE_REVEAL_KEY,
             reveal_label="Reveal a different spacing →",
-            revealed_message="**Same planets. Same variables. Same values. Different spacing.**",
-            explanation="On the log–log view, equal spaces represent multiplication rather than addition. You do not need to calculate logarithms to read the graph.",
+            revealed_message="Same planets. Same variables. Same values. Different spacing.",
+            explanation="On this graph, equal spaces mean equal multiplication rather than equal addition. You do not need to calculate logarithms to use it.",
         )
         if log_scale_revealed:
             st.subheader("Now: log–log spacing")
-            st.write("The axes still show orbital distance in AU and mass in Earth masses. The values are unchanged; only the spacing is different.")
+            st.write("The axes still show orbital distance and mass. The data have not changed; only the spacing has.")
             st.plotly_chart(d.solar_system_demographics_chart(True), width="stretch")
-            compare_prompt("Which version is more useful if you want to compare all eight planets? What becomes easier to see?")
-            with self_check("Check the representation choice"):
-                st.write("Both graphs show the same data. The log–log spacing makes the small inner planets easier to separate while keeping the giant outer planets visible.")
+            compare_prompt("Better? Which planets can you actually compare now that were hiding before?")
     elif part == 7:
         st.header("Step 7: Now add the detected population")
         prediction = st.session_state.get(_POPULATION_PREDICTION_KEY, "").strip()

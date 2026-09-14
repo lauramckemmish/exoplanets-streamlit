@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="690" viewBox="0 0 1200 690" role="img" aria-labelledby="title description">
-  <title id="title">Four combinations of exoplanet mass and orbital distance</title>
+  <title id="title">Four combinations of planet mass and orbital distance</title>
   <description id="description">A planet can have lower or higher mass and orbit close to or far from its star. These possibilities correspond to four areas of a mass versus orbital distance graph.</description>
   <rect width="1200" height="690" rx="28" fill="#F7F9FC"/>
-  <text x="600" y="46" text-anchor="middle" font-family="Arial, sans-serif" font-size="31" font-weight="700" fill="#172033">Each dot will represent one exoplanet</text>
+  <text x="600" y="46" text-anchor="middle" font-family="Arial, sans-serif" font-size="31" font-weight="700" fill="#172033">Each dot represents one planet</text>
   <text x="600" y="78" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" fill="#475569">Ask two questions: How massive is it? How far is it from its star?</text>
 
   <line x1="160" y1="600" x2="1145" y2="600" stroke="#334155" stroke-width="4" marker-end="url(#arrow)"/>
