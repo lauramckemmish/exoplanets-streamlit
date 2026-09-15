@@ -120,6 +120,31 @@ class PlanetsWeHaveNotFoundSolarSystemTests(unittest.TestCase):
         self.assertIn("“My claim is…” + “The evidence is…” + “A limitation is…”", screen_eight)
         self.assertNotIn("whether our Solar System is typical", screen_eight)
 
+    def test_teacher_support_matches_the_current_year_ten_reasoning_spine(self):
+        preparation = planets_we_have_not_found.YEAR10_PREPARATION
+
+        self.assertIn("The detected exoplanet catalogue is not a neutral census", preparation)
+        self.assertIn("Students do not need to calculate logarithms", planets_we_have_not_found.STAGE_PREPARATION[3])
+        self.assertIn("another Earth", planets_we_have_not_found.STAGE_PREPARATION[4])
+        self.assertIn("regularly repeated dips", planets_we_have_not_found.STAGE_PREPARATION[6])
+        self.assertIn("observed catalogue depends partly on how astronomers looked", planets_we_have_not_found.STAGE_PREPARATION[7])
+        self.assertNotIn("light-year", preparation.lower())
+        self.assertNotIn("Proxima", " ".join(planets_we_have_not_found.STAGE_PREPARATION.values()))
+        self.assertEqual(set(planets_we_have_not_found.LIVE_CUES), {3, 4, 5, 6, 7, 8})
+
+    def test_teacher_support_renders_preparation_and_cues_for_their_stage(self):
+        events = []
+        with (
+            patch.object(planets_we_have_not_found, "facilitator_live_cue", lambda *args: events.append(("cue", args))),
+            patch.object(planets_we_have_not_found, "facilitator_preparation", lambda *args, **kwargs: events.append(("preparation", args, kwargs))),
+        ):
+            planets_we_have_not_found.render_facilitator_support(6)
+
+        self.assertEqual(events[0][0], "cue")
+        self.assertIn("regularly repeated dips", events[0][1][1])
+        self.assertEqual(events[1][2]["key"], "year10_stage_6")
+        self.assertIn("regularly repeated dips", events[1][1][0])
+
 
 if __name__ == "__main__":
     unittest.main()

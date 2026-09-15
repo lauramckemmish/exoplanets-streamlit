@@ -25,59 +25,66 @@ PART_COUNT = len(STEP_LABELS)
 YEAR10_PREPARATION = """
 ### The two-lesson journey
 
-**Lesson 1:** establish the Solar System as a familiar reference; introduce exoplanets and planetary systems; compare mass and orbital distance; solve a representation problem with log axes; then make an initial evidence-based claim about whether detected planets resemble ours.
+**Lesson 1:** Solar System reference → detected exoplanet population → mass and orbital distance → experience the problem with linear axes → use log spacing → make and test a tentative comparison.
 
-**Lesson 2:** investigate direct imaging and transit detection; compare their detected populations; recognise that methods shape the observed dataset; revisit the original claim; and distinguish observed gaps from claims about what does or does not exist.
+**Lesson 2:** direct imaging → transit detection → compare method-specific detected populations → infer that discovery methods shape the observed dataset → revise and bound the original claim.
 
-The central habit is to ask both **“What pattern can I see?”** and **“How were these data collected?”** A detected or recorded planet is not the same as every planet that may exist. Here, **bias** means a systematic detection effect—not dishonesty or necessarily an error. Learners need no prior astronomy knowledge.
+### Central idea
+
+The detected exoplanet catalogue is not a neutral census of every planet that exists. Patterns in it can reflect both the planets that exist and how astronomers looked for them.
+
+### Protect the reasoning
+
+Let the poor linear representation be experienced before revealing log spacing; require prediction before the large detected-population reveal; inspect method-specific evidence before naming the selection-effect synthesis; and end with learner claim + evidence + limitation.
+
+### Useful simplifications
+
+Orbital distance is a standard, useful comparison variable here. Exact orbital period also depends on host-star mass, and orbital distance is not irradiation or temperature: stellar properties matter for those questions. Real detectability depends on more variables than this investigation shows. Those fuller distinctions are real physics; this investigation deliberately stops here. Do not let them open a Kepler's-laws, irradiation or temperature detour.
+
+### If time is tight
+
+**ESSENTIAL:** linear → log; prediction before population evidence; compare direct-imaging and transit evidence; infer that methods sample differently; finish with claim + evidence + limitation.
+
+**COMPRESSIBLE:** extended Solar System-table or mass-bar discussion, optional data-detective challenges, long graph discussions, and written responses (which can become brief oral or pair responses).
+
+**OPTIONAL:** wider method catalogue, extended astronomy discussion, enrichment, and a long final “keep wondering” discussion.
 """.strip()
 
 STAGE_PREPARATION = {
     1: """
-The Sun is a star. **Mass** describes amount of matter, not diameter or visual size; an Earth mass is a comparison unit. The qualitative mass groups are deliberately simplified analytical bins, not official planet classes. The Solar System illustration is not to scale.
+One AU is the average Earth–Sun distance. It is the orbital-distance unit used throughout this investigation.
 """.strip(),
     2: """
-An **exoplanet** orbits a star other than the Sun; a **planetary system** is the general term, while the **Solar System** is ours. A light-year is a distance. Proxima Centauri b is about 4.2 light-years away; many Kepler targets are 500–3,000 light-years away, all within the Milky Way. Known exoplanets remain a tiny sample of the galaxy.
-
-Redirect Big Bang questions toward planet formation from discs of gas and dust.
-
-- [NASA: What are exoplanets?](https://science.nasa.gov/exoplanets/)
-- [NASA: How do planets form?](https://science.nasa.gov/exoplanets/how-do-planets-form/)
+An exoplanet orbits a star other than the Sun. This screen moves quickly from the large detected catalogue to a first mass-distribution comparison with our Solar System.
 """.strip(),
     3: """
-A scatter plot places one planet using two measured variables; here they are mass and orbital distance. One AU is the average Earth–Sun distance. Linear spacing represents equal additions; logarithmic spacing represents equal multiplication. A log–log graph changes the representation, not the planets, variables, units or measurements.
+The log graph has the same planets, variables and numerical values as the linear graph; only the spacing changes. Log spacing is useful because mass and orbital distance span large ranges. Students do not need to calculate logarithms.
 """.strip(),
     4: """
-This graph compares **individual planets**, not whole-system architectures. Blue points are detected exoplanets with both plotted measurements; absence can reflect non-detection or missing measurements. Tentative conclusions are scientifically legitimate. Leave the explanation of apparent gaps for Lesson 2.
+This compares **individual planets** in mass–orbital-distance space, not whole-system architecture. The displayed population is not every planet that exists; a sparse region does not prove planets cannot exist there. Leave why gaps appear unresolved until Lesson 2.
+
+If students get excited about “another Earth”, let that stand. Ask what this graph actually tells them: similarity in these two variables is interesting, but much more information would be needed to establish Earth-like conditions.
 """.strip(),
     5: """
-Direct imaging detects light from a planet, usually as a point source rather than a surface photograph. Host-star glare is the central challenge; coronagraphs suppress starlight. Larger angular separation and young, massive, brighter planets can be easier to detect. The displayed tendency is not a universal rule.
-
-- [NASA: direct imaging and coronagraphs](https://science.nasa.gov/astrophysics/programs/exep/technology/coronagraph-video/)
+Direct imaging distinguishes light from a planet from light from its host star. A planet is much fainter, and sources that appear more widely separated are easier to distinguish—rather like two close sources blurring together until there is enough separation or resolution. This helps explain the region occupied by directly imaged planets. Use “better at finding”, not rigid detection boundaries.
 """.strip(),
     6: """
-A **transit** is a planet crossing its star from our viewpoint, causing a repeated brightness dip. Alignment matters; short orbits transit more often during a survey, and larger-radius planets usually create deeper dips. Transit depth primarily informs radius, not mass, so some transit planets need additional observations for mass. No formulas are needed.
-
-- [NASA: transit-method animation](https://science.nasa.gov/resource/exoplanet-detection-transit-method/)
+A planet either crosses in front of its star from Earth’s viewpoint or it does not. When it does, the star becomes slightly dimmer; regularly repeated dips provide strong evidence of a repeating orbit. A closer planet generally has a shorter year, so its dips repeat more often during a realistic observing period. This helps make close-in planets easier to detect. The exact distance–period relationship also depends on host-star mass, but that does not need a Kepler's-law derivation here.
 """.strip(),
     7: """
-Radial velocity, or the Doppler method, detects a star's towards-and-away wobble through spectral shifts. Microlensing is a rare, usually one-off gravitational magnification alignment. Timing and astrometry provide other routes. Each method has different thresholds and geometric requirements; combining methods broadens but does not complete the sample. A method is not bad because it has a selection effect, and not every gap is observational bias.
-
-- [NASA: Doppler and transit overview](https://science.nasa.gov/astrobiology/learning-resources/alp/discover-worlds-around-other-stars/)
-- [NASA: microlensing explainer](https://science.nasa.gov/resource/exoplanet-detection-microlensing-method/)
+Different discovery methods are better at finding different kinds of planets, so the observed catalogue depends partly on how astronomers looked. The optional fuller method list is depth, not prerequisite knowledge. Selection effects do not make the data fake, and not every pattern is observational bias.
 """.strip(),
     8: """
-Detected exoplanets demonstrate real diversity, but technology, target selection, observing time and geometry shape the catalogue. **Not detected** does not mean **does not exist**; some patterns may also reflect planet formation. Future evidence can change the picture. End with confident curiosity and an investigable next question.
+Multiple evidence-grounded conclusions are legitimate. The final response should contain claim + evidence + limitation; the core limitation is that the detected dataset is incomplete and shaped partly by discovery method. Do not return to a whole-system “is our Solar System typical?” claim.
 """.strip(),
 }
 
 LIVE_CUES = {
-    0: (("FACILITATION NOTE", "Ask what evidence would be needed to compare planetary systems. Do not reveal the detection-bias conclusion yet."),),
-    3: (("CORE LEARNING", "Let learners experience what is hard to distinguish on the linear graph. Reveal the log–log view only afterwards; focus on representation, not logarithm calculations."),),
-    4: (("CORE LEARNING", "Protect hypothesis before evidence. Use the shared Earth challenge first, then a chosen challenge; require graph evidence and defer explaining apparent gaps until Lesson 2."),),
-    5: (("CORE LEARNING", "Before learners inspect the graph, ask where direct-imaging detections might appear. Describe the observed pattern before connecting it to glare, separation and brightness."),),
-    6: (("CORE LEARNING", "Pause after the animation: ask what the telescope measures, then predict the graph. Describe the population using both axes before explaining it."),),
-    7: (("CORE LEARNING", "Inspect one method at a time before combined views. Ask what may be difficult to find; let learners infer incompleteness, using ‘could’ rather than promising every gap will be filled."),),
+    3: (("CORE LEARNING", "Let the awkward linear graph do its job first. When the log view appears, emphasise that the data have not changed and students do not need to calculate logarithms."),),
+    4: (("CORE LEARNING", "Protect prediction before reveal; leave gaps unexplained for now. If “another Earth” excites students, ask what this graph actually tells them—do not squash the excitement or settle the claim."),),
+    5: (("CORE LEARNING", "Let students describe the observed pattern before explaining why direct imaging is better at finding planets in that region."),),
+    6: (("CORE LEARNING", "Pause on what the telescope measures: regularly repeated dips. Let learners describe the transit population before explaining why close-in planets are easier to find."),),
+    7: (("CORE LEARNING", "Let students infer the selection effect: would a different method produce the same dataset? Selection effects do not make the data fake or every pattern observational bias."),),
     8: (("CORE LEARNING", "Ask for learners’ own evidence-based conclusion before consolidating the shared synthesis."),),
 }
 
