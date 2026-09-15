@@ -221,35 +221,38 @@ def apply_visual_system() -> None:
             margin: 0.35rem 0 0.55rem;
         }}
         .st-key-graph_reading_support p {{ margin-bottom: 0.2rem; }}
-        /* Facilitator guidance is private annotation, never learner-facing instruction. */
-        [class*="st-key-facilitator_panel_"] {{
-            border: 1px solid rgba(41, 76, 112, 0.48);
-            border-left: 4px solid var(--unsw-facilitator-annotation);
-            border-radius: 0.35rem;
-            background: rgba(41, 76, 112, 0.09);
-            padding: 0.6rem 0.75rem 0.55rem;
-            margin: 0.4rem 0 0.75rem;
-        }}
-        [class*="st-key-facilitator_optional_"] {{
-            border: 1px solid rgba(41, 76, 112, 0.30);
-            border-left: 2px solid var(--unsw-facilitator-annotation);
-            border-radius: 0.3rem;
+        /* Facilitator preparation is quiet; live cues are deliberately scan-friendly. */
+        [class*="st-key-facilitator_preparation_"] {{
+            border-left: 3px solid var(--unsw-facilitator-annotation);
             background: rgba(41, 76, 112, 0.045);
-            padding: 0.35rem 0.55rem;
-            margin: 0.35rem 0 0.6rem;
+            padding: 0.15rem 0.45rem;
+            margin: 0.55rem 0 0.8rem;
         }}
-        [class*="st-key-facilitator_panel_"] [data-testid="stCaptionContainer"] p,
-        [class*="st-key-facilitator_optional_"] [data-testid="stCaptionContainer"] p {{
-            color: inherit;
-            font-size: 0.73rem;
+        [class*="st-key-facilitator_preparation_"] [data-testid="stExpander"] {{ border-left: 0; }}
+        [class*="st-key-facilitator_live_"] {{
+            box-sizing: border-box;
+            min-width: 0;
+            max-width: 100%;
+            border-left: 4px solid var(--unsw-facilitator-annotation);
+            background: rgba(41, 76, 112, 0.10);
+            padding: 0.4rem 0.65rem;
+            margin: 0.35rem 0;
+            overflow-wrap: anywhere;
+        }}
+        .facilitator-live__label {{
+            display: block;
+            color: var(--unsw-facilitator-annotation);
+            font-size: 0.72rem;
             font-weight: 750;
-            letter-spacing: 0.06em;
-            line-height: 1.1;
-            margin-bottom: 0.3rem;
-            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            line-height: 1.2;
         }}
-        [class*="st-key-facilitator_optional_"] [data-testid="stExpander"] {{
-            border-left-color: var(--unsw-facilitator-annotation);
+        [class*="st-key-facilitator_live_"] p {{ margin-bottom: 0.15rem; line-height: 1.4; }}
+        .st-key-facilitator_orientation {{
+            border-left: 3px solid var(--unsw-facilitator-annotation);
+            background: rgba(41, 76, 112, 0.06);
+            padding: 0.5rem 0.7rem;
+            margin: 0.45rem 0 0.8rem;
         }}
         /* Shared interaction grammar: named cognitive prompts never gate progress. */
         [data-testid="stAlert"][data-baseweb="notification"] {{

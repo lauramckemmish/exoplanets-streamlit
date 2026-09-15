@@ -14,6 +14,8 @@ from data import PARSEC_TO_LIGHT_YEARS
 from charts import sky_map
 from ui_helpers import (
     completion_gate,
+    facilitator_live_cue,
+    facilitator_notes_enabled,
     facilitator_optional,
     facilitator_panel,
     hard_reveal,
@@ -47,7 +49,6 @@ STAGE_LABELS = [
 _STAGE_KEY = "planet_shopping_stage"
 _TAB_KEY = "planet_shopping_tab"
 _SCROLL_KEY = "planet_shopping_scroll_to_top"
-_FACILITATOR_VIEW_KEY = "planet_shopping_facilitator_view"
 _CATALOGUE_REVEAL_KEY = "planet_shopping_meet_catalogue_revealed"
 _DISTANCE_CONTROL_KEY = "planet_shopping_distance_control_ly"
 _APPLIED_DISTANCE_KEY = "planet_shopping_applied_distance_ly"
@@ -441,13 +442,11 @@ def _render_overlap_visual(
 def _render_temperature(data: pd.DataFrame) -> None:
     """Render the independent temperature criterion and missing-data decision."""
     st.subheader("🌡️ Temperature")
-    if st.session_state.get(_FACILITATOR_VIEW_KEY, False):
-        with facilitator_panel("planet_shopping_temperature"):
-            st.markdown(
-                "**Temperature is a deliberate whole-room reasoning anchor.**  \n"
-                "Unknown temperature is not the same as unsuitable. Equilibrium temperature is an **estimated model "
-                "quantity**, not a direct measurement of surface climate."
-            )
+    facilitator_live_cue(
+        "CORE LEARNING",
+        "Temperature is a deliberate whole-room reasoning anchor. Unknown temperature is not the same as unsuitable. "
+        "Equilibrium temperature is an estimated model quantity, not a direct measurement of surface climate.",
+    )
     st.write("Choose an acceptable temperature range for your planet.")
 
     temperature_range_c = st.slider(
@@ -636,7 +635,7 @@ def _render_meet_your_planet(data: pd.DataFrame) -> None:
     planet_name = st.session_state[_BROWSED_PLANET_KEY]
     planet = data.loc[data["pl_name"].astype(str) == planet_name].iloc[0]
     _render_planet_profile(planet_name, planet)
-    if st.session_state.get(_FACILITATOR_VIEW_KEY, False):
+    if facilitator_notes_enabled():
         with facilitator_optional("planet_shopping_meet_catalogue", "Got a keen student?"):
             st.markdown(
                 "**Why browse at all?**  \n"
@@ -703,15 +702,16 @@ def _render_distance(data: pd.DataFrame) -> None:
 
 def _render_combine(data: pd.DataFrame) -> None:
     st.subheader("🛒 Combine")
-    if st.session_state.get(_FACILITATOR_VIEW_KEY, False):
-        with facilitator_panel("planet_shopping_combine"):
-            st.markdown(
-                "**Combine is the second deliberate whole-room reasoning anchor.**  \n"
-                "Learners are bringing independently chosen criteria together. The revealed intersection is supported by "
-                "the **known** evidence; uncertain cases remain distinct. If groups have spread out, this is a useful "
-                "moment to regroup before releasing them back to the data. If time is short, protect this central "
-                "reasoning progression rather than adding extra discussion."
-            )
+    facilitator_live_cue(
+        "CORE LEARNING",
+        "Combine is the second deliberate whole-room reasoning anchor. Learners are bringing independently chosen "
+        "criteria together; the revealed intersection is supported by known evidence, while uncertain cases remain distinct. "
+        "If groups have spread out, this is a useful moment to regroup before returning them to the data.",
+    )
+    facilitator_live_cue(
+        "STREAMLINE",
+        "If time is short, protect this central reasoning progression rather than adding extra discussion.",
+    )
     st.write("You want a planet you can reach **AND** a temperature you can live with.")
     st.markdown("#### Your choices")
     _initialise_combine_control(st.session_state, _COMBINE_DISTANCE_CONTROL_KEY, _APPLIED_DISTANCE_KEY, 500)
@@ -789,15 +789,13 @@ def _render_combine(data: pd.DataFrame) -> None:
 
 def _render_destination(data: pd.DataFrame) -> None:
     st.subheader("🪐 Choose Your Destination")
-    if st.session_state.get(_FACILITATOR_VIEW_KEY, False):
-        with facilitator_panel("planet_shopping_destination"):
-            st.markdown(
-                "**A short recovery note for this stage.**  \n"
-                "An empty shortlist is not failure: loosen or change criteria, then consider why that combination produced "
-                "no candidates. Different groups may reach different defensible destinations. Filtering identifies "
-                "promising candidates; it does not prove habitability. Unexpected real-data cases can be acknowledged or "
-                "explored; an immediate expert explanation is not required."
-            )
+    facilitator_live_cue(
+        "FACILITATION NOTE",
+        "An empty shortlist is not failure: loosen or change criteria, then consider why that combination produced no "
+        "candidates. Different groups may reach different defensible destinations. Filtering identifies promising candidates; "
+        "it does not prove habitability. Unexpected real-data cases can be acknowledged or explored; an immediate expert "
+        "explanation is not required.",
+    )
     st.write("You’ve narrowed the catalogue — but that may still be a lot of planets.")
 
     combine_distance = int(st.session_state.get(_COMBINE_DISTANCE_CONTROL_KEY, st.session_state.get(_APPLIED_DISTANCE_KEY, _DISTANCE_DEFAULT_VALUE)))
@@ -991,7 +989,7 @@ def _render_destination(data: pd.DataFrame) -> None:
                     )
         else:
             st.caption("This planet's position is not available in the map data.")
-        if st.session_state.get(_FACILITATOR_VIEW_KEY, False):
+        if facilitator_notes_enabled():
             with facilitator_optional("planet_shopping_destination_context", "Want to go deeper?"):
                 st.markdown(
                     "**Why the catalogue looks historically uneven**  \n"
@@ -1061,16 +1059,8 @@ def render(data: pd.DataFrame, terminal_action) -> None:
         st.session_state[_STAGE_KEY] = 0
 
     stage = max(0, min(int(st.session_state[_STAGE_KEY]), len(STAGE_LABELS) - 1))
-    heading, activity_controls = st.columns([4, 2])
-    with heading:
-        st.header(TITLE)
-        st.caption(SUBTITLE)
-    with activity_controls:
-        st.toggle(
-            "Facilitator notes",
-            key=_FACILITATOR_VIEW_KEY,
-            help="Show concise preparation, facilitation guidance and optional scientific context.",
-        )
+    st.header(TITLE)
+    st.caption(SUBTITLE)
 
     _, selected_stage = step_tabs(STAGE_LABELS, _TAB_KEY, stage)
     if selected_stage != stage:
@@ -1078,7 +1068,7 @@ def render(data: pd.DataFrame, terminal_action) -> None:
         st.session_state[_STAGE_KEY] = stage
     scroll_to_top_if_requested(_SCROLL_KEY)
 
-    if stage == 0 and st.session_state.get(_FACILITATOR_VIEW_KEY, False):
+    if stage == 0 and facilitator_notes_enabled():
         _render_facilitator_orientation()
 
     if stage == 0:

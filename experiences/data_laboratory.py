@@ -4,7 +4,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from ui_helpers import predict_prompt
+from ui_helpers import facilitator_preparation, predict_prompt
 
 TITLE = "Exoplanet Data Laboratory"
 SUBTITLE = "Open exploration with contextual guidance for analytical choices"
@@ -55,9 +55,9 @@ PHYSICAL_GROUPS = {
 }
 
 
-def render_intro(data, guidance_mode, guidance_box):
+def render_intro(data, facilitator_notes, guidance_box):
     st.header("What is the Exoplanet Data Laboratory?")
-    guidance_box(guidance_mode, "Use real NASA data to ask questions, choose variables and build graphs about planets beyond our Solar System.", "Frame this as open investigation: students make analytical choices, inspect patterns and discuss what the data can and cannot show.")
+    guidance_box("Use real NASA data to ask questions, choose variables and build graphs about planets beyond our Solar System.", "Frame this as open investigation: students make analytical choices, inspect patterns and discuss what the data can and cannot show.", key="lab_intro")
     st.subheader("First: what is an exoplanet?")
     st.write("An exoplanet is a planet orbiting a star other than our Sun. The Milky Way probably contains about 400 billion stars, and most stars are thought to have planets. That means there may be an enormous number of planets in our galaxy.")
     st.subheader("How does a planet become a data record?")
@@ -68,21 +68,22 @@ def render_intro(data, guidance_mode, guidance_box):
     predict_prompt("A graph is an answer to a question. Before changing a setting, say what you want to find out.")
     st.subheader("A useful investigation cycle")
     st.markdown("1. Ask a question  \n2. Choose variables  \n3. Make a graph  \n4. Describe the pattern  \n5. Consider what might affect the pattern")
-    if guidance_mode == "Teacher":
-        with st.expander("NSW syllabus connections", expanded=False):
-            st.write(SYLLABUS_LANGUAGE["stage4"])
-            st.write(SYLLABUS_LANGUAGE["stage5"])
+    if facilitator_notes:
+        facilitator_preparation(
+            f"{SYLLABUS_LANGUAGE['stage4']}\n\n{SYLLABUS_LANGUAGE['stage5']}",
+            key="lab_intro_syllabus",
+            title="For facilitators — NSW syllabus connections",
+        )
 
 
-def render_summary(data, guidance_mode):
+def render_summary(data, _facilitator_notes):
     st.header("A quick summary of the data")
     st.write("These numbers describe the records in this table. They do not describe every planet that exists.")
     a, b, c = st.columns(3)
     a.metric("Planet records", f"{len(data):,}")
     b.metric("Host stars", f"{data['hostname'].nunique():,}")
     c.metric("Discovery methods", f"{data['discoverymethod'].nunique():,}")
-    if guidance_mode != "Minimal":
-        st.caption("The number of records can change as astronomers confirm new planets and update the archive.")
+    st.caption("The number of records can change as astronomers confirm new planets and update the archive.")
 
 
 def display_data(data):
@@ -92,13 +93,13 @@ def display_data(data):
     return shown
 
 
-def render_variables(data, guidance_mode, field_options, variables, variable_card, scale_guidance):
+def render_variables(data, facilitator_notes, field_options, variables, variable_card, scale_guidance):
     st.header("Variables")
     st.write("A variable is a feature we can record or compare. The archive field is the short name used in the NASA table.")
     variable_rows = [{"Variable": label, "NASA archive field": field, "What it tells us": variables.get(field, {}).get("description", "")} for label, field in DATASET_FIELDS]
     st.dataframe(pd.DataFrame(variable_rows), use_container_width=True, hide_index=True)
     selected_label = st.selectbox("Choose a variable to explore", list(field_options), key="dictionary_variable")
-    variable_card(data, field_options[selected_label], guidance_mode, variables, scale_guidance)
+    variable_card(data, field_options[selected_label], facilitator_notes, variables, scale_guidance)
 
 
 def render_dataset_table(data):
@@ -109,17 +110,16 @@ def render_dataset_table(data):
     st.dataframe(display_data(data)[display].rename(columns=friendly_columns), use_container_width=True, hide_index=True)
 
 
-def render_missing(data, guidance_mode):
+def render_missing(data, _facilitator_notes):
     st.header("Missing data")
     st.write("A blank value means that property has not been recorded for that planet. It does not mean zero or that the property does not exist.")
     display = [field for _, field in DATASET_FIELDS]
     missing = pd.DataFrame({"Variable": [label for label, _ in DATASET_FIELDS], "Missing records": [int(data[col].isna().sum()) for col in display], "Complete records (%)": [round(100 * data[col].notna().mean(), 1) for col in display]}).sort_values("Complete records (%)")
     st.dataframe(missing, use_container_width=True, hide_index=True)
-    if guidance_mode != "Minimal":
-        st.info("Missing values limit which questions can be answered reliably.")
+    st.info("Missing values limit which questions can be answered reliably.")
 
 
-def render_dataset_and_missing(data, guidance_mode):
+def render_dataset_and_missing(data, facilitator_notes):
     """Show the data table, basic counts and recorded-value limitations together."""
     st.header("Dataset and missing values")
     st.write("Each row is one known exoplanet record. This table is a sample of what astronomers have measured so far—not a list of every planet that exists.")
@@ -134,15 +134,18 @@ def render_dataset_and_missing(data, guidance_mode):
     st.write("A blank value means that property has not been recorded for that planet. It does not mean zero or that the property does not exist.")
     missing = pd.DataFrame({"Variable": [label for label, _ in DATASET_FIELDS], "Missing records": [int(data[col].isna().sum()) for col in display], "Complete records (%)": [round(100 * data[col].notna().mean(), 1) for col in display]}).sort_values("Complete records (%)")
     st.dataframe(missing, use_container_width=True, hide_index=True)
-    if guidance_mode == "Teacher":
-        st.caption("NSW Science link: process and analyse secondary data, including evaluating the quality and limitations of data.")
+    if facilitator_notes:
+        facilitator_preparation(
+            "NSW Science link: process and analyse secondary data, including evaluating the quality and limitations of data.",
+            key="lab_dataset_missing",
+        )
 
 
 def numeric_options(field_options):
     return {label: field for label, field in field_options.items() if field != "discoverymethod"}
 
 
-def render_one_variable(data, guidance_mode, field_options):
+def render_one_variable(data, facilitator_notes, field_options):
     st.header("One variable")
     st.write("Start by looking at one variable. A histogram counts how many records fall into each range; for an existing category, the same idea appears as a bar-count graph.")
 
@@ -176,11 +179,10 @@ def render_one_variable(data, guidance_mode, field_options):
     else:
         grouped_figure = px.pie(group_counts, names="Group", values="Number of planet records", title=f"{group_label}, grouped into meaningful ranges")
     st.plotly_chart(grouped_figure, use_container_width=True)
-    if guidance_mode != "Minimal":
-        st.info("Compare the histogram ranges with the physical groups. What story does each representation make easier to tell? NSW Science link: organise and summarise secondary data using an appropriate representation.")
+    st.info("Compare the histogram ranges with the physical groups. What story does each representation make easier to tell? NSW Science link: organise and summarise secondary data using an appropriate representation.")
 
 
-def render_two_variables(data, guidance_mode, field_options):
+def render_two_variables(data, facilitator_notes, field_options):
     st.header("Two variables")
     st.write("Choose two variables and look for a pattern. They might both be measurements, or one might describe a group.")
     options = numeric_options(field_options)
@@ -205,11 +207,10 @@ def render_two_variables(data, guidance_mode, field_options):
     if use_log_y:
         figure.update_yaxes(type="log")
     st.plotly_chart(figure, use_container_width=True)
-    if guidance_mode != "Minimal":
-        st.info("Describe the pattern first. Then try a log axis if small and large values are crowded together. The values stay the same; only the spacing changes. NSW Science link: identify trends, patterns and relationships in secondary data.")
+    st.info("Describe the pattern first. Then try a log axis if small and large values are crowded together. The values stay the same; only the spacing changes. NSW Science link: identify trends, patterns and relationships in secondary data.")
 
 
-def render_three_variables(data, guidance_mode, field_options):
+def render_three_variables(data, facilitator_notes, field_options):
     st.header("Three variables")
     st.write("Choose a horizontal variable, a vertical variable and a colour variable. Colour can show an existing category, a numerical scale or one of the meaningful groups used in One Variable.")
     options = numeric_options(field_options)
@@ -244,8 +245,7 @@ def render_three_variables(data, guidance_mode, field_options):
     if use_log_y:
         figure.update_yaxes(type="log")
     st.plotly_chart(figure, use_container_width=True)
-    if guidance_mode != "Minimal":
-        st.info("Ask whether the coloured groups occupy different parts of the graph. Try log axes if small and large values are crowded together, then consider whether the way the data were collected could affect the pattern. NSW Science link: use representations to analyse evidence and evaluate data limitations.")
+    st.info("Ask whether the coloured groups occupy different parts of the graph. Try log axes if small and large values are crowded together, then consider whether the way the data were collected could affect the pattern. NSW Science link: use representations to analyse evidence and evaluate data limitations.")
 
 DISCOVERY_GUIDANCE = {
     "summary": "Use this graph to compare categories over time. Look for changes in dominant discovery methods, sudden increases and periods with sparse data.",
@@ -254,13 +254,13 @@ DISCOVERY_GUIDANCE = {
 }
 
 
-def render_discoveries(data, guidance_mode, discovery_chart, guidance_box):
+def render_discoveries(data, facilitator_notes, discovery_chart, guidance_box):
     """Render the discoveries tab using shared application services."""
     st.header("How have exoplanets been discovered?")
     guidance_box(
-        guidance_mode,
         DISCOVERY_GUIDANCE["summary"],
         DISCOVERY_GUIDANCE["teacher"],
+        key="lab_discoveries",
     )
     methods = sorted(data["discoverymethod"].dropna().unique().tolist())
     selected_methods = st.multiselect("Discovery methods", methods, default=methods)
@@ -268,24 +268,23 @@ def render_discoveries(data, guidance_mode, discovery_chart, guidance_box):
         st.plotly_chart(discovery_chart(data, selected_methods), use_container_width=True)
     else:
         st.warning("Select at least one discovery method.")
-    if guidance_mode != "Minimal":
-        st.markdown(DISCOVERY_GUIDANCE["prompt"])
+    st.markdown(DISCOVERY_GUIDANCE["prompt"])
 
 
-def render_dataset(data, guidance_mode, field_options, variables, guidance_box, variable_card, scale_guidance):
+def render_dataset(data, facilitator_notes, field_options, variables, guidance_box, variable_card, scale_guidance):
     """Render the dataset tab using shared application services."""
     st.header("Meet the variables and dataset")
     guidance_box(
-        guidance_mode,
         "Start with the variables you might use to describe a planet. Then inspect how those variables are recorded in the dataset.",
         "Learning intention: students distinguish a question-friendly variable name from the archive field used to store it, and recognise that missing values limit which questions can be answered.",
+        key="lab_dataset",
     )
     st.subheader("1. Variables we can use")
     st.write("The student-friendly name describes the idea. The NASA archive field is the short name used in the original data table.")
     variable_rows = [{"Variable": label, "NASA archive field": field, "What it tells us": variables.get(field, {}).get("description", "")} for label, field in DATASET_FIELDS]
     st.dataframe(pd.DataFrame(variable_rows), use_container_width=True, hide_index=True)
     selected_label = st.selectbox("Choose a variable to explore", list(field_options), key="dictionary_variable")
-    variable_card(data, field_options[selected_label], guidance_mode, variables, scale_guidance)
+    variable_card(data, field_options[selected_label], facilitator_notes, variables, scale_guidance)
     st.subheader("2. The dataset")
     st.write("Each row is one known exoplanet record. This is a sample of what astronomers have measured so far—not a list of every planet that exists.")
     display = [field for _, field in DATASET_FIELDS]
@@ -299,11 +298,10 @@ def render_dataset(data, guidance_mode, field_options, variables, guidance_box, 
         "Complete records (%)": [round(100 * data[col].notna().mean(), 1) for col in display],
     }).sort_values("Complete records (%)")
     st.dataframe(missing, use_container_width=True, hide_index=True)
-    if guidance_mode != "Minimal":
-        st.info("Missing means unknown. It does not mean zero, unsuitable, or evidence that a planet meets a criterion.")
+    st.info("Missing means unknown. It does not mean zero, unsuitable, or evidence that a planet meets a criterion.")
 
 
-def render_map(data, guidance_mode, sky_map):
+def render_map(data, facilitator_notes, sky_map):
     """Render the celestial map with the same colour choices as Three variables."""
     st.header("Celestial map")
     st.write("Each point shows a known exoplanet's direction in the sky. Use colour to look for patterns in another variable.")
@@ -321,13 +319,14 @@ def render_map(data, guidance_mode, sky_map):
     elif colour_label == "Discovery year":
         colour_field = "disc_year"
     mapped = map_data.dropna(subset=["x", "y", "z"])
-    if guidance_mode != "Minimal":
-        st.info(f"The map uses celestial direction for {len(mapped):,} records. It shows where systems appear in the sky, not their physical separation.")
+    st.info(f"The map uses celestial direction for {len(mapped):,} records. It shows where systems appear in the sky, not their physical separation.")
     st.plotly_chart(sky_map(map_data, None, colour_field, colour_label), use_container_width=True)
     st.caption("The three directions are a way to display position on the sky. They are not distances or physical axes through space.")
-    if guidance_mode == "Teacher":
-        with st.expander("Facilitator notes", expanded=False):
-            st.write("The points are placed using direction on the celestial sphere. Distance is deliberately not used to position them, so a nearby star and a distant star can appear in the same sky region.")
+    if facilitator_notes:
+        facilitator_preparation(
+            "The points are placed using direction on the celestial sphere. Distance is deliberately not used to position them, so a nearby star and a distant star can appear in the same sky region.",
+            key="lab_map",
+        )
 
 
 INVESTIGATIONS = {
@@ -364,7 +363,7 @@ INVESTIGATIONS = {
 
 def render(
     data,
-    guidance_mode,
+    facilitator_notes,
     *,
     teacher_note,
     step_tabs,
@@ -379,13 +378,9 @@ def render(
     terminal_action,
 ):
     """Render the complete Data Laboratory experience using shared services."""
-    heading, activity_controls = st.columns([4, 2])
-    with heading:
-        st.title(TITLE)
-        st.caption(SUBTITLE)
-    with activity_controls:
-        st.toggle("Facilitator notes", key="lab_teacher_view", help="Show additional guidance for teaching and facilitating the investigation.")
-    if guidance_mode == "Teacher":
+    st.title(TITLE)
+    st.caption(SUBTITLE)
+    if facilitator_notes:
         teacher_note(
             TEACHER_GUIDANCE["title"],
             TEACHER_GUIDANCE["purpose"],
@@ -402,25 +397,25 @@ def render(
     scroll_to_top_if_requested("lab_scroll_to_top")
     if current_tab == 0:
         with tabs[0]:
-            render_intro(data, guidance_mode, guidance_box)
+            render_intro(data, facilitator_notes, guidance_box)
     elif current_tab == 1:
         with tabs[1]:
-            render_variables(data, guidance_mode, field_options, variables, variable_card, scale_guidance)
+            render_variables(data, facilitator_notes, field_options, variables, variable_card, scale_guidance)
     elif current_tab == 2:
         with tabs[2]:
-            render_dataset_and_missing(data, guidance_mode)
+            render_dataset_and_missing(data, facilitator_notes)
     elif current_tab == 3:
         with tabs[3]:
-            render_one_variable(data, guidance_mode, field_options)
+            render_one_variable(data, facilitator_notes, field_options)
     elif current_tab == 4:
         with tabs[4]:
-            render_two_variables(data, guidance_mode, field_options)
+            render_two_variables(data, facilitator_notes, field_options)
     elif current_tab == 5:
         with tabs[5]:
-            render_three_variables(data, guidance_mode, field_options)
+            render_three_variables(data, facilitator_notes, field_options)
     else:
         with tabs[6]:
-            render_map(data, guidance_mode, sky_map)
+            render_map(data, facilitator_notes, sky_map)
     step_buttons(
         TAB_LABELS,
         "lab_tab",

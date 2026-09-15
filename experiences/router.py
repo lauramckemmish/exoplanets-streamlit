@@ -103,7 +103,7 @@ def render_pathway(pathway, data, facilitated_pathway, stage4_pathway, stage5_pa
 
 
 def render_demographics_shell(data, demographics_started, pathway, title, facilitated_pathway, stage4_pathway, stage5_pathway, landing, curious_render, stage4_render, stage5_render, classroom_implementation, terminal_action):
-    """Render the common demographics heading, toggle and pathway dispatch."""
+    """Render the common demographics heading and pathway dispatch."""
     if not demographics_started:
         return landing(data)
     pathway = normalise_pathway(pathway, facilitated_pathway, stage4_pathway, stage5_pathway)
@@ -111,10 +111,6 @@ def render_demographics_shell(data, demographics_started, pathway, title, facili
         st.session_state["experience"] = "Introduction"
         st.rerun()
     st.session_state["demographics_pathway"] = pathway
-    heading, activity_controls = st.columns([4, 2])
-    with heading:
-        st.title(pathway)
-        st.markdown(f"*{title}*")
-    with activity_controls:
-        st.toggle("Facilitator notes", key="demographics_teacher_view", help="Show learning purpose, facilitation guidance and syllabus connections within each step.")
+    st.title(pathway)
+    st.markdown(f"*{title}*")
     return render_pathway(pathway, data, facilitated_pathway, stage4_pathway, stage5_pathway, curious_render, stage4_render, stage5_render, classroom_implementation, terminal_action)

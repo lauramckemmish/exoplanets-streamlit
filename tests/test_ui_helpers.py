@@ -25,6 +25,7 @@ class _StreamlitStub:
         self.write_calls = []
         self.captions = []
         self.container_keys = []
+        self.toggles = []
 
     def info(self, *args, **kwargs):
         pass
@@ -35,7 +36,8 @@ class _StreamlitStub:
         return False
 
     def columns(self, *_args, **_kwargs):
-        return [_Column(), _Column(), _Column()]
+        count = len(_args[0]) if _args and isinstance(_args[0], (list, tuple)) else 3
+        return [_Column() for _ in range(count)]
 
     def container(self, **_kwargs):
         self.container_keys.append(_kwargs.get("key"))
@@ -57,6 +59,10 @@ class _StreamlitStub:
 
     def multiselect(self, *_args, **_kwargs):
         return []
+
+    def toggle(self, label, **kwargs):
+        self.toggles.append((label, kwargs.get("key")))
+        return self.session_state.get(kwargs.get("key"), False)
 
 
 class SharedInteractionContractTests(unittest.TestCase):
@@ -163,20 +169,56 @@ class SharedInteractionContractTests(unittest.TestCase):
 
         self.assertEqual(stub.expanders[-2:], ["🧩 Default", "🚀 Rocket"])
 
-    def test_facilitator_helpers_label_essential_and_optional_guidance(self):
+    def test_facilitator_preparation_is_hidden_until_the_global_toggle_is_enabled(self):
         stub = _StreamlitStub()
         with patch.object(ui_helpers, "st", stub):
-            with ui_helpers.facilitator_panel("example"):
-                pass
-            with ui_helpers.facilitator_optional("example_detail", "Want to go deeper?"):
-                pass
+            ui_helpers.facilitator_preparation("Prepare this stage.", key="example")
+            self.assertEqual(stub.expanders, [])
+            stub.session_state[ui_helpers.FACILITATOR_NOTES_KEY] = True
+            ui_helpers.facilitator_preparation(
+                "Prepare this stage.", key="example_detail", title="For facilitators — Want to go deeper?"
+            )
 
-        self.assertEqual(stub.captions, ["Facilitator", "Facilitator · optional"])
         self.assertEqual(
             stub.container_keys,
-            ["facilitator_panel_example", "facilitator_optional_example_detail"],
+            ["facilitator_preparation_example_detail"],
         )
-        self.assertEqual(stub.expanders, ["Want to go deeper?"])
+        self.assertEqual(stub.expanders, ["For facilitators — Want to go deeper?"])
+        self.assertEqual(stub.expander_kwargs, [{"expanded": False}])
+
+    def test_global_facilitator_control_and_live_cues_use_canonical_labels_only(self):
+        stub = _StreamlitStub()
+        with patch.object(ui_helpers, "st", stub):
+            ui_helpers.facilitator_notes_control()
+            self.assertEqual(stub.toggles, [("Facilitator notes", ui_helpers.FACILITATOR_NOTES_KEY)])
+            stub.session_state[ui_helpers.FACILITATOR_NOTES_KEY] = True
+            for label in ui_helpers.FACILITATOR_LIVE_LABELS:
+                ui_helpers.facilitator_live_cue(label, "A delivery decision.")
+            with self.assertRaisesRegex(ValueError, "Unknown facilitator live cue"):
+                ui_helpers.facilitator_live_cue("SKIP", "Not a canonical label.")
+
+        self.assertEqual(len(stub.container_keys), 4)
+        self.assertEqual(stub.write_calls, ["A delivery decision."] * 4)
+
+    def test_global_facilitator_state_survives_routes_without_touching_learning_state(self):
+        from experiences import router
+
+        stub = _StreamlitStub()
+        stub.session_state.update(
+            {
+                ui_helpers.FACILITATOR_NOTES_KEY: True,
+                "stage_response": "An observation",
+                "planet_shopping_meet_catalogue_revealed": True,
+            }
+        )
+        with patch.object(router, "st", stub):
+            router.select_demographics_pathway("Strange New Worlds")
+            router.select_explore_resource("Exoplanet Data Lab")
+            router.return_to_experiences()
+
+        self.assertTrue(stub.session_state[ui_helpers.FACILITATOR_NOTES_KEY])
+        self.assertEqual(stub.session_state["stage_response"], "An observation")
+        self.assertTrue(stub.session_state["planet_shopping_meet_catalogue_revealed"])
 
     def test_semantic_prompt_uses_a_named_marker_without_a_reveal_or_gate(self):
         stub = _StreamlitStub()

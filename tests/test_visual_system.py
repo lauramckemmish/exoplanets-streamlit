@@ -28,10 +28,13 @@ class UNSWVisualSystemTests(unittest.TestCase):
 
         self.assertEqual(UNSW_PALETTE["facilitator_navy"], "#294C70")
         self.assertEqual(SEMANTIC_TOKENS["facilitator_annotation"], UNSW_PALETTE["facilitator_navy"])
-        self.assertIn("st-key-facilitator_panel_", styles)
-        self.assertIn("st-key-facilitator_optional_", styles)
+        self.assertIn("st-key-facilitator_preparation_", styles)
+        self.assertIn("st-key-facilitator_live_", styles)
+        self.assertIn("facilitator-live__label", styles)
         self.assertIn("def facilitator_panel", helpers)
         self.assertIn("def facilitator_optional", helpers)
+        self.assertIn("def facilitator_preparation", helpers)
+        self.assertIn("def facilitator_live_cue", helpers)
         self.assertNotIn("Planet Shopping", helpers)
 
     def test_native_streamlit_theme_uses_shared_primary_and_info_colours(self):

@@ -20,6 +20,8 @@ from charts import (
 from ui_helpers import (
     data_detective_challenge,
     demographics_question,
+    facilitator_notes_control,
+    facilitator_notes_enabled,
     guidance_box,
     graph_guide,
     graph_questions,
@@ -192,6 +194,7 @@ st.set_page_config(
     layout="wide",
 )
 apply_visual_system()
+facilitator_notes_control()
 
 
 
@@ -342,9 +345,6 @@ if experience == "Introduction":
     )
     st.stop()
 
-if experience == "Exoplanet Data Laboratory":
-    guidance_mode = "Teacher" if st.session_state.get("lab_teacher_view", False) else "Student"
-
 if experience == "Guided Tatooine Mission":
     tatooine.render(data, router.return_to_experiences)
 elif experience == planet_shopping.TITLE:
@@ -354,7 +354,7 @@ elif experience == "Exoplanet Demographics":
 elif experience == "Exoplanet Data Laboratory":
     data_laboratory.render(
         data,
-        guidance_mode,
+        facilitator_notes_enabled(),
         teacher_note=teacher_note,
         step_tabs=step_tabs,
         scroll_to_top_if_requested=scroll_to_top_if_requested,

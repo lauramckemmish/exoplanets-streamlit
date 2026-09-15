@@ -72,16 +72,21 @@ describe who owns communication at that point.
 
 ### Facilitator-only guidance
 
-Facilitator-only material must use the shared `facilitator_panel()` treatment
-so an educator can immediately distinguish private guidance from learner-facing
-content. The panel combines a calm muted-navy annotation surface with an
-explicit **Facilitator** label; do not rely on colour alone.
+Facilitator notes are one optional, site-wide layer. Keep them on while preparing,
+then walk the learner experience and open the local notes only where they change
+how a stage is understood or enacted.
 
-Use `facilitator_optional()` for contextual depth that is useful but not
-required preparation. Shared helpers own this visual semantic; each experience
-owns the facilitator content and decides its pedagogical placement. Keep global
-preparation near an experience's beginning and place stage-specific guidance
-beside the relevant learner reasoning.
+Use `facilitator_preparation()` for collapsed, stage-local **For facilitators**
+preparation. It uses the quiet navy surface and must not affect learner state or
+progression. `facilitator_panel()` and `facilitator_optional()` remain temporary
+compatibility names while mature local content is migrated.
+
+Use `facilitator_live_cue()` only for glanceable delivery decisions, choosing
+exactly one of **CORE LEARNING**, **STREAMLINE**, **EXTENSION**, or
+**FACILITATION NOTE**. Live cues use the stronger navy treatment. Do not turn
+background, answer keys, or every facilitator note into a live cue. Shared helpers
+own this visual semantic; each experience owns the facilitator content and decides
+its pedagogical placement.
 
 ## Learner-interaction grammar
 

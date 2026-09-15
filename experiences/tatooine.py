@@ -9,6 +9,8 @@ from charts import sky_map
 from data import PARSEC_TO_LIGHT_YEARS, mission_candidates
 from ui_helpers import (
     guidance_box,
+    facilitator_notes_enabled,
+    facilitator_preparation,
     scroll_to_top_if_requested,
     step_buttons,
     step_tabs,
@@ -102,13 +104,9 @@ def prepare_page():
     if "mission_step" not in st.session_state:
         st.session_state["mission_step"] = 0
     step = max(0, min(int(st.session_state["mission_step"]), STEP_COUNT - 1))
-    heading, controls = st.columns([4, 2])
-    with heading:
-        st.title(TITLE)
-        st.caption(SUBTITLE)
-    with controls:
-        presenter_mode = st.toggle("Facilitator notes", key="tatooine_teacher_view", help="Show facilitation guidance at the top of the experience.")
-    if presenter_mode:
+    st.title(TITLE)
+    st.caption(SUBTITLE)
+    if facilitator_notes_enabled():
         teacher_note(
             TEACHER_GUIDANCE["title"],
             TEACHER_GUIDANCE["purpose"],
@@ -126,10 +124,10 @@ def prepare_page():
     return step
 
 
-def render_custom_filters(data, guidance_mode, defaults=(2, 3, (0.8, 1.5)), key_prefix="perfect"):
+def render_custom_filters(data, defaults=(2, 3, (0.8, 1.5)), key_prefix="perfect"):
     """Render each optional filter as an inline choice → missing data → result story."""
     st.header("Choose your planet criteria")
-    guidance_box(guidance_mode, "Turn an idea about a planet into rules, then apply the rules one at a time.", "Ask students which criteria are essential, which are proxies and what missing values mean.")
+    guidance_box("Turn an idea about a planet into rules, then apply the rules one at a time.", "Ask students which criteria are essential, which are proxies and what missing values mean.", key=f"{key_prefix}_filters")
     st.write(f"We start with **{len(data):,} detected planet records**.")
     current = data.copy()
 
@@ -380,8 +378,11 @@ def render(data: pd.DataFrame, terminal_action) -> None:
         earth_like = radius_recorded[radius_recorded["pl_rade"].between(*radius_range, inclusive="both")].copy()
         st.info(f"Choice 3: keep planets with a radius between {radius_range[0]:.2f} and {radius_range[1]:.2f} Earth radii.")
         st.success(f"Result: {len(earth_like):,} planets remain.")
-        if st.session_state.get("tatooine_teacher_view", False):
-            st.info("Facilitator notes: missing temperature is not evidence that a planet is too hot or too cold. It means the value was not recorded. Temperature also does not prove habitability.")
+        if facilitator_notes_enabled():
+            facilitator_preparation(
+                "Missing temperature is not evidence that a planet is too hot or too cold. It means the value was not recorded. Temperature also does not prove habitability.",
+                key="tatooine_earth_like_temperature",
+            )
         st.info("These results use evidence that has actually been recorded. We think there are probably hundreds of billions of planets in our galaxy alone.")
         render_candidate_comparison(earth_like, "earth_like_worked", "Which candidate would you investigate further if you wanted to find another world to visit? What would you want to learn next?", include_system=False)
 
@@ -391,8 +392,7 @@ def render(data: pd.DataFrame, terminal_action) -> None:
         st.text_area("What kind of planet are you looking for?", placeholder="For example: a small, warm planet in a system with several worlds.", key="perfect_planet_story", height=100)
         st.subheader("Choose your variables and filters")
         st.caption("Each choice is a rule. Try to explain why the rule represents part of your story.")
-        guidance_mode = "Teacher" if st.session_state.get("tatooine_teacher_view", False) else "Student"
-        render_custom_filters(data, guidance_mode, key_prefix="perfect")
+        render_custom_filters(data, key_prefix="perfect")
 
     elif step == 4:
         st.header("Conclusion")

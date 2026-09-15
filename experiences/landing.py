@@ -6,6 +6,7 @@ from pathlib import Path
 import streamlit as st
 
 from visual_system import resource_identity, semantic_heading
+from ui_helpers import facilitator_orientation
 
 
 def _thumbnail_container_key(entry, button_key_prefix):
@@ -101,6 +102,7 @@ def render(data, image_path, portrait_logo_path, feedback_url, grant_url, catalo
             caption="Artist's concept of the variety of known exoplanets. Credit: NASA/JPL-Caltech",
             width="stretch",
         )
+    facilitator_orientation()
     semantic_heading("Choose an investigation", "major-section")
     experiences = catalog.experience_catalog()
     _render_cards(

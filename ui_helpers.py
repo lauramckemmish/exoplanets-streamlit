@@ -8,6 +8,22 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 _CONTINUE_BLOCKED_KEY = "_ui_helpers_continue_blocked"
+FACILITATOR_NOTES_KEY = "facilitator_notes_enabled"
+FACILITATOR_LIVE_LABELS = frozenset(
+    {"CORE LEARNING", "STREAMLINE", "EXTENSION", "FACILITATION NOTE"}
+)
+
+
+def facilitator_notes_control() -> None:
+    """Render the one site-wide optional facilitator layer control."""
+    _, control_column = st.columns([5, 1])
+    with control_column:
+        st.toggle("Facilitator notes", key=FACILITATOR_NOTES_KEY)
+
+
+def facilitator_notes_enabled() -> bool:
+    """Return whether the optional facilitator layer is enabled this session."""
+    return st.session_state.get(FACILITATOR_NOTES_KEY, False)
 
 
 def _block_continue() -> None:
@@ -284,20 +300,59 @@ def soft_reveal(
 
 
 @contextmanager
+def _facilitator_preparation_container(key: str, title: str = "For facilitators") -> Iterator[None]:
+    """Internal container for multi-element compatibility renderers."""
+    with st.container(key=f"facilitator_preparation_{key}"):
+        with st.expander(title, expanded=False):
+            yield
+
+
+def facilitator_preparation(content: str, *, key: str, title: str = "For facilitators") -> None:
+    """Render collapsed, stage-local preparation without affecting learner flow."""
+    if not facilitator_notes_enabled():
+        return
+    with _facilitator_preparation_container(key, title):
+        st.markdown(content)
+
+
+@contextmanager
 def facilitator_panel(key: str) -> Iterator[None]:
-    """Render a shared, clearly labelled panel for facilitator-only guidance."""
-    with st.container(key=f"facilitator_panel_{key}"):
-        st.caption("Facilitator")
+    """Compatibility name for the canonical collapsed preparation surface."""
+    with _facilitator_preparation_container(key):
         yield
 
 
 @contextmanager
 def facilitator_optional(key: str, title: str) -> Iterator[None]:
-    """Render optional facilitator-only context with lower visual prominence."""
-    with st.container(key=f"facilitator_optional_{key}"):
-        st.caption("Facilitator · optional")
-        with st.expander(title, expanded=False):
-            yield
+    """Compatibility name for optional contextual preparation."""
+    with _facilitator_preparation_container(key, f"For facilitators — {title}"):
+        yield
+
+
+def facilitator_live_cue(label: str, content: str) -> None:
+    """Render one concise facilitator-only decision cue for live delivery."""
+    if label not in FACILITATOR_LIVE_LABELS:
+        allowed = ", ".join(sorted(FACILITATOR_LIVE_LABELS))
+        raise ValueError(f"Unknown facilitator live cue: {label}. Use one of: {allowed}.")
+    if not facilitator_notes_enabled():
+        return
+    cue_key = label.lower().replace(" ", "_")
+    with st.container(key=f"facilitator_live_{cue_key}"):
+        st.markdown(f"<span class='facilitator-live__label'>{escape(label)}</span>", unsafe_allow_html=True)
+        st.write(content)
+
+
+def facilitator_orientation() -> None:
+    """Render the concise landing-page preparation orientation."""
+    if not facilitator_notes_enabled():
+        return
+    with st.container(key="facilitator_orientation"):
+        st.markdown("**Facilitator notes**")
+        st.write(
+            "Before delivery, walk through the learner experience yourself with Facilitator notes on. "
+            "Open the local notes as you go to prepare for learner reasoning, protected moments, "
+            "likely thinking, and relevant science or data-science context."
+        )
 
 
 def choice_reveal(
@@ -398,29 +453,28 @@ def learn_more_prompt(key_prefix: str) -> None:
         "- **People and ideas:** aliens, philosophy, culture, media, politics and how humanity might respond to a discovery"
     )
     st.text_area("My learn-more question", key=f"{key_prefix}_learn_more", height=90, placeholder="I would like to find out…")
-    if st.session_state.get("demographics_teacher_view", False):
-        with st.expander("Facilitator notes: helping students follow their interest"):
-            st.markdown(
-                "These are optional engagement routes, not additional required curriculum. Invite students to choose "
-                "one question and identify useful search terms or an appropriate source. Possible prompts include:\n\n"
-                "- How do planets and planetary systems form?\n"
-                "- How can a spectrum reveal molecules in an exoplanet atmosphere?\n"
-                "- What might count as evidence of life?\n"
-                "- Which future telescope or mission could answer this question?\n"
-                "- How might scientists communicate a possible discovery of life?\n"
-                "- How have different cultures imagined other worlds?\n\n"
-                "Atmospheric molecules, spectra and biosignatures belong here as learn-more possibilities. They are "
-                "not assumed knowledge or required content in either classroom pathway."
-            )
+    if facilitator_notes_enabled():
+        facilitator_preparation(
+            "These are optional engagement routes, not additional required curriculum. Invite students to choose "
+            "one question and identify useful search terms or an appropriate source. Possible prompts include:\n\n"
+            "- How do planets and planetary systems form?\n"
+            "- How can a spectrum reveal molecules in an exoplanet atmosphere?\n"
+            "- What might count as evidence of life?\n"
+            "- Which future telescope or mission could answer this question?\n"
+            "- How might scientists communicate a possible discovery of life?\n"
+            "- How have different cultures imagined other worlds?\n\n"
+            "Atmospheric molecules, spectra and biosignatures belong here as learn-more possibilities. They are "
+            "not assumed knowledge or required content in either classroom pathway.",
+            key=f"{key_prefix}_learn_more",
+            title="For facilitators — supporting learner interests",
+        )
 
 
-def guidance_box(mode: str, student_text: str, teacher_text: str | None = None) -> None:
-    if mode == "Student":
-        st.info(student_text)
-    elif mode == "Teacher" and teacher_text:
-        st.info(student_text)
-        with st.expander("Facilitator notes", expanded=False):
-            st.write(teacher_text)
+def guidance_box(student_text: str, facilitator_text: str | None = None, *, key: str = "guidance") -> None:
+    """Render learner guidance plus optional collapsed stage-local preparation."""
+    st.info(student_text)
+    if facilitator_text and facilitator_notes_enabled():
+        facilitator_preparation(facilitator_text, key=key)
 
 
 def sample_note(data, required: list[str], label: str = "records") -> int:
@@ -446,12 +500,13 @@ def teacher_note(
     misconceptions: str = "",
     facilitator_moment: str = "",
     resources: tuple[tuple[str, str], ...] = (),
-    teacher_state_key: str = "demographics_teacher_view",
 ) -> None:
-    if not st.session_state.get(teacher_state_key, False):
+    """Compatibility renderer for pathway metadata on collapsed preparation."""
+    if not facilitator_notes_enabled():
         return
-    with st.container(border=True):
-        st.markdown(f"### Facilitator notes: {title}")
+    preparation_key = "metadata_" + "".join(character.lower() if character.isalnum() else "_" for character in title)
+    with _facilitator_preparation_container(preparation_key):
+        st.markdown(f"**{title}**")
         if timing:
             st.caption(f"Suggested time: {timing} · Use this as guidance, not a required pace.")
         st.markdown(f"**Learning intention:** {purpose}")
@@ -494,14 +549,13 @@ def presenter_notes(step: int, notes_by_step: dict) -> None:
         st.markdown(f"**Watch for**  \n{notes['watch']}")
 
 
-def variable_card(data, field: str, guidance_mode: str, variables: dict, scale_guidance) -> None:
+def variable_card(data, field: str, _facilitator_notes: bool, variables: dict, scale_guidance) -> None:
     details = variables[field]
     status, reason, profile = scale_guidance(data, field, variables)
     st.markdown(f"#### {details['label']}")
     st.write(f"**Field:** `{field}`  ")
     st.write(f"**Unit:** {details['unit']}  ")
     st.write(details["description"])
-    if guidance_mode != "Minimal":
-        st.caption(details["measurement"])
-        st.info(f"**Scale guidance: {status}.** {reason}")
-        st.caption(f"Available for {profile['complete']:,} of {len(data):,} records; {profile['missing']:,} values are missing.")
+    st.caption(details["measurement"])
+    st.info(f"**Scale guidance: {status}.** {reason}")
+    st.caption(f"Available for {profile['complete']:,} of {len(data):,} records; {profile['missing']:,} values are missing.")
