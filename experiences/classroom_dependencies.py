@@ -19,7 +19,6 @@ def render_lesson(data, pathway, part, stage4_pathway, stage5_pathway, resources
             nasa_kepler_186f_poster_path=resources["nasa_kepler_186f_poster_path"],
             solar_system_demographics_chart=resources["solar_system_demographics_chart"],
             planet_mass_distribution_chart=resources["planet_mass_distribution_chart"],
-            discoveries_by_year_chart=resources["discoveries_by_year_chart"],
             current_demographics_chart=resources["current_demographics_chart"],
             graph_guide=resources["graph_guide"],
             graph_questions=resources["graph_questions"],

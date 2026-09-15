@@ -395,7 +395,6 @@ class LessonDependencies:
     nasa_kepler_186f_poster_path: object
     solar_system_demographics_chart: object
     planet_mass_distribution_chart: object
-    discoveries_by_year_chart: object
     current_demographics_chart: object
     graph_guide: object
     graph_questions: object
