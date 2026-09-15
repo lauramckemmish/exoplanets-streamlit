@@ -367,7 +367,7 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
                 "**Direct imaging** means taking a picture of light from a planet. It works best when a planet is bright "
                 "and far from its star."
             )
-        st.markdown("### Our question\nWhich kinds of planets are easiest to find using direct imaging?")
+        st.markdown("### Our question\nWhich kinds of planets is direct imaging better at finding?")
         graph_reading_support(
             "The bottom axis shows orbital distance and the side axis shows planet mass. Both use a log scale.",
             "Blue circles are planets found using direct imaging. Pink labelled diamonds are Solar System planets.",
@@ -382,10 +382,10 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
         )
         d.response_box(
             5,
-            "What kinds of planets does direct imaging tend to find? Use evidence from the graph.",
-            "“Direct imaging tends to find planets that are…” or “Most of the blue points are…”",
+            "What kinds of planets is direct imaging better at finding? Use evidence from the graph.",
+            "“Direct imaging is better at finding planets that are…” or “Most of the blue points are…”",
         )
-        d.key_idea("Direct imaging tends to find massive planets that are far from their stars.", "Most blue points sit high and to the right: high mass and far from their host stars.")
+        d.key_idea("Direct imaging is better at finding massive planets that are far from their stars.", "Most blue points sit high and to the right: high mass and far from their host stars.")
     # YEAR 10 STEP 6 — Transit detection
     elif part == 6:
         st.header("Step 6: Transit detection")
@@ -395,7 +395,7 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
         )
         st.video("https://www.youtube.com/watch?v=BFi4HBUdWkk")
         st.caption("NASA animation of an exoplanet transiting its star. Credit: NASA/JPL-Caltech")
-        st.markdown("### Our question\nWhich kinds of planets are easiest to find using transit detection?")
+        st.markdown("### Our question\nWhich kinds of planets is transit detection better at finding?")
         graph_reading_support(
             "The bottom axis shows orbital distance and the side axis shows planet mass. Both use a log scale.",
             "Blue circles are planets found using transits. Pink labelled diamonds are Solar System planets.",
@@ -410,10 +410,10 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
         )
         d.response_box(
             6,
-            "What kinds of planets does transit detection tend to find? Use evidence from the graph.",
-            "“Transit detection tends to find planets that are…” or “Most of the blue points are…”",
+            "What kinds of planets is transit detection better at finding? Use evidence from the graph.",
+            "“Transit detection is better at finding planets that are…” or “Most of the blue points are…”",
         )
-        d.key_idea("Most planets found using transits orbit close to their stars.", "Most transit points are on the left of the graph, showing short distances from their host stars.")
+        d.key_idea("Transit detection is better at finding planets that orbit close to their stars.", "Most transit points are on the left of the graph, showing short distances from their host stars.")
     # YEAR 10 STEP 7 — Compare discovery methods
     elif part == 7:
         st.header("Step 7: Compare discovery methods")
@@ -426,11 +426,11 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
         with direct_imaging_column:
             with st.container(border=True):
                 st.image(d.direct_imaging_image_path, use_container_width=True)
-                st.markdown("**Direct imaging**  \n\n**Often finds:** bright, massive planets far from their stars.")
+                st.markdown("**Direct imaging**  \n\n**Better at finding:** bright, massive planets far from their stars.")
         with transit_column:
             with st.container(border=True):
                 st.image(d.transit_detection_image_path, use_container_width=True)
-                st.markdown("**Transit detection**  \n\n**Often finds:** planets close to their stars—especially larger planets.")
+                st.markdown("**Transit detection**  \n\n**Better at finding:** planets close to their stars—especially larger planets.")
         st.caption("These are patterns in the planets we have detected, not a list of every planet that exists.")
         with soft_reveal("Explore other ways astronomers find exoplanets"):
             st.markdown(
@@ -461,10 +461,10 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
         )
         d.response_box(
             7,
-            "Why do different discovery methods find different kinds of planets?",
-            "“The methods find different planets because…” or “A planet is easier to find when…”",
+            "Why are different discovery methods better at finding different kinds of planets?",
+            "“The methods are better at finding different planets because…” or “A planet is easier to find when…”",
         )
-        d.key_idea("Different discovery methods find different kinds of planets.", "Switch between methods and watch how the occupied parts of the graph change.")
+        d.key_idea("Different discovery methods are better at finding different kinds of planets.", "The planets in the observed dataset depend partly on how astronomers looked for them. Switch between methods and watch how the occupied parts of the graph change.")
     # CLASSROOM STEP 8 — Conclusion
     elif part == 8:
         st.header("Conclusion")

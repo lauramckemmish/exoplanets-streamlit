@@ -87,6 +87,18 @@ class PlanetsWeHaveNotFoundSolarSystemTests(unittest.TestCase):
         self.assertIn("hard_reveal", names)
         self.assertLess(names.index("text_area"), names.index("hard_reveal"))
 
+    def test_steps_five_to_seven_use_method_preferences_to_explain_the_observed_dataset(self):
+        source = Path("experiences/planets_we_have_not_found.py").read_text()
+        screen_five = source.split("elif part == 5:", 1)[1].split("elif part == 6:", 1)[0]
+        screen_six = source.split("elif part == 6:", 1)[1].split("elif part == 7:", 1)[0]
+        screen_seven = source.split("elif part == 7:", 1)[1].split("elif part == 8:", 1)[0]
+
+        self.assertIn("Direct imaging is better at finding massive planets", screen_five)
+        self.assertIn("Transit detection is better at finding planets that orbit close", screen_six)
+        self.assertIn("Different discovery methods are better at finding different kinds of planets.", screen_seven)
+        self.assertIn("The planets in the observed dataset depend partly on how astronomers looked for them.", screen_seven)
+        self.assertNotIn("Different discovery methods find different kinds of planets.", screen_seven)
+
 
 if __name__ == "__main__":
     unittest.main()
