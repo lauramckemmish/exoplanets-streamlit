@@ -28,6 +28,17 @@ class CuriousInteractionTests(unittest.TestCase):
         discussion_index = CURIOUS_SOURCE.index('st.markdown("### Discuss")', reveal_index)
         self.assertLess(graph_index, reveal_index)
         self.assertLess(reveal_index, discussion_index)
+
+    def test_curriculum_reasoning_prompts_preserve_the_evidence_sequence(self):
+        self.assertIn("questions that could not previously be answered with evidence", CURIOUS_SOURCE)
+        self.assertIn("Which graph would you use to compare both the small inner planets", CURIOUS_SOURCE)
+        self.assertIn("Make a provisional claim", CURIOUS_SOURCE)
+        self.assertIn("The NASA exoplanet catalogue combines discoveries", CURIOUS_SOURCE)
+        self.assertIn("Would you now change or qualify your answer", CURIOUS_SOURCE)
+        self.assertLess(
+            CURIOUS_SOURCE.index("Make a provisional claim"),
+            CURIOUS_SOURCE.index("curious_method_pattern_revealed"),
+        )
         self.assertNotIn('with soft_reveal("What pattern does the evidence support?"):', CURIOUS_SOURCE)
 
     def test_transit_animation_and_conclusion_remain_soft_reveals(self):
