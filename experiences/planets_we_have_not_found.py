@@ -239,45 +239,9 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
     elif part == 2:
         st.header("Step 2: Meet exoplanets")
         st.info(
-            "### What is an exoplanet?\n"
             "An **exoplanet** is a planet that orbits a star other than the Sun. Astronomers have detected thousands "
-            "of exoplanets, although we do not have every measurement for every planet."
+            "of exoplanets. That gives us a large detected catalogue to compare with our Solar System."
         )
-        with media_text_pair(
-            d.planetary_systems_image_path,
-            role="context",
-            caption=(
-                "The Sun is a star, and our Solar System is one planetary system. Exoplanets belong to other "
-                "planetary systems."
-            ),
-            key="year10_planetary_systems",
-        ):
-            st.info(
-                "### How far away are they?\n"
-                "The nearest known exoplanet is about **4 light-years** away. Many of the stars searched by space "
-                "telescopes are **hundreds to thousands of light-years** away—still inside our Milky Way galaxy. A "
-                "light-year is a distance: how far light travels in one year."
-            )
-        st.markdown(
-            "### Imagine another planetary system\n"
-            "Could it have more planets, fewer planets, two stars, or planets arranged very differently? Describe "
-            "or sketch one possibility before looking at the data."
-        )
-        st.subheader("A new and fast-growing science")
-        st.markdown("**1992 — the first confirmed exoplanets were discovered.**")
-        discovery_years = pd.to_numeric(data["disc_year"], errors="coerce").dropna()
-        milestones = [
-            ("By 1995", int((discovery_years <= 1995).sum())),
-            ("By 2005", int((discovery_years <= 2005).sum())),
-            ("By 2015", int((discovery_years <= 2015).sum())),
-            ("By 2025", int((discovery_years <= 2025).sum())),
-            ("Today", int(discovery_years.size)),
-        ]
-        milestone_columns = st.columns(len(milestones))
-        for column, (label, total) in zip(milestone_columns, milestones):
-            with column:
-                st.metric(label, f"{total:,}")
-        st.caption("Running total of confirmed exoplanets in the NASA Exoplanet Archive.")
         st.markdown(
             "### Our question\n"
             "How do the masses of detected exoplanets compare with planets in our Solar System?"
@@ -478,12 +442,12 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             "### What have we learned?\n"
             "- Data lets astronomers investigate planets far beyond our Solar System.\n"
             "- A graph's scale can change which patterns are easy to see.\n"
-            "- Our Solar System is one planetary system among many—and defining whether it is ‘normal’ requires evidence.\n"
-            "- Our picture of exoplanets is incomplete because different methods find different kinds of planets."
+            "- Solar System planets give us a useful reference for comparison.\n"
+            "- Our picture of exoplanets is incomplete because different methods are better at finding different kinds of planets."
         )
         d.response_box(
             8,
-            "What can the known exoplanets tell us about whether our Solar System is typical—and what prevents us from being completely certain?",
+            "What do the known exoplanets suggest about how Solar System planets compare with detected exoplanets—and why can’t the detected dataset give us the whole answer?",
             "“My claim is…” + “The evidence is…” + “A limitation is…”",
         )
         st.markdown("### Keep wondering")

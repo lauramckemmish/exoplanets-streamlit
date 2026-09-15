@@ -99,6 +99,27 @@ class PlanetsWeHaveNotFoundSolarSystemTests(unittest.TestCase):
         self.assertIn("The planets in the observed dataset depend partly on how astronomers looked for them.", screen_seven)
         self.assertNotIn("Different discovery methods find different kinds of planets.", screen_seven)
 
+    def test_step_two_is_a_compact_detected_population_mass_comparison(self):
+        source = Path("experiences/planets_we_have_not_found.py").read_text()
+        screen_two = source.split("elif part == 2:", 1)[1].split("elif part == 4:", 1)[0]
+
+        self.assertIn("An **exoplanet** is a planet that orbits a star other than the Sun.", screen_two)
+        self.assertIn("large detected catalogue", screen_two)
+        self.assertIn("d.planet_mass_distribution_chart(data)", screen_two)
+        self.assertIn("d.response_box(\n            2,", screen_two)
+        self.assertNotIn("light-year", screen_two.lower())
+        self.assertNotIn("Imagine another planetary system", screen_two)
+        self.assertNotIn("disc_year", screen_two)
+
+    def test_conclusion_uses_individual_planet_scope_and_method_preference(self):
+        source = Path("experiences/planets_we_have_not_found.py").read_text()
+        screen_eight = source.split("elif part == 8:", 1)[1]
+
+        self.assertIn("different methods are better at finding different kinds of planets", screen_eight)
+        self.assertIn("how Solar System planets compare with detected exoplanets", screen_eight)
+        self.assertIn("“My claim is…” + “The evidence is…” + “A limitation is…”", screen_eight)
+        self.assertNotIn("whether our Solar System is typical", screen_eight)
+
 
 if __name__ == "__main__":
     unittest.main()
