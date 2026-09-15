@@ -8,6 +8,7 @@ Each experience has its own module in `experiences/`. Student-facing wording, le
 
 | Experience | Edit here | Notes |
 | --- | --- | --- |
+| **Planet Shopping Outside Our Solar System** | `experiences/planet_shopping.md`, then `experiences/planet_shopping.py` | Authoritative facilitated filtering, missing-data and evidence-based decision experience design, then implementation. |
 | **Is Our Solar System Normal?** (CURIOUS) | `experiences/curious.py` | Facilitator-led sequence, discussion prompts and Facilitator notes. |
 | **Strange New Worlds** (Year 8) | `experiences/strange_new_worlds.md`, then `experiences/strange_new_worlds.py` | Authoritative Year 8 pedagogical design, then student steps, Facilitator notes and background information. |
 | **The Planets We Haven't Found** (Year 10) | `experiences/planets_we_have_not_found.py` | Year 10 student steps, Facilitator notes and background information. |

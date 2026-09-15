@@ -1,5 +1,13 @@
 # Learner-interaction audit
 
+> **Status: HISTORICAL AUDIT SNAPSHOT**
+>
+> This document is retained as evidence of the interaction estate when the
+> audit was run. Its implementation findings must not be treated as the current
+> migration backlog. Current code, tests, and project/repository sources are
+> authoritative for present state. Run a fresh diagnostic audit if a new
+> interaction review is needed.
+
 This audit records the learner-facing interaction estate against the shared
 grammar in [`curious_online_style.md`](curious_online_style.md) and the helpers
 in `ui_helpers.py`. It is evidence for later migration work; no experience or

@@ -1,5 +1,15 @@
 # Planet Shopping delivery sprint
 
+> **Status: CLOSED / HISTORICAL DELIVERY SPRINT**
+>
+> This document records the August 2026 Planet Shopping delivery sprint. It is
+> no longer an active scope-control surface, and its historical “current
+> pointer” must not be treated as authorisation for new work.
+>
+> For current work, use current user/project instructions, root/local
+> `AGENTS.md`, `CONTENT_MAP.md`, `experiences/planet_shopping.md`, and current
+> implementation/tests.
+
 This file is the **delivery-control surface** for getting **Planet Shopping Outside Our Solar System** ready for facilitated CURIOUS delivery.
 
 It is intentionally narrower than a normal product backlog.
@@ -52,11 +62,13 @@ Back / Continue progression.
 
 One screen should have one obvious main cognitive job.
 
-## Current pointer
+## Historical final pointer
 
-> **CURRENT: PS-05 — Isabella end-to-end delivery rehearsal**
+When this sprint was active, its final pointer was **PS-05 — Isabella
+end-to-end delivery rehearsal**.
 
-Everything else in this document is context, not permission to modify it.
+Everything else in this document is historical context, not permission to
+modify it.
 
 ---
 
