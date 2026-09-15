@@ -96,7 +96,7 @@ class PlanetsWeHaveNotFoundSolarSystemTests(unittest.TestCase):
         self.assertIn("Direct imaging is better at finding massive planets", screen_five)
         self.assertIn("Transit detection is better at finding planets that orbit close", screen_six)
         self.assertIn("Different discovery methods are better at finding different kinds of planets.", screen_seven)
-        self.assertIn("The planets in the observed dataset depend partly on how astronomers looked for them.", screen_seven)
+        self.assertIn("The planets in this catalogue depend partly on how astronomers looked for them.", screen_seven)
         self.assertNotIn("Different discovery methods find different kinds of planets.", screen_seven)
 
     def test_step_two_is_a_compact_detected_population_mass_comparison(self):

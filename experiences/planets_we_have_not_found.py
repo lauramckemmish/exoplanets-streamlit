@@ -178,7 +178,7 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             "3. Use mass and orbital distance to identify patterns.\n"
             "4. Make an initial claim.\n"
             "5. Investigate direct imaging and transit detection.\n"
-            "6. Compare the observational windows.\n"
+            "6. Compare how astronomers look for planets.\n"
             "7. Reconsider what the evidence supports."
         )
     # YEAR 10 STEP 3 — Mass and distance
@@ -253,7 +253,7 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             "“Compared with …, … has … mass and is … from the Sun.”",
         )
         d.key_idea(
-            "The Solar System is our familiar reference population for comparing planetary data.",
+            "The Solar System is our familiar reference for comparing planet data.",
             "Its planets vary greatly in both mass and orbital distance, so those quantities give us useful ways to compare planets.",
         )
     # YEAR 10 STEP 2 — Meet exoplanets
@@ -380,7 +380,8 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
         st.header("Step 6: Transit detection")
         st.write(
             "A **transit** happens when a planet passes in front of its star from our viewpoint. The planet blocks a "
-            "tiny amount of starlight. If the dip repeats, astronomers can use it as evidence of an orbiting planet."
+            "tiny amount of starlight. If the dip repeats, astronomers can use it as evidence of an orbiting planet. "
+            "Planets closer to their stars generally have shorter years, so their dips repeat more often."
         )
         st.video("https://www.youtube.com/watch?v=BFi4HBUdWkk")
         st.caption("NASA animation of an exoplanet transiting its star. Credit: NASA/JPL-Caltech")
@@ -453,7 +454,7 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             "Why are different discovery methods better at finding different kinds of planets?",
             "“The methods are better at finding different planets because…” or “A planet is easier to find when…”",
         )
-        d.key_idea("Different discovery methods are better at finding different kinds of planets.", "The planets in the observed dataset depend partly on how astronomers looked for them. Switch between methods and watch how the occupied parts of the graph change.")
+        d.key_idea("Different discovery methods are better at finding different kinds of planets.", "The planets in this catalogue depend partly on how astronomers looked for them. Switch between methods and watch how the occupied parts of the graph change.")
     # CLASSROOM STEP 8 — Conclusion
     elif part == 8:
         st.header("Conclusion")
