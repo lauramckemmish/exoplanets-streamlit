@@ -65,21 +65,6 @@ class StrangeNewWorldsRepresentationChoiceTests(unittest.TestCase):
         self.assertIn("Better? Which planets can you actually compare now that were hiding before?", next(event[1][0] for event in events if event[0] == "compare"))
         self.assertNotIn("self_check", names)
 
-    def test_reveal_key_and_facilitator_guidance_match_the_same_data_message(self):
-        events = self._render(revealed=False)
-        reveal = next(event for event in events if event[0] == "hard_reveal")
-        note = strange_new_worlds.TEACHER_NOTE_OVERRIDES[6]
-        background = strange_new_worlds.TEACHER_BACKGROUNDS[6]
-
-        self.assertEqual(reveal[1][1], strange_new_worlds._SOLAR_SYSTEM_SCALE_REVEAL_KEY)
-        self.assertEqual(reveal[2]["revealed_message"], "Same planets. Same variables. Same values. Different spacing.")
-        self.assertEqual(reveal[2]["explanation"], "On this graph, equal spaces mean equal multiplication rather than equal addition. You do not need to calculate logarithms to use it.")
-        self.assertEqual(note["title"], "How can we show both variables?")
-        self.assertIn("equal additions", note["facilitation"])
-        self.assertIn("equal multiplication", note["facilitation"])
-        self.assertIn("same planets, variables and values", background)
-        self.assertIn("do not calculate logarithms", background)
-
     def test_screen_reuses_pathway_neutral_support_graphic_before_linear_chart(self):
         events = self._render(revealed=False)
         names = [event[0] for event in events]

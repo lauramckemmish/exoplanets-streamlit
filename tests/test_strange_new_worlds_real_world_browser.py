@@ -100,25 +100,6 @@ class StrangeNewWorldsRealWorldBrowserTests(unittest.TestCase):
         self.assertNotIn("Size", rendered)
         self.assertNotIn("year length", rendered.lower())
 
-    def test_facilitator_guidance_matches_the_browser_boundary(self):
-        note = strange_new_worlds.TEACHER_NOTE_OVERRIDES[4]
-        background = strange_new_worlds.TEACHER_BACKGROUNDS[4]
-
-        self.assertEqual(note["title"], "Meet some real worlds")
-        self.assertIn("three distinct", note["purpose"])
-        self.assertIn("not a representative sample", note["misconceptions"])
-        self.assertIn("only mass and orbital distance", background)
-
-        source = Path("experiences/strange_new_worlds.py").read_text()
-        screen_four = source.split("elif part == 4:", 1)[1].split("elif part == 5:", 1)[0].lower()
-        self.assertIn("so far, we chose the examples. now meet a few other real detected planets", screen_four)
-        self.assertIn("how do these planets compare with the solar system planets you started with", screen_four)
-        self.assertNotIn("catalogue surprise", screen_four)
-        self.assertNotIn("mass and orbital distance are connected", screen_four)
-        self.assertNotIn("holiday", screen_four)
-        self.assertNotIn("destination", screen_four)
-        self.assertNotIn("filter", screen_four)
-
     def test_prediction_is_required_after_three_distinct_planets_and_uses_session_state(self):
         events = []
         state = {

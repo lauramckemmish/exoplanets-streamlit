@@ -93,17 +93,6 @@ class StrangeNewWorldsPredictionTest(unittest.TestCase):
         self.assertEqual(text_areas[1][2]["key"], strange_new_worlds._POPULATION_REVISION_KEY)
         self.assertEqual(text_areas[1][2]["placeholder"], "I predicted…, but the graph shows…, so now I think…")
 
-    def test_facilitator_note_and_boundary_are_cautious(self):
-        note = strange_new_worlds.TEACHER_NOTE_OVERRIDES[7]
-        background = strange_new_worlds.TEACHER_BACKGROUNDS[7]
-
-        self.assertEqual(note["title"], "Now add the detected population")
-        self.assertIn("commit", note["purpose"])
-        self.assertIn("not every planet", note["misconceptions"])
-        self.assertIn("detailed detection bias", note["misconceptions"])
-        self.assertIn("not correct answers", background)
-        self.assertIn("In this detected dataset", background)
-
     def test_prediction_examples_scaffold_form_without_prescribing_an_answer(self):
         source = Path("experiences/strange_new_worlds.py").read_text()
         screen_seven = source.split("elif part == 7:", 1)[1].split("elif part == 8:", 1)[0]

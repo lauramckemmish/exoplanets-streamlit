@@ -61,18 +61,6 @@ class StrangeNewWorldsConclusionTest(unittest.TestCase):
         self.assertIn("More discoveries changed the way scientists organised the evidence.", screen_eight)
         self.assertNotIn("1992", screen_eight)
 
-    def test_facilitator_guidance_is_a_brief_evidence_history_close(self):
-        note = strange_new_worlds.TEACHER_NOTE_OVERRIDES[8]
-        background = strange_new_worlds.TEACHER_BACKGROUNDS[8]
-
-        self.assertEqual(note["timing"], "3–5 minutes (Lesson 2 close)")
-        self.assertIn("Screen 7 has already done that work", note["facilitation"])
-        self.assertIn("SC4-DA1-01 and SC4-OTU-01", note["alignment"])
-        self.assertIn("easier to find and measure", note["misconceptions"])
-        self.assertIn("initial sample of one planetary system", background)
-        self.assertIn("1995 and 51 Pegasi b", background)
-        self.assertIn("optional Pluto parallel", background)
-
 
 if __name__ == "__main__":
     unittest.main()

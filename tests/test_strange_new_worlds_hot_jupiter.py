@@ -96,8 +96,6 @@ class StrangeNewWorldsHotJupiterTests(unittest.TestCase):
     def test_temperature_context_is_not_added_to_browser_or_population_state(self):
         screen4_source = inspect.getsource(strange_new_worlds.render_lesson).split("elif part == 4:", 1)[1].split("elif part == 5:", 1)[0]
         self.assertNotIn("temperature", screen4_source.lower())
-        self.assertNotIn("temperature", strange_new_worlds.TEACHER_NOTE_OVERRIDES[4]["purpose"].lower())
-        self.assertNotIn("temperature", strange_new_worlds.TEACHER_NOTE_OVERRIDES[5]["purpose"].lower())
 
     def test_static_comparison_uses_expected_rounded_values(self):
         self.assertEqual(strange_new_worlds._hot_jupiter_comparison_table().to_dict("records"), [
@@ -105,17 +103,6 @@ class StrangeNewWorldsHotJupiterTests(unittest.TestCase):
             {"Planet and star": "Mercury — Sun", "Mass (Earth = 1)": "0.0553", "Distance from star (AU)": "0.387"},
             {"Planet and star": "51 Pegasi b — 51 Pegasi", "Mass (Earth = 1)": "≈146 (estimate)", "Distance from star (AU)": "0.052"},
         ])
-
-    def test_facilitator_note_matches_the_prediction_and_revision_sequence(self):
-        note = strange_new_worlds.TEACHER_NOTE_OVERRIDES[2]
-
-        self.assertEqual(note["title"], "And then astronomers found this")
-        self.assertIn("1995", note["purpose"])
-        self.assertIn("prediction-before-reveal", note["facilitation"])
-        self.assertIn("Sun-like-star", note["facilitation"])
-        self.assertIn("mass is an estimate", note["misconceptions"])
-        self.assertIn("migration as one important possibility", note["facilitation"])
-        self.assertIn("do not teach mechanisms", note["misconceptions"])
 
     def test_migration_is_only_introduced_after_the_anomaly(self):
         source = inspect.getsource(strange_new_worlds.render_lesson)

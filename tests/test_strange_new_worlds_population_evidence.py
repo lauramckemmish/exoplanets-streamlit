@@ -73,16 +73,6 @@ class StrangeNewWorldsPopulationEvidenceTests(unittest.TestCase):
         self.assertNotIn("discoveries_by_year_chart", screen_three)
         self.assertNotIn("Discoveries over time", strange_new_worlds.STEP_LABELS)
 
-    def test_facilitator_note_marks_lesson_two_population_evidence(self):
-        note = strange_new_worlds.TEACHER_NOTE_OVERRIDES[5]
-        background = strange_new_worlds.TEACHER_BACKGROUNDS[5]
-
-        self.assertEqual(note["title"], "From individual planets to population patterns")
-        self.assertIn("start of Lesson 2", note["timing"])
-        self.assertIn("proportions", note["listen_for"])
-        self.assertIn("not every planet", note["misconceptions"])
-        self.assertIn("individual records", background)
-
 
 if __name__ == "__main__":
     unittest.main()

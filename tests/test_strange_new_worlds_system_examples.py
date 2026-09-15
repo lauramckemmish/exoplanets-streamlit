@@ -70,21 +70,6 @@ class StrangeNewWorldsSystemExamplesTests(unittest.TestCase):
         self.assertIn("closely packed", compare)
         self.assertNotIn("number of stars", compare)
 
-    def test_facilitator_note_matches_the_single_system_contrast(self):
-        note = strange_new_worlds.TEACHER_NOTE_OVERRIDES[3]
-        background = strange_new_worlds.TEACHER_BACKGROUNDS[3]
-
-        self.assertEqual(note["title"], "Our Solar System isn't the only arrangement")
-        self.assertIn("compact", note["purpose"])
-        self.assertIn("illustration", note["misconceptions"])
-        self.assertIn("possibility, not frequency", note["misconceptions"])
-        self.assertNotIn("Kepler-16", note["purpose"] + note["facilitation"] + note["evidence"])
-        self.assertNotIn("star count", note["facilitation"].lower())
-        self.assertIn("all closer", note["facilitation"])
-        self.assertIn("TRAPPIST-1", background)
-        self.assertNotIn("Kepler-16", background)
-        self.assertIn("seven known planets", background)
-
 
 if __name__ == "__main__":
     unittest.main()

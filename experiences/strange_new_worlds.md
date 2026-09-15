@@ -41,7 +41,7 @@ code. Return the question for design review.
 - Screens 0–4 use the canonical split: `facilitator_preparation()` carries compact stage-local context omitted from the learner journey, while `facilitator_live_cue()` protects only consequential delivery decisions.
 - Screen 0 protects a genuine Solar-System expectation. Screen 1 gives a compact formation-model boundary and historical context. Screen 2 distinguishes the 1992 pulsar planets from the 1995 51 Pegasi b anchor and gives bounded migration context. Screen 3 explains evidence growth and the NASA Exoplanet Archive. Screen 4 keeps the examples as possible-not-typical and prepares the optional Earth-like question.
 - Lesson 1 has three sparse **CORE LEARNING** cues: preserve the expectation (Screen 0), notice before explanation (Screen 1), and predict before reveal before introducing migration (Screen 2).
-- The legacy local-note renderer is bypassed for Screens 0–4 so teachers do not see duplicate support. Step 2B completes the same migration for Screens 5–8.
+- The complete migration removed the obsolete Strange New Worlds local legacy notes; Screens 0–4 use the canonical support directly.
 
 **DECISION — Lesson 2 local teacher support (Step 2B)**
 
@@ -49,7 +49,7 @@ code. Return the question for design review.
 - Compact detection-method context is teacher-only and does not turn the learner journey into a detection-bias lesson.
 - Lesson 2 adds two sparse **CORE LEARNING** cues: do not solve the linear-graph problem before learners experience it (Screen 6); and protect prediction → evidence → revision on Screen 7.
 - The front-loaded preparation includes neutral time-adaptation categories: **CORE**, **COMPRESSIBLE**, and **OPTIONAL IF TIME ALLOWS**.
-- The local legacy-note renderer is now bypassed for all Screens 0–8. No learner screen displays duplicate legacy and canonical local support.
+- Obsolete Strange New Worlds local legacy notes have been removed. All Screens 0–8 use one canonical local support system, with no duplicate teacher blocks.
 
 **DECISION — Distinctive identity**
 

@@ -42,12 +42,9 @@ class StrangeNewWorldsOpeningTests(unittest.TestCase):
             patch.object(strange_new_worlds, "media_text_pair", lambda *args, **kwargs: nullcontext()),
             patch.object(strange_new_worlds, "predict_prompt", lambda _prompt: None),
             patch.object(strange_new_worlds, "notice_prompt", lambda _prompt: None),
-            patch.object(strange_new_worlds, "teacher_note", lambda **_kwargs: events.append(("legacy",))),
         ):
             strange_new_worlds.render_lesson(pd.DataFrame(), 0, dependencies)
             strange_new_worlds.render_lesson(pd.DataFrame(), 1, dependencies)
-            strange_new_worlds.render_teacher_note(0)
-            strange_new_worlds.render_teacher_note(5)
 
         cues = [event for event in events if event[0] == "cue"]
         preparations = [event for event in events if event[0] == "preparation"]
@@ -56,7 +53,6 @@ class StrangeNewWorldsOpeningTests(unittest.TestCase):
         self.assertIn("notice the rocky-inner", cues[1][1][1])
         self.assertEqual(preparations[0][2]["key"], "year8_strange_new_worlds_screen_1")
         self.assertIn("Why this model matters", preparations[0][1][0])
-        self.assertEqual(sum(event[0] == "legacy" for event in events), 0)
         self.assertEqual(set(strange_new_worlds.LESSON_ONE_PREPARATION), {1, 2, 3, 4})
         self.assertEqual(set(strange_new_worlds.LESSON_ONE_LIVE_CUES), {0, 1, 2})
         self.assertIn("PSR B1257+12", strange_new_worlds.LESSON_ONE_PREPARATION[2])
@@ -175,16 +171,6 @@ class StrangeNewWorldsOpeningTests(unittest.TestCase):
         self.assertNotIn("snow line", screen_one)
         self.assertNotIn("frost line", screen_one)
         self.assertNotRegex(screen_one, r"\\bice\\b")
-
-    def test_opening_facilitator_notes_preserve_expectation_and_formation_purpose(self):
-        opening = strange_new_worlds.TEACHER_NOTE_OVERRIDES[0]
-        evidence = strange_new_worlds.TEACHER_NOTE_OVERRIDES[1]
-
-        self.assertIn("expectation", opening["purpose"])
-        self.assertIn("do not foreshadow", opening["facilitation"])
-        self.assertIn("formation model", evidence["purpose"])
-        self.assertIn("gas-and-dust disk", evidence["facilitation"])
-        self.assertIn("solid material", evidence["misconceptions"])
 
 
 if __name__ == "__main__":
