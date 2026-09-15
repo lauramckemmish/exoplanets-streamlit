@@ -62,6 +62,8 @@ class StrangeNewWorldsSystemExamplesTests(unittest.TestCase):
         self.assertIn("One system can show us what is possible. We need more systems to know what is common.", learner_text)
         self.assertIn("confirmed exoplanets", learner_text)
         self.assertIn("NASA Exoplanet Archive", learner_text)
+        self.assertIn("cannot visit these planets", learner_text)
+        self.assertIn("remote observations and measurements", learner_text)
         self.assertIn("Let’s meet a few of them.", learner_text)
         self.assertNotIn("Kepler-16", learner_text)
         self.assertNotIn("two stars", learner_text.lower())

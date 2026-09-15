@@ -544,6 +544,7 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             st.write(
                 "Discoveries come from many telescopes, surveys and research teams. Published discoveries and measurements are brought together in the NASA Exoplanet Archive so scientists can compare many planets in one dataset."
             )
+            st.write("Astronomers cannot visit these planets, so they use remote observations and measurements to infer what planetary systems are like.")
             st.write("The archive changes as new planets are confirmed and existing measurements are updated.")
             st.write("Let’s meet a few of them.")
     elif part == 4:
@@ -636,7 +637,7 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             st.subheader("Now: log–log spacing")
             st.write("The axes still show orbital distance and mass. The data have not changed; only the spacing has.")
             st.plotly_chart(d.solar_system_demographics_chart(True), width="stretch")
-            compare_prompt("Better? Which planets can you actually compare now that were hiding before?")
+            compare_prompt("Which representation would you use to compare both the small inner planets and the giant outer planets? Why? What became visible?")
     elif part == 7:
         st.header("Step 7: Now add the detected population")
         prediction = st.session_state.get(_POPULATION_PREDICTION_KEY, "").strip()

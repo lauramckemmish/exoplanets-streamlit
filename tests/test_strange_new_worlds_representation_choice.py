@@ -62,7 +62,9 @@ class StrangeNewWorldsRepresentationChoiceTests(unittest.TestCase):
         chart_calls = [event[1][0] for event in events if event[0] == "solar_chart"]
         self.assertEqual(chart_calls, [False, True])
         self.assertLess(names.index("hard_reveal"), names.index("compare"))
-        self.assertIn("Better? Which planets can you actually compare now that were hiding before?", next(event[1][0] for event in events if event[0] == "compare"))
+        prompt = next(event[1][0] for event in events if event[0] == "compare")
+        self.assertIn("Which representation would you use", prompt)
+        self.assertIn("What became visible?", prompt)
         self.assertNotIn("self_check", names)
 
     def test_screen_reuses_pathway_neutral_support_graphic_before_linear_chart(self):
