@@ -1,6 +1,8 @@
 """Focused checks for Year 10's Solar System reference screen."""
 
 import unittest
+from contextlib import nullcontext
+from pathlib import Path
 from unittest.mock import patch
 
 import pandas as pd
@@ -24,6 +26,13 @@ class _Dependencies:
         self.graph_questions = lambda *args: events.append(("graph_questions", args, {}))
         self.response_box = lambda *args: events.append(("response_box", args, {}))
         self.key_idea = lambda *args: events.append(("key_idea", args, {}))
+
+
+class _ScreenFourDependencies:
+    exoplanet_quadrants_image_path = "quadrants-image"
+
+    def __init__(self, events):
+        self.hard_reveal = lambda *args, **kwargs: events.append(("hard_reveal", args, kwargs)) or False
 
 
 class PlanetsWeHaveNotFoundSolarSystemTests(unittest.TestCase):
@@ -50,6 +59,33 @@ class PlanetsWeHaveNotFoundSolarSystemTests(unittest.TestCase):
         )
         self.assertEqual(table.loc[table["Planet"] == "Earth", "Mass (Earth = 1)"].iloc[0], 1.0)
         self.assertEqual(table.loc[table["Planet"] == "Jupiter", "Distance from the Sun (AU)"].iloc[0], 5.203)
+
+    def test_step_four_keeps_prediction_reveal_reconsideration_with_individual_planet_scope(self):
+        source = Path("experiences/planets_we_have_not_found.py").read_text()
+        screen_four = source.split("elif part == 4:", 1)[1].split("elif part == 5:", 1)[0]
+
+        self.assertIn("How do detected planets compare with ours?", screen_four)
+        self.assertIn("similar mass-and-distance regions to Solar System planets", screen_four)
+        self.assertIn("similarities and differences between detected exoplanets and Solar System planets", screen_four)
+        self.assertIn("does not show the full architecture of a planetary system", screen_four)
+        self.assertNotIn("planets in other systems are like ours", screen_four)
+        self.assertLess(screen_four.index("st.text_area("), screen_four.index("d.hard_reveal("))
+        self.assertLess(screen_four.index("d.hard_reveal("), screen_four.index("d.current_demographics_chart(data)"))
+        self.assertLess(screen_four.index("d.current_demographics_chart(data)"), screen_four.index("d.response_box("))
+
+    def test_step_four_smoke_renders_the_prediction_before_the_protected_reveal(self):
+        events = []
+        with (
+            patch.object(planets_we_have_not_found, "st", _StreamlitRecorder(events)),
+            patch.object(planets_we_have_not_found, "render_facilitator_support"),
+            patch.object(planets_we_have_not_found, "media_text_pair", lambda *args, **kwargs: nullcontext()),
+        ):
+            planets_we_have_not_found.render_lesson(pd.DataFrame(), 4, _ScreenFourDependencies(events))
+
+        names = [event[0] for event in events]
+        self.assertIn("text_area", names)
+        self.assertIn("hard_reveal", names)
+        self.assertLess(names.index("text_area"), names.index("hard_reveal"))
 
 
 if __name__ == "__main__":

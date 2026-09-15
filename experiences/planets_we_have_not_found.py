@@ -304,7 +304,7 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
         d.key_idea("Detected exoplanets have a different mix of masses from the planets in our Solar System.", "Compare the same labelled section in the two bars, especially the widest section in each.")
     # YEAR 10 STEP 4 — Are our planets typical?
     elif part == 4:
-        st.header("Step 4: Are planets in other systems like ours?")
+        st.header("Step 4: How do detected planets compare with ours?")
         st.markdown("### Question we can answer with data\nHow similar are detected exoplanets to Solar System planets in mass and orbital distance?")
         st.markdown("### What we will plot\nA log–log scatter plot of planet mass against orbital distance, with the Solar System planets highlighted.")
         with media_text_pair(
@@ -325,12 +325,12 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             "Write your hypothesis",
             key="year10_planet_typicality_hypothesis",
             height=100,
-            placeholder="If planets in other systems are like ours, then I predict…",
+            placeholder="If detected exoplanets occupy similar mass-and-distance regions to Solar System planets, then I predict…",
             label_visibility="collapsed",
         )
         data_revealed = d.hard_reveal(
-            "If planets in other systems are like the planets in our Solar System, what pattern would you expect "
-            "when the detected exoplanets are added to this graph?",
+            "If detected exoplanets occupy similar mass-and-distance regions to Solar System planets, what pattern "
+            "would you expect when the detected exoplanets are added to this graph?",
             "year10_step4_data_revealed",
             reveal_label="Reveal the detected planets →",
         )
@@ -345,10 +345,10 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             d.data_detective_challenge()
             d.response_box(
                 4,
-                "Return to your hypothesis. What did the Earth challenge and your chosen challenge show about whether planets in other systems are like ours?",
+                "Return to your hypothesis. What do the Earth challenge and your chosen challenge show about similarities and differences between detected exoplanets and Solar System planets?",
                 "“My hypothesis was…, and the graph shows…” or “We cannot yet call a planet Earth-like because…”",
             )
-            d.key_idea("The graph lets us compare known planet properties, but not decide whether every planet is like ours.", "A blue point near Earth has a similar mass and orbital distance—but what information is still missing?")
+            d.key_idea("The graph lets us compare individual planets by mass and orbital distance. It does not show the full architecture of a planetary system.", "A blue point near Earth has a similar mass and orbital distance—but what information is still missing?")
             st.info(
                 "### Suggested end of Lesson 1\n"
                 "Lesson 2 begins by investigating how the way astronomers search affects the planets they find."
