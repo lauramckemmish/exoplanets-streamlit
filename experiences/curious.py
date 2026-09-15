@@ -15,6 +15,8 @@ from ui_helpers import (
     compare_prompt,
     conclude_prompt,
     data_detective_challenge,
+    facilitator_live_cue,
+    facilitator_preparation,
     graph_guide,
     graph_reading_support,
     hard_reveal,
@@ -27,7 +29,6 @@ from ui_helpers import (
     soft_reveal,
     step_buttons,
     step_tabs,
-    teacher_note,
 )
 
 PATHWAY_TITLE = "Is Our Solar System Normal?"
@@ -51,29 +52,71 @@ STEP_LABELS = [
 ]
 PART_COUNT = len(STEP_LABELS)
 
+CURIOUS_PREPARATION = """
+### The learning journey
 
-def render_teacher_note(part: int) -> None:
-    notes = {
-        0: dict(title="Welcome", purpose="Turn a broad question about other worlds into a measurable investigation.", timing="3 minutes", facilitation="Start with ‘Are we alone in the Universe?’, then establish that thousands of exoplanets now give us evidence about other planetary systems. Move directly to the question of what can be measured and compared; do not ask students to predict whether the Solar System is normal yet.", evidence="Students can explain why ‘normal’ needs a measurable definition before it can be investigated.", listen_for="Questions about what planetary systems normally look like and which properties could be compared."),
-        1: dict(title="Our Solar System", purpose="Use planet mass as the first measurable property for comparing planetary systems.", timing="5 minutes", facilitation="Keep responses spoken and move on once students can read the bar and recognise that mass is being compared. This is a familiar reference point, not yet evidence of what is normal.", evidence="Students identify at least one qualitative mass group.", listen_for="Mass comparisons and the idea that one planetary system is a starting reference, not a population estimate.", misconceptions="The Solar System image is not to scale; the planets are enlarged and placed close together."),
-        2: dict(title="Meet exoplanets", purpose="Expand students’ scale model from our Solar System to planets orbiting other stars, so a comparison becomes possible.", timing="7 minutes", facilitation="Secure ‘Sun/star’, ‘Solar System/planetary system’ and ‘planet/exoplanet’. Emphasise that the recent catalogue of thousands of exoplanets makes a population comparison possible; do not spend time on detailed discovery chronology.", evidence="Students can define an exoplanet in their own words and identify the comparison between our eight planets and detected exoplanets.", listen_for="Other stars can host planetary systems that need not resemble ours.", background="For quick questions: Proxima Centauri b is about 4 light-years away; many Kepler targets are 500–3,000 light-years away; the Milky Way is about 100,000 light-years across and contains roughly 100–400 billion stars. Exoplanets discussed here are within our galaxy. Redirect Big Bang questions towards planet formation from discs of gas and dust.", resources=(("NASA Eyes on Exoplanets", "https://eyes.nasa.gov/apps/exo/"), ("NASA: How do planets form?", "https://science.nasa.gov/exoplanets/how-do-planets-form/"))),
-        3: dict(title="Mass and distance", purpose="Understand why changing from linear to log–log axes makes a wide range of values easier to see.", timing="10 minutes", facilitation="Treat this as the major conceptual transition. Let students experience what is hidden on the linear graph, then use the hard reveal to show the log–log view. Ask what became visible before explaining that only the axis spacing changed. Do not teach logarithm calculations.", evidence="Students can say what became easier to see.", listen_for="The inner planets separate while the outer giants remain visible.", misconceptions="The planets and measurements have not changed, and ‘log’ does not refer to discovery records over time."),
-        4: dict(title="Are we normal?", purpose="Use a shared Earth challenge and one chosen graph challenge to make a cautious evidence-based claim.", timing="7 minutes", facilitation="Name the blue points as detected exoplanets before students inspect the graph. Have everyone locate Earth first, then let groups choose one further data-detective challenge. Accept different meanings of ‘normal’ when supported by the graph. Preserve the distinction between a nearby point and another Earth.", evidence="Students use the Earth comparison or another visible graph feature to support a claim.", listen_for="‘Near Earth does not prove Earth-like’, uncertainty and requests for more evidence—not a single correct verdict."),
-        5: dict(title="How we find planets", purpose="Infer that different measurement methods reveal different parts of the planet population.", timing="14 minutes", facilitation="Show the two methods, pause for a spoken prediction, then let students inspect each method-specific graph. Use the optional explanation after they have looked at the evidence. Ask what could be difficult to find, but let students articulate the detection-bias conclusion themselves.", evidence="Students predict a likely pattern, then describe how the plotted points differ between methods.", listen_for="‘Not detected’ is not the same as ‘does not exist’; future technology may reveal currently difficult-to-detect planets.", facilitator_moment="After the prediction, this is a good place for an authentic research/scientist story, example or live explanation about how exoplanets are found. The app deliberately does not supply one; continue to the evidence whether or not you have a personal story to tell.", background="Radial velocity can be introduced as the **Doppler method**: a planet makes its star wobble, producing small red and blue shifts. Microlensing uses a rare gravitational magnification alignment. Treat other methods as optional research.", resources=(("NASA: transit method", "https://science.nasa.gov/resource/exoplanet-detection-transit-method/"), ("NASA: microlensing method", "https://science.nasa.gov/resource/exoplanet-detection-microlensing-method/"))),
-        6: dict(title="Conclusion", purpose="Consolidate planet diversity, incomplete evidence and the role of future technology.", timing="4 minutes", facilitation="Pause for students to state what the evidence allows them to conclude before showing the common synthesis. Keep the conclusion cautious: the detected catalogue contains real patterns, but it is not a complete census. Invite interest-led next questions; students do not need to pursue every option.", evidence="Students give a cautious conclusion that distinguishes detected patterns from a complete inventory of planetary systems.", listen_for="Future instruments may reveal small or distant planets, while some patterns may also reflect real planet formation."),
-    }
-    backgrounds = {
-        0: "**Core idea:** exoplanet discoveries changed the question astronomers can ask. A catalogue of thousands of planets around other stars allows comparisons between planetary systems, but ‘normal’ first needs to be defined using properties that can be measured. Students begin with planet mass and add other properties later.",
-        1: "The **Sun is a star**, and the Solar System consists of the Sun and everything gravitationally bound to it. **Mass** is the amount of matter in a planet and is not the same as its diameter. One Earth mass is simply Earth's mass used as a comparison unit. The displayed Solar System is not to scale: planets are enlarged and moved closer together.",
-        2: "An **exoplanet** orbits a star other than the Sun. The general term for planets orbiting a star is a **planetary system**; ‘Solar System’ names our own. **Alpha Centauri** is the nearest star system, and its closest member, **Proxima Centauri**, hosts the nearest known exoplanet about 4.2 light-years away. **Kepler** was a NASA space telescope that monitored more than 100,000 stars in one patch of sky and found thousands of candidates through transits. The Milky Way is about 100,000 light-years across and contains roughly 100–400 billion stars, so known exoplanets represent a small sample.",
-        3: "A linear axis uses equal additions, while a logarithmic axis uses equal multiplications. This lets values below 1 and values in the hundreds remain visible together. A **log–log graph** changes the spacing on both axes, not the data, units or planet positions. Students do not need logarithm calculations; ask only what became easier to distinguish.",
-        4: "Each point is a detected exoplanet with a recorded mass and orbital distance. ‘Normal’ might mean common, central, similarly arranged or expected, so several claims can be reasonable. The graph is the **known sample**, not all planets that exist. Leave the reason for sparse regions unresolved until students compare detection methods.",
-        5: "**Direct imaging** suppresses bright starlight to detect faint light from a planet; current instruments tend to favour bright, massive planets well separated from their stars. A **transit** is a small repeated dip in starlight when an aligned planet crosses its star; short orbits repeat more often. **Radial velocity/Doppler** detects a star's towards-and-away wobble through spectral shifts. **Microlensing** uses a rare gravitational magnification alignment. Different requirements shape each plotted sample.",
-        6: "The careful conclusion is that detected exoplanets are not a complete inventory. Future instruments may find planets in currently sparse regions, but some patterns may also be real results of planet formation. ‘Not yet detected’ does not mean ‘does not exist’, and ‘a gap may be bias’ does not mean every gap must eventually disappear.",
-    }
-    for step, background in backgrounds.items():
-        notes[step]["background"] = background
-    teacher_note(**notes[part])
+This short, discussion-led experience asks whether our Solar System is normal. Learners turn **normal** into measurable comparisons, use planet mass and orbital distance as evidence, and compare the Solar System with detected exoplanets.
+
+Log axes are a representation choice that makes a wide range easier to inspect, not a lesson in logarithm calculations. Method-specific views then reveal that detection methods shape the catalogue. The conclusion must stay cautious: it is based on an incomplete detected sample.
+
+Protect learner reasoning over exhaustive explanation. Let discussion, prediction, inspection and evidence-grounded conclusions do the work.
+""".strip()
+
+STAGE_PREPARATION = {
+    1: """
+The Solar System is a familiar reference, not evidence of what is normal. **Mass** is the amount of matter, not a planet's diameter; one Earth mass is a comparison unit. The image is not to scale: the planets are enlarged and placed closer together.
+""".strip(),
+    2: """
+An **exoplanet** orbits a star other than the Sun; a **planetary system** describes planets orbiting a star, while the **Solar System** is ours. Known exoplanets are a small sample within the Milky Way. For common scale questions, Proxima Centauri b is about 4 light-years away, many Kepler targets are 500–3,000 light-years away, and the Milky Way is about 100,000 light-years across.
+
+Redirect origin questions toward planets forming from discs of gas and dust rather than a Big Bang explanation.
+
+- [NASA Eyes on Exoplanets](https://eyes.nasa.gov/apps/exo/)
+- [NASA: How do planets form?](https://science.nasa.gov/exoplanets/how-do-planets-form/)
+""".strip(),
+    3: """
+A linear axis uses equal additions; a logarithmic axis uses equal multiplications. A log–log graph changes the spacing, not the data, units or planet positions. It allows values below 1 and in the hundreds to remain visible together.
+""".strip(),
+    4: """
+Each point is a detected exoplanet with recorded mass and orbital distance. **Normal** can reasonably mean common, central, similarly arranged or expected, so evidence-supported interpretations may differ. This is the known detected sample, not every planet that exists.
+""".strip(),
+    5: """
+Direct imaging suppresses bright starlight to detect faint planet light and tends to favour bright, massive planets far from their stars. A transit is a repeated dip in starlight when an aligned planet crosses its star; shorter orbits repeat more often. Radial velocity, or the Doppler method, detects a star's towards-and-away wobble through spectral shifts. Microlensing uses a rare gravitational magnification alignment. These different requirements shape the detected samples.
+
+- [NASA: transit method](https://science.nasa.gov/resource/exoplanet-detection-transit-method/)
+- [NASA: microlensing method](https://science.nasa.gov/resource/exoplanet-detection-microlensing-method/)
+""".strip(),
+    6: """
+The detected catalogue contains real patterns but is not a complete inventory. Future observations may reveal planets in currently sparse regions, while some patterns may also reflect planet formation. Detection bias can explain some gaps; it does not mean every gap is artificial. Mass and orbital distance alone cannot determine whether an entire planetary system is normal.
+""".strip(),
+}
+
+LIVE_CUES = {
+    0: (("FACILITATION NOTE", "Move from the broad hook to what learners can measure and compare. Do not ask them to decide whether the Solar System is normal yet."),),
+    3: (("CORE LEARNING", "Let learners first experience what is difficult to see on the linear axes. Reveal the log–log view afterwards; ask what became visible before explaining, without teaching logarithm calculations."),),
+    4: (("CORE LEARNING", "Have everyone locate Earth first, then let groups choose another challenge. Accept evidence-supported meanings of normal, and do not explain sparse regions as detection bias until the next step."),),
+    5: (
+        ("CORE LEARNING", "Show the methods, pause for prediction, then let learners inspect the method-specific graphs. Let them articulate the detection-bias conclusion before opening the interpretation."),
+        ("FACILITATION NOTE", "After the prediction, you may add an authentic scientist or research story, real example, or live explanation of detection. Continue to the evidence whether or not you have one."),
+    ),
+    6: (("CORE LEARNING", "Ask learners what the evidence allows them to conclude before reading the common synthesis. Keep claims about normality and the detected catalogue cautious."),),
+}
+
+
+def render_facilitator_support(part: int) -> None:
+    """Render CURIOUS preparation and sparse live guidance without changing learner flow."""
+    facilitator_preparation(
+        CURIOUS_PREPARATION,
+        key="curious_orientation",
+        title="For facilitators — CURIOUS: Is Our Solar System Normal?",
+    )
+    for label, content in LIVE_CUES.get(part, ()):
+        facilitator_live_cue(label, content)
+    if part in STAGE_PREPARATION:
+        facilitator_preparation(
+            STAGE_PREPARATION[part],
+            key=f"curious_stage_{part}",
+        )
 
 
 def render(data: pd.DataFrame, terminal_action) -> None:
@@ -89,7 +132,7 @@ def render(data: pd.DataFrame, terminal_action) -> None:
         st.session_state["curious_part"] = part
         st.session_state["curious_scroll_to_top"] = True
     scroll_to_top_if_requested("curious_scroll_to_top")
-    render_teacher_note(part)
+    render_facilitator_support(part)
     if part == 0:
         st.header("Welcome")
         with media_text_pair(EXOPLANET_IMAGE_PATH, role="context", caption="Artist's concepts of exoplanets. Credit: NASA/JPL-Caltech", key="curious_welcome"):
