@@ -56,12 +56,18 @@ class StrangeNewWorldsOpeningTests(unittest.TestCase):
         self.assertIn("notice the rocky-inner", cues[1][1][1])
         self.assertEqual(preparations[0][2]["key"], "year8_strange_new_worlds_screen_1")
         self.assertIn("Why this model matters", preparations[0][1][0])
-        self.assertEqual(sum(event[0] == "legacy" for event in events), 1)
+        self.assertEqual(sum(event[0] == "legacy" for event in events), 0)
         self.assertEqual(set(strange_new_worlds.LESSON_ONE_PREPARATION), {1, 2, 3, 4})
         self.assertEqual(set(strange_new_worlds.LESSON_ONE_LIVE_CUES), {0, 1, 2})
         self.assertIn("PSR B1257+12", strange_new_worlds.LESSON_ONE_PREPARATION[2])
         self.assertIn("Where did thousands of exoplanets come from?", strange_new_worlds.LESSON_ONE_PREPARATION[3])
         self.assertIn("Earth-sized does not mean another Earth", strange_new_worlds.LESSON_ONE_PREPARATION[4])
+        self.assertEqual(set(strange_new_worlds.LESSON_TWO_PREPARATION), {5, 6, 7, 8})
+        self.assertEqual(set(strange_new_worlds.LESSON_TWO_LIVE_CUES), {6, 7})
+        self.assertIn("Possible is not typical", strange_new_worlds.LESSON_TWO_PREPARATION[5])
+        self.assertIn("same planets, variables and values", strange_new_worlds.LESSON_TWO_PREPARATION[6])
+        self.assertIn("Intervention threshold", strange_new_worlds.LESSON_TWO_PREPARATION[7])
+        self.assertIn("Optional Pluto parallel", strange_new_worlds.LESSON_TWO_PREPARATION[8])
 
     def test_teacher_orientation_uses_the_shared_preparation_surface_before_the_lesson(self):
         events = []

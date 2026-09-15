@@ -66,6 +66,14 @@ TEACHER_PREPARATION = """
 ### Scope — what this experience does not try to cover
 
 This two-lesson experience is a focused contribution to Data Science 1 rather than complete coverage of the focus area. It does not cover computer simulations or model manipulation, learner-created scientific models, repeated trials or means and ranges, digital footprints, formal sampling theory, detailed detection-bias analysis, or logarithm calculations. Detailed exoplanet detection bias and habitability belong elsewhere.
+
+### If time is tight
+
+**CORE:** protect the genuine prediction before evidence; the 51 Pegasi b contradiction; the linear → log comparison; and Screen 7’s prediction → evidence → revision → limitation sequence.
+
+**COMPRESSIBLE:** extended discussion, extra random-planet browsing, temperature elaboration, extended TRAPPIST-1 discussion, and long debriefs around individual examples.
+
+**OPTIONAL IF TIME ALLOWS:** the Pluto coda, extra mission/history enrichment, and deeper teacher-provided astronomy context.
 """.strip()
 
 
@@ -119,6 +127,64 @@ LESSON_ONE_LIVE_CUES = {
     0: "Let students treat the Solar System pattern as a reasonable basis for prediction. Do not foreshadow later exoplanet evidence.",
     1: "Let students notice the rocky-inner / giant-outer pattern before giving the formation explanation.",
     2: "Establish a giant planet and predict before revealing its orbit. Let the contradiction land briefly before migration.",
+}
+
+
+LESSON_TWO_PREPARATION = {
+    5: """
+### Possible is not typical
+
+A few examples can show that a kind of planet or system exists, but cannot establish how common it is. The question has changed from “Can this happen?” to “What patterns appear across many detected planets?”—so a larger dataset is needed.
+
+### Detected-sample boundary
+
+This is not every planet that exists. It contains planets astronomers have detected and, for a given graph, planets with the measurements needed for that representation. A sparse region can mean few or none have been detected or measured there in this dataset; it does not mean no planets exist there.
+
+### Detection context — for teacher confidence
+
+Transit and radial velocity are the two major discovery techniques; direct imaging and microlensing provide complementary routes. Different techniques are sensitive to different planets and orbits, and small or more distant planets are generally harder to detect or characterise. The detected catalogue is therefore not an unbiased census. This is context for teacher questions; detailed detection bias belongs in the separate later exoplanet experience.
+""".strip(),
+    6: """
+### What changed?
+
+The log graph has the same planets, variables and values as the linear graph—only the spacing changes. Linear equal distances represent equal additions; logarithmic equal distances represent equal multiplication or ratios. Students do not need to calculate logarithms.
+
+### Why use it here?
+
+Mass and orbital distance span large ranges. Log spacing can make values across those ranges easier to compare without changing the underlying data. It is not “more true”; it is a representation chosen for a comparison job.
+""".strip(),
+    7: """
+### Enough understanding
+
+Students should identify at least one visible feature in the detected population, compare it with their earlier prediction, retain or revise their conclusion using evidence, and qualify the claim as applying to this detected/measured dataset.
+
+### Detection and sample boundary
+
+Sparse regions do not automatically prove planets cannot exist there. The graph reflects what exists, what has been detected, and what has the measurements required for this plot—three related but different things.
+
+### Intervention threshold
+
+Let harmless variation in evidence-grounded conclusions stand. Intervene when students make consequential universal claims such as “there are no planets there,” “all planetary systems are like this,” or “this graph shows every planet.” This is professional judgement, not an answer script.
+""".strip(),
+    8: """
+### Why this close matters
+
+The point is not simply that scientists discovered more planets. Reasonable conclusions are based on the evidence available; new observations can make them incomplete; larger and richer datasets allow stronger questions and tests; and scientific conclusions can change without earlier reasoning having been foolish.
+
+### Short history and context
+
+For most of history, all known planets belonged to our Solar System. The first confirmed exoplanets in 1992 and 51 Pegasi b in 1995 opened a new observational era. Kepler and later surveys greatly expanded the sample, which is still growing and incomplete.
+
+### Optional Pluto parallel
+
+Use Pluto only as optional enrichment: new observations can change the boundaries of a scientific category. Do not turn it into a debate about whether Pluto was unfairly demoted.
+""".strip(),
+}
+
+
+LESSON_TWO_LIVE_CUES = {
+    6: "Let students experience what is awkward about the linear graph before introducing log spacing. Do not solve the representation problem early.",
+    7: "Commit the prediction before the graph. After reveal, ask what the evidence shows before judging the prediction; revision follows evidence.",
 }
 
 
@@ -355,11 +421,9 @@ TEACHER_NOTE_OVERRIDES = {
 
 def render_teacher_note(part):
     """Render this pathway's complete Facilitator notes from pathway-owned content."""
-    if part <= 4:
-        return
-    note = dict(TEACHER_NOTE_OVERRIDES[part])
-    note["background"] = TEACHER_BACKGROUNDS[part]
-    teacher_note(**note)
+    del part
+    # All Strange New Worlds screens now use the canonical local support below.
+    return None
 
 
 def render_teacher_preparation() -> None:
@@ -588,9 +652,16 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
     d = dependencies
     if part in LESSON_ONE_LIVE_CUES:
         facilitator_live_cue("CORE LEARNING", LESSON_ONE_LIVE_CUES[part])
+    if part in LESSON_TWO_LIVE_CUES:
+        facilitator_live_cue("CORE LEARNING", LESSON_TWO_LIVE_CUES[part])
     if part in LESSON_ONE_PREPARATION:
         facilitator_preparation(
             LESSON_ONE_PREPARATION[part],
+            key=f"year8_strange_new_worlds_screen_{part}",
+        )
+    if part in LESSON_TWO_PREPARATION:
+        facilitator_preparation(
+            LESSON_TWO_PREPARATION[part],
             key=f"year8_strange_new_worlds_screen_{part}",
         )
     if part == 0:

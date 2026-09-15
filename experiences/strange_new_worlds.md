@@ -34,14 +34,22 @@ code. Return the question for design review.
 - When Facilitator notes are enabled, the experience begins with a collapsed **For teachers — Strange New Worlds** preparation surface before the stage navigation and local notes.
 - The surface gives a succinct two-lesson journey, then a syllabus-first curriculum map: **syllabus content/outcome → how the experience addresses it → where in the journey**.
 - **SC4-DA1-01 — Data Science 1** receives the detailed map. Related Working Scientifically outcomes and SC4-OTU-01 receive compact truthful mappings.
-- This is deliberately partial curriculum coverage, not a claim to cover the full Data Science 1 focus area. It does not replace the local facilitator notes or introduce live cues; those remain separate implementation work.
+- This is deliberately partial curriculum coverage, not a claim to cover the full Data Science 1 focus area. It remains separate from the local facilitator notes and live cues that support individual screens.
 
 **DECISION — Lesson 1 local teacher support (Step 2A)**
 
 - Screens 0–4 use the canonical split: `facilitator_preparation()` carries compact stage-local context omitted from the learner journey, while `facilitator_live_cue()` protects only consequential delivery decisions.
 - Screen 0 protects a genuine Solar-System expectation. Screen 1 gives a compact formation-model boundary and historical context. Screen 2 distinguishes the 1992 pulsar planets from the 1995 51 Pegasi b anchor and gives bounded migration context. Screen 3 explains evidence growth and the NASA Exoplanet Archive. Screen 4 keeps the examples as possible-not-typical and prepares the optional Earth-like question.
 - Lesson 1 has three sparse **CORE LEARNING** cues: preserve the expectation (Screen 0), notice before explanation (Screen 1), and predict before reveal before introducing migration (Screen 2).
-- The legacy local-note renderer is bypassed for Screens 0–4 so teachers do not see duplicate support. Screens 5–8 retain the legacy local-note system until the separate Lesson 2 migration step.
+- The legacy local-note renderer is bypassed for Screens 0–4 so teachers do not see duplicate support. Step 2B completes the same migration for Screens 5–8.
+
+**DECISION — Lesson 2 local teacher support (Step 2B)**
+
+- Screens 5–8 now use `facilitator_preparation()` for context that supports enactment without repeating learner copy. Screen 5 distinguishes possible from typical and gives teacher-only detected-sample context. Screen 6 protects the linear-to-log representation sequence. Screen 7 protects prediction → evidence → revision → limitation. Screen 8 frames the epistemic close rather than retelling mission history.
+- Compact detection-method context is teacher-only and does not turn the learner journey into a detection-bias lesson.
+- Lesson 2 adds two sparse **CORE LEARNING** cues: do not solve the linear-graph problem before learners experience it (Screen 6); and protect prediction → evidence → revision on Screen 7.
+- The front-loaded preparation includes neutral time-adaptation categories: **CORE**, **COMPRESSIBLE**, and **OPTIONAL IF TIME ALLOWS**.
+- The local legacy-note renderer is now bypassed for all Screens 0–8. No learner screen displays duplicate legacy and canonical local support.
 
 **DECISION — Distinctive identity**
 
