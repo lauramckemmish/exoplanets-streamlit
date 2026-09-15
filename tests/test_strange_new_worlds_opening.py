@@ -28,6 +28,41 @@ class _StreamlitRecorder:
 
 
 class StrangeNewWorldsOpeningTests(unittest.TestCase):
+    def test_lesson_one_uses_sparse_shared_teacher_support_and_bypasses_legacy_notes(self):
+        events = []
+        dependencies = SimpleNamespace(
+            solar_system_image_path="solar-system-image",
+            planet_formation_image_path="formation-image",
+        )
+
+        with (
+            patch.object(strange_new_worlds, "st", _StreamlitRecorder(events)),
+            patch.object(strange_new_worlds, "facilitator_live_cue", lambda *args: events.append(("cue", args))),
+            patch.object(strange_new_worlds, "facilitator_preparation", lambda *args, **kwargs: events.append(("preparation", args, kwargs))),
+            patch.object(strange_new_worlds, "media_text_pair", lambda *args, **kwargs: nullcontext()),
+            patch.object(strange_new_worlds, "predict_prompt", lambda _prompt: None),
+            patch.object(strange_new_worlds, "notice_prompt", lambda _prompt: None),
+            patch.object(strange_new_worlds, "teacher_note", lambda **_kwargs: events.append(("legacy",))),
+        ):
+            strange_new_worlds.render_lesson(pd.DataFrame(), 0, dependencies)
+            strange_new_worlds.render_lesson(pd.DataFrame(), 1, dependencies)
+            strange_new_worlds.render_teacher_note(0)
+            strange_new_worlds.render_teacher_note(5)
+
+        cues = [event for event in events if event[0] == "cue"]
+        preparations = [event for event in events if event[0] == "preparation"]
+        self.assertEqual([cue[1][0] for cue in cues], ["CORE LEARNING", "CORE LEARNING"])
+        self.assertIn("reasonable basis for prediction", cues[0][1][1])
+        self.assertIn("notice the rocky-inner", cues[1][1][1])
+        self.assertEqual(preparations[0][2]["key"], "year8_strange_new_worlds_screen_1")
+        self.assertIn("Why this model matters", preparations[0][1][0])
+        self.assertEqual(sum(event[0] == "legacy" for event in events), 1)
+        self.assertEqual(set(strange_new_worlds.LESSON_ONE_PREPARATION), {1, 2, 3, 4})
+        self.assertEqual(set(strange_new_worlds.LESSON_ONE_LIVE_CUES), {0, 1, 2})
+        self.assertIn("PSR B1257+12", strange_new_worlds.LESSON_ONE_PREPARATION[2])
+        self.assertIn("Where did thousands of exoplanets come from?", strange_new_worlds.LESSON_ONE_PREPARATION[3])
+        self.assertIn("Earth-sized does not mean another Earth", strange_new_worlds.LESSON_ONE_PREPARATION[4])
+
     def test_teacher_orientation_uses_the_shared_preparation_surface_before_the_lesson(self):
         events = []
 

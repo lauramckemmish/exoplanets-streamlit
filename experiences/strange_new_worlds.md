@@ -36,6 +36,13 @@ code. Return the question for design review.
 - **SC4-DA1-01 — Data Science 1** receives the detailed map. Related Working Scientifically outcomes and SC4-OTU-01 receive compact truthful mappings.
 - This is deliberately partial curriculum coverage, not a claim to cover the full Data Science 1 focus area. It does not replace the local facilitator notes or introduce live cues; those remain separate implementation work.
 
+**DECISION — Lesson 1 local teacher support (Step 2A)**
+
+- Screens 0–4 use the canonical split: `facilitator_preparation()` carries compact stage-local context omitted from the learner journey, while `facilitator_live_cue()` protects only consequential delivery decisions.
+- Screen 0 protects a genuine Solar-System expectation. Screen 1 gives a compact formation-model boundary and historical context. Screen 2 distinguishes the 1992 pulsar planets from the 1995 51 Pegasi b anchor and gives bounded migration context. Screen 3 explains evidence growth and the NASA Exoplanet Archive. Screen 4 keeps the examples as possible-not-typical and prepares the optional Earth-like question.
+- Lesson 1 has three sparse **CORE LEARNING** cues: preserve the expectation (Screen 0), notice before explanation (Screen 1), and predict before reveal before introducing migration (Screen 2).
+- The legacy local-note renderer is bypassed for Screens 0–4 so teachers do not see duplicate support. Screens 5–8 retain the legacy local-note system until the separate Lesson 2 migration step.
+
 **DECISION — Distinctive identity**
 
 This experience is about **observations breaking expectations and increasingly rich data changing our picture of planetary diversity**.

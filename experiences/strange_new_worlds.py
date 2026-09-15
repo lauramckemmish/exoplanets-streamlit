@@ -11,6 +11,7 @@ from ui_helpers import (
     compare_prompt,
     completion_gate,
     conclude_prompt,
+    facilitator_live_cue,
     facilitator_preparation,
     graph_reading_support,
     media_text_pair,
@@ -66,6 +67,59 @@ TEACHER_PREPARATION = """
 
 This two-lesson experience is a focused contribution to Data Science 1 rather than complete coverage of the focus area. It does not cover computer simulations or model manipulation, learner-created scientific models, repeated trials or means and ranges, digital footprints, formal sampling theory, detailed detection-bias analysis, or logarithm calculations. Detailed exoplanet detection bias and habitability belong elsewhere.
 """.strip()
+
+
+LESSON_ONE_PREPARATION = {
+    1: """
+### Enough understanding
+
+The learner-facing model is intentionally sufficient: young star + gas-and-dust disk → hotter close in / colder farther out → more material available as solids farther out → larger cores easier to build → sufficiently massive cores can later collect gas. It gives a sensible explanation for the broad architecture of **our** Solar System.
+
+### Why this model matters
+
+Before exoplanet discoveries, this broad Solar-System/core-accretion picture gave scientists a physically sensible explanation for the only planetary system they could study in detail. Exoplanet discoveries did not make that physics meaningless; they showed that formation location does not necessarily equal final planet location, and that system evolution can produce more varied architectures.
+
+### You do not need to teach
+
+Snow or frost lines, volatile chemistry, planetesimals or pebble accretion, competing formation mechanisms, and detailed gas-accretion physics are outside this Year 8 journey. Mass is not physical diameter or visual size; an AU is a distance.
+""".strip(),
+    2: """
+### Why 1995 is the anchor here
+
+Search results may name 1992 first: planets around the pulsar **PSR B1257+12** were confirmed then. **51 Pegasi b**, announced in 1995, was the first confirmed exoplanet around a Sun-like, normal main-sequence star, so it is the deliberate historical anchor here. Learners do not need a pulsar explanation unless they ask.
+
+### Migration — enough understanding
+
+A giant planet can form farther out and later move inward while the system evolves. This is one important way to reconcile hot Jupiters with the broad formation picture. Do not imply every hot Jupiter has one known migration history, that all giant planets migrate, or that students need disk torques or dynamical theory.
+
+### Temperature boundary
+
+51 Pegasi b is a gas giant, so its ~1000 °C value is an atmospheric, model-dependent estimate—not a solid surface temperature.
+""".strip(),
+    3: """
+### Where did thousands of exoplanets come from?
+
+The evidence grew through many observations: confirmed pulsar planets in 1992; 51 Pegasi b around a Sun-like star in 1995; and then dedicated surveys. **Kepler** transformed exoplanet science by finding thousands of planets and candidates. After reaction-wheel failures, it was repurposed as **K2** and continued productive observations. **TESS** extended transit searches across much more of the sky, especially around relatively nearby bright stars. **Roman**, launched in 2026, is part of the next stage of this evidence story; do not imply it has already produced this learner dataset.
+
+Observations and published measurements from missions, observatories and research teams are curated together in the NASA Exoplanet Archive. That lets scientists compare planets and update records as evidence improves.
+""".strip(),
+    4: """
+### Why these examples?
+
+The browser samples records from the larger detected catalogue. Three examples make possibilities concrete and give learners evidence for a prediction, but do not establish what is typical. It deliberately stays with mass and orbital distance because those are the variables used later.
+
+### Common question: have we found another Earth?
+
+Scientists have found many roughly Earth-sized planets, but Earth-sized does not mean another Earth. Deciding whether a planet is genuinely Earth-like needs much more information, including its orbit, atmosphere, surface conditions and other properties. This is not a habitability lesson.
+""".strip(),
+}
+
+
+LESSON_ONE_LIVE_CUES = {
+    0: "Let students treat the Solar System pattern as a reasonable basis for prediction. Do not foreshadow later exoplanet evidence.",
+    1: "Let students notice the rocky-inner / giant-outer pattern before giving the formation explanation.",
+    2: "Establish a giant planet and predict before revealing its orbit. Let the contradiction land briefly before migration.",
+}
 
 
 # Year 8 Facilitator-notes background. The shared classroom renderer applies
@@ -301,6 +355,8 @@ TEACHER_NOTE_OVERRIDES = {
 
 def render_teacher_note(part):
     """Render this pathway's complete Facilitator notes from pathway-owned content."""
+    if part <= 4:
+        return
     note = dict(TEACHER_NOTE_OVERRIDES[part])
     note["background"] = TEACHER_BACKGROUNDS[part]
     teacher_note(**note)
@@ -530,6 +586,13 @@ class LessonDependencies:
 def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencies) -> None:
     """Render the existing Year 8 lesson text and interactions for one step."""
     d = dependencies
+    if part in LESSON_ONE_LIVE_CUES:
+        facilitator_live_cue("CORE LEARNING", LESSON_ONE_LIVE_CUES[part])
+    if part in LESSON_ONE_PREPARATION:
+        facilitator_preparation(
+            LESSON_ONE_PREPARATION[part],
+            key=f"year8_strange_new_worlds_screen_{part}",
+        )
     if part == 0:
         st.header("The system we knew")
         with media_text_pair(
