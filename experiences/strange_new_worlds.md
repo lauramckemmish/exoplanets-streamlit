@@ -28,6 +28,14 @@ code. Return the question for design review.
 
 > **How different can planets and planetary systems be from our Solar System?**
 
+**DECISION — Facilitator audience and front-loaded preparation**
+
+- The primary facilitator audience is a Year 8 classroom science teacher; outreach use is secondary.
+- When Facilitator notes are enabled, the experience begins with a collapsed **For teachers — Strange New Worlds** preparation surface before the stage navigation and local notes.
+- The surface gives a succinct two-lesson journey, then a syllabus-first curriculum map: **syllabus content/outcome → how the experience addresses it → where in the journey**.
+- **SC4-DA1-01 — Data Science 1** receives the detailed map. Related Working Scientifically outcomes and SC4-OTU-01 receive compact truthful mappings.
+- This is deliberately partial curriculum coverage, not a claim to cover the full Data Science 1 focus area. It does not replace the local facilitator notes or introduce live cues; those remain separate implementation work.
+
 **DECISION — Distinctive identity**
 
 This experience is about **observations breaking expectations and increasingly rich data changing our picture of planetary diversity**.

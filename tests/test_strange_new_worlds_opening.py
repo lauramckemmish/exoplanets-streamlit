@@ -28,6 +28,29 @@ class _StreamlitRecorder:
 
 
 class StrangeNewWorldsOpeningTests(unittest.TestCase):
+    def test_teacher_orientation_uses_the_shared_preparation_surface_before_the_lesson(self):
+        events = []
+
+        def implementation(_data, **_kwargs):
+            events.append("lesson")
+
+        with patch.object(
+            strange_new_worlds,
+            "facilitator_preparation",
+            lambda content, **kwargs: events.append((content, kwargs)),
+        ):
+            strange_new_worlds.render(pd.DataFrame(), implementation, terminal_action=lambda: None)
+
+        orientation, kwargs = events[0]
+        self.assertEqual(kwargs["key"], "year8_strange_new_worlds_orientation")
+        self.assertEqual(kwargs["title"], "For teachers — Strange New Worlds")
+        self.assertIn("The two-lesson journey", orientation)
+        self.assertIn("SC4-DA1-01", orientation)
+        self.assertIn("Strong, deliberately partial contribution", orientation)
+        self.assertIn("Question formulation — partial", orientation)
+        self.assertIn("what this experience does not try to cover", orientation)
+        self.assertEqual(events[-1], "lesson")
+
     def test_solar_system_table_is_in_orbital_order_with_display_rounding(self):
         table = strange_new_worlds._format_solar_system_table()
 
