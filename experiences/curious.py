@@ -24,6 +24,7 @@ from ui_helpers import (
     media_text_pair,
     notice_prompt,
     predict_prompt,
+    role_image,
     scroll_to_top_if_requested,
     self_check,
     soft_reveal,
@@ -220,12 +221,12 @@ def render(data: pd.DataFrame, terminal_action) -> None:
         direct_imaging_column, transit_column = st.columns(2)
         with direct_imaging_column:
             with st.container(border=True):
-                st.image(DIRECT_IMAGING_IMAGE_PATH, use_container_width=True)
+                role_image(DIRECT_IMAGING_IMAGE_PATH, role="support", key="curious_direct_imaging")
                 st.markdown("### Direct imaging")
                 st.write("Astronomers take a picture of light from a planet.")
         with transit_column:
             with st.container(border=True):
-                st.image(TRANSIT_DETECTION_IMAGE_PATH, use_container_width=True)
+                role_image(TRANSIT_DETECTION_IMAGE_PATH, role="support", key="curious_transit_detection")
                 st.markdown("### Transit detection")
                 st.write("A planet passes in front of its star, causing a tiny dip in starlight.")
         predict_prompt(
