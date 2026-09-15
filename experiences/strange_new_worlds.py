@@ -200,7 +200,6 @@ def render(data, implementation, terminal_action):
     render_teacher_preparation()
     return implementation(
         data,
-        teacher_note_renderer=None,
         terminal_action=terminal_action,
     )
 

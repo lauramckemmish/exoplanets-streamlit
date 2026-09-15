@@ -13,7 +13,6 @@ def render(
     stage5_labels,
     stage4_part_count,
     stage5_part_count,
-    teacher_note_renderer,
     render_lesson_body,
     terminal_action,
 ):
@@ -28,8 +27,6 @@ def render(
         return
 
     part = classroom_navigation.select_step(step_labels, part_count)
-    if teacher_note_renderer is not None:
-        teacher_note_renderer(part)
     allow_next = render_lesson_body(data, pathway, part)
     step_buttons(
         step_labels,
@@ -53,7 +50,6 @@ def render_pathway(
     stage5_labels,
     stage4_part_count,
     stage5_part_count,
-    teacher_note_renderer,
     resources,
     terminal_action,
 ):
@@ -67,7 +63,6 @@ def render_pathway(
         stage5_labels,
         stage4_part_count,
         stage5_part_count,
-        teacher_note_renderer,
         lambda frame, selected_pathway, part: classroom_dependencies.render_lesson(
             frame,
             selected_pathway,

@@ -487,52 +487,6 @@ def sample_note(data, required: list[str], label: str = "records") -> int:
     return complete
 
 
-def teacher_note(
-    title: str,
-    purpose: str,
-    facilitation: str,
-    alignment: str = "",
-    *,
-    timing: str = "",
-    evidence: str = "",
-    listen_for: str = "",
-    background: str = "",
-    misconceptions: str = "",
-    facilitator_moment: str = "",
-    resources: tuple[tuple[str, str], ...] = (),
-) -> None:
-    """Compatibility renderer for pathway metadata on collapsed preparation."""
-    if not facilitator_notes_enabled():
-        return
-    preparation_key = "metadata_" + "".join(character.lower() if character.isalnum() else "_" for character in title)
-    with _facilitator_preparation_container(preparation_key):
-        st.markdown(f"**{title}**")
-        if timing:
-            st.caption(f"Suggested time: {timing} · Use this as guidance, not a required pace.")
-        st.markdown(f"**Learning intention:** {purpose}")
-        if alignment:
-            st.markdown(f"**Relevant NSW syllabus outcomes:** {alignment}")
-        if evidence:
-            st.markdown(f"**Evidence of learning:** {evidence}")
-        with st.expander("Teaching this step"):
-            st.markdown(f"**Suggested approach:** {facilitation}")
-            if listen_for:
-                st.markdown(f"**Listen for:** {listen_for}")
-            if facilitator_moment:
-                st.markdown(f"**Facilitator-owned moment:** {facilitator_moment}")
-        if background or misconceptions:
-            with st.expander("Facilitator notes: background and possible misconceptions"):
-                if background:
-                    st.markdown(background)
-                if misconceptions:
-                    st.markdown(f"**Possible misconceptions:** {misconceptions}")
-        if resources:
-            with st.expander("Facilitator notes: resources and optional extension"):
-                for label, url in resources:
-                    st.markdown(f"- [{label}]({url})")
-                st.caption("These are optional teacher background or no-equipment research resources; they are not additional required activities.")
-
-
 def demographics_question(wonder: str, data_question: str, plot_description: str) -> None:
     st.markdown(f"### I wonder…\n{wonder}")
     st.markdown(f"### Question we can answer with data\n{data_question}")

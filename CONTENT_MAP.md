@@ -42,7 +42,7 @@ Most editable student-facing wording appears in calls such as:
 - `graph_guide`, `graph_questions`, `response_box`, `key_idea`
 - `st.text_area`
 
-Facilitator-notes wording is stored in `TEACHER_NOTE_OVERRIDES` and `TEACHER_BACKGROUNDS` inside the relevant classroom pathway module.
+Facilitator-only wording lives with the relevant experience, using `facilitator_preparation()` for preparation and `facilitator_live_cue()` for sparse live-delivery decisions.
 
 Keep surrounding indentation, brackets and commas intact. After a wording-only change, run:
 

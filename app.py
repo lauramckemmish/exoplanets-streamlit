@@ -222,7 +222,6 @@ facilitator_notes_control()
 
 def render_demographics_classroom(
     data: pd.DataFrame,
-    teacher_note_renderer=None,
     terminal_action=None,
     catalogue_source=None,
 ) -> None:
@@ -237,7 +236,6 @@ def render_demographics_classroom(
         planets_we_have_not_found.STEP_LABELS,
         strange_new_worlds.PART_COUNT,
         planets_we_have_not_found.PART_COUNT,
-        teacher_note_renderer,
         resources,
         terminal_action,
     )

@@ -100,7 +100,6 @@ def render(data, implementation, terminal_action):
     )
     return implementation(
         data,
-        teacher_note_renderer=None,
         terminal_action=terminal_action,
     )
 
