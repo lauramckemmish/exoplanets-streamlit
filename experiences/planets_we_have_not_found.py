@@ -41,6 +41,14 @@ Let the poor linear representation be experienced before revealing log spacing; 
 
 Orbital distance is a standard, useful comparison variable here. Exact orbital period also depends on host-star mass, and orbital distance is not irradiation or temperature: stellar properties matter for those questions. Real detectability depends on more variables than this investigation shows. Those fuller distinctions are real physics; this investigation deliberately stops here. Do not let them open a Kepler's-laws, irradiation or temperature detour.
 
+### Suggested pacing
+
+Designed for approximately two 50–60 minute lessons. These are planning guides rather than fixed timings; classes will vary.
+
+**Lesson 1:** Screens 0–2 should take about the first 15 minutes and move briskly. Allow about 10–15 minutes for Screen 3: protect linear → log without making it a maths lesson. Aim to reach Screen 4 by roughly the two-thirds point. It is the expandable reasoning space: if behind, reduce challenges, shorten writing or take reconsideration orally, but preserve prediction → reveal → reconsideration. Finish Lesson 1 after Screen 4.
+
+**Lesson 2:** Aim for Screens 5–6 in about 20–25 minutes. Give Screen 7 about 15–20 minutes, protecting at least about 10 minutes for comparison and the selection-effect inference; cut optional method detail before that comparison. Enter Screen 8 with roughly 8–10 minutes remaining so claim + evidence + limitation are not squeezed out. If time is tight, shorten “Keep wondering” and take earlier responses orally.
+
 ### If time is tight
 
 **ESSENTIAL:** linear → log; prediction before population evidence; compare direct-imaging and transit evidence; infer that methods sample differently; finish with claim + evidence + limitation.
@@ -64,6 +72,8 @@ The log graph has the same planets, variables and numerical values as the linear
 This compares **individual planets** in mass–orbital-distance space, not whole-system architecture. The displayed population is not every planet that exists; a sparse region does not prove planets cannot exist there. Leave why gaps appear unresolved until Lesson 2.
 
 If students get excited about “another Earth”, let that stand. Ask what this graph actually tells them: similarity in these two variables is interesting, but much more information would be needed to establish Earth-like conditions.
+
+This is the final third of Lesson 1 and can expand productively if reached early. If time is tight, use the Earth challenge plus at most one further observation and take reconsideration briefly or orally; protect prediction → reveal → reconsideration.
 """.strip(),
     5: """
 Direct imaging distinguishes light from a planet from light from its host star. A planet is much fainter, and sources that appear more widely separated are easier to distinguish—rather like two close sources blurring together until there is enough separation or resolution. This helps explain the region occupied by directly imaged planets. Use “better at finding”, not rigid detection boundaries.
@@ -73,9 +83,13 @@ A planet either crosses in front of its star from Earth’s viewpoint or it does
 """.strip(),
     7: """
 Different discovery methods are better at finding different kinds of planets, so the observed catalogue depends partly on how astronomers looked. The optional fuller method list is depth, not prerequisite knowledge. Selection effects do not make the data fake, and not every pattern is observational bias.
+
+Aim for about 15–20 minutes here and protect at least about 10 minutes for the actual comparison and inference. This is Lesson 2's expandable reasoning space; cut optional wider-method content before the core comparison.
 """.strip(),
     8: """
 Multiple evidence-grounded conclusions are legitimate. The final response should contain claim + evidence + limitation; the core limitation is that the detected dataset is incomplete and shaped partly by discovery method. Do not return to a whole-system “is our Solar System typical?” claim.
+
+Aim to arrive with roughly 8–10 minutes remaining. Protect claim + evidence + limitation; shorten optional closing discussion before sacrificing the conclusion.
 """.strip(),
 }
 
