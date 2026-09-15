@@ -5,6 +5,7 @@ from dataclasses import dataclass
 import pandas as pd
 import streamlit as st
 
+from data import SOLAR_SYSTEM_PLANETS
 from ui_helpers import (
     facilitator_live_cue,
     facilitator_preparation,
@@ -206,6 +207,34 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
                 "“The log–log graph makes it easier to see…” or “On the linear graph…, but on the log–log graph…”",
             )
             d.key_idea("A log scale helps us see small and large planets on the same graph.", "The inner planets separate from one another while Jupiter and the other giant planets remain visible.")
+    # YEAR 10 STEP 1 — Our Solar System
+    elif part == 1:
+        st.header("Step 1: Our Solar System")
+        st.write(
+            "Before comparing other planetary systems, build a reference from the one we know best. "
+            "The table shows the eight planets using two quantities we will use throughout this investigation."
+        )
+        st.caption("Mass is shown relative to Earth (Earth = 1). One astronomical unit (AU) is the average Earth–Sun distance.")
+        reference_planets = SOLAR_SYSTEM_PLANETS.rename(
+            columns={
+                "Planet mass (Earth masses)": "Mass (Earth = 1)",
+                "Orbital distance (AU)": "Distance from the Sun (AU)",
+            }
+        )
+        st.dataframe(reference_planets, hide_index=True, width="stretch")
+        d.graph_questions(
+            "Choose two planets. How do their masses and distances from the Sun compare?",
+            "Which planet is closest to Earth in mass? Which is farthest from the Sun?",
+        )
+        d.response_box(
+            1,
+            "Use two planets from the table to describe one pattern or difference in our Solar System.",
+            "“Compared with …, … has … mass and is … from the Sun.”",
+        )
+        d.key_idea(
+            "The Solar System is our familiar reference population for comparing planetary data.",
+            "Its planets vary greatly in both mass and orbital distance, so those quantities give us useful ways to compare planets.",
+        )
     # YEAR 10 STEP 2 — Meet exoplanets
     elif part == 2:
         st.header("Step 2: Meet exoplanets")
