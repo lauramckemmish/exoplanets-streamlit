@@ -28,6 +28,7 @@ def render_lesson(data, pathway, part, stage4_pathway, stage5_pathway, resources
             hard_reveal=resources["hard_reveal"],
             data_detective_challenge=resources["data_detective_challenge"],
             learn_more_prompt=resources["learn_more_prompt"],
+            catalogue_source=resources.get("catalogue_source"),
         )
         return strange_new_worlds.render_lesson(data, part, dependencies)
 

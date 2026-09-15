@@ -34,6 +34,9 @@ class _StreamlitRecorder:
 class _Dependencies:
     nasa_trappist_1e_poster_path = "trappist-1.jpg"
 
+    def hard_reveal(self, *args, **kwargs):
+        return True
+
 
 class StrangeNewWorldsSystemExamplesTests(unittest.TestCase):
     def test_screen_uses_only_trappist_one_and_a_simplified_compare_prompt(self):
@@ -56,6 +59,10 @@ class StrangeNewWorldsSystemExamplesTests(unittest.TestCase):
         self.assertIn("possible", learner_text)
         self.assertIn("One strange planet could have been an exception", learner_text)
         self.assertIn("Seven planets. All inside Mercury's orbit.", learner_text)
+        self.assertIn("One system can show us what is possible. We need more systems to know what is common.", learner_text)
+        self.assertIn("confirmed exoplanets", learner_text)
+        self.assertIn("NASA Exoplanet Archive", learner_text)
+        self.assertIn("Let’s meet a few of them.", learner_text)
         self.assertNotIn("Kepler-16", learner_text)
         self.assertNotIn("two stars", learner_text.lower())
         compare = next(event[1][0] for event in events if event[0] == "compare")

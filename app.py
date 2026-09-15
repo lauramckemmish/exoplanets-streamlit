@@ -225,8 +225,10 @@ def render_demographics_classroom(
     data: pd.DataFrame,
     teacher_note_renderer=None,
     terminal_action=None,
+    catalogue_source=None,
 ) -> None:
     """Render a classroom pathway through the shared classroom infrastructure."""
+    resources = {**CLASSROOM_RESOURCES, "catalogue_source": catalogue_source}
     classroom_shell.render_pathway(
         data,
         st.session_state.get("demographics_pathway"),
@@ -237,7 +239,7 @@ def render_demographics_classroom(
         strange_new_worlds.PART_COUNT,
         planets_we_have_not_found.PART_COUNT,
         teacher_note_renderer,
-        CLASSROOM_RESOURCES,
+        resources,
         terminal_action,
     )
 
@@ -265,7 +267,11 @@ def render_demographics(data: pd.DataFrame, source) -> None:
         curious.render,
         strange_new_worlds.render,
         planets_we_have_not_found.render,
-        render_demographics_classroom,
+        lambda frame, **kwargs: render_demographics_classroom(
+            frame,
+            catalogue_source=source,
+            **kwargs,
+        ),
         router.return_to_experiences,
     )
 

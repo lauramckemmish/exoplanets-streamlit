@@ -54,9 +54,10 @@ TEACHER_BACKGROUNDS = {
         "main-path formation model: a young star has a disk of gas and dust; it is hotter close in and colder farther out; "
         "more material can exist as solid particles in the colder region; larger cores can grow there; and sufficiently massive "
         "cores can collect gas. This explains the broad pattern in **our** Solar System, not a universal arrangement.\n\n"
-        "The visual remains a clearly labelled future causal schematic, not a decorative placeholder: young star and disk → "
-        "temperature difference → solid material → larger cores → gas capture → our Solar System. Its exact static or animated "
-        "format is still open. Avoid snow-line language, detailed chemistry, competing models and migration until Screen 2."
+        "The implemented static visual is a clearly labelled causal schematic, not a decorative placeholder: young star and disk → "
+        "temperature difference → solid material → larger cores → gas capture → our Solar System. It is available at "
+        "`assets/planet-formation-from-disk-to-system.png`. Avoid snow-line language, detailed "
+        "chemistry, competing models and migration until Screen 2."
     ),
     2: (
         "**A reasonable expectation meets a disruptive observation**\n\n"
@@ -90,7 +91,9 @@ TEACHER_BACKGROUNDS = {
         "not tell us how common the arrangement is.\n\n"
         "Invite comparison before explaining: ask how many known planets TRAPPIST-1 has and how closely they orbit "
         "compared with our Solar System. No specialist TRAPPIST-1 knowledge is needed. Do not expand into habitability, "
-        "detection methods or a long catalogue of unusual systems."
+        "detection methods or a long catalogue of unusual systems. After the comparison, the hard reveal introduces the live "
+        "NASA Exoplanet Archive count and explains that many telescopes, surveys and research teams contribute measurements "
+        "to the shared archive."
     ),
     4: (
         "**Why browse a few real worlds?**\n\n"
@@ -199,7 +202,7 @@ TEACHER_NOTE_OVERRIDES = {
         title="Our Solar System isn't the only arrangement",
         purpose="Broaden from one surprising planet to a whole-system contrast: TRAPPIST-1 has seven known planets in a compact region inside Mercury's orbital distance.",
         timing="8–10 minutes (Lesson 1)",
-        facilitation="Open with the idea that one strange planet could have been an exception, then invite comparison before lecturing. Use TRAPPIST-1 for one clear job: seven known planets all closer to its star than Mercury is to the Sun. No specialist TRAPPIST-1 knowledge is needed. Treat the poster as context after the real-system description, not as a photograph or as evidence of how common the arrangement is.",
+        facilitation="Open with the idea that one strange planet could have been an exception, then invite comparison before lecturing. Use TRAPPIST-1 for one clear job: seven known planets all closer to its star than Mercury is to the Sun. No specialist TRAPPIST-1 knowledge is needed. Treat the poster as context after the real-system description, not as a photograph or as evidence of how common the arrangement is. After the comparison, use the reveal to show that astronomers combine published discoveries and measurements from many teams in the NASA Exoplanet Archive; the count changes as the archive changes.",
         alignment="SC4-DA1-01 and SC4-WS-06: compare observations and distinguish what examples establish from what would require broader data.",
         evidence="Students identify that TRAPPIST-1 has seven known planets, all orbiting inside Mercury's orbital distance, and explain how that differs from our Solar System.",
         listen_for="Concrete comparisons about the number of known planets and how tightly packed the orbits are, rather than habitability speculation or a claim that every planetary system is unusual.",
@@ -298,6 +301,13 @@ def _format_solar_system_table() -> pd.DataFrame:
         "Mass (Earth = 1)": table["Planet mass (Earth masses)"].map(format_mass),
         "Distance from the Sun (AU)": table["Orbital distance (AU)"].map(format_distance),
     })
+
+
+def _confirmed_exoplanet_count(data: pd.DataFrame) -> int:
+    """Count the unique confirmed-planet records in the loaded archive catalogue."""
+    if "pl_name" not in data.columns:
+        return len(data)
+    return int(data["pl_name"].dropna().nunique())
 
 
 # NASA Exoplanet Archive, 51 Pegasi b overview (accessed 2026-09-13):
@@ -466,6 +476,7 @@ class LessonDependencies:
     hard_reveal: object
     data_detective_challenge: object
     learn_more_prompt: object
+    catalogue_source: object = None
 
 
 def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencies) -> None:
@@ -505,6 +516,9 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             st.write("Once a core becomes massive enough, its gravity can collect large amounts of gas.")
             st.write(
                 "That gives us a sensible explanation for what we see in our Solar System: small rocky planets closer to the Sun, and giant planets farther out."
+            )
+            st.write(
+                "Scientists use this simplified scientific model of planet formation to explain that broad pattern in our Solar System."
             )
             st.image(
                 d.planet_formation_image_path,
@@ -554,6 +568,7 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             st.write("Planetary systems are not necessarily frozen in the arrangement in which their planets formed.")
             st.write("A giant planet on such a close orbit is called a **hot Jupiter**.")
             st.write("The Solar System had given scientists a sensible story. Hot Jupiters meant that story needed some work.")
+            st.write("The model explained something real about our Solar System, but this new observation showed that the picture was incomplete.")
             st.caption("Mass is not physical size.")
             revise_prompt("What does 51 Pegasi b make you reconsider about where giant planets can be?")
     elif part == 3:
@@ -568,7 +583,27 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
         compare_prompt("What is different from our Solar System here? How many known planets does TRAPPIST-1 have, and how closely packed are their orbits?")
         with self_check("Check your comparison"):
             st.write("TRAPPIST-1 shows that seven known planets can be packed into a region inside Mercury's orbit—much smaller than the inner Solar System.")
-        st.caption("This individual system shows what is possible. It does not tell us how common the arrangement is.")
+        st.write("One system can show us what is possible. We need more systems to know what is common.")
+        archive_revealed = d.hard_reveal(
+            "So how many planets have scientists found beyond our Solar System?",
+            "year8_archive_confirmed_count_revealed",
+            reveal_label="Ask scientists",
+            revealed_message="The catalogue gives us a much larger evidence base than one planetary system.",
+        )
+        if archive_revealed:
+            confirmed_count = _confirmed_exoplanet_count(data)
+            source = getattr(d, "catalogue_source", None)
+            if getattr(source, "is_live", True):
+                st.write(f"Right now, the live NASA Exoplanet Archive lists **{confirmed_count:,} confirmed exoplanets**.")
+            else:
+                st.write(
+                    f"This classroom is using a bundled NASA Archive sample with **{confirmed_count:,} records** while the live archive is unavailable."
+                )
+            st.write(
+                "Discoveries come from many telescopes, surveys and research teams. Published discoveries and measurements are brought together in the NASA Exoplanet Archive so scientists can compare many planets in one dataset."
+            )
+            st.write("The archive changes as new planets are confirmed and existing measurements are updated.")
+            st.write("Let’s meet a few of them.")
     elif part == 4:
         st.header("Step 4: Meet some real worlds")
         st.write("So far, we chose the examples. Now meet a few other real detected planets.")
