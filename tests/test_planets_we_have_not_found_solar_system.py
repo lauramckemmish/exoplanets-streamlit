@@ -105,6 +105,8 @@ class PlanetsWeHaveNotFoundSolarSystemTests(unittest.TestCase):
 
         self.assertIn("An **exoplanet** is a planet that orbits a star other than the Sun.", screen_two)
         self.assertIn("large detected catalogue", screen_two)
+        self.assertIn("many observing programs and discovery methods", screen_two)
+        self.assertIn("planet has every property measured", screen_two)
         self.assertIn("d.planet_mass_distribution_chart(data)", screen_two)
         self.assertIn("d.response_box(\n            2,", screen_two)
         self.assertNotIn("light-year", screen_two.lower())
@@ -116,7 +118,11 @@ class PlanetsWeHaveNotFoundSolarSystemTests(unittest.TestCase):
         screen_eight = source.split("elif part == 8:", 1)[1]
 
         self.assertIn("different methods are better at finding different kinds of planets", screen_eight)
-        self.assertIn("how Solar System planets compare with detected exoplanets", screen_eight)
+        self.assertIn(
+            "What do the detected exoplanets suggest about how Solar System planets compare with the planets we have detected?",
+            screen_eight,
+        )
+        self.assertIn("Use at least two pieces of evidence from different graphs or discovery methods", screen_eight)
         self.assertIn("“My claim is…” + “The evidence is…” + “A limitation is…”", screen_eight)
         self.assertNotIn("whether our Solar System is typical", screen_eight)
 

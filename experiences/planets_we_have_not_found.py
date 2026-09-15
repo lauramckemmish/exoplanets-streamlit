@@ -263,6 +263,10 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             "An **exoplanet** is a planet that orbits a star other than the Sun. Astronomers have detected thousands "
             "of exoplanets. That gives us a large detected catalogue to compare with our Solar System."
         )
+        st.caption(
+            "The catalogue brings together measurements from many observing programs and discovery methods, and not every "
+            "planet has every property measured."
+        )
         st.markdown(
             "### Our question\n"
             "How do the masses of detected exoplanets compare with planets in our Solar System?"
@@ -468,7 +472,9 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
         )
         d.response_box(
             8,
-            "What do the known exoplanets suggest about how Solar System planets compare with detected exoplanets—and why can’t the detected dataset give us the whole answer?",
+            "What do the detected exoplanets suggest about how Solar System planets compare with the planets we have detected? "
+            "Use at least two pieces of evidence from different graphs or discovery methods, and explain one limitation of the "
+            "detected dataset.",
             "“My claim is…” + “The evidence is…” + “A limitation is…”",
         )
         st.markdown("### Keep wondering")
