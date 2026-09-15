@@ -30,7 +30,6 @@ from ui_helpers import (
     hard_reveal,
     response_box,
     scroll_to_top_if_requested,
-    teacher_note,
     step_buttons,
     step_tabs,
     variable_card,
@@ -361,7 +360,6 @@ elif experience == "Exoplanet Data Laboratory":
     data_laboratory.render(
         data,
         facilitator_notes_enabled(),
-        teacher_note=teacher_note,
         step_tabs=step_tabs,
         scroll_to_top_if_requested=scroll_to_top_if_requested,
         step_buttons=step_buttons,

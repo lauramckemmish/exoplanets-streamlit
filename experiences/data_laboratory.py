@@ -18,14 +18,19 @@ TAB_LABELS = [
     "Sky map",
 ]
 
-TEACHER_GUIDANCE = {
-    "title": "Exoplanet Data Laboratory",
-    "purpose": "Support open-ended exploration while making analytical choices visible and discussable.",
-    "approach": "Invite students to state a question before changing variables. Ask what each axis, colour and scale contributes, and whether missing data or detection methods could affect the pattern.",
-    "alignment": "NSW Science 7–10 Working Scientifically: process and analyse secondary data; construct and use representations; identify trends, patterns and relationships; draw evidence-based conclusions; evaluate data quality and limitations.",
-    "timing": "Flexible investigation",
-    "listen_for": "Students explaining why a graph answers a particular question rather than treating graph settings as decoration.",
-}
+FACILITATOR_ORIENTATION = """
+**What this experience is doing**
+
+Learners explore real exoplanet data openly, while making their analytical choices visible and discussable.
+
+**Useful facilitation stance**
+
+Encourage learners to state a question before changing variables. Ask what each axis, colour choice and scale contributes, and keep missingness and detection method in view when they affect an interpretation.
+
+**What to listen for**
+
+Learners explaining why a graph helps answer a particular question, rather than treating its settings as decoration.
+""".strip()
 
 SYLLABUS_LANGUAGE = {
     "stage4": "Stage 4 emphasis: summarise data from secondary sources; use tables and graphs; identify trends, patterns and relationships; use evidence to support or discount a question; and reflect on data quality.",
@@ -365,7 +370,6 @@ def render(
     data,
     facilitator_notes,
     *,
-    teacher_note,
     step_tabs,
     scroll_to_top_if_requested,
     step_buttons,
@@ -381,13 +385,10 @@ def render(
     st.title(TITLE)
     st.caption(SUBTITLE)
     if facilitator_notes:
-        teacher_note(
-            TEACHER_GUIDANCE["title"],
-            TEACHER_GUIDANCE["purpose"],
-            TEACHER_GUIDANCE["approach"],
-            alignment=TEACHER_GUIDANCE["alignment"],
-            timing=TEACHER_GUIDANCE["timing"],
-            listen_for=TEACHER_GUIDANCE["listen_for"],
+        facilitator_preparation(
+            FACILITATOR_ORIENTATION,
+            key="data_laboratory_orientation",
+            title="For facilitators — Exoplanet Data Laboratory",
         )
     current_tab = int(st.session_state.get("lab_tab_step", 0))
     tabs, selected_tab = step_tabs(TAB_LABELS, "lab_tab", current_tab)
