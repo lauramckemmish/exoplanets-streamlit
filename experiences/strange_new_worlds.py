@@ -11,7 +11,11 @@ from ui_helpers import (
     compare_prompt,
     completion_gate,
     conclude_prompt,
+    curriculum_summary,
+    curriculum_tags,
     facilitator_live_cue,
+    facilitator_notes_enabled,
+    facilitator_panel,
     facilitator_preparation,
     graph_reading_support,
     media_text_pair,
@@ -30,6 +34,17 @@ STEP_LABELS = [
 YEAR_LEVEL = "Year 8"
 PART_COUNT = len(STEP_LABELS)
 
+SCREEN_CURRICULUM_TAGS = {
+    1: (("SC4-DA1-01.M2", "✓"), ("SC4-DA1-01.A1", "◐"), ("SC4-WS-06.2", "✓")),
+    2: (("SC4-DA1-01.M4", "✓"), ("SC4-WS-02.2", "✓"), ("SC4-WS-06.3", "✓")),
+    3: (("SC4-DA1-01.D1", "◐"), ("SC4-OTU-01", "✓")),
+    4: (("SC4-DA1-01.C1", "◐"), ("SC4-WS-02.2", "✓")),
+    5: (("SC4-WS-05.1", "✓"), ("SC4-WS-06.2", "✓")),
+    6: (("SC4-WS-05.2", "◐"), ("SC4-WS-06.2", "✓")),
+    7: (("SC4-DA1-01.M4", "✓"), ("SC4-WS-06.3", "✓"), ("SC4-WS-06.4", "✓")),
+    8: (("SC4-WS-06.5", "✓"), ("SC4-OTU-01", "✓")),
+}
+
 
 TEACHER_PREPARATION = """
 ### The two-lesson journey
@@ -41,26 +56,6 @@ TEACHER_PREPARATION = """
 **Lesson 2:** Reactivate the prediction → move from individual examples to population evidence → compare linear and log representations → commit a prediction before the larger detected population → test it against evidence → revise a conclusion → state the detected-sample limitation → connect this journey to the historical growth of exoplanet evidence.
 
 **Protect the reasoning:** keep the Solar-System expectation genuine; let students notice the pattern before explaining it; predict before revealing 51 Pegasi b’s orbit; let the contradiction land before introducing migration; experience the poor linear representation before log spacing; commit a prediction before larger population evidence; and observe evidence before revising or concluding.
-
-### Curriculum map
-
-**SC4-DA1-01 — Data Science 1** — **Strong, deliberately partial contribution.**
-
-- **Scientific models and evidence:** students use Solar System observations and data to understand a simplified planet-formation model, then encounter observations showing that the model-based expectation was incomplete. **Where:** Screens 1–2; historical synthesis in Screen 8.
-- **Patterns and predictions:** students identify patterns in scientific data and use them to generate expectations and predictions. **Where:** Screens 0–2 and 4–7.
-- **Testing predictions against additional evidence:** students commit an expectation, inspect later data and revise their thinking when warranted. **Where:** especially Screens 2 and 7.
-- **Data representations:** students move between readable planet data, individual catalogue records, population representations, and linear/log two-variable graphs, judging what each makes visible. **Where:** Screens 1 and 4–7.
-- **Sources and uses of scientific data:** observations from many telescopes, surveys and teams are brought together in the NASA Exoplanet Archive so many planets can be compared as a growing dataset. **Where:** Screen 3 provenance reveal → Screen 4 onward.
-
-**Question formulation — partial:** students investigate a genuine scientific question, but the resource supplies the central question rather than asking students to formulate it independently.
-
-**Other outcomes — compact map**
-
-- **SC4-WS-02 — Questioning and predicting:** students make evidence-informed predictions before later evidence is revealed. **Where:** Screens 0–2, 4 and 7.
-- **SC4-WS-05 — Processing data and information:** students use several scientific data representations and compare linear and log spacing. **Where:** Screens 1 and 4–7.
-- **SC4-WS-06 — Analysing data and information:** students identify patterns and relationships, compare evidence with predictions, and draw or revise conclusions. **Where:** Screens 1–2 and 5–8.
-- **SC4-WS-08 — Communicating:** supporting role through articulated comparisons, predictions and evidence-informed revisions. **Where:** discussion prompts and written responses across the journey.
-- **SC4-OTU-01 — Observing the Universe:** exoplanet observations show how new observations increase and change scientific knowledge of planetary systems. **Where:** Screens 2–3 and 8.
 
 ### Scope — what this experience does not try to cover
 
@@ -189,11 +184,24 @@ LESSON_TWO_LIVE_CUES = {
 
 def render_teacher_preparation() -> None:
     """Render the experience-level orientation before local facilitator notes."""
-    facilitator_preparation(
-        TEACHER_PREPARATION,
-        key="year8_strange_new_worlds_orientation",
+    if not facilitator_notes_enabled():
+        return
+    with facilitator_panel(
+        "year8_strange_new_worlds_orientation",
         title="For teachers — Strange New Worlds",
-    )
+    ):
+        curriculum_summary(
+            "NSW curriculum — Stage 4 Data Science 1",
+            "SC4-DA1-01",
+            "Learners use observations and real exoplanet data to recognise and interrogate a simplified scientific "
+            "model, make evidence-informed predictions, compare representations, identify patterns and revise "
+            "conclusions as the evidence base grows. The experience directly supports scientific-model reasoning "
+            "(M2, M4) and analysis of patterns and evidence, with partial contributions to identifying the "
+            "observations behind models (A1), investigating a supplied data question (C1) and examining scientific "
+            "data sources (D1).",
+            detailed_content_note=True,
+        )
+        st.markdown(TEACHER_PREPARATION)
 
 
 def render(data, implementation, terminal_action):
@@ -423,6 +431,10 @@ def render_lesson(data: pd.DataFrame, part: int, dependencies: LessonDependencie
             LESSON_TWO_PREPARATION[part],
             key=f"year8_strange_new_worlds_screen_{part}",
         )
+    curriculum_tags(
+        SCREEN_CURRICULUM_TAGS.get(part, ()),
+        key=f"year8_strange_new_worlds_screen_{part}",
+    )
     if part == 0:
         st.header("The system we knew")
         with media_text_pair(

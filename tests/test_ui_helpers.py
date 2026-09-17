@@ -169,6 +169,49 @@ class SharedInteractionContractTests(unittest.TestCase):
 
         self.assertEqual(stub.expanders[-2:], ["🧩 Default", "🚀 Rocket"])
 
+    def test_curriculum_summary_is_facilitator_only_and_preserves_supplied_content(self):
+        stub = _StreamlitStub()
+        with patch.object(ui_helpers, "st", stub):
+            ui_helpers.curriculum_summary("Title", "SC5-DA2-01", "Supplied summary.")
+        self.assertEqual(stub.markdown_calls, [])
+
+        stub.session_state[ui_helpers.FACILITATOR_NOTES_KEY] = True
+        with patch.object(ui_helpers, "st", stub):
+            ui_helpers.curriculum_summary(
+                "NSW curriculum — Stage 5 Data Science 2",
+                "SC5-DA2-01",
+                "Supplied summary.",
+                detailed_content_note=True,
+            )
+
+        rendered = stub.markdown_calls[-1]
+        self.assertIn("NSW curriculum — Stage 5 Data Science 2", rendered)
+        self.assertIn("SC5-DA2-01", rendered)
+        self.assertIn("Supplied summary.", rendered)
+        self.assertIn("✓ direct alignment · ◐ partial alignment", rendered)
+        self.assertIn("Data to Discovery shorthand", rendered)
+        self.assertEqual(stub.container_keys[-1], "curriculum_summary")
+
+    def test_curriculum_tags_preserve_supplied_identifiers_and_marks(self):
+        stub = _StreamlitStub()
+        tags = [("SC5-DA2-01.L3", "✓"), ("SC5-WS-06.7", "◐")]
+        with patch.object(ui_helpers, "st", stub):
+            ui_helpers.curriculum_tags(tags, key="stage_example")
+        self.assertEqual(stub.markdown_calls, [])
+
+        stub.session_state[ui_helpers.FACILITATOR_NOTES_KEY] = True
+        with patch.object(ui_helpers, "st", stub):
+            ui_helpers.curriculum_tags(tags, key="stage_example")
+
+        rendered = stub.markdown_calls[-1]
+        for identifier, mark in tags:
+            self.assertIn(identifier, rendered)
+            self.assertIn(mark, rendered)
+        self.assertNotIn("SC5-DA2-01.SC5-WS-06.7", rendered)
+        self.assertIn("direct alignment", rendered)
+        self.assertIn("partial alignment", rendered)
+        self.assertEqual(stub.container_keys[-1], "curriculum_tags_stage_example")
+
     def test_facilitator_preparation_is_hidden_until_the_global_toggle_is_enabled(self):
         stub = _StreamlitStub()
         with patch.object(ui_helpers, "st", stub):

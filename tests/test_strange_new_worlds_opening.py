@@ -65,28 +65,54 @@ class StrangeNewWorldsOpeningTests(unittest.TestCase):
         self.assertIn("Intervention threshold", strange_new_worlds.LESSON_TWO_PREPARATION[7])
         self.assertIn("Optional Pluto parallel", strange_new_worlds.LESSON_TWO_PREPARATION[8])
 
-    def test_teacher_orientation_uses_the_shared_preparation_surface_before_the_lesson(self):
+    def test_teacher_orientation_uses_the_compact_shared_curriculum_surface_before_the_lesson(self):
         events = []
 
         def implementation(_data, **_kwargs):
             events.append("lesson")
 
-        with patch.object(
-            strange_new_worlds,
-            "facilitator_preparation",
-            lambda content, **kwargs: events.append((content, kwargs)),
+        with (
+            patch.object(strange_new_worlds, "facilitator_notes_enabled", return_value=True),
+            patch.object(strange_new_worlds, "facilitator_panel", lambda *args, **kwargs: nullcontext()),
+            patch.object(
+                strange_new_worlds,
+                "curriculum_summary",
+                lambda *args, **kwargs: events.append(("summary", args, kwargs)),
+            ),
+            patch.object(strange_new_worlds, "st", _StreamlitRecorder(events)),
         ):
             strange_new_worlds.render(pd.DataFrame(), implementation, terminal_action=lambda: None)
 
-        orientation, kwargs = events[0]
-        self.assertEqual(kwargs["key"], "year8_strange_new_worlds_orientation")
-        self.assertEqual(kwargs["title"], "For teachers — Strange New Worlds")
-        self.assertIn("The two-lesson journey", orientation)
-        self.assertIn("SC4-DA1-01", orientation)
-        self.assertIn("Strong, deliberately partial contribution", orientation)
-        self.assertIn("Question formulation — partial", orientation)
-        self.assertIn("what this experience does not try to cover", orientation)
+        summary = events[0]
+        self.assertEqual(summary[0], "summary")
+        self.assertEqual(summary[1][:2], ("NSW curriculum — Stage 4 Data Science 1", "SC4-DA1-01"))
+        self.assertIn("scientific-model reasoning", summary[1][2])
+        self.assertTrue(summary[2]["detailed_content_note"])
+        rendered_markdown = [event for event in events if event[0] == "markdown"]
+        self.assertIn("The two-lesson journey", rendered_markdown[0][1][0])
+        self.assertNotIn("### Curriculum map", rendered_markdown[0][1][0])
         self.assertEqual(events[-1], "lesson")
+
+    def test_curriculum_tags_match_the_approved_screen_mapping_and_skip_screen_zero(self):
+        expected = {
+            1: (("SC4-DA1-01.M2", "✓"), ("SC4-DA1-01.A1", "◐"), ("SC4-WS-06.2", "✓")),
+            2: (("SC4-DA1-01.M4", "✓"), ("SC4-WS-02.2", "✓"), ("SC4-WS-06.3", "✓")),
+            3: (("SC4-DA1-01.D1", "◐"), ("SC4-OTU-01", "✓")),
+            4: (("SC4-DA1-01.C1", "◐"), ("SC4-WS-02.2", "✓")),
+            5: (("SC4-WS-05.1", "✓"), ("SC4-WS-06.2", "✓")),
+            6: (("SC4-WS-05.2", "◐"), ("SC4-WS-06.2", "✓")),
+            7: (("SC4-DA1-01.M4", "✓"), ("SC4-WS-06.3", "✓"), ("SC4-WS-06.4", "✓")),
+            8: (("SC4-WS-06.5", "✓"), ("SC4-OTU-01", "✓")),
+        }
+        disallowed = {
+            "SC4-DA1-01.M3", "SC4-DA1-01.M5", "SC4-DA1-01.C2", "SC4-DA1-01.C3",
+            "SC4-DA1-01.X1", "SC4-WS-05.4", "SC4-WS-07",
+        }
+
+        self.assertEqual(strange_new_worlds.SCREEN_CURRICULUM_TAGS, expected)
+        self.assertNotIn(0, strange_new_worlds.SCREEN_CURRICULUM_TAGS)
+        introduced = {identifier for tags in expected.values() for identifier, _alignment in tags}
+        self.assertTrue(disallowed.isdisjoint(introduced))
 
     def test_solar_system_table_is_in_orbital_order_with_display_rounding(self):
         table = strange_new_worlds._format_solar_system_table()

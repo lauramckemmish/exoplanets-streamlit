@@ -32,9 +32,9 @@ code. Return the question for design review.
 
 - The primary facilitator audience is a Year 8 classroom science teacher; outreach use is secondary.
 - When Facilitator notes are enabled, the experience begins with a collapsed **For teachers — Strange New Worlds** preparation surface before the stage navigation and local notes.
-- The surface gives a succinct two-lesson journey, then a syllabus-first curriculum map: **syllabus content/outcome → how the experience addresses it → where in the journey**.
-- **SC4-DA1-01 — Data Science 1** receives the detailed map. Related Working Scientifically outcomes and SC4-OTU-01 receive compact truthful mappings.
-- This is deliberately partial curriculum coverage, not a claim to cover the full Data Science 1 focus area. It remains separate from the local facilitator notes and live cues that support individual screens.
+- The surface presents the shared compact **NSW curriculum — Stage 4 Data Science 1** summary, headed by official outcome **SC4-DA1-01**, with the detailed-content note enabled.
+- The summary records direct scientific-model reasoning (M2, M4) and partial contributions to observations behind models (A1), a supplied data question (C1), and scientific data sources (D1). It is deliberately partial curriculum coverage, not a claim to cover the full Data Science 1 focus area.
+- Sparse shared `curriculum_tags()` appear only in Facilitator notes at the screens where learners perform the mapped work; they remain separate from learner copy, local preparation, and live cues.
 
 **DECISION — Lesson 1 local teacher support (Step 2A)**
 
@@ -73,54 +73,27 @@ This experience is not primarily about:
 
 The experience is deliberately designed as a strong contribution to the current NSW Stage 4 Science syllabus rather than as an astronomy enrichment activity with graphs added afterwards.
 
-### Primary curriculum emphasis
+### Approved curriculum presentation
 
-**SC4-DA1-01 — Data Science 1**  
-Learners use scientific data and representations to develop, test and revise expectations about planetary systems.
+The facilitator-only summary uses **NSW curriculum — Stage 4 Data Science 1**, official outcome **SC4-DA1-01**, and `detailed_content_note=True`. It states that learners use observations and real exoplanet data to recognise and interrogate a simplified scientific model, make evidence-informed predictions, compare representations, identify patterns and revise conclusions as the evidence base grows.
 
-**SC4-WS-06 — Analysing data and information**  
-Learners use data to identify patterns and relationships and draw evidence-based conclusions.
+The detailed claims are: **SC4-DA1-01.M2 ✓**, **SC4-DA1-01.M4 ✓**, **SC4-DA1-01.A1 ◐**, **SC4-DA1-01.C1 ◐**, **SC4-DA1-01.D1 ◐**, **SC4-WS-02.2 ✓**, **SC4-WS-05.1 ✓**, **SC4-WS-05.2 ◐**, **SC4-WS-06.2 ✓**, **SC4-WS-06.3 ✓**, **SC4-WS-06.4 ✓**, **SC4-WS-06.5 ✓**, and **SC4-OTU-01 ✓** at outcome level. Alignment grammar is **✓ DIRECT**, **◐ PARTIAL**, **○ POTENTIAL**, and **— NOT ADDRESSED**.
 
-### Deliberately integrated Working Scientifically processes
+### Local facilitator-only tags
 
-**SC4-WS-02 — Questioning and predicting**
+| Screen | Tags |
+| --- | --- |
+| 0 — The system we knew | None |
+| 1 — Our Solar System as evidence | SC4-DA1-01.M2 ✓; SC4-DA1-01.A1 ◐; SC4-WS-06.2 ✓ |
+| 2 — And then astronomers found this | SC4-DA1-01.M4 ✓; SC4-WS-02.2 ✓; SC4-WS-06.3 ✓ |
+| 3 — Our Solar System isn't the only arrangement | SC4-DA1-01.D1 ◐; SC4-OTU-01 ✓ |
+| 4 — Meet some real worlds | SC4-DA1-01.C1 ◐; SC4-WS-02.2 ✓ |
+| 5 — From individual planets to population patterns | SC4-WS-05.1 ✓; SC4-WS-06.2 ✓ |
+| 6 — How can we show both variables? | SC4-WS-05.2 ◐; SC4-WS-06.2 ✓ |
+| 7 — Now add the detected population | SC4-DA1-01.M4 ✓; SC4-WS-06.3 ✓; SC4-WS-06.4 ✓ |
+| 8 — Conclusion | SC4-WS-06.5 ✓; SC4-OTU-01 ✓ |
 
-- make a prediction from familiar Solar System evidence;
-- revisit or revise that expectation after new observations;
-- make a later prediction about the larger mass–orbital-distance population.
-
-**SC4-WS-05 — Processing data and information**
-
-- move deliberately between a readable table/data display, individual catalogue records, a one-variable population representation and a two-variable representation;
-- recognise that different representations make different features easier to see.
-
-**SC4-WS-08 — Communicating**
-
-- state comparisons and claims using evidence;
-- communicate what changed between an initial expectation and a later conclusion.
-
-### Science-content context
-
-**SC4-OTU-01 — Observing the Universe**
-
-The astronomy story is genuine curriculum content: observations of exoplanets have increased scientific knowledge and changed expectations about what planetary systems can be like.
-
-A recurring scientific message is:
-
-> New observations can change scientific expectations about the Universe.
-
-### DA1 learning to foreground
-
-The experience should strongly support learners to:
-
-- investigate a scientific question that can be addressed using data;
-- recognise and use representations built from scientific observations/data;
-- identify patterns and relationships in data;
-- generate an expectation or prediction from evidence;
-- test whether later evidence is consistent with that prediction;
-- revise a conclusion or evidence-informed model/expectation when additional evidence warrants it.
-
-Do **not** claim that this two-lesson experience covers every Data Science 1 content point.
+The presentation describes existing learner activity only. It does not introduce new learner tasks or claim SC4-DA1-01.M3, SC4-DA1-01.M5, SC4-DA1-01.C2, SC4-DA1-01.C3, SC4-DA1-01.X1, SC4-WS-05.4, SC4-WS-07, or communication outcomes.
 
 ### Curriculum boundaries
 
