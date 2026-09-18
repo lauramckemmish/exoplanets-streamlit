@@ -1,11 +1,25 @@
 """Exoplanet Data Laboratory experience entry point."""
 
+import math
+
 import pandas as pd
 import plotly.express as px
 import streamlit as st
 
+from charts import categorical_bar, count_heatmap, grouped_boxplot, histogram, scatter
 from ui_helpers import facilitator_preparation, predict_prompt
-from experiences.data_lab_fields import DATA_LAB_FIELDS, source_missingness
+from experiences.data_lab_fields import (
+    DATA_LAB_FIELDS,
+    category_counts,
+    chart_population,
+    data_lab_fields,
+    meaningful_range_counts,
+    numeric_summary,
+    one_variable_representations,
+    pair_rejection_reason,
+    representation_for_fields,
+    source_missingness,
+)
 
 TITLE = "Exoplanet Data Laboratory"
 SUBTITLE = "Open exploration with contextual guidance for analytical choices"
@@ -155,68 +169,150 @@ def numeric_options(field_options):
     return {label: field for label, field in field_options.items() if field != "discoverymethod"}
 
 
+def _field_label(field: str, *, include_unit: bool = False) -> str:
+    metadata = DATA_LAB_FIELDS[field]
+    return metadata.option_label if include_unit else metadata.label
+
+
+def _display_frame_for(data: pd.DataFrame, fields: list[str]) -> pd.DataFrame:
+    return display_data(data) if "sy_dist" in fields else data
+
+
+def _chart_population_caption(population, required_fields: list[str]) -> None:
+    labels = " and ".join(_field_label(field) for field in required_fields)
+    st.caption(
+        f"Data used: {len(population.data):,} of {population.total:,} records. "
+        f"{population.missing:,} omitted because {labels} {'is' if len(required_fields) == 1 else 'are'} missing."
+    )
+    if population.log_excluded:
+        st.caption(
+            f"{population.log_excluded:,} more {'record was' if population.log_excluded == 1 else 'records were'} "
+            "not shown because a logarithmic scale needs positive values."
+        )
+
+
+def _format_summary_value(value: float) -> str:
+    return "—" if math.isnan(value) else f"{value:,.4g}"
+
+
+def _render_raw_numeric_summary(data: pd.DataFrame, field: str) -> None:
+    summary = numeric_summary(data, field)
+    unit = DATA_LAB_FIELDS[field].unit
+    suffix = f" ({unit})" if unit else ""
+    minimum, median, mean, maximum = st.columns(4)
+    minimum.metric(f"Minimum{suffix}", _format_summary_value(summary["minimum"]))
+    median.metric(f"Median{suffix}", _format_summary_value(summary["median"]))
+    mean.metric(f"Mean{suffix}", _format_summary_value(summary["mean"]))
+    maximum.metric(f"Maximum{suffix}", _format_summary_value(summary["maximum"]))
+
+
+def _log_control(label: str, key: str, field: str) -> bool:
+    """Offer log display only for the field explicitly configured to allow it."""
+    if not DATA_LAB_FIELDS[field].log_eligible:
+        return False
+    return st.checkbox(label, key=key)
+
+
+ONE_VARIABLE_REPRESENTATION_LABELS = {
+    "equal_ranges": "Equal ranges",
+    "orders_of_magnitude": "Orders of magnitude",
+    "meaningful_ranges": "Meaningful planet-scale ranges",
+}
+
+
+def _one_variable_representation_guidance(representation: str) -> str:
+    return {
+        "equal_ranges": "Each range has the same numerical width.",
+        "orders_of_magnitude": "Each range changes by a similar multiplication factor.",
+        "meaningful_ranges": "The boundaries use familiar planet-scale reference points.",
+    }[representation]
+
+
 def render_one_variable(data, facilitator_notes, field_options):
     st.header("One variable")
-    st.write("Start by looking at one variable. A histogram counts how many records fall into each range; for an existing category, the same idea appears as a bar-count graph.")
+    st.write("Start by looking at one variable. Choose how to group numerical values, or count an existing category.")
 
-    st.subheader("A. Start with a histogram")
-    histogram_choices = {**numeric_options(field_options), "Discovery method": "discoverymethod"}
-    histogram_label = st.selectbox("Choose a variable", list(histogram_choices), key="lab_one_histogram")
-    histogram_field = histogram_choices[histogram_label]
-    histogram_data = display_data(data) if histogram_field == "sy_dist" else data
-    if histogram_field == "discoverymethod":
-        figure = px.histogram(histogram_data.dropna(subset=[histogram_field]), x=histogram_field, title=f"Counts by {histogram_label}")
-        figure.update_layout(xaxis_title=histogram_label, yaxis_title="Number of planet records")
-        st.caption("For a category such as discovery method, the histogram is read like a bar chart: one bar for each group.")
+    st.subheader("A. Explore one variable")
+    fields = data_lab_fields(data, eligibility="one_variable")
+    field = st.selectbox("Choose a variable", fields, format_func=lambda value: _field_label(value, include_unit=True), key="lab_one_field")
+    metadata = DATA_LAB_FIELDS[field]
+    displayed = _display_frame_for(data, [field])
+    if metadata.kind == "numeric":
+        representations = one_variable_representations(field)
+        representation = st.segmented_control(
+            "Show the values as",
+            representations,
+            default=representations[0],
+            format_func=lambda value: ONE_VARIABLE_REPRESENTATION_LABELS[value],
+            key=f"lab_one_representation_{field}",
+            required=True,
+            width="stretch",
+        )
+        st.caption(_one_variable_representation_guidance(representation))
+        population = chart_population(
+            displayed,
+            [field],
+            log_fields=[field] if representation == "orders_of_magnitude" else None,
+        )
+        _chart_population_caption(population, [field])
+        if representation == "equal_ranges":
+            bin_count = st.slider("Number of histogram ranges", min_value=5, max_value=60, value=20, help="The histogram groups nearby values into ranges. More ranges show finer detail; fewer ranges show a simpler overall pattern.", key=f"lab_one_equal_range_bins_{field}")
+            figure = histogram(population.data, field, label=_field_label(field, include_unit=True))
+            figure.update_traces(nbinsx=bin_count)
+        elif representation == "orders_of_magnitude":
+            figure = histogram(population.data, field, label=_field_label(field, include_unit=True), log_x=True)
+        else:
+            figure = categorical_bar(
+                meaningful_range_counts(population.data, field),
+                label=_field_label(field, include_unit=True),
+            )
+        st.plotly_chart(figure, width="stretch")
+        _render_raw_numeric_summary(displayed, field)
     else:
-        bin_count = st.slider("Number of histogram ranges", min_value=5, max_value=60, value=20, help="The histogram groups nearby values into ranges. More ranges show finer detail; fewer ranges show a simpler overall pattern.")
-        figure = px.histogram(histogram_data.dropna(subset=[histogram_field]), x=histogram_field, nbins=bin_count, title=f"Histogram of {histogram_label}")
-        figure.update_layout(xaxis_title=histogram_label, yaxis_title="Number of planet records")
-    st.plotly_chart(figure, use_container_width=True)
-
-    st.subheader("B. Group values using planet and Solar System analogies")
-    st.write("Sometimes equal-width histogram ranges are not the most meaningful groups. Scientists can also use ranges linked to familiar planets and orbital scales.")
-    group_label = st.selectbox("Choose a measurement to group", list(PHYSICAL_GROUPS), key="lab_one_physical_group")
-    group_field, breaks, labels = PHYSICAL_GROUPS[group_label]
-    group_values = data[group_field].dropna()
-    groups = pd.cut(group_values, bins=breaks, labels=labels, include_lowest=True)
-    group_counts = groups.value_counts(sort=False).reset_index()
-    group_counts.columns = ["Group", "Number of planet records"]
-    group_chart = st.radio("Show these groups as", ["Bar chart", "Pie chart"], horizontal=True, key="lab_one_group_chart")
-    if group_chart == "Bar chart":
-        grouped_figure = px.bar(group_counts, x="Group", y="Number of planet records", title=f"{group_label}, grouped into meaningful ranges")
-        grouped_figure.update_layout(xaxis_tickangle=-35)
-    else:
-        grouped_figure = px.pie(group_counts, names="Group", values="Number of planet records", title=f"{group_label}, grouped into meaningful ranges")
-    st.plotly_chart(grouped_figure, use_container_width=True)
-    st.info("Compare the histogram ranges with the physical groups. What story does each representation make easier to tell? NSW Science link: organise and summarise secondary data using an appropriate representation.")
+        population = chart_population(displayed, [field])
+        _chart_population_caption(population, [field])
+        figure = categorical_bar(category_counts(population.data, field), label=_field_label(field))
+        st.plotly_chart(figure, width="stretch")
 
 
 def render_two_variables(data, facilitator_notes, field_options):
     st.header("Two variables")
-    st.write("Choose two variables and look for a pattern. They might both be measurements, or one might describe a group.")
-    options = numeric_options(field_options)
-    all_options = {**options, "Discovery method": "discoverymethod"}
+    st.write("Choose two variables and look for a pattern. The graph changes to suit the variables you selected.")
+    fields = data_lab_fields(data, eligibility="two_variable")
     left, right = st.columns(2)
-    x_label = left.selectbox("Horizontal variable", list(all_options), index=list(all_options.values()).index("pl_orbsmax"), key="lab_two_x")
-    y_label = right.selectbox("Vertical variable", list(all_options), index=list(all_options.values()).index("pl_bmasse"), key="lab_two_y")
-    x_field, y_field = all_options[x_label], all_options[y_label]
-    plotted = display_data(data) if "sy_dist" in {x_field, y_field} else data
-    scale_left, scale_right = st.columns(2)
-    use_log_x = scale_left.checkbox("Use a logarithmic horizontal axis", disabled=x_field == "discoverymethod", key="lab_two_log_x")
-    use_log_y = scale_right.checkbox("Use a logarithmic vertical axis", disabled=y_field == "discoverymethod", key="lab_two_log_y")
-    valid = plotted.dropna(subset=[x_field, y_field])
-    if use_log_x:
-        valid = valid[valid[x_field] > 0]
-    if use_log_y:
-        valid = valid[valid[y_field] > 0]
-    figure = px.scatter(valid, x=x_field, y=y_field, hover_name="pl_name", title=f"{y_label} and {x_label}")
-    figure.update_layout(xaxis_title=x_label, yaxis_title=y_label)
-    if use_log_x:
-        figure.update_xaxes(type="log")
-    if use_log_y:
-        figure.update_yaxes(type="log")
-    st.plotly_chart(figure, use_container_width=True)
+    x_field = left.selectbox("First variable", fields, index=fields.index("pl_orbsmax"), format_func=lambda value: _field_label(value, include_unit=True), key="lab_two_x")
+    y_field = right.selectbox("Second variable", fields, index=fields.index("pl_bmasse"), format_func=lambda value: _field_label(value, include_unit=True), key="lab_two_y")
+    if x_field == y_field:
+        st.info("Choose two different variables to compare.")
+        return
+    rejection = pair_rejection_reason(x_field, y_field)
+    if rejection:
+        st.info(f"This pairing is not available here: {rejection}")
+        return
+    route = representation_for_fields(x_field, y_field)
+    x_metadata, y_metadata = DATA_LAB_FIELDS[x_field], DATA_LAB_FIELDS[y_field]
+    displayed = _display_frame_for(data, [x_field, y_field])
+
+    if route == "scatter":
+        scale_left, scale_right = st.columns(2)
+        with scale_left:
+            use_log_x = _log_control("Use a logarithmic horizontal axis", "lab_two_log_x", x_field)
+        with scale_right:
+            use_log_y = _log_control("Use a logarithmic vertical axis", "lab_two_log_y", y_field)
+        population = chart_population(displayed, [x_field, y_field], log_fields=[field for field, active in ((x_field, use_log_x), (y_field, use_log_y)) if active])
+        _chart_population_caption(population, [x_field, y_field])
+        figure = scatter(population.data, x_field, y_field, x_label=_field_label(x_field, include_unit=True), y_label=_field_label(y_field, include_unit=True), log_x=use_log_x, log_y=use_log_y)
+    elif route == "grouped_boxplot":
+        category, numeric = (x_field, y_field) if x_metadata.kind == "categorical" else (y_field, x_field)
+        use_log_y = _log_control("Use a logarithmic numerical axis", "lab_two_grouped_log", numeric)
+        population = chart_population(displayed, [category, numeric], log_fields=[numeric] if use_log_y else None)
+        _chart_population_caption(population, [category, numeric])
+        figure = grouped_boxplot(population.data, category, numeric, category_label=_field_label(category), numeric_label=_field_label(numeric, include_unit=True), log_y=use_log_y)
+    else:
+        population = chart_population(displayed, [x_field, y_field])
+        _chart_population_caption(population, [x_field, y_field])
+        figure = count_heatmap(population.data, x_field, y_field, x_label=_field_label(x_field), y_label=_field_label(y_field))
+    st.plotly_chart(figure, width="stretch")
     st.info("Describe the pattern first. Then try a log axis if small and large values are crowded together. The values stay the same; only the spacing changes. NSW Science link: identify trends, patterns and relationships in secondary data.")
 
 
