@@ -112,7 +112,7 @@ def test_existing_data_lab_labels_and_stage_order_remain_compatible():
 
     assert list(data_laboratory.TAB_LABELS) == [
         "Start here", "Variables", "Dataset and missing values", "One variable",
-        "Two variables", "Three variables", "Sky map",
+        "Two variables", "Another angle", "Sky map", "Follow it further",
     ]
     assert legacy_field_options()["Planet mass (Earth masses)"] == "pl_bmasse"
     assert variables["pl_eqt"]["measurement"].startswith("Calculated estimate")

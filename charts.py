@@ -54,6 +54,33 @@ def scatter(
     return figure
 
 
+def discovery_method_scatter(
+    data: pd.DataFrame,
+    x: str,
+    y: str,
+    *,
+    x_label: str,
+    y_label: str,
+    log_x: bool,
+    log_y: bool,
+    title: str,
+) -> go.Figure:
+    """Show one numeric relationship through the configured discovery-method lens."""
+    figure = px.scatter(
+        data,
+        x=x,
+        y=y,
+        color="discoverymethod",
+        symbol="discoverymethod",
+        hover_name="pl_name" if "pl_name" in data else None,
+        log_x=log_x,
+        log_y=log_y,
+        title=title,
+    )
+    figure.update_layout(xaxis_title=x_label, yaxis_title=y_label, legend_title="Discovery method")
+    return figure
+
+
 def grouped_boxplot(
     data: pd.DataFrame, category: str, numeric: str, *, category_label: str, numeric_label: str, log_y: bool
 ) -> go.Figure:

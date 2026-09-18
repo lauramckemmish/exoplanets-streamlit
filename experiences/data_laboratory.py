@@ -6,8 +6,8 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from charts import categorical_bar, count_heatmap, grouped_boxplot, histogram, scatter
-from ui_helpers import facilitator_preparation, predict_prompt
+from charts import categorical_bar, count_heatmap, discovery_method_scatter, grouped_boxplot, histogram, scatter
+from ui_helpers import compare_prompt, facilitator_preparation, predict_prompt
 from experiences.data_lab_fields import (
     DATA_LAB_FIELDS,
     category_counts,
@@ -29,8 +29,9 @@ TAB_LABELS = [
     "Dataset and missing values",
     "One variable",
     "Two variables",
-    "Three variables",
+    "Another angle",
     "Sky map",
+    "Follow it further",
 ]
 
 FACILITATOR_ORIENTATION = """
@@ -71,7 +72,7 @@ PHYSICAL_GROUPS = {
 
 def render_intro(data, facilitator_notes, guidance_box):
     st.header("What is the Exoplanet Data Laboratory?")
-    guidance_box("Use real NASA data to ask questions, choose variables and build graphs about planets beyond our Solar System.", "Frame this as open investigation: students make analytical choices, inspect patterns and discuss what the data can and cannot show.", key="lab_intro")
+    guidance_box("Use real NASA data to understand the catalogue, examine patterns, check them through discovery method, explore the sky and decide what evidence to seek next.", "Frame this as open investigation: students make analytical choices, inspect patterns and discuss what the data can and cannot show.", key="lab_intro")
     st.subheader("First: what is an exoplanet?")
     st.write("An exoplanet is a planet orbiting a star other than our Sun. The Milky Way probably contains about 400 billion stars, and most stars are thought to have planets. That means there may be an enormous number of planets in our galaxy.")
     st.subheader("How does a planet become a data record?")
@@ -232,7 +233,6 @@ def render_one_variable(data, facilitator_notes, field_options):
     st.header("One variable")
     st.write("Start by looking at one variable. Choose how to group numerical values, or count an existing category.")
 
-    st.subheader("A. Explore one variable")
     fields = data_lab_fields(data, eligibility="one_variable")
     field = st.selectbox("Choose a variable", fields, format_func=lambda value: _field_label(value, include_unit=True), key="lab_one_field")
     metadata = DATA_LAB_FIELDS[field]
@@ -316,42 +316,90 @@ def render_two_variables(data, facilitator_notes, field_options):
     st.info("Describe the pattern first. Then try a log axis if small and large values are crowded together. The values stay the same; only the spacing changes. NSW Science link: identify trends, patterns and relationships in secondary data.")
 
 
-def render_three_variables(data, facilitator_notes, field_options):
-    st.header("Three variables")
-    st.write("Choose a horizontal variable, a vertical variable and a colour variable. Colour can show an existing category, a numerical scale or one of the meaningful groups used in One Variable.")
-    options = numeric_options(field_options)
-    all_options = {**options, "Discovery method": "discoverymethod"}
-    left, middle, right = st.columns(3)
-    x_label = left.selectbox("Horizontal variable", list(all_options), index=list(all_options.values()).index("pl_orbsmax"), key="lab_three_x")
-    y_label = middle.selectbox("Vertical variable", list(all_options), index=list(all_options.values()).index("pl_bmasse"), key="lab_three_y")
-    colour_options = ["Discovery method", "Discovery year"] + [f"{label} group" for label in PHYSICAL_GROUPS]
-    category_label = right.selectbox("Colour variable", colour_options, key="lab_three_category")
-    x_field, y_field = all_options[x_label], all_options[y_label]
-    plotted = display_data(data) if "sy_dist" in {x_field, y_field} else data
-    if category_label.endswith(" group"):
-        group_label = category_label.removesuffix(" group")
-        group_field, breaks, labels = PHYSICAL_GROUPS[group_label]
-        plotted = plotted.copy()
-        colour_field = "_colour_group"
-        plotted[colour_field] = pd.cut(plotted[group_field], bins=breaks, labels=labels, include_lowest=True)
-    else:
-        colour_field = "discoverymethod" if category_label == "Discovery method" else "disc_year"
+def another_angle_numeric_fields(data: pd.DataFrame) -> list[str]:
+    """Return the deliberately numerical relationship choices for Another angle."""
+    return [
+        field for field in data_lab_fields(data, eligibility="two_variable")
+        if DATA_LAB_FIELDS[field].kind == "numeric"
+    ]
+
+
+def discovery_method_subset(data: pd.DataFrame, method: str) -> pd.DataFrame:
+    """Return one configured discovery-method subset without becoming a general filter."""
+    return data.loc[data["discoverymethod"] == method].copy()
+
+
+def render_another_angle(data, facilitator_notes, field_options):
+    st.header("Another angle")
+    st.write("Does the relationship look the same for planets discovered in different ways?")
+    fields = another_angle_numeric_fields(data)
+    left, right = st.columns(2)
+    x_field = left.selectbox("Horizontal variable", fields, index=fields.index("pl_orbsmax"), format_func=lambda value: _field_label(value, include_unit=True), key="lab_angle_x")
+    y_field = right.selectbox("Vertical variable", fields, index=fields.index("pl_bmasse"), format_func=lambda value: _field_label(value, include_unit=True), key="lab_angle_y")
+    if x_field == y_field:
+        st.info("Choose two different variables to compare.")
+        return
+
     scale_left, scale_right = st.columns(2)
-    use_log_x = scale_left.checkbox("Use a logarithmic horizontal axis", disabled=x_field == "discoverymethod", key="lab_three_log_x")
-    use_log_y = scale_right.checkbox("Use a logarithmic vertical axis", disabled=y_field == "discoverymethod", key="lab_three_log_y")
-    valid = plotted.dropna(subset=[x_field, y_field, colour_field])
-    if use_log_x:
-        valid = valid[valid[x_field] > 0]
-    if use_log_y:
-        valid = valid[valid[y_field] > 0]
-    figure = px.scatter(valid, x=x_field, y=y_field, color=colour_field, hover_name="pl_name", title=f"{y_label} and {x_label}, coloured by {category_label}")
-    figure.update_layout(xaxis_title=x_label, yaxis_title=y_label, legend_title=category_label)
-    if use_log_x:
-        figure.update_xaxes(type="log")
-    if use_log_y:
-        figure.update_yaxes(type="log")
-    st.plotly_chart(figure, use_container_width=True)
-    st.info("Ask whether the coloured groups occupy different parts of the graph. Try log axes if small and large values are crowded together, then consider whether the way the data were collected could affect the pattern. NSW Science link: use representations to analyse evidence and evaluate data limitations.")
+    with scale_left:
+        use_log_x = _log_control("Use a logarithmic horizontal axis", "lab_angle_log_x", x_field)
+    with scale_right:
+        use_log_y = _log_control("Use a logarithmic vertical axis", "lab_angle_log_y", y_field)
+    mode = st.segmented_control(
+        "Look again through discovery method",
+        ["Compare discovery methods", "Focus on one method"],
+        default="Compare discovery methods",
+        required=True,
+        key="lab_angle_mode",
+        width="stretch",
+    )
+    displayed = _display_frame_for(data, [x_field, y_field])
+    log_fields = [field for field, active in ((x_field, use_log_x), (y_field, use_log_y)) if active]
+    if mode == "Compare discovery methods":
+        population = chart_population(displayed, [x_field, y_field, "discoverymethod"], log_fields=log_fields)
+        _chart_population_caption(population, [x_field, y_field, "discoverymethod"])
+        figure = discovery_method_scatter(
+            population.data, x_field, y_field,
+            x_label=_field_label(x_field, include_unit=True),
+            y_label=_field_label(y_field, include_unit=True),
+            log_x=use_log_x, log_y=use_log_y,
+            title=f"{_field_label(y_field, include_unit=True)} and {_field_label(x_field, include_unit=True)} by discovery method",
+        )
+    else:
+        methods = sorted(displayed["discoverymethod"].dropna().unique().tolist())
+        method = st.selectbox("Focus on discovery method", methods, key="lab_angle_method")
+        subset = discovery_method_subset(displayed, method)
+        st.caption(f"Viewing **{method}**: {len(subset):,} of {len(displayed):,} prepared catalogue records. Changing the method changes the evidence shown.")
+        population = chart_population(subset, [x_field, y_field], log_fields=log_fields)
+        _chart_population_caption(population, [x_field, y_field])
+        figure = scatter(
+            population.data, x_field, y_field,
+            x_label=_field_label(x_field, include_unit=True),
+            y_label=_field_label(y_field, include_unit=True),
+            log_x=use_log_x, log_y=use_log_y,
+        )
+        figure.update_layout(title=f"{_field_label(y_field, include_unit=True)} and {_field_label(x_field, include_unit=True)} — {method}")
+    st.plotly_chart(figure, width="stretch")
+    compare_prompt("What stays similar? What changes? Is the original pattern still visible, and could the way planets were found affect the sample we see?")
+    if facilitator_notes:
+        facilitator_preparation(
+            "Ask learners what changes before supplying an explanation. Discovery method can shape the detected sample; it does not change a planet's physical properties by magic.",
+            key="lab_another_angle",
+        )
+
+
+def render_follow_it_further(_data, facilitator_notes):
+    st.header("Follow it further")
+    st.write("A graph can show a pattern, but it does not automatically explain why that pattern exists.")
+    st.caption("Optional notes for your own thinking, a partner discussion or a class conversation.")
+    st.text_area("What did you notice?", key="lab_follow_notice", height=70, placeholder="A pattern, difference or uncertainty you noticed…")
+    st.text_area("What does that make you wonder?", key="lab_follow_question", height=70, placeholder="A question the graph leaves open…")
+    st.text_area("What evidence could help you investigate that?", key="lab_follow_evidence", height=70, placeholder="Another property, discovery method, sample or observation…")
+    if facilitator_notes:
+        facilitator_preparation(
+            "Ask what evidence could distinguish possible explanations. Keep the move from observation to next evidence open rather than supplying a causal conclusion.",
+            key="lab_follow_further",
+        )
 
 DISCOVERY_GUIDANCE = {
     "summary": "Use this graph to compare categories over time. Look for changes in dominant discovery methods, sudden increases and periods with sparse data.",
@@ -408,7 +456,7 @@ def render_dataset(data, facilitator_notes, field_options, variables, guidance_b
 
 
 def render_map(data, facilitator_notes, sky_map):
-    """Render the celestial map with the same colour choices as Three variables."""
+    """Render the celestial map with its established local colour choices."""
     st.header("Celestial map")
     st.write("Each point shows a known exoplanet's direction in the sky. Use colour to look for patterns in another variable.")
     colour_options = ["No colour grouping", "Discovery method", "Discovery year"] + [f"{label} group" for label in PHYSICAL_GROUPS]
@@ -514,10 +562,13 @@ def render(
             render_two_variables(data, facilitator_notes, field_options)
     elif current_tab == 5:
         with tabs[5]:
-            render_three_variables(data, facilitator_notes, field_options)
-    else:
+            render_another_angle(data, facilitator_notes, field_options)
+    elif current_tab == 6:
         with tabs[6]:
             render_map(data, facilitator_notes, sky_map)
+    else:
+        with tabs[7]:
+            render_follow_it_further(data, facilitator_notes)
     step_buttons(
         TAB_LABELS,
         "lab_tab",

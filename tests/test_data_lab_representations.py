@@ -5,7 +5,7 @@ import inspect
 import pandas as pd
 import pytest
 
-from charts import categorical_bar, count_heatmap, grouped_boxplot, histogram, scatter
+from charts import categorical_bar, count_heatmap, discovery_method_scatter, grouped_boxplot, histogram, scatter
 from experiences import data_laboratory
 from experiences.data_lab_fields import (
     DATA_LAB_FIELDS,
@@ -187,3 +187,62 @@ def test_no_fitted_model_equation_or_r_squared_is_added_to_data_lab():
     assert "r²" not in source
     assert "r2" not in source
     assert "equation" not in source
+
+
+def test_another_angle_uses_only_eligible_numeric_fields_and_discovery_method_grouping():
+    fields = data_laboratory.another_angle_numeric_fields(_data())
+
+    assert set(fields) == {"pl_bmasse", "pl_rade", "pl_eqt"}
+    assert "discoverymethod" not in fields
+    assert DATA_LAB_FIELDS["discoverymethod"].grouping_eligible
+    assert DATA_LAB_FIELDS["discoverymethod"].subset_eligible
+
+
+def test_another_angle_compare_chart_redundantly_encodes_discovery_method():
+    data = pd.DataFrame({
+        "pl_name": ["A", "B"],
+        "pl_rade": [1.0, 2.0],
+        "pl_bmasse": [1.0, 8.0],
+        "discoverymethod": ["Transit", "Imaging"],
+    })
+    figure = discovery_method_scatter(
+        data, "pl_rade", "pl_bmasse", x_label="Planet radius", y_label="Planet mass",
+        log_x=False, log_y=False, title="By discovery method",
+    )
+
+    assert len(figure.data) == 2
+    assert figure.layout.legend.title.text == "Discovery method"
+    assert len({trace.marker.symbol for trace in figure.data}) == 2
+
+
+def test_another_angle_focus_subset_and_population_are_truthful():
+    data = _data()
+    subset = data_laboratory.discovery_method_subset(data, "Transit")
+    population = chart_population(subset, ["pl_rade", "pl_bmasse"])
+
+    assert subset["discoverymethod"].tolist() == ["Transit", "Transit"]
+    assert population.total == 2
+    assert population.missing == 1
+    assert len(population.data) == 1
+
+
+def test_another_angle_has_no_generic_third_variable_colour_or_interpretation_claim():
+    source = inspect.getsource(data_laboratory.render_another_angle).lower()
+
+    assert "colour variable" not in source
+    assert "discovery year" not in source
+    assert "meaningful_ranges" not in source
+    assert "causes" not in source
+
+
+def test_sky_map_caveat_and_follow_it_further_non_gating_prompts_remain_present():
+    map_source = inspect.getsource(data_laboratory.render_map).lower()
+    follow_source = inspect.getsource(data_laboratory.render_follow_it_further).lower()
+
+    assert "celestial direction" in map_source
+    assert "physical separation" in map_source
+    assert "graph can show a pattern" in follow_source
+    assert "what did you notice?" in follow_source
+    assert "what does that make you wonder?" in follow_source
+    assert "what evidence could help you investigate that?" in follow_source
+    assert "completion" not in follow_source

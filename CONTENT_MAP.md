@@ -12,7 +12,7 @@ Each experience has its own module in `experiences/`. Student-facing wording, le
 | **Is Our Solar System Normal?** (CURIOUS) | `experiences/curious.py` | Facilitator-led sequence, discussion prompts and Facilitator notes. |
 | **Strange New Worlds** (Year 8) | `experiences/strange_new_worlds.md`, then `experiences/strange_new_worlds.py` | Authoritative Year 8 pedagogical design, then student steps, Facilitator notes and background information. |
 | **The Planets We Haven't Found** (Year 10) | `experiences/planets_we_have_not_found.py` | Year 10 student steps, Facilitator notes and background information. |
-| **Exoplanet Data Laboratory** | `experiences/data_laboratory.py` | Data visualisation and representation investigation. |
+| **Exoplanet Data Laboratory** | `experiences/data_laboratory.py` | Local journey from catalogue orientation through one/two-variable evidence, then an `Another angle` discovery-method check, astronomy-specific Sky map, and observation → question → next evidence. |
 | **Find Your Perfect Planet** | `experiences/tatooine.py` | Filtering investigation; Tatooine is a compact worked example. |
 | **Explore resources** | `experiences/explore.py` | Independent resources; the catalogue decides which resources appear in Explore. |
 | **Introduction** | `experiences/landing.py` | Landing-page text, experience cards and acknowledgements. |
@@ -30,7 +30,7 @@ Do not edit these files to change a lesson’s student-facing text or Facilitato
 ## Shared building blocks
 
 - `data.py` — NASA Exoplanet Archive loading, bundled sample loading and data preparation.
-- `experiences/data_lab_fields.py` — Data-Lab-only field and capability adapter. It keeps learner-facing field meaning, explicit graph/log/grouping/subset eligibility and source-derived missingness together; it also drives Data Lab’s kind-aware chart dispatch and chart-local usable/excluded counts. Pandas dtype does not determine scientific eligibility, and generic fitting remains absent. It is not a repository-wide metadata contract; local exoplanet unknown/measurement semantics remain with the relevant experience.
+- `experiences/data_lab_fields.py` — Data-Lab-only field and capability adapter. It keeps learner-facing field meaning, explicit graph/log/grouping/subset eligibility and source-derived missingness together; it also drives Data Lab’s kind-aware chart dispatch and chart-local usable/excluded counts. Pandas dtype does not determine scientific eligibility, generic fitting remains absent, and continuous numeric colour stays a local Sky-map feature under review rather than shared machinery. It is not a repository-wide metadata contract; local exoplanet unknown/measurement semantics remain with the relevant experience.
 - `charts.py` — reusable Plotly chart builders, including the Solar System/exoplanet comparison graphs.
 - `ui_helpers.py` — reusable visual scaffolds such as graph-reading guidance, response boxes, key ideas, reveal patterns, image-role rendering, Facilitator notes and navigation controls.
 - `docs/curious_online_style.md` — shared CURIOUS writing, interaction and visual-hierarchy defaults. Individual experiences decide which shared patterns to use.
