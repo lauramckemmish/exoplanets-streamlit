@@ -976,7 +976,7 @@ def _render_destination(data: pd.DataFrame) -> None:
                             st.write(
                                 "One reason is that astronomers have not searched every part of the sky in the same way. "
                                 "NASA’s Kepler mission spent years watching one patch of sky around Cygnus and Lyra, repeatedly "
-                                "measuring the brightness of more than 100,000 stars and finding planets when they crossed in front of them."
+                                "measuring the brightness of more than 100,000 stars in that concentrated patch."
                             )
                             st.write(
                                 "So the clumps and gaps in this map partly reflect **where we looked and how we looked** — "
@@ -1001,23 +1001,9 @@ def _render_destination(data: pd.DataFrame) -> None:
                 st.caption("THE SEARCH CONTINUES")
                 st.markdown(
                     "**There are more exoplanets out there than the ones in this catalogue.**  \n"
-                    "You chose from the worlds we have detected so far. **Astronomers are still finding more.**"
+                    "You chose from the worlds we have detected so far. **Astronomers are still finding more.**  \n"
+                    "NASA’s Roman Space Telescope is part of the next stage of expanding our knowledge of planetary systems."
                 )
-            # TEMPORARY 2026 DELIVERY ENRICHMENT — review/remove after CURIOUS
-            with soft_reveal("Where will we find the next exoplanets?", icon="🚀"):
-                st.write(
-                    "NASA’s Nancy Grace Roman Space Telescope launched on **30 August 2026**. "
-                    "One way Roman will search for exoplanets is **gravitational microlensing** — "
-                    "using the gravity of a foreground star to magnify the light of a more distant star "
-                    "and reveal planets we might otherwise miss."
-                )
-                with st.container(width=720):
-                    st.caption("Roman launch")
-                    st.video("https://www.youtube.com/watch?v=U_yGbjnLMGM")
-                    st.markdown(
-                        "[**Want to know how microlensing works? → NASA**]("
-                        "https://science.nasa.gov/mission/roman-space-telescope/microlensing/)"
-                    )
         else:
             st.caption("This planet's position is not available in the map data.")
         if facilitator_notes_enabled():
