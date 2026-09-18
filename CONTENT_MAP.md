@@ -30,6 +30,7 @@ Do not edit these files to change a lesson’s student-facing text or Facilitato
 ## Shared building blocks
 
 - `data.py` — NASA Exoplanet Archive loading, bundled sample loading and data preparation.
+- `experiences/data_lab_fields.py` — Data-Lab-only field and capability adapter. It keeps learner-facing field meaning, explicit graph/log/grouping/subset eligibility and source-derived missingness together; pandas dtype does not determine scientific eligibility. It is not a repository-wide metadata contract, and local exoplanet unknown/measurement semantics remain with the relevant experience.
 - `charts.py` — reusable Plotly chart builders, including the Solar System/exoplanet comparison graphs.
 - `ui_helpers.py` — reusable visual scaffolds such as graph-reading guidance, response boxes, key ideas, reveal patterns, image-role rendering, Facilitator notes and navigation controls.
 - `docs/curious_online_style.md` — shared CURIOUS writing, interaction and visual-hierarchy defaults. Individual experiences decide which shared patterns to use.

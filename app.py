@@ -47,6 +47,7 @@ from experiences import (
     strange_new_worlds,
     tatooine,
 )
+from experiences.data_lab_fields import legacy_field_options, legacy_variables
 
 APP_DIR = Path(__file__).resolve().parent
 ASSETS_DIR = APP_DIR / "assets"
@@ -80,85 +81,10 @@ GRANT_RECIPIENTS_URL = (
     "maker-projects-community-stem-engagement-grants-2024/grant-recipients"
 )
 
-VARIABLES = {
-    "pl_rade": {
-        "label": "Planet radius",
-        "unit": "Earth radii",
-        "description": "The size of the planet compared with Earth.",
-        "measurement": "Measured or modelled from observations, often from transit data.",
-        "log": "optional",
-        "log_reason": "Radius varies substantially, but usually across fewer orders of magnitude than mass or orbital period.",
-    },
-    "pl_bmasse": {
-        "label": "Planet mass",
-        "unit": "Earth masses",
-        "description": "The mass of the planet compared with Earth.",
-        "measurement": "Measured or estimated from methods such as radial velocity and transit timing.",
-        "log": "recommended",
-        "log_reason": "Planet masses span many orders of magnitude, so a logarithmic axis usually reveals the structure more clearly.",
-    },
-    "pl_orbper": {
-        "label": "Orbital period",
-        "unit": "days",
-        "description": "The time taken for the planet to complete one orbit around its host star.",
-        "measurement": "Measured from repeating signals such as transits or radial-velocity cycles.",
-        "log": "recommended",
-        "log_reason": "Orbital periods range from fractions of a day to many years.",
-    },
-    "pl_orbsmax": {
-        "label": "Orbital distance",
-        "unit": "astronomical units (AU)",
-        "description": "A measure of the planet's orbital distance from its host star.",
-        "measurement": "Calculated from orbital observations and system models.",
-        "log": "recommended",
-        "log_reason": "Orbital distances span very small to very large values.",
-    },
-    "pl_eqt": {
-        "label": "Equilibrium temperature",
-        "unit": "kelvin (K)",
-        "description": "An estimate of the planet's temperature based on absorbed and emitted radiation.",
-        "measurement": "Calculated estimate. It does not directly represent surface temperature or climate.",
-        "log": "usually unnecessary",
-        "log_reason": "Temperature values are positive but normally occupy a range that remains readable on a linear axis.",
-    },
-    "sy_dist": {
-        "label": "Distance from Earth",
-        "unit": "light-years",
-        "description": "The distance from Earth to the planetary system.",
-        "measurement": "Measured astronomically, commonly using parallax and related methods.",
-        "log": "recommended",
-        "log_reason": "Distances span a broad range and may cluster near the lower end on a linear axis.",
-    },
-    "disc_year": {
-        "label": "Discovery year",
-        "unit": "year",
-        "description": "The year the planet was reported as discovered.",
-        "measurement": "A calendar year, not a physical measurement.",
-        "log": "usually unnecessary",
-        "log_reason": "Equal differences between years are meaningful, so a linear axis is clearer.",
-    },
-    "sy_snum": {
-        "label": "Stars in system",
-        "unit": "count",
-        "description": "The number of known stars in the planetary system.",
-        "measurement": "A small whole-number count.",
-        "log": "not suitable",
-        "log_reason": "Small category-like counts are clearer on a linear axis.",
-    },
-    "sy_pnum": {
-        "label": "Planets in system",
-        "unit": "count",
-        "description": "The number of known planets in the planetary system.",
-        "measurement": "A small whole-number count that may change as more planets are discovered.",
-        "log": "not suitable",
-        "log_reason": "Small whole-number counts are clearer on a linear axis.",
-    },
-}
-
-FIELD_OPTIONS = {
-    f"{details['label']} ({details['unit']})": field
-    for field, details in VARIABLES.items()
-}
+# Compatibility views for the existing Data Lab renderer.  Their authoritative
+# values live in the Data Lab-specific capability adapter.
+VARIABLES = legacy_variables()
+FIELD_OPTIONS = legacy_field_options()
 # Shared infrastructure supplied to the two independently owned classroom lessons.
 CLASSROOM_RESOURCES = {
     "exoplanet_image_path": EXOPLANET_IMAGE_PATH,

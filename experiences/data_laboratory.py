@@ -5,6 +5,7 @@ import plotly.express as px
 import streamlit as st
 
 from ui_helpers import facilitator_preparation, predict_prompt
+from experiences.data_lab_fields import DATA_LAB_FIELDS, source_missingness
 
 TITLE = "Exoplanet Data Laboratory"
 SUBTITLE = "Open exploration with contextual guidance for analytical choices"
@@ -38,17 +39,11 @@ SYLLABUS_LANGUAGE = {
 }
 
 DATASET_FIELDS = [
-    ("Planet name", "pl_name"),
-    ("Host star", "hostname"),
-    ("Discovery year", "disc_year"),
-    ("Discovery method", "discoverymethod"),
-    ("Planet radius (Earth radii)", "pl_rade"),
-    ("Planet mass (Earth masses)", "pl_bmasse"),
-    ("Orbital period (days)", "pl_orbper"),
-    ("Equilibrium temperature (K)", "pl_eqt"),
-    ("Distance from Earth (light-years)", "sy_dist"),
-    ("Known stars in system", "sy_snum"),
-    ("Known planets in system", "sy_pnum"),
+    (DATA_LAB_FIELDS[field].table_label, field)
+    for field in (
+        "pl_name", "hostname", "disc_year", "discoverymethod", "pl_rade",
+        "pl_bmasse", "pl_orbper", "pl_eqt", "sy_dist", "sy_snum", "sy_pnum",
+    )
 ]
 
 PHYSICAL_GROUPS = {
@@ -98,6 +93,16 @@ def display_data(data):
     return shown
 
 
+def source_missing_table(data, display):
+    """Return the existing Data Lab source-level missingness view."""
+    profiles = [source_missingness(data, field) for field in display]
+    return pd.DataFrame({
+        "Variable": [label for label, _ in DATASET_FIELDS],
+        "Missing records": [profile["missing_count"] for profile in profiles],
+        "Complete records (%)": [round(100 - profile["missing_percentage"], 1) for profile in profiles],
+    }).sort_values("Complete records (%)")
+
+
 def render_variables(data, facilitator_notes, field_options, variables, variable_card, scale_guidance):
     st.header("Variables")
     st.write("A variable is a feature we can record or compare. The archive field is the short name used in the NASA table.")
@@ -119,7 +124,7 @@ def render_missing(data, _facilitator_notes):
     st.header("Missing data")
     st.write("A blank value means that property has not been recorded for that planet. It does not mean zero or that the property does not exist.")
     display = [field for _, field in DATASET_FIELDS]
-    missing = pd.DataFrame({"Variable": [label for label, _ in DATASET_FIELDS], "Missing records": [int(data[col].isna().sum()) for col in display], "Complete records (%)": [round(100 * data[col].notna().mean(), 1) for col in display]}).sort_values("Complete records (%)")
+    missing = source_missing_table(data, display)
     st.dataframe(missing, use_container_width=True, hide_index=True)
     st.info("Missing values limit which questions can be answered reliably.")
 
@@ -137,7 +142,7 @@ def render_dataset_and_missing(data, facilitator_notes):
     st.dataframe(display_data(data)[display].rename(columns=friendly_columns), use_container_width=True, hide_index=True)
     st.subheader("What does a blank value mean?")
     st.write("A blank value means that property has not been recorded for that planet. It does not mean zero or that the property does not exist.")
-    missing = pd.DataFrame({"Variable": [label for label, _ in DATASET_FIELDS], "Missing records": [int(data[col].isna().sum()) for col in display], "Complete records (%)": [round(100 * data[col].notna().mean(), 1) for col in display]}).sort_values("Complete records (%)")
+    missing = source_missing_table(data, display)
     st.dataframe(missing, use_container_width=True, hide_index=True)
     if facilitator_notes:
         facilitator_preparation(
