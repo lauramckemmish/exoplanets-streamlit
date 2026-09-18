@@ -14,6 +14,8 @@ from data import PARSEC_TO_LIGHT_YEARS
 from charts import sky_map
 from ui_helpers import (
     completion_gate,
+    curriculum_summary,
+    curriculum_tags,
     facilitator_live_cue,
     facilitator_notes_enabled,
     facilitator_optional,
@@ -124,6 +126,15 @@ def _format_travel_years(years: float) -> str:
 def _render_facilitator_orientation() -> None:
     """Render the compact, Launch-associated preparation note."""
     with facilitator_panel("planet_shopping_launch"):
+        curriculum_summary(
+            "NSW curriculum — Stage 5 Data Science 2",
+            "SC5-DA2-01",
+            "Learners use a real exoplanet catalogue to inspect and filter data, combine criteria, reason about "
+            "missing information and make an evidence-based destination choice. The experience directly supports "
+            "descriptive and multivariable analysis of a large dataset (L3, L5) and an evidence-based decision "
+            "(X1), with a meaningful contribution to developing and testing a data question (L2).",
+            detailed_content_note=True,
+        )
         st.markdown("**Before you teach**")
         st.markdown(
             "**What this experience is doing**  \n"
@@ -442,6 +453,10 @@ def _render_overlap_visual(
 def _render_temperature(data: pd.DataFrame) -> None:
     """Render the independent temperature criterion and missing-data decision."""
     st.subheader("🌡️ Temperature")
+    curriculum_tags(
+        [("SC5-DA2-01.L3", "✓"), ("SC5-WS-06.7", "◐")],
+        key="planet_shopping_temperature",
+    )
     facilitator_live_cue(
         "CORE LEARNING",
         "Temperature is a deliberate whole-room reasoning anchor. Unknown temperature is not the same as unsuitable. "
@@ -637,6 +652,10 @@ def _render_meet_your_planet(data: pd.DataFrame) -> None:
     _render_planet_profile(planet_name, planet)
     if facilitator_notes_enabled():
         with facilitator_optional("planet_shopping_meet_catalogue", "Got a keen student?"):
+            curriculum_tags(
+                [("SC5-DA2-01.L1", "◐"), ("SC5-WS-05.2", "✓")],
+                key="planet_shopping_meet_a_planet",
+            )
             st.markdown(
                 "**Why browse at all?**  \n"
                 "These are real catalogue objects, but browsing them one at a time is deliberately inefficient. It gives "
@@ -674,6 +693,10 @@ def _render_meet_your_planet(data: pd.DataFrame) -> None:
 
 def _render_distance(data: pd.DataFrame) -> None:
     st.subheader("🔎 Distance")
+    curriculum_tags(
+        [("SC5-DA2-01.L3", "✓"), ("SC5-WS-05.2", "✓")],
+        key="planet_shopping_distance",
+    )
 
     distance_population = _known_distance_population(data)
     st.caption(
@@ -702,6 +725,10 @@ def _render_distance(data: pd.DataFrame) -> None:
 
 def _render_combine(data: pd.DataFrame) -> None:
     st.subheader("🛒 Combine")
+    curriculum_tags(
+        [("SC5-DA2-01.L5", "✓"), ("SC5-WS-06.7", "◐")],
+        key="planet_shopping_combine",
+    )
     facilitator_live_cue(
         "CORE LEARNING",
         "Combine is the second deliberate whole-room reasoning anchor. Learners are bringing independently chosen "
@@ -789,6 +816,10 @@ def _render_combine(data: pd.DataFrame) -> None:
 
 def _render_destination(data: pd.DataFrame) -> None:
     st.subheader("🪐 Choose Your Destination")
+    curriculum_tags(
+        [("SC5-DA2-01.X1", "✓"), ("SC5-WS-06.5", "✓")],
+        key="planet_shopping_destination",
+    )
     facilitator_live_cue(
         "FACILITATION NOTE",
         "An empty shortlist is not failure: loosen or change criteria, then consider why that combination produced no "
@@ -1014,6 +1045,7 @@ def _render_destination(data: pd.DataFrame) -> None:
 
 def _render_data_science() -> None:
     st.subheader("💡 Data Science")
+    curriculum_tags([("SC5-DA2-01.L2", "◐")], key="planet_shopping_data_science")
     st.write("So why did we call this a shopping expedition?")
     with st.container(width=720):
         role_image(

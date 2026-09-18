@@ -184,6 +184,42 @@ class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
         self.assertIn("An empty shortlist is not failure", destination)
         self.assertIn("Kepler → TESS → Roman: changing scientific questions", destination)
 
+    def test_approved_curriculum_metadata_is_facilitator_only_and_stage_local(self):
+        source = Path("experiences/planet_shopping.py").read_text()
+        launch = source[source.index("def _render_facilitator_orientation"):source.index("def _render_temperature")]
+        meet = source[source.index("def _render_meet_your_planet"):source.index("def _render_distance")]
+        distance = source[source.index("def _render_distance"):source.index("def _render_combine")]
+        temperature = source[source.index("def _render_temperature"):source.index("def _render_launch")]
+        combine = source[source.index("def _render_combine"):source.index("def _render_destination")]
+        destination = source[source.index("def _render_destination"):source.index("def _render_data_science")]
+        data_science = source[source.index("def _render_data_science"):source.index("def render")]
+
+        self.assertIn("curriculum_summary(", launch)
+        self.assertIn("NSW curriculum — Stage 5 Data Science 2", launch)
+        self.assertIn('"SC5-DA2-01"', launch)
+        self.assertIn("detailed_content_note=True", launch)
+        self.assertNotIn("curriculum_tags(", launch)
+        self.assertIn("facilitator_panel", launch)
+
+        expected_tags = {
+            "meet": (meet, "SC5-DA2-01.L1", "◐", "SC5-WS-05.2", "✓"),
+            "distance": (distance, "SC5-DA2-01.L3", "✓", "SC5-WS-05.2", "✓"),
+            "temperature": (temperature, "SC5-DA2-01.L3", "✓", "SC5-WS-06.7", "◐"),
+            "combine": (combine, "SC5-DA2-01.L5", "✓", "SC5-WS-06.7", "◐"),
+            "destination": (destination, "SC5-DA2-01.X1", "✓", "SC5-WS-06.5", "✓"),
+            "data_science": (data_science, "SC5-DA2-01.L2", "◐"),
+        }
+        for stage, values in expected_tags.items():
+            with self.subTest(stage=stage):
+                rendered_stage, *tags = values
+                self.assertIn("curriculum_tags(", rendered_stage)
+                for tag in tags:
+                    self.assertIn(f'"{tag}"', rendered_stage)
+
+        self.assertNotIn("SC5-DA2-01.L4", source)
+        self.assertNotIn("SC5-DA2-01.L6", source)
+        self.assertNotIn("SC5-DA2-01.L7", source)
+
     def test_destination_commitment_is_durable_and_distinct_from_inspection(self):
         names = ["Planet A", "Planet B"]
         state = {}
