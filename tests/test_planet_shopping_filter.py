@@ -26,6 +26,7 @@ from experiences.planet_shopping import (
     _record_browsed_planet,
     _show_another_browsed_planet,
     _temperature_profile,
+    _year_profile,
     _UNKNOWN_TEMPERATURE_OPTIONS,
     _combine_groups,
     _candidate_names,
@@ -89,6 +90,23 @@ class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
     def test_profile_values_use_learner_facing_units(self):
         self.assertEqual(_temperature_profile(273.15)[0], "0 °C")
         self.assertEqual(_distance_profile(1.0)[0], f"{PARSEC_TO_LIGHT_YEARS:.0f} light-years")
+
+    def test_year_profile_uses_days_for_short_orbital_periods(self):
+        self.assertEqual(_year_profile(12)[0], "12 Earth days")
+
+    def test_year_profile_uses_whole_months_for_intermediate_orbital_periods(self):
+        self.assertEqual(_year_profile(90)[0], "3 Earth months")
+        self.assertEqual(_year_profile(75)[0], "3 Earth months")
+
+    def test_year_profile_uses_readable_years_for_long_orbital_periods(self):
+        self.assertEqual(_year_profile(400)[0], "1.1 Earth years")
+        self.assertEqual(_year_profile(3_650)[0], "10 Earth years")
+
+    def test_year_profile_changes_units_at_the_day_month_and_month_year_boundaries(self):
+        self.assertEqual(_year_profile(59)[0], "59 Earth days")
+        self.assertEqual(_year_profile(60)[0], "2 Earth months")
+        self.assertEqual(_year_profile(364)[0], "12 Earth months")
+        self.assertEqual(_year_profile(365)[0], "1 Earth year")
 
     def test_temperature_profile_uses_distinct_high_temperature_bands(self):
         self.assertEqual(_temperature_profile(373.15)[1], "Hotter than a summer day on Earth.")

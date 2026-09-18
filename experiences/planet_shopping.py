@@ -252,7 +252,24 @@ def _stars_profile(value) -> tuple[str, str]:
 def _year_profile(value) -> tuple[str, str]:
     days = float(value)
     interpretation = "Birthdays come around fast." if days < 365 else "A long trip around its star."
-    return f"{days:.0f} Earth days", interpretation
+    if days < 60:
+        duration = f"{days:.0f} Earth days"
+    elif days < 365:
+        months = int(days / 30 + 0.5)
+        duration = f"{months} Earth month" if months == 1 else f"{months} Earth months"
+    else:
+        years = days / 365
+        rounded_years = (
+            f"{years:.1f}".rstrip("0").rstrip(".")
+            if years < 10
+            else f"{years:.0f}"
+        )
+        duration = (
+            f"{rounded_years} Earth year"
+            if rounded_years == "1"
+            else f"{rounded_years} Earth years"
+        )
+    return duration, interpretation
 
 
 def _render_planet_property(label: str, value, formatter: callable) -> None:
