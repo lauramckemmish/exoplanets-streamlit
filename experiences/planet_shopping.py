@@ -1004,6 +1004,9 @@ def _render_destination(data: pd.DataFrame) -> None:
                     "You chose from the worlds we have detected so far. **Astronomers are still finding more.**  \n"
                     "NASA’s Roman Space Telescope is part of the next stage of expanding our knowledge of planetary systems."
                 )
+                with st.container(width=720):
+                    st.caption("Roman launch")
+                    st.video("https://www.youtube.com/watch?v=U_yGbjnLMGM")
         else:
             st.caption("This planet's position is not available in the map data.")
         if facilitator_notes_enabled():
