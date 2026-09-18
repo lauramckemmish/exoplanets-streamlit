@@ -151,6 +151,90 @@ class PlanetsWeHaveNotFoundSolarSystemTests(unittest.TestCase):
         self.assertEqual(events[1][2]["key"], "year10_stage_6")
         self.assertIn("regularly repeated dips", events[1][1][0])
 
+    def test_curriculum_tags_match_the_settled_year_ten_mapping(self):
+        expected = {
+            2: (("SC5-DA2-01.L1", "✓"), ("SC5-WS-05.2", "✓")),
+            3: (("SC5-DA2-01.L3", "✓"), ("SC5-DA2-01.L5", "✓"), ("SC5-WS-05.1", "✓")),
+            4: (("SC5-DA2-01.Q4", "✓"), ("SC5-DA2-01.Q5", "✓"), ("SC5-WS-05.4", "✓")),
+            7: (("SC5-DA2-01.L5", "✓"), ("SC5-WS-06.2", "✓"), ("SC5-WS-06.7", "✓")),
+            8: (("SC5-DA2-01.Q6", "✓"), ("SC5-WS-06.6", "✓"), ("SC5-WS-07.6", "✓"), ("SC5-WS-08.1", "✓")),
+        }
+        excluded_stages = {0, 1, 5, 6}
+        disallowed = {
+            "SC5-DA2-01.L6", "SC5-DA2-01.L7", "SC5-WS-06.8",
+            "SC4-DA1-01", "P1", "P2", "P3", "P4", "P5",
+        }
+
+        self.assertEqual(planets_we_have_not_found.STAGE_CURRICULUM_TAGS, expected)
+        self.assertTrue(excluded_stages.isdisjoint(expected))
+        introduced = {identifier for tags in expected.values() for identifier, _alignment in tags}
+        self.assertTrue(disallowed.isdisjoint(introduced))
+
+    def test_curriculum_tags_are_called_only_for_the_settled_stages(self):
+        events = []
+        with (
+            patch.object(planets_we_have_not_found, "facilitator_live_cue"),
+            patch.object(planets_we_have_not_found, "facilitator_preparation"),
+            patch.object(
+                planets_we_have_not_found,
+                "curriculum_tags",
+                lambda tags, **kwargs: events.append((tags, kwargs)),
+            ),
+        ):
+            for stage in range(9):
+                planets_we_have_not_found.render_facilitator_support(stage)
+
+        self.assertEqual(
+            events,
+            [
+                (planets_we_have_not_found.STAGE_CURRICULUM_TAGS.get(stage, ()), {"key": f"year10_stage_{stage}"})
+                for stage in range(9)
+            ],
+        )
+
+    def test_orientation_uses_the_shared_curriculum_summary_when_facilitator_notes_are_enabled(self):
+        events = []
+
+        def implementation(_data, **_kwargs):
+            events.append("lesson")
+
+        with (
+            patch.object(planets_we_have_not_found, "facilitator_notes_enabled", return_value=True),
+            patch.object(planets_we_have_not_found, "facilitator_panel", lambda *args, **kwargs: nullcontext()),
+            patch.object(
+                planets_we_have_not_found,
+                "curriculum_summary",
+                lambda *args, **kwargs: events.append(("summary", args, kwargs)),
+            ),
+            patch.object(planets_we_have_not_found, "st", _StreamlitRecorder(events)),
+        ):
+            planets_we_have_not_found.render(pd.DataFrame(), implementation, terminal_action=lambda: None)
+
+        summary = events[0]
+        self.assertEqual(summary[0], "summary")
+        self.assertEqual(summary[1][:2], ("NSW curriculum — Stage 5 Data Science 2", "SC5-DA2-01"))
+        self.assertIn("large scientific dataset", summary[1][2])
+        self.assertTrue(summary[2]["detailed_content_note"])
+        self.assertEqual(events[-1], "lesson")
+
+    def test_orientation_is_hidden_when_facilitator_notes_are_disabled(self):
+        events = []
+
+        with (
+            patch.object(planets_we_have_not_found, "facilitator_notes_enabled", return_value=False),
+            patch.object(planets_we_have_not_found, "facilitator_panel") as panel,
+            patch.object(planets_we_have_not_found, "curriculum_summary") as summary,
+        ):
+            planets_we_have_not_found.render(
+                pd.DataFrame(),
+                lambda _data, **_kwargs: events.append("lesson"),
+                terminal_action=lambda: None,
+            )
+
+        panel.assert_not_called()
+        summary.assert_not_called()
+        self.assertEqual(events, ["lesson"])
+
 
 if __name__ == "__main__":
     unittest.main()

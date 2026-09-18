@@ -7,7 +7,11 @@ import streamlit as st
 
 from data import SOLAR_SYSTEM_PLANETS
 from ui_helpers import (
+    curriculum_summary,
+    curriculum_tags,
     facilitator_live_cue,
+    facilitator_notes_enabled,
+    facilitator_panel,
     facilitator_preparation,
     graph_reading_support,
     media_text_pair,
@@ -21,6 +25,14 @@ STEP_LABELS = [
 ]
 YEAR_LEVEL = "Year 10"
 PART_COUNT = len(STEP_LABELS)
+
+STAGE_CURRICULUM_TAGS = {
+    2: (("SC5-DA2-01.L1", "✓"), ("SC5-WS-05.2", "✓")),
+    3: (("SC5-DA2-01.L3", "✓"), ("SC5-DA2-01.L5", "✓"), ("SC5-WS-05.1", "✓")),
+    4: (("SC5-DA2-01.Q4", "✓"), ("SC5-DA2-01.Q5", "✓"), ("SC5-WS-05.4", "✓")),
+    7: (("SC5-DA2-01.L5", "✓"), ("SC5-WS-06.2", "✓"), ("SC5-WS-06.7", "✓")),
+    8: (("SC5-DA2-01.Q6", "✓"), ("SC5-WS-06.6", "✓"), ("SC5-WS-07.6", "✓"), ("SC5-WS-08.1", "✓")),
+}
 
 YEAR10_PREPARATION = """
 ### The two-lesson journey
@@ -112,14 +124,27 @@ def render_facilitator_support(part: int) -> None:
             STAGE_PREPARATION[part],
             key=f"year10_stage_{part}",
         )
+    curriculum_tags(
+        STAGE_CURRICULUM_TAGS.get(part, ()),
+        key=f"year10_stage_{part}",
+    )
 
 
 def render(data, implementation, terminal_action):
-    facilitator_preparation(
-        YEAR10_PREPARATION,
-        key="year10_orientation",
-        title="For facilitators — The Planets We Haven’t Found",
-    )
+    if facilitator_notes_enabled():
+        with facilitator_panel(
+            "year10_orientation",
+            title="For facilitators — The Planets We Haven’t Found",
+        ):
+            curriculum_summary(
+                "NSW curriculum — Stage 5 Data Science 2",
+                "SC5-DA2-01",
+                "Learners use a large scientific dataset to make and test a provisional claim, analyse patterns across "
+                "multiple representations, investigate how discovery methods shape the observed sample, synthesise "
+                "evidence and evaluate uncertainty before revising or qualifying their conclusion.",
+                detailed_content_note=True,
+            )
+            st.markdown(YEAR10_PREPARATION)
     return implementation(
         data,
         terminal_action=terminal_action,
