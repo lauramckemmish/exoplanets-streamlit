@@ -42,6 +42,7 @@ from experiences import (
     planets_we_have_not_found,
     catalog,
     landing,
+    portfolio,
     planet_shopping,
     router,
     strange_new_worlds,
@@ -201,6 +202,15 @@ def render_demographics(data: pd.DataFrame, source) -> None:
 
 if "experience" not in st.session_state:
     st.session_state["experience"] = "Introduction"
+
+# A portable launch is translated once into the established session-state
+# router.  Removing only this parameter lets later sidebar and landing-page
+# navigation behave exactly as it does for a normal visit.
+public_experience_id = st.query_params.get(portfolio.PUBLIC_QUERY_PARAMETER)
+if public_experience_id is not None:
+    if not router.select_portfolio_experience(public_experience_id):
+        router.select_experience("Introduction")
+    del st.query_params[portfolio.PUBLIC_QUERY_PARAMETER]
 
 enabled_app_experiences = set(catalog.enabled_app_experience_names())
 if (

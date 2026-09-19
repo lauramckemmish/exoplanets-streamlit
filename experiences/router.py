@@ -3,6 +3,7 @@
 import streamlit as st
 
 from experiences import catalog
+from experiences import portfolio
 
 
 def reset_navigation() -> None:
@@ -60,6 +61,28 @@ def select_explore_resource(name: str) -> None:
 def open_explore_resource(name: str) -> None:
     """Open an Explore resource from the Introduction catalogue."""
     select_explore_resource(name)
+
+
+def select_portfolio_experience(experience_id: str) -> bool:
+    """Launch one stable public experience ID through existing local routing.
+
+    ``False`` leaves the caller free to use the normal Introduction fallback
+    for absent, malformed, disabled, or no-longer-published public IDs.
+    """
+    destination = portfolio.destination_for_id(experience_id)
+    if destination is None:
+        return False
+    if destination.collection == "experience":
+        if catalog.get_experience(destination.catalogue_name) is None:
+            return False
+        select_catalog_experience(destination.catalogue_name)
+        return True
+    if destination.collection == "explore":
+        if catalog.get_explore_resource(destination.catalogue_name) is None:
+            return False
+        select_explore_resource(destination.catalogue_name)
+        return True
+    return False
 
 
 def is_catalog_experience_selected(name: str) -> bool:
