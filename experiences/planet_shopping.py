@@ -71,6 +71,7 @@ _COMBINE_DISTANCE_CONTROL_KEY = "planet_shopping_combine_distance_control_ly"
 _COMBINE_TEMPERATURE_CONTROL_KEY = "planet_shopping_combine_temperature_control_c"
 _COMBINE_UNKNOWN_CONTROL_KEY = "planet_shopping_combine_unknown_temperature_control"
 _COMBINE_REVEAL_KEY = "planet_shopping_combine_result_revealed"
+_COMBINE_GUESS_KEY = "planet_shopping_combine_overlap_guess"
 _COMBINE_DESTINATION_KEY = "planet_shopping_combine_destination"
 _DESTINATION_CONTROL_KEY = "planet_shopping_destination_control"
 _APPLIED_DESTINATION_KEY = "planet_shopping_applied_destination"
@@ -807,6 +808,15 @@ def _render_combine(data: pd.DataFrame) -> None:
     if not st.session_state.get(_COMBINE_REVEAL_KEY, False):
         _render_overlap_visual(len(distance_matches), len(temperature_matches))
     predict_prompt("How many planets do you think are in both groups?")
+    # A prediction is optional input: it never gates the reveal or Continue.
+    st.number_input(
+        "Your guess: how many planets are in both groups?",
+        min_value=0,
+        step=1,
+        value=None,
+        placeholder="Type a number",
+        key=_COMBINE_GUESS_KEY,
+    )
     if not hard_reveal(
         "",
         _COMBINE_REVEAL_KEY,
