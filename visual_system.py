@@ -406,3 +406,66 @@ def apply_visual_system() -> None:
         """,
         unsafe_allow_html=True,
     )
+
+
+TYPOGRAPHY_TOKENS = {
+    "heading_font": "'Titillium Web'",
+    "heading_weight": "700",
+    "body_font_fallback": "'Source Sans', 'Source Sans Pro', sans-serif",
+    "learner_min_size": "1rem",
+    "facilitator_min_size": "0.875rem",
+}
+_HEADING_FONT_URL = "https://fonts.googleapis.com/css2?family=Titillium+Web:wght@700&display=swap"
+
+
+def apply_typography(scope_key: str) -> None:
+    """Apply bold headings and minimum text sizes only while ``scope_key`` is on the page.
+
+    Typography is opt-in per experience. The experience renders this marker
+    container once; the styles apply to the main content area only while the
+    marker exists, so other experiences keep their current appearance.
+    """
+
+    heading_font = TYPOGRAPHY_TOKENS["heading_font"]
+    fallback = TYPOGRAPHY_TOKENS["body_font_fallback"]
+    weight = TYPOGRAPHY_TOKENS["heading_weight"]
+    learner = TYPOGRAPHY_TOKENS["learner_min_size"]
+    facilitator = TYPOGRAPHY_TOKENS["facilitator_min_size"]
+    scope = f'[data-testid="stMain"]:has(.st-key-{scope_key})'
+    with st.container(key=scope_key):
+        st.markdown(
+            f"""
+            <style>
+            @import url('{_HEADING_FONT_URL}');
+            {scope} h1, {scope} h2, {scope} h3, {scope} h4 {{
+                font-family: {heading_font}, {fallback};
+                font-weight: {weight};
+            }}
+            {scope} h1 *, {scope} h2 *, {scope} h3 *, {scope} h4 * {{ font-weight: {weight}; }}
+            /* Learner-facing text: nothing smaller than body size. */
+            {scope} [data-testid="stCaptionContainer"],
+            {scope} [data-testid="stCaptionContainer"] p,
+            {scope} [data-testid="stTabs"] [role="tab"] p,
+            {scope} [data-testid="stWidgetLabel"] p,
+            {scope} [data-testid="stButton"] button p,
+            {scope} [data-testid="stSlider"] p,
+            {scope} [data-testid="stRadio"] p,
+            {scope} [data-testid="stCheckbox"] p,
+            {scope} [data-testid="stMetricLabel"] p,
+            {scope} [data-testid="stSliderTickBarMin"],
+            {scope} [data-testid="stSliderTickBarMax"],
+            {scope} [data-testid="stExpander"] summary p,
+            {scope} [class*="st-key-hard_reveal_"] .interaction-marker,
+            {scope} [class*="_prompt"] .cognitive-prompt__label {{ font-size: {learner}; }}
+            /* Facilitator-only text: smaller is allowed, but not tiny. */
+            {scope} .facilitator-live__label,
+            {scope} .curriculum-summary__outcome,
+            {scope} .curriculum-summary__note,
+            {scope} .curriculum-summary__body,
+            {scope} .curriculum-summary p,
+            {scope} .curriculum-tags {{ font-size: {facilitator}; }}
+            {scope} .curriculum-summary__outcome span {{ font-size: 1em; }}
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
