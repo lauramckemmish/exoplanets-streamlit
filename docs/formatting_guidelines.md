@@ -68,3 +68,36 @@ Constants (fonts, weight, size floors) live in `TYPOGRAPHY_TOKENS` in
 `curious_online_style.md` does not currently specify fonts or text-size floors,
 so this entry adds to it rather than overriding it. If the rule is rolled out to
 all experiences, a short pointer to this section should be added to that file.
+
+---
+
+## 2. Emoji and icons
+
+**Status:** ADOPTED in Planet Shopping · ROLLOUT PENDING for other experiences  
+**Scope:** local to each experience. Planet Shopping implements it with `_render_icon_marker()` in `experiences/planet_shopping.py`; this is not yet a shared helper.
+
+### Rules
+
+1. **No emoji in titles.** Stage titles and other headings are plain text (for example `Combine`, not `🛒 Combine`).
+2. **Where an emoji remains in body content, it is a margin marker, not inline text.** It sits in its own narrow column to the left, like a bullet or dot point, and the text aligns beside it. No line of text begins with an emoji character.
+3. **Text carries the meaning.** The emoji is decorative and hidden from assistive technology; never rely on it alone to convey information.
+4. **Group text with its marker.** A marker applies to a whole group (for example label, value and interpretation in a planet profile property), not to each line.
+
+### Why
+
+An emoji at the very start of a heading or line is one of the most recognisable signs of generated, templated text. A consistent margin marker keeps the visual cue learners like without that pattern, and keeps the text edge clean.
+
+### How it is built in Planet Shopping
+
+| Where | Approach |
+| --- | --- |
+| Stage titles | Emoji removed from the `st.subheader()` text. |
+| Planet profile properties (Temperature, Distance, Size, Stars, Year length) | `_render_planet_property()` renders the emoji in a left column and the three text lines beside it. |
+| Distance travel-time line | `_render_icon_marker("✈️", …, note=True)`: same marker, slightly muted text. |
+| Temperature choice buttons (Take the risk / Play it safe) | They stay native Streamlit buttons so their behaviour is unchanged. The emoji is added by CSS as a `::before` marker on each button (with an empty alt text so screen readers skip it) and is not part of the button label. |
+
+Marker size is 1.45rem in a 1.9rem column with a 0.7rem gap. If other experiences adopt the rule, reuse these values so markers look the same everywhere.
+
+### Out of scope
+
+The sidebar (experience list and its icons) belongs to shared navigation and is not edited as part of Planet Shopping work. Facilitator and shared-helper labels such as `👀 Read the graph` live in shared code and are left alone until a shared decision is made.
