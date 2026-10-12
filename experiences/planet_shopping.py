@@ -274,17 +274,38 @@ def _year_profile(value) -> tuple[str, str]:
     return duration, interpretation
 
 
-def _render_planet_property(icon: str, label: str, value, formatter: callable) -> None:
-    """Show one profile property with its icon as a margin marker, not inline text."""
-    display_value, interpretation = _planet_display_value(value, formatter)
+_ICON_MARKER_STYLE = (
+    "<style>"
+    ".icon-marker { display: flex; align-items: flex-start; gap: 0.7rem; margin: 0 0 0.9rem; }"
+    ".icon-marker__icon { flex: 0 0 1.9rem; font-size: 1.45rem; line-height: 1.3; text-align: center; }"
+    ".icon-marker__text { min-width: 0; line-height: 1.35; }"
+    ".icon-marker--note .icon-marker__text { opacity: 0.75; }"
+    "</style>"
+)
+
+
+def _render_icon_marker(icon: str, text_html: str, *, note: bool = False) -> None:
+    """Show text with its emoji as a margin marker (like a bullet), never inline.
+
+    ``text_html`` must already be escaped. The emoji is decorative: the text
+    carries the meaning, so it is hidden from assistive technology.
+    """
+    modifier = " icon-marker--note" if note else ""
     st.markdown(
-        "<div class='planet-property'>"
-        f"<span class='planet-property__icon' aria-hidden='true'>{icon}</span>"
-        "<div class='planet-property__text'>"
-        f"<strong>{escape(label)}</strong><br><strong>{escape(str(display_value))}</strong><br>"
-        f"<em>{escape(str(interpretation))}</em>"
-        "</div></div>",
+        _ICON_MARKER_STYLE
+        + f"<div class='icon-marker{modifier}'>"
+        f"<span class='icon-marker__icon' aria-hidden='true'>{icon}</span>"
+        f"<div class='icon-marker__text'>{text_html}</div></div>",
         unsafe_allow_html=True,
+    )
+
+
+def _render_planet_property(icon: str, label: str, value, formatter: callable) -> None:
+    display_value, interpretation = _planet_display_value(value, formatter)
+    _render_icon_marker(
+        icon,
+        f"<strong>{escape(label)}</strong><br><strong>{escape(str(display_value))}</strong><br>"
+        f"<em>{escape(str(interpretation))}</em>",
     )
 
 
@@ -581,10 +602,17 @@ def _render_temperature(data: pd.DataFrame) -> None:
                 "planet_shopping_temperature_play_safe",
             ),
         )
+        marker_css = "".join(
+            f".st-key-{key_prefix}_button button::before {{"
+            f' content: "{icon}"; content: "{icon}" / ""; flex: 0 0 1.9rem; align-self: flex-start;'
+            " font-size: 1.45rem; line-height: 1.3; text-align: center; margin-right: 0.7rem; }"
+            for _, _, icon, _, _, key_prefix in choices
+        )
+        st.markdown(f"<style>{marker_css}</style>", unsafe_allow_html=True)
         for card, option, icon, title, consequence, key_prefix in choices:
             selected = unknown_decision == option
             with card:
-                button_label = f"{icon} **{title}**\n{consequence}"
+                button_label = f"**{title}**\n{consequence}"
                 if selected:
                     button_label += "\n✓ Selected"
                 st.button(
@@ -652,14 +680,6 @@ def _render_planet_profile(planet_name: str, planet: pd.Series) -> None:
             )
             st.caption("Symbolic data portrait — colour and size are not to scale.")
     with details:
-        st.markdown(
-            "<style>"
-            ".planet-property { display: flex; align-items: flex-start; gap: 0.7rem; margin: 0 0 0.9rem; }"
-            ".planet-property__icon { flex: 0 0 1.9rem; font-size: 1.45rem; line-height: 1.3; text-align: center; }"
-            ".planet-property__text { min-width: 0; line-height: 1.35; }"
-            "</style>",
-            unsafe_allow_html=True,
-        )
         st.markdown("#### Planet profile")
         top_left, top_right = st.columns(2)
         with top_left:
@@ -754,8 +774,11 @@ def _render_distance(data: pd.DataFrame) -> None:
 
     distance_filtered = _filter_distance_light_years(distance_population, distance_limit_ly)
     st.metric(f"Possible planets within {distance_limit_ly:,} light-years", f"{len(distance_filtered):,}")
-    st.caption(
-        f"✈️ At passenger-plane speed: ~{_format_travel_years(_passenger_plane_travel_years(distance_limit_ly))}"
+    _render_icon_marker(
+        "✈️",
+        "At passenger-plane speed: "
+        f"~{escape(_format_travel_years(_passenger_plane_travel_years(distance_limit_ly)))}",
+        note=True,
     )
 
 
