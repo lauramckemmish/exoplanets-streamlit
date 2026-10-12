@@ -4,6 +4,7 @@ See ``planet_shopping.md`` for the established pedagogical design.
 """
 
 from datetime import date
+from html import escape
 from pathlib import Path
 import random
 
@@ -273,9 +274,18 @@ def _year_profile(value) -> tuple[str, str]:
     return duration, interpretation
 
 
-def _render_planet_property(label: str, value, formatter: callable) -> None:
+def _render_planet_property(icon: str, label: str, value, formatter: callable) -> None:
+    """Show one profile property with its icon as a margin marker, not inline text."""
     display_value, interpretation = _planet_display_value(value, formatter)
-    st.markdown(f"**{label}**  \n**{display_value}**  \n*{interpretation}*")
+    st.markdown(
+        "<div class='planet-property'>"
+        f"<span class='planet-property__icon' aria-hidden='true'>{icon}</span>"
+        "<div class='planet-property__text'>"
+        f"<strong>{escape(label)}</strong><br><strong>{escape(str(display_value))}</strong><br>"
+        f"<em>{escape(str(interpretation))}</em>"
+        "</div></div>",
+        unsafe_allow_html=True,
+    )
 
 
 def _split_temperature_groups(
@@ -470,7 +480,7 @@ def _render_overlap_visual(
 
 def _render_temperature(data: pd.DataFrame) -> None:
     """Render the independent temperature criterion and missing-data decision."""
-    st.subheader("🌡️ Temperature")
+    st.subheader("Temperature")
     curriculum_tags(
         [("SC5-DA2-01.L3", "✓"), ("SC5-WS-06.7", "◐")],
         key="planet_shopping_temperature",
@@ -589,7 +599,7 @@ def _render_temperature(data: pd.DataFrame) -> None:
 
 
 def _render_launch(data: pd.DataFrame) -> None:
-    st.subheader("🚀 Launch")
+    st.subheader("Launch")
     with st.container(width=960):
         role_image(
             WELCOME_HOOK_IMAGE_PATH,
@@ -642,19 +652,27 @@ def _render_planet_profile(planet_name: str, planet: pd.Series) -> None:
             )
             st.caption("Symbolic data portrait — colour and size are not to scale.")
     with details:
+        st.markdown(
+            "<style>"
+            ".planet-property { display: flex; align-items: flex-start; gap: 0.7rem; margin: 0 0 0.9rem; }"
+            ".planet-property__icon { flex: 0 0 1.9rem; font-size: 1.45rem; line-height: 1.3; text-align: center; }"
+            ".planet-property__text { min-width: 0; line-height: 1.35; }"
+            "</style>",
+            unsafe_allow_html=True,
+        )
         st.markdown("#### Planet profile")
         top_left, top_right = st.columns(2)
         with top_left:
-            _render_planet_property("🌡️ Temperature", planet["pl_eqt"], _temperature_profile)
-            _render_planet_property("🚀 Distance", planet["sy_dist"], _distance_profile)
-            _render_planet_property("🌍 Size", planet["pl_rade"], _size_profile)
+            _render_planet_property("🌡️", "Temperature", planet["pl_eqt"], _temperature_profile)
+            _render_planet_property("🚀", "Distance", planet["sy_dist"], _distance_profile)
+            _render_planet_property("🌍", "Size", planet["pl_rade"], _size_profile)
         with top_right:
-            _render_planet_property("☀️ Stars in the system", planet["sy_snum"], _stars_profile)
-            _render_planet_property("📅 Year length", planet["pl_orbper"], _year_profile)
+            _render_planet_property("☀️", "Stars in the system", planet["sy_snum"], _stars_profile)
+            _render_planet_property("📅", "Year length", planet["pl_orbper"], _year_profile)
 
 
 def _render_meet_your_planet(data: pd.DataFrame) -> None:
-    st.subheader("🛰️ Meet a Planet")
+    st.subheader("Meet a Planet")
     st.write("**Pick a planet. Any planet.**")
     if _BROWSED_PLANET_KEY not in st.session_state:
         st.session_state[_BROWSED_PLANET_KEY] = _random_planet_name(data)
@@ -710,7 +728,7 @@ def _render_meet_your_planet(data: pd.DataFrame) -> None:
 
 
 def _render_distance(data: pd.DataFrame) -> None:
-    st.subheader("🔎 Distance")
+    st.subheader("Distance")
     curriculum_tags(
         [("SC5-DA2-01.L3", "✓"), ("SC5-WS-05.2", "✓")],
         key="planet_shopping_distance",
@@ -742,7 +760,7 @@ def _render_distance(data: pd.DataFrame) -> None:
 
 
 def _render_combine(data: pd.DataFrame) -> None:
-    st.subheader("🛒 Combine")
+    st.subheader("Combine")
     curriculum_tags(
         [("SC5-DA2-01.L5", "✓"), ("SC5-WS-06.7", "◐")],
         key="planet_shopping_combine",
@@ -833,7 +851,7 @@ def _render_combine(data: pd.DataFrame) -> None:
 
 
 def _render_destination(data: pd.DataFrame) -> None:
-    st.subheader("🪐 Choose Your Destination")
+    st.subheader("Choose Your Destination")
     curriculum_tags(
         [("SC5-DA2-01.X1", "✓"), ("SC5-WS-06.5", "✓")],
         key="planet_shopping_destination",
@@ -1051,7 +1069,7 @@ def _render_destination(data: pd.DataFrame) -> None:
 
 
 def _render_data_science() -> None:
-    st.subheader("💡 Data Science")
+    st.subheader("Data Science")
     curriculum_tags([("SC5-DA2-01.L2", "◐")], key="planet_shopping_data_science")
     st.write("So why did we call this a shopping expedition?")
     with st.container(width=720):
