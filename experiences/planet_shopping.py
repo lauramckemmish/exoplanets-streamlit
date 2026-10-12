@@ -629,6 +629,14 @@ def _render_planet_profile(planet_name: str, planet: pd.Series) -> None:
     st.markdown(
         "<style>"
         ".st-key-planet_shopping_profile { width: 100%; max-width: 56rem; margin-left: auto; margin-right: auto; }"
+        # With the default 300px sidebar open, centre on the whole window rather than the content area
+        # (sidebar 300px + 80px page padding = 380px). Narrower windows fall back to the rule above.
+        "@media (min-width: 1200px) {"
+        ' [data-testid="stApp"]:has([data-testid="stSidebar"][aria-expanded="true"]) .st-key-planet_shopping_profile {'
+        " --profile-width: min(56rem, calc(100vw - 760px));"
+        " width: var(--profile-width); max-width: none;"
+        " margin-left: calc(50vw - 380px - var(--profile-width) / 2); margin-right: 0; }"
+        "}"
         "</style>",
         unsafe_allow_html=True,
     )
