@@ -42,7 +42,7 @@ to Planet Shopping only; other experiences not yet changed).
 ### Notes and decisions
 
 - Fonts tried: Titillium Web (Light 300, then Regular 400) and Tomorrow. Light was too thin at 16px. Tomorrow was chosen for its sci-fi character.
-- Tomorrow is wide and squared, so lines wrap sooner than in Source Sans (the Planet Shopping title now takes two lines). Check long facilitator notes and narrow screens when rolling out.
+- Tomorrow is wide and squared, so lines wrap sooner than in Source Sans on narrow windows. Check long facilitator notes and narrow screens when rolling out.
 - The weight is `body_weight` in `TYPOGRAPHY_TOKENS`; the family is `heading_font`.
 - ESA's own heading typeface (*Notes ESA*) is proprietary to ESA and is not used.
   Tomorrow is a free font and is not a copy of ESA's typeface.
