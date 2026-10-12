@@ -25,7 +25,7 @@ to Planet Shopping only; other experiences not yet changed).
 | Element | Rule |
 | --- | --- |
 | Headings (`st.header`, `st.subheader`, title, raw `h1`–`h4`) | **Titillium Web, bold (700)**. Chosen to echo the bold, slightly squared headings on the European Space Agency home page. |
-| Body text | **Titillium Web Light (300)**, so headings and body share one family. Bold text inside body copy (`**…**`) is semi-bold (600). Icon fonts are not touched. |
+| Body text | **Titillium Web Regular (400)**, so headings and body share one family. Bold text inside body copy (`**…**`) is semi-bold (600). Icon fonts are not touched. |
 | Learner-facing text (captions, tab labels, widget and slider labels, slider values, radio and checkbox options, button text, metric labels, expander titles, prompt/reveal labels) | **Minimum 16px (1rem)**, the same as body text. |
 | Facilitator-only text (curriculum summary and tags, live-cue labels) | **Minimum 14px (0.875rem)**. Previously as small as about 11px. |
 
@@ -41,7 +41,7 @@ to Planet Shopping only; other experiences not yet changed).
 
 ### Notes and decisions
 
-- Light weight at 16px is thin, especially on a projector or in bright rooms. If it reads poorly in delivery, raise `body_weight` in `TYPOGRAPHY_TOKENS` to 400 rather than abandoning the font.
+- Light (300) was tried first and judged too thin at 16px, so body text uses Regular (400). The weight is `body_weight` in `TYPOGRAPHY_TOKENS`.
 - ESA's own heading typeface (*Notes ESA*) is proprietary to ESA and is not used.
   Titillium Web is a free substitute.
 - The font is loaded from Google Fonts (`@import` in `apply_typography`).

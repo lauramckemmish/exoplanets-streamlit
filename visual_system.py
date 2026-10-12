@@ -412,7 +412,7 @@ TYPOGRAPHY_TOKENS = {
     "heading_font": "'Titillium Web'",
     "heading_weight": "700",
     "body_font_fallback": "'Source Sans', 'Source Sans Pro', sans-serif",
-    "body_weight": "300",
+    "body_weight": "400",
     "body_strong_weight": "600",
     "learner_min_size": "1rem",
     "facilitator_min_size": "0.875rem",
