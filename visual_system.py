@@ -412,10 +412,12 @@ TYPOGRAPHY_TOKENS = {
     "heading_font": "'Titillium Web'",
     "heading_weight": "700",
     "body_font_fallback": "'Source Sans', 'Source Sans Pro', sans-serif",
+    "body_weight": "300",
+    "body_strong_weight": "600",
     "learner_min_size": "1rem",
     "facilitator_min_size": "0.875rem",
 }
-_HEADING_FONT_URL = "https://fonts.googleapis.com/css2?family=Titillium+Web:wght@700&display=swap"
+_HEADING_FONT_URL = "https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700&display=swap"
 
 
 def apply_typography(scope_key: str) -> None:
@@ -429,6 +431,8 @@ def apply_typography(scope_key: str) -> None:
     heading_font = TYPOGRAPHY_TOKENS["heading_font"]
     fallback = TYPOGRAPHY_TOKENS["body_font_fallback"]
     weight = TYPOGRAPHY_TOKENS["heading_weight"]
+    body_weight = TYPOGRAPHY_TOKENS["body_weight"]
+    strong_weight = TYPOGRAPHY_TOKENS["body_strong_weight"]
     learner = TYPOGRAPHY_TOKENS["learner_min_size"]
     facilitator = TYPOGRAPHY_TOKENS["facilitator_min_size"]
     scope = f'[data-testid="stMain"]:has(.st-key-{scope_key})'
@@ -442,6 +446,14 @@ def apply_typography(scope_key: str) -> None:
                 font-weight: {weight};
             }}
             {scope} h1 *, {scope} h2 *, {scope} h3 *, {scope} h4 * {{ font-weight: {weight}; }}
+            /* Body text: Titillium Web Light. Targeted, so icon fonts are untouched. */
+            {scope} p, {scope} li, {scope} summary, {scope} label,
+            {scope} [data-testid="stCaptionContainer"],
+            {scope} [data-testid="stMetricValue"], {scope} [data-testid="stMetricLabel"] {{
+                font-family: {heading_font}, {fallback};
+                font-weight: {body_weight};
+            }}
+            {scope} p strong, {scope} li strong, {scope} p b, {scope} li b {{ font-weight: {strong_weight}; }}
             /* Learner-facing text: nothing smaller than body size. */
             {scope} [data-testid="stCaptionContainer"],
             {scope} [data-testid="stCaptionContainer"] p,
