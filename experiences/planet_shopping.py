@@ -628,18 +628,17 @@ def _render_planet_profile(planet_name: str, planet: pd.Series) -> None:
     planet_size, planet_colour, colour_description = _planet_visual_style(planet)
     st.markdown(
         "<style>"
-        # Two equal columns sized so the portrait box is as wide as it was in the original 1:2 layout (one third of
-        # the content width): 2/3 of the container plus half a column gap.
-        ".st-key-planet_shopping_profile { width: calc(66.667% + 5.33px); margin-left: auto; margin-right: auto; }"
-        # With the default 300px sidebar open, centre on the whole window rather than the content area
-        # (sidebar 300px + 80px page padding = 380px), nudged 100px right of true window centre because exact
-        # centring looked too far left beside the left-aligned title. Narrower windows fall back to the rule above.
-        "@media (min-width: 1200px) {"
+        # Fixed-size block: two equal columns (portrait box + profile), 478px each with a 16px gap, as the
+        # portrait box was in the original layout on a wide monitor. It only shrinks ("squishes") once the
+        # content area is narrower than the block.
+        ".st-key-planet_shopping_profile { --profile-width: min(972px, 100%);"
+        " width: var(--profile-width); margin-left: auto; margin-right: auto; }"
+        # With the default 300px sidebar open, the block's midpoint sits 100px right of the window centre
+        # (sidebar 300px + 80px page padding = 380px). The space either side is whatever is left: as the
+        # window narrows it shrinks, down to zero on the left or right, rather than resizing the block.
         ' [data-testid="stApp"]:has([data-testid="stSidebar"][aria-expanded="true"]) .st-key-planet_shopping_profile {'
-        " --profile-width: calc(66.667% + 5.33px);"
-        " width: var(--profile-width);"
-        " margin-left: calc(50vw - 380px + 100px - var(--profile-width) / 2); margin-right: 0; }"
-        "}"
+        " margin-left: clamp(0px, calc(50vw - 280px - var(--profile-width) / 2), calc(100% - var(--profile-width)));"
+        " margin-right: 0; }"
         "</style>",
         unsafe_allow_html=True,
     )
