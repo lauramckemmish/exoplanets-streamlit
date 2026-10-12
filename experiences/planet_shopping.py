@@ -628,15 +628,17 @@ def _render_planet_profile(planet_name: str, planet: pd.Series) -> None:
     planet_size, planet_colour, colour_description = _planet_visual_style(planet)
     st.markdown(
         "<style>"
-        ".st-key-planet_shopping_profile { width: 100%; max-width: 56rem; margin-left: auto; margin-right: auto; }"
+        # Two equal columns sized so the portrait box is as wide as it was in the original 1:2 layout (one third of
+        # the content width): 2/3 of the container plus half a column gap.
+        ".st-key-planet_shopping_profile { width: calc(66.667% + 5.33px); margin-left: auto; margin-right: auto; }"
         # With the default 300px sidebar open, centre on the whole window rather than the content area
-        # (sidebar 300px + 80px page padding = 380px), nudged 60px right of true window centre because exact
+        # (sidebar 300px + 80px page padding = 380px), nudged 100px right of true window centre because exact
         # centring looked too far left beside the left-aligned title. Narrower windows fall back to the rule above.
         "@media (min-width: 1200px) {"
         ' [data-testid="stApp"]:has([data-testid="stSidebar"][aria-expanded="true"]) .st-key-planet_shopping_profile {'
-        " --profile-width: min(56rem, calc(100vw - 760px));"
-        " width: var(--profile-width); max-width: none;"
-        " margin-left: calc(50vw - 380px + 60px - var(--profile-width) / 2); margin-right: 0; }"
+        " --profile-width: calc(66.667% + 5.33px);"
+        " width: var(--profile-width);"
+        " margin-left: calc(50vw - 380px + 100px - var(--profile-width) / 2); margin-right: 0; }"
         "}"
         "</style>",
         unsafe_allow_html=True,
