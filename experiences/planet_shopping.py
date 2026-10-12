@@ -628,12 +628,12 @@ def _render_planet_profile(planet_name: str, planet: pd.Series) -> None:
     planet_size, planet_colour, colour_description = _planet_visual_style(planet)
     st.markdown(
         "<style>"
-        ".st-key-planet_shopping_profile { width: 100%; max-width: 46rem; margin-left: auto; margin-right: auto; }"
+        ".st-key-planet_shopping_profile { width: 100%; max-width: 56rem; margin-left: auto; margin-right: auto; }"
         "</style>",
         unsafe_allow_html=True,
     )
     with st.container(key="planet_shopping_profile"):
-        portrait, details = st.columns([1, 2])
+        portrait, details = st.columns(2)
         with portrait:
             with st.container(border=True):
                 st.markdown("#### Planet portrait")
