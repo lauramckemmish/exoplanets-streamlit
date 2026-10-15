@@ -4,6 +4,7 @@ See ``planet_shopping.md`` for the established pedagogical design.
 """
 
 from datetime import date
+from html import escape
 from pathlib import Path
 import random
 
@@ -11,6 +12,7 @@ import pandas as pd
 import streamlit as st
 
 from data import PARSEC_TO_LIGHT_YEARS
+from visual_system import apply_typography
 from charts import sky_map
 from ui_helpers import (
     completion_gate,
@@ -272,9 +274,39 @@ def _year_profile(value) -> tuple[str, str]:
     return duration, interpretation
 
 
-def _render_planet_property(label: str, value, formatter: callable) -> None:
+_ICON_MARKER_STYLE = (
+    "<style>"
+    ".icon-marker { display: flex; align-items: flex-start; gap: 0.7rem; margin: 0 0 0.9rem; }"
+    ".icon-marker__icon { flex: 0 0 1.9rem; font-size: 1.45rem; line-height: 1.3; text-align: center; }"
+    ".icon-marker__text { min-width: 0; line-height: 1.35; }"
+    ".icon-marker--note .icon-marker__text { opacity: 0.75; }"
+    "</style>"
+)
+
+
+def _render_icon_marker(icon: str, text_html: str, *, note: bool = False) -> None:
+    """Show text with its emoji as a margin marker (like a bullet), never inline.
+
+    ``text_html`` must already be escaped. The emoji is decorative: the text
+    carries the meaning, so it is hidden from assistive technology.
+    """
+    modifier = " icon-marker--note" if note else ""
+    st.markdown(
+        _ICON_MARKER_STYLE
+        + f"<div class='icon-marker{modifier}'>"
+        f"<span class='icon-marker__icon' aria-hidden='true'>{icon}</span>"
+        f"<div class='icon-marker__text'>{text_html}</div></div>",
+        unsafe_allow_html=True,
+    )
+
+
+def _render_planet_property(icon: str, label: str, value, formatter: callable) -> None:
     display_value, interpretation = _planet_display_value(value, formatter)
-    st.markdown(f"**{label}**  \n**{display_value}**  \n*{interpretation}*")
+    _render_icon_marker(
+        icon,
+        f"<strong>{escape(label)}</strong><br><strong>{escape(str(display_value))}</strong><br>"
+        f"<em>{escape(str(interpretation))}</em>",
+    )
 
 
 def _split_temperature_groups(
@@ -469,7 +501,7 @@ def _render_overlap_visual(
 
 def _render_temperature(data: pd.DataFrame) -> None:
     """Render the independent temperature criterion and missing-data decision."""
-    st.subheader("🌡️ Temperature")
+    st.subheader("Temperature")
     curriculum_tags(
         [("SC5-DA2-01.L3", "✓"), ("SC5-WS-06.7", "◐")],
         key="planet_shopping_temperature",
@@ -570,10 +602,17 @@ def _render_temperature(data: pd.DataFrame) -> None:
                 "planet_shopping_temperature_play_safe",
             ),
         )
+        marker_css = "".join(
+            f".st-key-{key_prefix}_button button::before {{"
+            f' content: "{icon}"; content: "{icon}" / ""; flex: 0 0 1.9rem; align-self: flex-start;'
+            " font-size: 1.45rem; line-height: 1.3; text-align: center; margin-right: 0.7rem; }"
+            for _, _, icon, _, _, key_prefix in choices
+        )
+        st.markdown(f"<style>{marker_css}</style>", unsafe_allow_html=True)
         for card, option, icon, title, consequence, key_prefix in choices:
             selected = unknown_decision == option
             with card:
-                button_label = f"{icon} **{title}**\n{consequence}"
+                button_label = f"**{title}**\n{consequence}"
                 if selected:
                     button_label += "\n✓ Selected"
                 st.button(
@@ -588,7 +627,7 @@ def _render_temperature(data: pd.DataFrame) -> None:
 
 
 def _render_launch(data: pd.DataFrame) -> None:
-    st.subheader("🚀 Launch")
+    st.subheader("Launch")
     with st.container(width=960):
         role_image(
             WELCOME_HOOK_IMAGE_PATH,
@@ -644,16 +683,16 @@ def _render_planet_profile(planet_name: str, planet: pd.Series) -> None:
         st.markdown("#### Planet profile")
         top_left, top_right = st.columns(2)
         with top_left:
-            _render_planet_property("🌡️ Temperature", planet["pl_eqt"], _temperature_profile)
-            _render_planet_property("🚀 Distance", planet["sy_dist"], _distance_profile)
-            _render_planet_property("🌍 Size", planet["pl_rade"], _size_profile)
+            _render_planet_property("🌡️", "Temperature", planet["pl_eqt"], _temperature_profile)
+            _render_planet_property("🚀", "Distance", planet["sy_dist"], _distance_profile)
+            _render_planet_property("🌍", "Size", planet["pl_rade"], _size_profile)
         with top_right:
-            _render_planet_property("☀️ Stars in the system", planet["sy_snum"], _stars_profile)
-            _render_planet_property("📅 Year length", planet["pl_orbper"], _year_profile)
+            _render_planet_property("☀️", "Stars in the system", planet["sy_snum"], _stars_profile)
+            _render_planet_property("📅", "Year length", planet["pl_orbper"], _year_profile)
 
 
 def _render_meet_your_planet(data: pd.DataFrame) -> None:
-    st.subheader("🛰️ Meet a Planet")
+    st.subheader("Meet a Planet")
     st.write(
         "**Pick a planet.** Have a look at a few worlds first — "
         f"view at least {_CATALOGUE_BROWSING_MINIMUM} different planets before revealing the catalogue."
@@ -714,7 +753,7 @@ def _render_meet_your_planet(data: pd.DataFrame) -> None:
 
 
 def _render_distance(data: pd.DataFrame) -> None:
-    st.subheader("🔎 Distance")
+    st.subheader("Distance")
     curriculum_tags(
         [("SC5-DA2-01.L3", "✓"), ("SC5-WS-05.2", "✓")],
         key="planet_shopping_distance",
@@ -740,13 +779,16 @@ def _render_distance(data: pd.DataFrame) -> None:
 
     distance_filtered = _filter_distance_light_years(distance_population, distance_limit_ly)
     st.metric(f"Possible planets within {distance_limit_ly:,} light-years", f"{len(distance_filtered):,}")
-    st.caption(
-        f"✈️ At passenger-plane speed: ~{_format_travel_years(_passenger_plane_travel_years(distance_limit_ly))}"
+    _render_icon_marker(
+        "✈️",
+        "At passenger-plane speed: "
+        f"~{escape(_format_travel_years(_passenger_plane_travel_years(distance_limit_ly)))}",
+        note=True,
     )
 
 
 def _render_combine(data: pd.DataFrame) -> None:
-    st.subheader("🛒 Combine")
+    st.subheader("Combine")
     curriculum_tags(
         [("SC5-DA2-01.L5", "✓"), ("SC5-WS-06.7", "◐")],
         key="planet_shopping_combine",
@@ -837,7 +879,7 @@ def _render_combine(data: pd.DataFrame) -> None:
 
 
 def _render_destination(data: pd.DataFrame) -> None:
-    st.subheader("🪐 Choose Your Destination")
+    st.subheader("Choose Your Destination")
     curriculum_tags(
         [("SC5-DA2-01.X1", "✓"), ("SC5-WS-06.5", "✓")],
         key="planet_shopping_destination",
@@ -1055,7 +1097,7 @@ def _render_destination(data: pd.DataFrame) -> None:
 
 
 def _render_data_science() -> None:
-    st.subheader("💡 Data Science")
+    st.subheader("Data Science")
     curriculum_tags([("SC5-DA2-01.L2", "◐")], key="planet_shopping_data_science")
     st.write("So why did we call this a shopping expedition?")
     with st.container(width=720):
@@ -1102,6 +1144,7 @@ def render(data: pd.DataFrame, terminal_action) -> None:
         st.session_state[_STAGE_KEY] = 0
 
     stage = max(0, min(int(st.session_state[_STAGE_KEY]), len(STAGE_LABELS) - 1))
+    apply_typography("planet_shopping_typography")
     st.header(TITLE)
     st.caption(SUBTITLE)
 
