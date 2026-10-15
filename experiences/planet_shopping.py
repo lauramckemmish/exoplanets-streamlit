@@ -597,9 +597,9 @@ def _render_launch(data: pd.DataFrame) -> None:
         '.st-key-planet_shopping_hero_image [data-testid="stElementContainer"]:has(.hero-overlay) {'
         " position: absolute; top: 1.1rem; left: 1.4rem; width: 52%; z-index: 2; }"
         ".hero-overlay { color: #fff; text-shadow: 0 1px 6px rgba(20, 8, 40, 0.75), 0 0 2px rgba(20, 8, 40, 0.6); }"
-        ".hero-overlay__title { margin: 0; color: #FF635D; font-weight: 700; line-height: 1.1;"
+        ".st-key-planet_shopping_hero_image .hero-overlay .hero-overlay__title { margin: 0; color: #FF635D; font-weight: 700; line-height: 1.1;"
         " font-size: clamp(1.4rem, 3.2vw, 2.4rem); text-transform: uppercase; }"
-        ".hero-overlay__text { margin: 0.45rem 0 0; font-size: clamp(1rem, 1.7vw, 1.35rem); line-height: 1.3; }"
+        ".st-key-planet_shopping_hero_image .hero-overlay .hero-overlay__text { margin: 0.45rem 0 0; font-size: clamp(1rem, 1.7vw, 1.35rem); line-height: 1.3; }"
         ".st-key-planet_shopping_mission_box { border: 2px solid rgba(255, 220, 0, 0.7); border-radius: 1.25rem;"
         " padding: 1.2rem 1.4rem; }"
         ".st-key-planet_shopping_mission_box h4 { margin: 0 0 0.6rem; letter-spacing: 0.06em; }"
