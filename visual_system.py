@@ -505,8 +505,7 @@ def apply_section_spacing(scope_key: str) -> None:
             f"""
             <style>
             {flow} > [data-testid="stElementContainer"]:has(h4) {{ margin-top: {space}; }}
-            {flow} > [class*="st-key-hard_reveal_"]:has(.interaction-marker),
-            {flow} > [data-testid="stElementContainer"]:has([class*="st-key-hard_reveal_"] .interaction-marker) {{ margin-top: {space}; }}
+            {flow} > [data-testid="stLayoutWrapper"]:has(> [class*="st-key-hard_reveal_"] .interaction-marker) {{ margin-top: {space}; }}
             </style>
             """,
             unsafe_allow_html=True,
