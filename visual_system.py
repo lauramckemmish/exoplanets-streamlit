@@ -487,9 +487,9 @@ SLIDER_TOKENS = {
     "track_height": "7px",  # Streamlit default: 4px
     "thumb_size": "19px",  # Streamlit default: 12px
     "value_size": "1.1rem",  # Streamlit default: 1rem
-    "value_lift": "-35px",  # Moves the value above the larger thumb (default: -22px)
-    "group_height": "54px",  # Leaves room for the larger thumb and value (default: 40px)
-    "group_top_space": "30px",  # Keeps the larger value label clear of the slider's own label
+    "value_lift": "-32px",  # Moves the value above the larger thumb (default: -22px)
+    "group_height": "48px",  # Leaves room for the larger thumb and value (default: 40px)
+    "group_top_space": "16px",  # Keeps the larger value label clear of the slider's own label
 }
 
 
