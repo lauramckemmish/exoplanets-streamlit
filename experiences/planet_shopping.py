@@ -79,6 +79,8 @@ _APPLIED_DESTINATION_KEY = "planet_shopping_applied_destination"
 _HABITABILITY_BOUNDARY_REVEAL_KEY = "planet_shopping_habitability_boundary_revealed"
 _SKY_MAP_REVEAL_KEY = "planet_shopping_sky_map_revealed"
 _DESTINATION_SORT_KEY = "planet_shopping_destination_sort"
+_DESTINATION_ORDER_KEY = "planet_shopping_destination_order"
+_DESTINATION_ORDER_OPTIONS = ("Low to high", "High to low")
 _DESTINATION_LIST_LIMIT = 150  # Above this the list is too long to browse; learners narrow their filters first.
 _DESTINATION_LIST_HEIGHT = 640
 _DESTINATION_SORT_OPTIONS = {
@@ -427,17 +429,22 @@ def _candidate_names(candidates: pd.DataFrame) -> list[str]:
     return sorted(candidates.dropna(subset=["pl_name"]).drop_duplicates("pl_name")["pl_name"].astype(str).tolist())
 
 
-def _sort_destination_candidates(candidates: pd.DataFrame, column: str) -> pd.DataFrame:
-    """List each named planet once, lowest value first, with unknown values last.
+def _sort_destination_candidates(
+    candidates: pd.DataFrame, column: str, *, descending: bool = False
+) -> pd.DataFrame:
+    """List each named planet once, ordered by one field, with unknown values always last.
 
-    Ties are broken by name so the order is stable. Unknown is never treated as zero.
+    Ties are broken by name so the order is stable. Unknown is never treated as zero,
+    so it stays at the bottom whether the order is low to high or high to low.
     """
     named = candidates.dropna(subset=["pl_name"]).drop_duplicates("pl_name").copy()
     named["_name"] = named["pl_name"].astype(str)
     if column == "pl_name":
         return named.sort_values("_name").drop(columns="_name")
     named["_value"] = pd.to_numeric(named[column], errors="coerce")
-    return named.sort_values(["_value", "_name"], na_position="last").drop(columns=["_name", "_value"])
+    return named.sort_values(
+        ["_value", "_name"], ascending=[not descending, True], na_position="last"
+    ).drop(columns=["_name", "_value"])
 
 
 def _apply_optional_filter(
@@ -1018,15 +1025,29 @@ def _render_destination(data: pd.DataFrame) -> None:
     if len(names) > _DESTINATION_LIST_LIMIT:
         st.info(
             f"There are {len(names):,} possible destinations, which is too many to look through one by one. "
-            f"Narrow your choices above until there are {_DESTINATION_LIST_LIMIT} or fewer."
+            "Narrow your choices above until the list feels more manageable."
         )
         completion_gate(False)
         return
-    sort_label = st.selectbox("Sort by", list(_DESTINATION_SORT_OPTIONS), key=_DESTINATION_SORT_KEY)
+    sort_choice, order_choice = st.columns([2, 1])
+    with sort_choice:
+        sort_label = st.selectbox("Sort by", list(_DESTINATION_SORT_OPTIONS), key=_DESTINATION_SORT_KEY)
     sort_column = _DESTINATION_SORT_OPTIONS[sort_label]
-    ordered = _sort_destination_candidates(candidates, sort_column)
+    with order_choice:
+        order = st.radio(
+            "Order",
+            _DESTINATION_ORDER_OPTIONS,
+            horizontal=True,
+            disabled=sort_column == "pl_name",
+            key=_DESTINATION_ORDER_KEY,
+        )
+    descending = order == _DESTINATION_ORDER_OPTIONS[1] and sort_column != "pl_name"
+    ordered = _sort_destination_candidates(candidates, sort_column, descending=descending)
     if sort_column != "pl_name":
-        st.caption(f"Lowest {sort_label.lower()} first. Planets with an unknown value are listed last.")
+        st.caption(
+            f"{'Highest' if descending else 'Lowest'} {sort_label.lower()} first. "
+            "Planets with an unknown value are listed last."
+        )
     chosen_name = st.session_state.get(_APPLIED_DESTINATION_KEY)
     unknown_heading_shown = False
     with st.container(height=_DESTINATION_LIST_HEIGHT, border=True, key="planet_shopping_destination_list"):

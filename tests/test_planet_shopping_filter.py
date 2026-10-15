@@ -437,3 +437,17 @@ class DestinationSortTests(unittest.TestCase):
         candidates = pd.DataFrame({"pl_name": ["b", "a", "b", None], "pl_eqt": [1, 2, 3, 4]})
 
         self.assertEqual(_sort_destination_candidates(candidates, "pl_name")["pl_name"].tolist(), ["a", "b"])
+
+    def test_high_to_low_reverses_known_values_but_keeps_unknown_last(self):
+        from experiences.planet_shopping import _sort_destination_candidates
+
+        candidates = pd.DataFrame(
+            {
+                "pl_name": ["Warm", "Unknown", "Cold", "Hot"],
+                "pl_eqt": [300.0, None, 100.0, 900.0],
+            }
+        )
+
+        ordered = _sort_destination_candidates(candidates, "pl_eqt", descending=True)
+
+        self.assertEqual(ordered["pl_name"].tolist(), ["Hot", "Warm", "Cold", "Unknown"])
