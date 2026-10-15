@@ -12,7 +12,7 @@ import pandas as pd
 import streamlit as st
 
 from data import PARSEC_TO_LIGHT_YEARS
-from visual_system import apply_typography
+from visual_system import apply_slider_style, apply_typography
 from charts import sky_map
 from ui_helpers import (
     completion_gate,
@@ -1140,6 +1140,7 @@ def render(data: pd.DataFrame, terminal_action) -> None:
 
     stage = max(0, min(int(st.session_state[_STAGE_KEY]), len(STAGE_LABELS) - 1))
     apply_typography("planet_shopping_typography")
+    apply_slider_style("planet_shopping_sliders")
     st.header(TITLE)
     st.caption(SUBTITLE)
 
