@@ -600,11 +600,28 @@ def _render_launch(data: pd.DataFrame) -> None:
         ".st-key-planet_shopping_hero_image .hero-overlay .hero-overlay__title { margin: 0; color: #FF635D; font-weight: 700; line-height: 1.1;"
         " font-size: clamp(1.4rem, 3.2vw, 2.4rem); text-transform: uppercase; }"
         ".st-key-planet_shopping_hero_image .hero-overlay .hero-overlay__text { margin: 0.45rem 0 0; font-size: clamp(1rem, 1.7vw, 1.35rem); line-height: 1.3; }"
-        ".st-key-planet_shopping_mission_box { border: 2px solid rgba(255, 220, 0, 0.7); border-radius: 1.25rem;"
-        " padding: 1.2rem 1.4rem; }"
-        ".st-key-planet_shopping_mission_box h4 { margin: 0 0 0.6rem; letter-spacing: 0.06em; }"
-        ".st-key-planet_shopping_mission_box ol { margin: 0; padding-left: 1.3rem; }"
-        ".st-key-planet_shopping_mission_box li { margin-bottom: 0.45rem; }"
+        # Mission briefing panel: dark navy like the night sky, UNSW yellow accents, as tall as the image.
+        # The image column is 5/2 times the width of this one, and the image is 1344x924, so an aspect ratio of
+        # 1 : 1.71875 makes this box exactly as tall as the image. On narrow screens the columns stack.
+        ".st-key-planet_shopping_mission_box { position: relative; overflow: hidden; aspect-ratio: 1 / 1.71875;"
+        " border-radius: 1.25rem; background: linear-gradient(165deg, #0d1733 0%, #18214a 60%, #271f4d 100%);"
+        " border: 1px solid rgba(255, 220, 0, 0.35); padding: 1.6rem 1.4rem 1.2rem; color: #fff; }"
+        ".st-key-planet_shopping_mission_box::before { content: ''; position: absolute; top: 0; left: 0; right: 0;"
+        " height: 6px; background: #FFDC00; }"
+        ".st-key-planet_shopping_mission_box > div, .st-key-planet_shopping_mission_box [data-testid='stElementContainer'],"
+        " .st-key-planet_shopping_mission_box [data-testid='stMarkdown'] { height: 100%; }"
+        ".mission { display: flex; flex-direction: column; height: 100%; }"
+        ".st-key-planet_shopping_mission_box .mission__title { margin: 0.4rem 0 0.9rem; padding: 0 0 0.9rem;"
+        " color: #FFDC00; font-size: 1.15rem; font-weight: 700; letter-spacing: 0.16em;"
+        " border-bottom: 1px solid rgba(255, 220, 0, 0.45); }"
+        ".mission__steps { list-style: none; counter-reset: step; margin: 0; padding: 0; flex: 1;"
+        " display: flex; flex-direction: column; justify-content: space-evenly; }"
+        ".mission__steps li { counter-increment: step; display: flex; align-items: center; gap: 0.9rem;"
+        " padding: 0.55rem 0; color: #fff; font-size: 1.1rem; line-height: 1.3; }"
+        ".mission__steps li + li { border-top: 1px solid rgba(255, 255, 255, 0.16); }"
+        ".mission__steps li::before { content: counter(step, decimal-leading-zero); flex: 0 0 auto;"
+        " color: #FFDC00; font-size: 2.1rem; font-weight: 700; line-height: 1; min-width: 2.6rem; }"
+        "@media (max-width: 640px) { .st-key-planet_shopping_mission_box { aspect-ratio: auto; } }"
         "</style>",
         unsafe_allow_html=True,
     )
@@ -626,12 +643,16 @@ def _render_launch(data: pd.DataFrame) -> None:
                 )
         with mission_column:
             with st.container(key="planet_shopping_mission_box"):
-                st.markdown("#### YOUR MISSION")
                 st.markdown(
-                    "1. Explore the data\n"
-                    "2. Set your criteria\n"
-                    "3. Filter the options\n"
-                    "4. Find the best world for our new home"
+                    "<div class='mission'>"
+                    "<h4 class='mission__title'>YOUR MISSION</h4>"
+                    "<ol class='mission__steps'>"
+                    "<li>Explore the data</li>"
+                    "<li>Set your criteria</li>"
+                    "<li>Filter the options</li>"
+                    "<li>Find the best world for our new home</li>"
+                    "</ol></div>",
+                    unsafe_allow_html=True,
                 )
 
     with st.container(width="content"):
