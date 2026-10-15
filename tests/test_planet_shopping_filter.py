@@ -467,3 +467,48 @@ class DestinationSortTests(unittest.TestCase):
 
         self.assertEqual(low_to_high["pl_name"].tolist(), ["Unknown a", "Unknown b", "Cold", "Warm", "Hot"])
         self.assertEqual(high_to_low["pl_name"].tolist(), ["Unknown a", "Unknown b", "Hot", "Warm", "Cold"])
+
+
+class DestinationLongShortlistFallbackTests(unittest.TestCase):
+    def _run(self, limit):
+        from streamlit.testing.v1 import AppTest
+
+        def app():
+            import streamlit as st
+            import data
+            from experiences import planet_shopping as ps
+
+            ps._DESTINATION_LIST_LIMIT = st.session_state.get("limit", 150)
+            if "init" not in st.session_state:
+                st.session_state["init"] = True
+                st.session_state[ps._COMBINE_DISTANCE_CONTROL_KEY] = 2000
+                st.session_state[ps._COMBINE_TEMPERATURE_CONTROL_KEY] = (-200, 2000)
+                st.session_state[ps._COMBINE_UNKNOWN_CONTROL_KEY] = ps._UNKNOWN_TEMPERATURE_OPTIONS[0]
+            ps._render_destination(data.prepare(data.load_sample()))
+
+        at = AppTest.from_function(app, default_timeout=60)
+        at.session_state["limit"] = limit
+        return at.run()
+
+    def test_too_many_planets_still_lets_the_learner_preview_and_choose_one(self):
+        at = self._run(limit=1)
+
+        self.assertFalse(at.exception)
+        self.assertTrue(any("too many to look through one by one" in i.value for i in at.info))
+        self.assertTrue(any("Preview exoplanets one by one" in m.value for m in at.markdown))
+        preview = [s for s in at.selectbox if s.label == "Choose a planet to preview"]
+        self.assertEqual(len(preview), 1)
+
+        preview[0].select(preview[0].options[0]).run()
+        choose = [b for b in at.button if b.label == "Choose this planet"]
+        self.assertEqual(len(choose), 1)
+        choose[0].click().run()
+
+        self.assertTrue(any("Destination chosen" in s.value for s in at.success))
+
+    def test_a_manageable_shortlist_shows_the_sortable_list_and_no_preview_dropdown(self):
+        at = self._run(limit=10_000)
+
+        self.assertFalse(at.exception)
+        self.assertTrue(any(s.label == "Sort by" for s in at.selectbox))
+        self.assertFalse(any(s.label == "Choose a planet to preview" for s in at.selectbox))

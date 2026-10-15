@@ -930,6 +930,90 @@ def _render_combine(data: pd.DataFrame) -> None:
         )
 
 
+def _render_destination_list(candidates: pd.DataFrame) -> None:
+    """Show every possible destination in a sortable scrolling list, each with a choose button."""
+    sort_choice, order_choice, unknown_choice = st.columns([3, 2, 2])
+    with sort_choice:
+        sort_label = st.selectbox("Sort by", list(_DESTINATION_SORT_OPTIONS), key=_DESTINATION_SORT_KEY)
+    sort_column = _DESTINATION_SORT_OPTIONS[sort_label]
+    by_name = sort_column == "pl_name"
+    with order_choice:
+        order = st.radio(
+            "Order",
+            _DESTINATION_ORDER_OPTIONS,
+            horizontal=True,
+            disabled=by_name,
+            key=_DESTINATION_ORDER_KEY,
+        )
+    with unknown_choice:
+        unknown_position = st.radio(
+            "Unknown values",
+            _DESTINATION_UNKNOWN_OPTIONS,
+            horizontal=True,
+            disabled=by_name,
+            key=_DESTINATION_UNKNOWN_KEY,
+        )
+    descending = order == _DESTINATION_ORDER_OPTIONS[1] and not by_name
+    unknowns_first = unknown_position == _DESTINATION_UNKNOWN_OPTIONS[0] and not by_name
+    ordered = _sort_destination_candidates(
+        candidates, sort_column, descending=descending, unknowns_first=unknowns_first
+    )
+    if not by_name:
+        st.caption(
+            f"{'Highest' if descending else 'Lowest'} {sort_label.lower()} first. "
+            f"Planets with an unknown value are listed {'first' if unknowns_first else 'last'}."
+        )
+        known_mask = pd.to_numeric(ordered[sort_column], errors="coerce").notna()
+        has_both_groups = bool(known_mask.any() and (~known_mask).any())
+    else:
+        has_both_groups = False
+    chosen_name = st.session_state.get(_APPLIED_DESTINATION_KEY)
+    current_group = None
+    with st.container(height=_DESTINATION_LIST_HEIGHT, border=True, key="planet_shopping_destination_list"):
+        for _, planet in ordered.iterrows():
+            planet_name = str(planet["pl_name"])
+            if has_both_groups:
+                is_known = pd.notna(pd.to_numeric(pd.Series([planet[sort_column]]), errors="coerce").iloc[0])
+                if is_known != current_group:
+                    current_group = is_known
+                    if is_known:
+                        st.markdown(f"**Known {sort_label.lower()}**")
+                    else:
+                        st.markdown(f"**Unknown {sort_label.lower()}**")
+                        st.caption("We don't have a measurement for these planets yet.")
+            _render_planet_profile(planet_name, planet, centred=False)
+            if planet_name == chosen_name:
+                st.success("Your destination")
+            else:
+                st.button(
+                    "Choose this planet",
+                    type="primary",
+                    key=f"planet_shopping_choose_{planet_name}",
+                    on_click=_record_destination_selection,
+                    args=(st.session_state, planet_name),
+                )
+            st.divider()
+
+
+def _render_destination_preview(candidates: pd.DataFrame, names: list[str]) -> None:
+    """Fallback for a long shortlist: preview one planet at a time and still choose one."""
+    st.markdown("**Preview exoplanets one by one:**")
+    previous = _initialise_destination_control(st.session_state, names)
+    index = names.index(previous) if previous in names else None
+    inspected_name = st.selectbox(
+        "Choose a planet to preview",
+        names,
+        index=index,
+        key=_DESTINATION_CONTROL_KEY,
+    )
+    if inspected_name is not None:
+        inspected_destination = candidates.loc[candidates["pl_name"].astype(str) == inspected_name].iloc[0]
+        _render_planet_profile(inspected_name, inspected_destination)
+        st.write("Still want this one? Or narrow your choices above to compare more planets at once.")
+        if st.button("Choose this planet", type="primary"):
+            _record_destination_selection(st.session_state, inspected_name)
+
+
 def _render_destination(data: pd.DataFrame) -> None:
     st.subheader("Choose Your Destination")
     curriculum_tags(
@@ -1032,69 +1116,9 @@ def _render_destination(data: pd.DataFrame) -> None:
             f"There are {len(names):,} possible destinations, which is too many to look through one by one. "
             "Narrow your choices above until the list feels more manageable."
         )
-        completion_gate(False)
-        return
-    sort_choice, order_choice, unknown_choice = st.columns([3, 2, 2])
-    with sort_choice:
-        sort_label = st.selectbox("Sort by", list(_DESTINATION_SORT_OPTIONS), key=_DESTINATION_SORT_KEY)
-    sort_column = _DESTINATION_SORT_OPTIONS[sort_label]
-    by_name = sort_column == "pl_name"
-    with order_choice:
-        order = st.radio(
-            "Order",
-            _DESTINATION_ORDER_OPTIONS,
-            horizontal=True,
-            disabled=by_name,
-            key=_DESTINATION_ORDER_KEY,
-        )
-    with unknown_choice:
-        unknown_position = st.radio(
-            "Unknown values",
-            _DESTINATION_UNKNOWN_OPTIONS,
-            horizontal=True,
-            disabled=by_name,
-            key=_DESTINATION_UNKNOWN_KEY,
-        )
-    descending = order == _DESTINATION_ORDER_OPTIONS[1] and not by_name
-    unknowns_first = unknown_position == _DESTINATION_UNKNOWN_OPTIONS[0] and not by_name
-    ordered = _sort_destination_candidates(
-        candidates, sort_column, descending=descending, unknowns_first=unknowns_first
-    )
-    if not by_name:
-        st.caption(
-            f"{'Highest' if descending else 'Lowest'} {sort_label.lower()} first. "
-            f"Planets with an unknown value are listed {'first' if unknowns_first else 'last'}."
-        )
-        known_mask = pd.to_numeric(ordered[sort_column], errors="coerce").notna()
-        has_both_groups = bool(known_mask.any() and (~known_mask).any())
+        _render_destination_preview(candidates, names)
     else:
-        has_both_groups = False
-    chosen_name = st.session_state.get(_APPLIED_DESTINATION_KEY)
-    current_group = None
-    with st.container(height=_DESTINATION_LIST_HEIGHT, border=True, key="planet_shopping_destination_list"):
-        for _, planet in ordered.iterrows():
-            planet_name = str(planet["pl_name"])
-            if has_both_groups:
-                is_known = pd.notna(pd.to_numeric(pd.Series([planet[sort_column]]), errors="coerce").iloc[0])
-                if is_known != current_group:
-                    current_group = is_known
-                    if is_known:
-                        st.markdown(f"**Known {sort_label.lower()}**")
-                    else:
-                        st.markdown(f"**Unknown {sort_label.lower()}**")
-                        st.caption("We don't have a measurement for these planets yet.")
-            _render_planet_profile(planet_name, planet, centred=False)
-            if planet_name == chosen_name:
-                st.success("Your destination")
-            else:
-                st.button(
-                    "Choose this planet",
-                    type="primary",
-                    key=f"planet_shopping_choose_{planet_name}",
-                    on_click=_record_destination_selection,
-                    args=(st.session_state, planet_name),
-                )
-            st.divider()
+        _render_destination_list(candidates)
 
     destination_name = st.session_state.get(_APPLIED_DESTINATION_KEY)
     selected = destination_name in names
