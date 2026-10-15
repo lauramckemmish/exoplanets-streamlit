@@ -693,12 +693,19 @@ def _render_planet_profile(planet_name: str, planet: pd.Series) -> None:
 
 def _render_meet_your_planet(data: pd.DataFrame) -> None:
     st.subheader("Meet a Planet")
-    st.write("**Pick a planet. Any planet.**")
+    st.write(
+        "**Pick a planet.** Have a look at a few worlds first — "
+        f"view at least {_CATALOGUE_BROWSING_MINIMUM} different planets before revealing the catalogue."
+    )
     if _BROWSED_PLANET_KEY not in st.session_state:
         st.session_state[_BROWSED_PLANET_KEY] = _random_planet_name(data)
     _record_browsed_planet(st.session_state, st.session_state[_BROWSED_PLANET_KEY])
+    seen = st.session_state[_BROWSED_PLANETS_SEEN_KEY]
+    # Until the minimum is met this is the required action, so it gets the
+    # shared "moves you forward" treatment; afterwards it is optional.
     st.button(
         "Show me another planet",
+        type="primary" if len(seen) < _CATALOGUE_BROWSING_MINIMUM else "secondary",
         key=_BROWSED_PLANET_BUTTON_KEY,
         on_click=_show_another_browsed_planet,
         args=(data, st.session_state),
@@ -719,10 +726,8 @@ def _render_meet_your_planet(data: pd.DataFrame) -> None:
                 "field or unusual planet."
             )
 
-    seen = st.session_state[_BROWSED_PLANETS_SEEN_KEY]
     if len(seen) < _CATALOGUE_BROWSING_MINIMUM:
         st.caption(f"Planets explored: {len(seen)} of {_CATALOGUE_BROWSING_MINIMUM}")
-        st.write("Have a look at a few worlds first — see 3 different planets before revealing the catalogue.")
         completion_gate(False)
         return
 
