@@ -115,11 +115,11 @@ Sliders should look like the important, clickable controls they are. The increas
 
 | Part | Streamlit default | Now |
 | --- | --- | --- |
-| Track (the line) | 4px | **8px**, with fully rounded ends |
-| Handle (the circle) | 12px | **22px** |
-| Value shown above the handle | 16px (1rem) | **19.2px (1.2rem)** |
+| Track (the line) | 4px | **7px**, with fully rounded ends |
+| Handle (the circle) | 12px | **19px** |
+| Value shown above the handle | 16px (1rem) | **17.6px (1.1rem)** |
 
-The block above each slider has more space (32px) so the larger value stays clear of the slider's own label.
+The block above each slider has more space (30px) so the larger value stays clear of the slider's own label.
 
 ### Why
 
