@@ -600,10 +600,12 @@ def _render_launch(data: pd.DataFrame) -> None:
         ".st-key-planet_shopping_hero_image .hero-overlay .hero-overlay__title { margin: 0; color: #FF635D; font-weight: 700; line-height: 1.1;"
         " font-size: clamp(1.4rem, 3.2vw, 2.4rem); text-transform: uppercase; }"
         ".st-key-planet_shopping_hero_image .hero-overlay .hero-overlay__text { margin: 0.45rem 0 0; font-size: clamp(1rem, 1.7vw, 1.35rem); line-height: 1.3; }"
-        # Mission briefing panel: dark navy like the night sky, UNSW yellow accents, as tall as the image.
-        # The image column is 5/2 times the width of this one, and the image is 1344x924, so an aspect ratio of
-        # 1 : 1.71875 makes this box exactly as tall as the image. On narrow screens the columns stack.
-        ".st-key-planet_shopping_mission_box { position: relative; overflow: hidden; aspect-ratio: 1 / 1.71875;"
+        # Mission briefing panel: dark navy like the night sky, UNSW yellow accents. The row stretches its two
+        # columns to the same height, and the panel fills its column, so it is exactly as tall as the image.
+        '[data-testid="stHorizontalBlock"]:has(.st-key-planet_shopping_mission_box) { align-items: stretch; }'
+        '[data-testid="stColumn"]:has(.st-key-planet_shopping_mission_box) > [data-testid="stVerticalBlock"] { height: 100%; }'
+        '[data-testid="stColumn"]:has(.st-key-planet_shopping_mission_box) [data-testid="stLayoutWrapper"] { height: 100%; }'
+        ".st-key-planet_shopping_mission_box { position: relative; overflow: hidden; height: 100%; min-height: 20rem;"
         " border-radius: 1.25rem; background: linear-gradient(165deg, #0d1733 0%, #18214a 60%, #271f4d 100%);"
         " border: 1px solid rgba(255, 220, 0, 0.35); padding: 1.6rem 1.4rem 1.2rem; color: #fff; }"
         ".st-key-planet_shopping_mission_box::before { content: ''; position: absolute; top: 0; left: 0; right: 0;"
@@ -621,12 +623,11 @@ def _render_launch(data: pd.DataFrame) -> None:
         ".mission__steps li + li { border-top: 1px solid rgba(255, 255, 255, 0.16); }"
         ".mission__steps li::before { content: counter(step, decimal-leading-zero); flex: 0 0 auto;"
         " color: #FFDC00; font-size: 2.1rem; font-weight: 700; line-height: 1; min-width: 2.6rem; }"
-        "@media (max-width: 640px) { .st-key-planet_shopping_mission_box { aspect-ratio: auto; } }"
         "</style>",
         unsafe_allow_html=True,
     )
     with st.container(width=1100):
-        image_column, mission_column = st.columns([5, 2], gap="medium", vertical_alignment="center")
+        image_column, mission_column = st.columns([5, 2], gap="medium")
         with image_column:
             with st.container(key="planet_shopping_hero_image"):
                 role_image(
