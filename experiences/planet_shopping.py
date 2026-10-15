@@ -1140,8 +1140,6 @@ def render(data: pd.DataFrame, terminal_action) -> None:
 
     stage = max(0, min(int(st.session_state[_STAGE_KEY]), len(STAGE_LABELS) - 1))
     apply_typography("planet_shopping_typography")
-    if stage not in (0, 2):  # Launch and Distance keep their tighter flow.
-        apply_section_spacing("planet_shopping_section_spacing")
     st.header(TITLE)
     st.caption(SUBTITLE)
 
@@ -1149,6 +1147,8 @@ def render(data: pd.DataFrame, terminal_action) -> None:
     if selected_stage != stage:
         stage = selected_stage
         st.session_state[_STAGE_KEY] = stage
+    if stage not in (0, 2):  # Launch and Distance keep their tighter flow.
+        apply_section_spacing("planet_shopping_section_spacing")
     scroll_to_top_if_requested(_SCROLL_KEY)
 
     if stage == 0 and facilitator_notes_enabled():
