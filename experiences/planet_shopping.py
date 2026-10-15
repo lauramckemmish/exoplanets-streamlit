@@ -600,16 +600,25 @@ def _render_launch(data: pd.DataFrame) -> None:
         ".st-key-planet_shopping_hero_image .hero-overlay .hero-overlay__title { margin: 0; color: #FF635D; font-weight: 700; line-height: 1.1;"
         " font-size: clamp(1.4rem, 3.2vw, 2.4rem); text-transform: uppercase; }"
         ".st-key-planet_shopping_hero_image .hero-overlay .hero-overlay__text { margin: 0.45rem 0 0; font-size: clamp(1rem, 1.7vw, 1.35rem); line-height: 1.3; }"
-        # Mission briefing panel: sky blue-purple sampled from the hero image, same corner radius as the image. The row stretches its two
+        # Mission briefing panel: deep space navy-black with yellow corner brackets and cyan step numbers; same corner
+        # radius as the image. The row stretches its two
         # columns to the same height, and the panel fills its column, so it is exactly as tall as the image.
         '[data-testid="stHorizontalBlock"]:has(.st-key-planet_shopping_mission_box) { align-items: stretch; }'
         '[data-testid="stColumn"]:has(.st-key-planet_shopping_mission_box) > [data-testid="stVerticalBlock"] { height: 100%; }'
         '[data-testid="stColumn"]:has(.st-key-planet_shopping_mission_box) [data-testid="stLayoutWrapper"] { height: 100%; }'
         ".st-key-planet_shopping_mission_box { position: relative; overflow: hidden; height: 100%; min-height: 20rem;"
-        " border-radius: 0.5rem; background: linear-gradient(165deg, #3e4e97 0%, #504a92 50%, #59447c 100%);"
-        " border: 1px solid rgba(255, 220, 0, 0.35); padding: 1.6rem 1.4rem 1.2rem; color: #fff; }"
-        ".st-key-planet_shopping_mission_box::before { content: ''; position: absolute; top: 0; left: 0; right: 0;"
-        " height: 6px; background: #FFDC00; }"
+        " border-radius: 0.5rem; background: linear-gradient(165deg, #0a1020 0%, #0e172e 55%, #121a33 100%);"
+        " border: 1px solid rgba(255, 220, 0, 0.28); padding: 1.7rem 1.5rem 1.3rem; color: #fff; }"
+        ".st-key-planet_shopping_mission_box::after { content: ''; position: absolute; inset: 9px; pointer-events: none;"
+        " background:"
+        " linear-gradient(#FFDC00, #FFDC00) top left / 20px 2px no-repeat,"
+        " linear-gradient(#FFDC00, #FFDC00) top left / 2px 20px no-repeat,"
+        " linear-gradient(#FFDC00, #FFDC00) top right / 20px 2px no-repeat,"
+        " linear-gradient(#FFDC00, #FFDC00) top right / 2px 20px no-repeat,"
+        " linear-gradient(#FFDC00, #FFDC00) bottom left / 20px 2px no-repeat,"
+        " linear-gradient(#FFDC00, #FFDC00) bottom left / 2px 20px no-repeat,"
+        " linear-gradient(#FFDC00, #FFDC00) bottom right / 20px 2px no-repeat,"
+        " linear-gradient(#FFDC00, #FFDC00) bottom right / 2px 20px no-repeat; }"
         ".st-key-planet_shopping_mission_box > div, .st-key-planet_shopping_mission_box [data-testid='stElementContainer'],"
         " .st-key-planet_shopping_mission_box [data-testid='stMarkdown'] { height: 100%; }"
         ".mission { display: flex; flex-direction: column; height: 100%; }"
@@ -631,7 +640,8 @@ def _render_launch(data: pd.DataFrame) -> None:
         " padding: 0.55rem 0; color: #fff; font-size: 1.3rem; line-height: 1.25; }"
         ".mission__steps li + li { border-top: 1px solid rgba(255, 255, 255, 0.16); }"
         ".mission__steps li::before { content: counter(step, decimal-leading-zero); flex: 0 0 auto;"
-        " color: rgba(255, 255, 255, 0.9); font-size: 2.2rem; font-weight: 700; line-height: 1; min-width: 2.8rem; }"
+        " color: #4fd1e0; text-shadow: 0 0 10px rgba(79, 209, 224, 0.55); font-size: 2.2rem; font-weight: 700;"
+        " line-height: 1; min-width: 2.8rem; }"
         "</style>",
         unsafe_allow_html=True,
     )
