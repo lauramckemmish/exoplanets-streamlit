@@ -451,3 +451,19 @@ class DestinationSortTests(unittest.TestCase):
         ordered = _sort_destination_candidates(candidates, "pl_eqt", descending=True)
 
         self.assertEqual(ordered["pl_name"].tolist(), ["Hot", "Warm", "Cold", "Unknown"])
+
+    def test_unknowns_can_be_placed_first_in_either_direction_without_being_sorted_as_a_value(self):
+        from experiences.planet_shopping import _sort_destination_candidates
+
+        candidates = pd.DataFrame(
+            {
+                "pl_name": ["Warm", "Unknown b", "Cold", "Unknown a", "Hot"],
+                "pl_eqt": [300.0, None, 100.0, None, 900.0],
+            }
+        )
+
+        low_to_high = _sort_destination_candidates(candidates, "pl_eqt", unknowns_first=True)
+        high_to_low = _sort_destination_candidates(candidates, "pl_eqt", descending=True, unknowns_first=True)
+
+        self.assertEqual(low_to_high["pl_name"].tolist(), ["Unknown a", "Unknown b", "Cold", "Warm", "Hot"])
+        self.assertEqual(high_to_low["pl_name"].tolist(), ["Unknown a", "Unknown b", "Hot", "Warm", "Cold"])

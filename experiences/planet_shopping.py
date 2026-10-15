@@ -81,6 +81,8 @@ _SKY_MAP_REVEAL_KEY = "planet_shopping_sky_map_revealed"
 _DESTINATION_SORT_KEY = "planet_shopping_destination_sort"
 _DESTINATION_ORDER_KEY = "planet_shopping_destination_order"
 _DESTINATION_ORDER_OPTIONS = ("Low to high", "High to low")
+_DESTINATION_UNKNOWN_KEY = "planet_shopping_destination_unknown_position"
+_DESTINATION_UNKNOWN_OPTIONS = ("Show first", "Show last")
 _DESTINATION_LIST_LIMIT = 150  # Above this the list is too long to browse; learners narrow their filters first.
 _DESTINATION_LIST_HEIGHT = 640
 _DESTINATION_SORT_OPTIONS = {
@@ -430,12 +432,13 @@ def _candidate_names(candidates: pd.DataFrame) -> list[str]:
 
 
 def _sort_destination_candidates(
-    candidates: pd.DataFrame, column: str, *, descending: bool = False
+    candidates: pd.DataFrame, column: str, *, descending: bool = False, unknowns_first: bool = False
 ) -> pd.DataFrame:
-    """List each named planet once, ordered by one field, with unknown values always last.
+    """List each named planet once, ordered by one field.
 
-    Ties are broken by name so the order is stable. Unknown is never treated as zero,
-    so it stays at the bottom whether the order is low to high or high to low.
+    Planets with an unknown value form their own group, placed first or last as the learner
+    chooses. Unknown is never sorted as if it were a low or high value (or zero). Ties are
+    broken by name so the order is stable.
     """
     named = candidates.dropna(subset=["pl_name"]).drop_duplicates("pl_name").copy()
     named["_name"] = named["pl_name"].astype(str)
@@ -443,7 +446,9 @@ def _sort_destination_candidates(
         return named.sort_values("_name").drop(columns="_name")
     named["_value"] = pd.to_numeric(named[column], errors="coerce")
     return named.sort_values(
-        ["_value", "_name"], ascending=[not descending, True], na_position="last"
+        ["_value", "_name"],
+        ascending=[not descending, True],
+        na_position="first" if unknowns_first else "last",
     ).drop(columns=["_name", "_value"])
 
 
@@ -1029,38 +1034,55 @@ def _render_destination(data: pd.DataFrame) -> None:
         )
         completion_gate(False)
         return
-    sort_choice, order_choice = st.columns([2, 1])
+    sort_choice, order_choice, unknown_choice = st.columns([3, 2, 2])
     with sort_choice:
         sort_label = st.selectbox("Sort by", list(_DESTINATION_SORT_OPTIONS), key=_DESTINATION_SORT_KEY)
     sort_column = _DESTINATION_SORT_OPTIONS[sort_label]
+    by_name = sort_column == "pl_name"
     with order_choice:
         order = st.radio(
             "Order",
             _DESTINATION_ORDER_OPTIONS,
             horizontal=True,
-            disabled=sort_column == "pl_name",
+            disabled=by_name,
             key=_DESTINATION_ORDER_KEY,
         )
-    descending = order == _DESTINATION_ORDER_OPTIONS[1] and sort_column != "pl_name"
-    ordered = _sort_destination_candidates(candidates, sort_column, descending=descending)
-    if sort_column != "pl_name":
+    with unknown_choice:
+        unknown_position = st.radio(
+            "Unknown values",
+            _DESTINATION_UNKNOWN_OPTIONS,
+            horizontal=True,
+            disabled=by_name,
+            key=_DESTINATION_UNKNOWN_KEY,
+        )
+    descending = order == _DESTINATION_ORDER_OPTIONS[1] and not by_name
+    unknowns_first = unknown_position == _DESTINATION_UNKNOWN_OPTIONS[0] and not by_name
+    ordered = _sort_destination_candidates(
+        candidates, sort_column, descending=descending, unknowns_first=unknowns_first
+    )
+    if not by_name:
         st.caption(
             f"{'Highest' if descending else 'Lowest'} {sort_label.lower()} first. "
-            "Planets with an unknown value are listed last."
+            f"Planets with an unknown value are listed {'first' if unknowns_first else 'last'}."
         )
+        known_mask = pd.to_numeric(ordered[sort_column], errors="coerce").notna()
+        has_both_groups = bool(known_mask.any() and (~known_mask).any())
+    else:
+        has_both_groups = False
     chosen_name = st.session_state.get(_APPLIED_DESTINATION_KEY)
-    unknown_heading_shown = False
+    current_group = None
     with st.container(height=_DESTINATION_LIST_HEIGHT, border=True, key="planet_shopping_destination_list"):
         for _, planet in ordered.iterrows():
             planet_name = str(planet["pl_name"])
-            if (
-                sort_column != "pl_name"
-                and not unknown_heading_shown
-                and pd.isna(pd.to_numeric(pd.Series([planet[sort_column]]), errors="coerce").iloc[0])
-            ):
-                unknown_heading_shown = True
-                st.markdown(f"**Unknown {sort_label.lower()}**")
-                st.caption("We don't have a measurement for these planets yet.")
+            if has_both_groups:
+                is_known = pd.notna(pd.to_numeric(pd.Series([planet[sort_column]]), errors="coerce").iloc[0])
+                if is_known != current_group:
+                    current_group = is_known
+                    if is_known:
+                        st.markdown(f"**Known {sort_label.lower()}**")
+                    else:
+                        st.markdown(f"**Unknown {sort_label.lower()}**")
+                        st.caption("We don't have a measurement for these planets yet.")
             _render_planet_profile(planet_name, planet, centred=False)
             if planet_name == chosen_name:
                 st.success("Your destination")
