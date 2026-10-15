@@ -613,6 +613,15 @@ def _render_launch(data: pd.DataFrame) -> None:
         ".st-key-planet_shopping_mission_box > div, .st-key-planet_shopping_mission_box [data-testid='stElementContainer'],"
         " .st-key-planet_shopping_mission_box [data-testid='stMarkdown'] { height: 100%; }"
         ".mission { display: flex; flex-direction: column; height: 100%; }"
+        # Below 1100px the side-by-side layout gets cramped (the sidebar takes 300px of it), so stack the two.
+        "@media (max-width: 1100px) {"
+        ' [data-testid="stHorizontalBlock"]:has(.st-key-planet_shopping_mission_box) { flex-direction: column; }'
+        ' [data-testid="stHorizontalBlock"]:has(.st-key-planet_shopping_mission_box) > [data-testid="stColumn"] {'
+        " width: 100% !important; flex: 1 1 100% !important; min-width: 100% !important; }"
+        ' [data-testid="stColumn"]:has(.st-key-planet_shopping_mission_box) > [data-testid="stVerticalBlock"],'
+        ' [data-testid="stColumn"]:has(.st-key-planet_shopping_mission_box) [data-testid="stLayoutWrapper"] { height: auto; }'
+        " .st-key-planet_shopping_mission_box { height: auto; min-height: 0; }"
+        "}"
         ".st-key-planet_shopping_mission_box .mission__title { margin: 0.4rem 0 0.9rem; padding: 0 0 0.9rem;"
         " color: #FFDC00; font-size: 1.15rem; font-weight: 700; letter-spacing: 0.16em;"
         " border-bottom: 1px solid rgba(255, 220, 0, 0.45); }"
