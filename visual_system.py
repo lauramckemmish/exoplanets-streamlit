@@ -489,6 +489,7 @@ SLIDER_TOKENS = {
     "value_size": "1.2rem",  # Streamlit default: 1rem
     "value_lift": "-38px",  # Moves the value above the larger thumb (default: -22px)
     "group_height": "56px",  # Leaves room for the larger thumb and value (default: 40px)
+    "group_top_space": "18px",  # Keeps the larger value label clear of the slider's own label
 }
 
 
@@ -505,7 +506,7 @@ def apply_slider_style(scope_key: str) -> None:
         st.markdown(
             f"""
             <style>
-            {slider} [role="group"] {{ height: {t['group_height']}; }}
+            {slider} [role="group"] {{ height: {t['group_height']}; margin-top: {t['group_top_space']}; }}
             {slider} [role="group"] > div > div:first-child {{
                 height: {t['track_height']};
                 border-radius: calc({t['track_height']} / 2);
