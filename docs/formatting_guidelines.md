@@ -101,3 +101,36 @@ Marker size is 1.45rem in a 1.9rem column with a 0.7rem gap. If other experience
 ### Out of scope
 
 The sidebar (experience list and its icons) belongs to shared navigation and is not edited as part of Planet Shopping work. Facilitator and shared-helper labels such as `👀 Read the graph` live in shared code and are left alone until a shared decision is made.
+
+---
+
+## 4. Sliders
+
+**Status:** ADOPTED in Planet Shopping (all stages with sliders) · ROLLOUT PENDING for other experiences  
+**Scope:** shared mechanism (`apply_slider_style()` in `visual_system.py`), opted into per experience
+
+### Rules
+
+Sliders should look like the important, clickable controls they are. The increases are deliberately **subtle but noticeable**:
+
+| Part | Streamlit default | Now |
+| --- | --- | --- |
+| Track (the line) | 4px | **8px**, with fully rounded ends |
+| Handle (the circle) | 12px | **22px** |
+| Value shown above the handle | 16px (1rem) | **19.2px (1.2rem)** |
+
+The block above each slider has more space (32px) so the larger value stays clear of the slider's own label.
+
+### Why
+
+At the default size the handle is small and easy to miss, especially on a projector or a touch screen, and the slider reads as a thin decorative line. A thicker track and bigger handle make it clear that this is the thing to move, and a larger value makes the number the learner is choosing easy to read.
+
+### Notes
+
+- All values live in `SLIDER_TOKENS` in `visual_system.py`; change them there, not per experience.
+- Not changed: the colour. Streamlit shows the slider value in the primary colour (UNSW yellow), which has low contrast on a white background. This is a known issue for a later accessibility pass, since the style guide asks for 4.5:1 contrast on ordinary text.
+- The min and max numbers under the slider keep their size.
+
+### How to apply to another experience
+
+Call `apply_slider_style("<experience>_sliders")` once near the top of the experience's render function. The styles apply only while that marker is on the page, so other experiences are unchanged.
