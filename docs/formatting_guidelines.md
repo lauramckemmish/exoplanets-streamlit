@@ -119,7 +119,7 @@ Sliders should look like the important, clickable controls they are. The increas
 | Handle (the circle) | 12px | **19px** |
 | Value shown above the handle | 16px (1rem) | **17.6px (1.1rem)** |
 
-The block above each slider has a little extra space (16px) so the larger value stays clear of the slider's own label.
+The block above each slider has a little extra space (12px) so the larger value stays clear of the slider's own label.
 
 ### Why
 
