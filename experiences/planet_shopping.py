@@ -655,6 +655,10 @@ def _render_launch(data: pd.DataFrame) -> None:
                     "</ol></div>",
                     unsafe_allow_html=True,
                 )
+        st.caption(
+            "Image: WALL-E promotional still [digital image]. Pixar Animation Studios, 2008, "
+            "Disney+ (disneyplus.com). © Walt Disney Pictures."
+        )
 
     with st.container(width="content"):
         st.markdown("#### Where can we go?")
