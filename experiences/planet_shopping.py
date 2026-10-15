@@ -32,7 +32,7 @@ from ui_helpers import (
 TITLE = "Planet Shopping Outside Our Solar System"
 SUBTITLE = "Use real exoplanet data to find your perfect planet."
 ASSETS_DIR = Path(__file__).resolve().parent.parent / "assets"
-WELCOME_HOOK_IMAGE_PATH = ASSETS_DIR / "planet-shopping-welcome-hook.png"
+WELCOME_HOOK_IMAGE_PATH = ASSETS_DIR / "wall-e-looking-up-at-the-stars.jpg"
 SOLAR_SYSTEM_IMAGE_PATH = ASSETS_DIR / "solar-system-nasa.jpeg"
 TRANSFER_IMAGE_PATH = ASSETS_DIR / "planet-shopping-transfer.png"
 
@@ -589,12 +589,50 @@ def _render_temperature(data: pd.DataFrame) -> None:
 
 def _render_launch(data: pd.DataFrame) -> None:
     st.subheader("🚀 Launch")
-    with st.container(width=960):
-        role_image(
-            WELCOME_HOOK_IMAGE_PATH,
-            role="hero",
-            key="planet_shopping_welcome_hook",
-        )
+    st.markdown(
+        "<style>"
+        # The overlay text sits in the image's top-left corner. Streamlit cannot layer elements, so the
+        # image's wrapper is positioned and the overlay's element container is placed over it.
+        ".st-key-planet_shopping_hero_image { position: relative; }"
+        '.st-key-planet_shopping_hero_image [data-testid="stElementContainer"]:has(.hero-overlay) {'
+        " position: absolute; top: 1.1rem; left: 1.4rem; width: 52%; z-index: 2; }"
+        ".hero-overlay { color: #fff; text-shadow: 0 1px 6px rgba(20, 8, 40, 0.75), 0 0 2px rgba(20, 8, 40, 0.6); }"
+        ".hero-overlay__title { margin: 0; color: #FF635D; font-weight: 700; line-height: 1.1;"
+        " font-size: clamp(1.4rem, 3.2vw, 2.4rem); text-transform: uppercase; }"
+        ".hero-overlay__text { margin: 0.45rem 0 0; font-size: clamp(1rem, 1.7vw, 1.35rem); line-height: 1.3; }"
+        ".st-key-planet_shopping_mission_box { border: 2px solid rgba(255, 220, 0, 0.7); border-radius: 1.25rem;"
+        " padding: 1.2rem 1.4rem; }"
+        ".st-key-planet_shopping_mission_box h4 { margin: 0 0 0.6rem; letter-spacing: 0.06em; }"
+        ".st-key-planet_shopping_mission_box ol { margin: 0; padding-left: 1.3rem; }"
+        ".st-key-planet_shopping_mission_box li { margin-bottom: 0.45rem; }"
+        "</style>",
+        unsafe_allow_html=True,
+    )
+    with st.container(width=1100):
+        image_column, mission_column = st.columns([5, 2], gap="medium", vertical_alignment="center")
+        with image_column:
+            with st.container(key="planet_shopping_hero_image"):
+                role_image(
+                    WELCOME_HOOK_IMAGE_PATH,
+                    role="hero",
+                    key="planet_shopping_welcome_hook",
+                )
+                st.markdown(
+                    "<div class='hero-overlay'>"
+                    "<p class='hero-overlay__title'>Earth is unavailable</p>"
+                    "<p class='hero-overlay__text'>But the universe is full of possibilities.</p>"
+                    "</div>",
+                    unsafe_allow_html=True,
+                )
+        with mission_column:
+            with st.container(key="planet_shopping_mission_box"):
+                st.markdown("#### YOUR MISSION")
+                st.markdown(
+                    "1. Explore the data\n"
+                    "2. Set your criteria\n"
+                    "3. Filter the options\n"
+                    "4. Find the best world for our new home"
+                )
 
     with st.container(width="content"):
         st.markdown("#### Where can we go?")
