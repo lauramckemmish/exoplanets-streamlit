@@ -414,3 +414,26 @@ class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class DestinationSortTests(unittest.TestCase):
+    def test_sort_puts_lowest_first_and_unknown_last_without_treating_unknown_as_zero(self):
+        from experiences.planet_shopping import _sort_destination_candidates
+
+        candidates = pd.DataFrame(
+            {
+                "pl_name": ["Warm", "Unknown one", "Cold", "Hot", "Unknown two", "Cold"],
+                "pl_eqt": [300.0, None, 100.0, 900.0, float("nan"), 100.0],
+            }
+        )
+
+        ordered = _sort_destination_candidates(candidates, "pl_eqt")
+
+        self.assertEqual(ordered["pl_name"].tolist(), ["Cold", "Warm", "Hot", "Unknown one", "Unknown two"])
+
+    def test_sort_by_name_is_alphabetical_and_lists_each_planet_once(self):
+        from experiences.planet_shopping import _sort_destination_candidates
+
+        candidates = pd.DataFrame({"pl_name": ["b", "a", "b", None], "pl_eqt": [1, 2, 3, 4]})
+
+        self.assertEqual(_sort_destination_candidates(candidates, "pl_name")["pl_name"].tolist(), ["a", "b"])
