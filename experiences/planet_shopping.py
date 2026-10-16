@@ -694,8 +694,8 @@ def _render_planet_profile(planet_name: str, planet: pd.Series) -> None:
 def _render_meet_your_planet(data: pd.DataFrame) -> None:
     st.subheader("Meet a Planet")
     st.write(
-        "**Pick a planet.** Have a look at a few worlds first — "
-        f"view at least {_CATALOGUE_BROWSING_MINIMUM} different planets before revealing the catalogue."
+        "**Pick a planet.** Have a look at a few worlds first. "
+        f"View at least {_CATALOGUE_BROWSING_MINIMUM} different planets before revealing the catalogue."
     )
     if _BROWSED_PLANET_KEY not in st.session_state:
         st.session_state[_BROWSED_PLANET_KEY] = _random_planet_name(data)
