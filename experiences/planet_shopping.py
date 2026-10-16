@@ -1074,9 +1074,9 @@ _TRANSFER_TABLE_STYLE = (
     ".transfer-table thead td { padding: 0; background: none; border: 0; }"
     ".transfer-table thead th { vertical-align: bottom; }"
     # The astronaut stands on the EXOPLANETS cell: it lives in the header's empty top-left cell, and its wheels rest
-    # on the cell's top outline (0.6rem below the header row, which is the table's row spacing).
+    # on the cell's top outline (the header cell's bottom edge sits right on that outline).
     ".transfer-table thead td.mascot { position: relative; height: 7rem; padding: 0; }"
-    ".transfer-astronaut { position: absolute; left: 0.7rem; bottom: calc(-0.6rem - 2px); height: 8.4rem; width: auto;"
+    ".transfer-astronaut { position: absolute; left: 0.7rem; bottom: -2px; height: 8.4rem; width: auto;"
     " z-index: 2; pointer-events: none; }"
     ".transfer-table thead td::before { content: none; }"
     ".transfer-table td, .transfer-table tbody th { position: relative; padding: 0.9rem 0.8rem; vertical-align: middle;"
