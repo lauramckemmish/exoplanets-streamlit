@@ -1073,11 +1073,11 @@ _TRANSFER_TABLE_STYLE = (
     ".transfer-table th:last-child { color: #FFDC00; }"
     ".transfer-table thead td { padding: 0; background: none; border: 0; }"
     ".transfer-table thead th { vertical-align: bottom; }"
-    # The astronaut stands on the table's top-left corner: about half of it above the table's top edge, half over the
-    # header's empty cell. It sits outside the scrolling wrapper so it is not clipped.
-    ".transfer-figure { position: relative; padding-top: 4rem; }"
-    ".transfer-astronaut { position: absolute; top: 0; left: 1rem; height: 9rem; width: auto; z-index: 2; pointer-events: none; }"
-    ".transfer-table thead td.mascot { height: 5rem; }"
+    # The astronaut stands on the table's top outline: the figure reserves the astronaut's height above the table,
+    # and the astronaut sits just on the border line. It is outside the scrolling wrapper so it is not clipped.
+    ".transfer-figure { position: relative; padding-top: 9rem; }"
+    ".transfer-astronaut { position: absolute; top: 2px; left: 1rem; height: 9rem; width: auto; z-index: 2; pointer-events: none; }"
+    ".transfer-table thead td.mascot { padding: 0; }"
     ".transfer-table thead td::before { content: none; }"
     ".transfer-table td, .transfer-table tbody th { position: relative; padding: 0.9rem 0.8rem; vertical-align: middle;"
     " background: rgba(47, 184, 255, 0.06); border-top: 1px solid rgba(47, 184, 255, 0.5);"
