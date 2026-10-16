@@ -1073,11 +1073,11 @@ _TRANSFER_TABLE_STYLE = (
     ".transfer-table th:last-child { color: #FFDC00; }"
     ".transfer-table thead td { padding: 0; background: none; border: 0; }"
     ".transfer-table thead th { vertical-align: bottom; }"
-    # The astronaut stands on the table's top outline: the figure reserves the astronaut's height above the table,
-    # and the astronaut sits just on the border line. It is outside the scrolling wrapper so it is not clipped.
-    ".transfer-figure { position: relative; padding-top: 9rem; }"
-    ".transfer-astronaut { position: absolute; top: 2px; left: 1rem; height: 9rem; width: auto; z-index: 2; pointer-events: none; }"
-    ".transfer-table thead td.mascot { padding: 0; }"
+    # The astronaut stands on the EXOPLANETS cell: it lives in the header's empty top-left cell, and its wheels rest
+    # on the cell's top outline (0.6rem below the header row, which is the table's row spacing).
+    ".transfer-table thead td.mascot { position: relative; height: 7rem; padding: 0; }"
+    ".transfer-astronaut { position: absolute; left: 0.7rem; bottom: calc(-0.6rem - 2px); height: 8.4rem; width: auto;"
+    " z-index: 2; pointer-events: none; }"
     ".transfer-table thead td::before { content: none; }"
     ".transfer-table td, .transfer-table tbody th { position: relative; padding: 0.9rem 0.8rem; vertical-align: middle;"
     " background: rgba(47, 184, 255, 0.06); border-top: 1px solid rgba(47, 184, 255, 0.5);"
@@ -1112,13 +1112,12 @@ def _transfer_table_html() -> str:
     )
     return (
         _TRANSFER_TABLE_STYLE
-        + "<div class='transfer-figure'>"
-        f"<img class='transfer-astronaut' src='{_astronaut_data_uri()}' alt=''>"
-        "<div class='transfer-table-wrap'><table class='transfer-table'>"
+        + "<div class='transfer-table-wrap'><table class='transfer-table'>"
         "<caption>The same steps in exoplanet search and online shopping</caption>"
         "<colgroup><col class='setting'><col><col><col><col></colgroup>"
-        f"<thead><tr><td class='mascot' aria-hidden='true'></td>{header}</tr></thead>"
-        f"<tbody>{rows}</tbody></table></div></div>"
+        f"<thead><tr><td class='mascot' aria-hidden='true'>"
+        f"<img class='transfer-astronaut' src='{_astronaut_data_uri()}' alt=''></td>{header}</tr></thead>"
+        f"<tbody>{rows}</tbody></table></div>"
     )
 
 
