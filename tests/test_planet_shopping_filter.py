@@ -531,7 +531,7 @@ class DestinationOrderCaptionTests(unittest.TestCase):
             _destination_order_caption(
                 "Number of stars in the system", descending=False, has_unknowns=False, unknowns_first=False
             ),
-            "Number of stars in the system listed low to high. No unknown values for this criterion.",
+            "Number of stars in the system listed low to high. No unknowns for this criterion.",
         )
         self.assertEqual(
             _destination_order_caption("Temperature", descending=True, has_unknowns=True, unknowns_first=True),

@@ -450,7 +450,7 @@ def _destination_order_caption(
     """Say how the list is ordered and where (or whether) unknown values appear."""
     direction = "high to low" if descending else "low to high"
     if not has_unknowns:
-        return f"{subject} listed {direction}. No unknown values for this criterion."
+        return f"{subject} listed {direction}. No unknowns for this criterion."
     position = "first" if unknowns_first else "last"
     return f"{subject} listed {direction}. Planets with an unknown value are listed {position}."
 
