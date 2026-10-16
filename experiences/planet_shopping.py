@@ -1075,7 +1075,7 @@ _TRANSFER_TABLE_STYLE = (
     ".transfer-table thead th { vertical-align: bottom; }"
     # The astronaut stands on the EXOPLANETS cell: it lives in the header's empty top-left cell, and its wheels rest
     # on the cell's top outline (the header cell's bottom edge sits right on that outline).
-    ".transfer-table thead td.mascot { position: relative; height: 7rem; padding: 0; }"
+    ".transfer-table thead td.mascot { position: relative; height: 7.6rem; padding: 0; }"
     ".transfer-astronaut { position: absolute; left: 0.7rem; bottom: -2px; height: 8.4rem; width: auto;"
     " z-index: 2; pointer-events: none; }"
     ".transfer-table thead td::before { content: none; }"
