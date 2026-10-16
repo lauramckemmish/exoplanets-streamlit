@@ -1061,34 +1061,34 @@ _TRANSFER_ROWS = (
 
 _TRANSFER_TABLE_STYLE = (
     "<style>"
-    ".transfer-table-wrap { overflow-x: auto; padding: 0.9rem 1rem 0.5rem; border-radius: 0.5rem;"
-    " margin-bottom: 0.75rem; background: linear-gradient(170deg, #030a14 0%, #06122a 100%); border: 1px solid rgba(47, 184, 255, 0.35); }"
-    ".transfer-table { width: 100%; min-width: 560px; table-layout: fixed; border-collapse: separate; border-spacing: 0 0.6rem; color: #e8f1ff; }"
-    ".transfer-table col.setting { width: 8.5rem; }"
+    ".transfer-table-wrap { overflow-x: auto; padding: 1.06rem 1.18rem 0.59rem; border-radius: 0.59rem;"
+    " margin-bottom: 0.89rem; background: linear-gradient(170deg, #030a14 0%, #06122a 100%); border: 1px solid rgba(47, 184, 255, 0.35); }"
+    ".transfer-table { width: 100%; min-width: 660px; table-layout: fixed; border-collapse: separate; border-spacing: 0 0.71rem; color: #e8f1ff; }"
+    ".transfer-table col.setting { width: 10.03rem; }"
     ".transfer-table caption { position: absolute; left: -9999px; }"
-    ".transfer-table th { padding: 0.2rem 0.8rem 0.5rem; text-align: left; font-size: 0.85rem; font-weight: 700;"
+    ".transfer-table th { padding: 0.24rem 0.94rem 0.59rem; text-align: left; font-size: 1rem; font-weight: 700;"
     " letter-spacing: 0.08em; text-transform: uppercase; color: #3fc3ff; }"
-    ".transfer-table th .step-number { display: inline-block; min-width: 1.5rem; height: 1.5rem; margin-right: 0.45rem;"
-    " line-height: 1.4rem; text-align: center; border: 1.5px solid currentColor; border-radius: 50%; }"
+    ".transfer-table th .step-number { display: inline-block; min-width: 1.77rem; height: 1.77rem; margin-right: 0.53rem;"
+    " line-height: 1.65rem; text-align: center; border: 1.5px solid currentColor; border-radius: 50%; }"
     ".transfer-table th:last-child { color: #FFDC00; }"
     ".transfer-table thead td { padding: 0; background: none; border: 0; }"
     ".transfer-table thead th { vertical-align: bottom; }"
     # The astronaut stands on the EXOPLANETS cell: it lives in the header's empty top-left cell, and its wheels rest
     # on the cell's top outline (the header cell's bottom edge sits right on that outline).
-    ".transfer-table thead td.mascot { position: relative; height: 7.6rem; padding: 0; }"
-    ".transfer-astronaut { position: absolute; left: 0.7rem; bottom: -2px; height: 7.8rem; width: auto;"
+    ".transfer-table thead td.mascot { position: relative; height: 8.97rem; padding: 0; }"
+    ".transfer-astronaut { position: absolute; left: 0.83rem; bottom: -2px; height: 9.2rem; width: auto;"
     " z-index: 2; pointer-events: none; }"
     ".transfer-table thead td::before { content: none; }"
-    ".transfer-table td, .transfer-table tbody th { position: relative; padding: 0.9rem 0.8rem; vertical-align: middle;"
+    ".transfer-table td, .transfer-table tbody th { position: relative; padding: 1.06rem 0.94rem; vertical-align: middle;"
     " background: rgba(47, 184, 255, 0.06); border-top: 1px solid rgba(47, 184, 255, 0.5);"
-    " border-bottom: 1px solid rgba(47, 184, 255, 0.5); font-size: 1rem; line-height: 1.3; }"
-    ".transfer-table tbody th { border-left: 1px solid rgba(47, 184, 255, 0.5); border-radius: 0.5rem 0 0 0.5rem;"
-    " font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase; color: #3fc3ff; text-shadow: 0 0 8px rgba(47, 184, 255, 0.45); overflow-wrap: break-word; }"
-    ".transfer-table td:last-child { border-right: 1px solid rgba(255, 220, 0, 0.6); border-radius: 0 0.5rem 0.5rem 0;"
+    " border-bottom: 1px solid rgba(47, 184, 255, 0.5); font-size: 1.18rem; line-height: 1.3; }"
+    ".transfer-table tbody th { border-left: 1px solid rgba(47, 184, 255, 0.5); border-radius: 0.59rem 0 0 0.59rem;"
+    " font-size: 1.06rem; letter-spacing: 0.05em; text-transform: uppercase; color: #3fc3ff; text-shadow: 0 0 8px rgba(47, 184, 255, 0.45); overflow-wrap: break-word; }"
+    ".transfer-table td:last-child { border-right: 1px solid rgba(255, 220, 0, 0.6); border-radius: 0 0.59rem 0.59rem 0;"
     " color: #FFDC00; font-weight: 600; text-shadow: 0 0 8px rgba(255, 220, 0, 0.4); background: rgba(255, 220, 0, 0.07);"
     " border-top-color: rgba(255, 220, 0, 0.6); border-bottom-color: rgba(255, 220, 0, 0.6); }"
-    ".transfer-table td + td::before { content: '\\2192'; position: absolute; left: -0.62rem; top: 50%;"
-    " transform: translateY(-50%); color: #3fc3ff; font-size: 1.1rem; text-shadow: 0 0 6px rgba(47, 184, 255, 0.6); }"
+    ".transfer-table td + td::before { content: '\\2192'; position: absolute; left: -0.73rem; top: 50%;"
+    " transform: translateY(-50%); color: #3fc3ff; font-size: 1.3rem; text-shadow: 0 0 6px rgba(47, 184, 255, 0.6); }"
     ".transfer-table td:last-child::before { color: #FFDC00; text-shadow: 0 0 6px rgba(255, 220, 0, 0.6); }"
     "</style>"
 )
@@ -1125,7 +1125,7 @@ def _render_data_science() -> None:
     st.subheader("💡 Data Science")
     curriculum_tags([("SC5-DA2-01.L2", "◐")], key="planet_shopping_data_science")
     st.write("So why did we call this a shopping expedition?")
-    with st.container(width=680):
+    with st.container(width=800):
         st.markdown(_transfer_table_html(), unsafe_allow_html=True)
         st.caption("Image: Astronaut shopping [illustration]. @catalyststuff, Magnific (magnific.com).")
     st.write(
