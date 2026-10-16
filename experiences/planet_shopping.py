@@ -1057,15 +1057,6 @@ _TRANSFER_STEPS = ("Many options", "Use criteria / filter", "Compare what remain
 _TRANSFER_ROWS = (
     ("Exoplanets", "Many planets", "Filter candidate worlds", "Compare shortlisted planets", "Choose best match"),
     ("Online shopping", "Many products", "Filter by needs", "Compare results", "Choose best option"),
-    ("Medicine", "Many treatments", "Use evidence and patient needs", "Compare benefits and risks", "Choose best treatment"),
-    ("Careers", "Many possible paths", "Use what matters to you", "Compare matches", "Choose best fit"),
-    (
-        "Sport & performance",
-        "Many players or strategies",
-        "Use criteria (skills / roles / goals)",
-        "Compare performance",
-        "Choose best lineup",
-    ),
 )
 
 _TRANSFER_TABLE_STYLE = (
@@ -1082,8 +1073,11 @@ _TRANSFER_TABLE_STYLE = (
     ".transfer-table th:last-child { color: #FFDC00; }"
     ".transfer-table thead td { padding: 0; background: none; border: 0; }"
     ".transfer-table thead th { vertical-align: bottom; }"
-    ".transfer-table thead td.mascot { vertical-align: bottom; padding: 0 0.6rem 0.25rem 0.2rem; }"
-    ".transfer-table thead td.mascot img { display: block; height: 6.5rem; width: auto; max-width: 100%; margin: 0; }"
+    # The astronaut stands on the table's top-left corner: about half of it above the table's top edge, half over the
+    # header's empty cell. It sits outside the scrolling wrapper so it is not clipped.
+    ".transfer-figure { position: relative; padding-top: 4rem; }"
+    ".transfer-astronaut { position: absolute; top: 0; left: 1rem; height: 9rem; width: auto; z-index: 2; pointer-events: none; }"
+    ".transfer-table thead td.mascot { height: 5rem; }"
     ".transfer-table thead td::before { content: none; }"
     ".transfer-table td, .transfer-table tbody th { position: relative; padding: 0.9rem 0.8rem; vertical-align: middle;"
     " background: rgba(47, 184, 255, 0.06); border-top: 1px solid rgba(47, 184, 255, 0.5);"
@@ -1107,7 +1101,7 @@ def _astronaut_data_uri() -> str:
 
 
 def _transfer_table_html() -> str:
-    """The same process in five settings, as a real table (replaces the old AI-generated graphic)."""
+    """The same process in exoplanet search and online shopping, as a real table (replaces the old AI-generated graphic)."""
     header = "".join(
         f"<th scope='col'><span class='step-number' aria-hidden='true'>{number}</span>{escape(step)}</th>"
         for number, step in enumerate(_TRANSFER_STEPS, start=1)
@@ -1118,11 +1112,13 @@ def _transfer_table_html() -> str:
     )
     return (
         _TRANSFER_TABLE_STYLE
-        + "<div class='transfer-table-wrap'><table class='transfer-table'>"
-        "<caption>The same steps in exoplanet search, online shopping, medicine, careers and sport</caption>"
+        + "<div class='transfer-figure'>"
+        f"<img class='transfer-astronaut' src='{_astronaut_data_uri()}' alt=''>"
+        "<div class='transfer-table-wrap'><table class='transfer-table'>"
+        "<caption>The same steps in exoplanet search and online shopping</caption>"
         "<colgroup><col class='setting'><col><col><col><col></colgroup>"
-        f"<thead><tr><td class='mascot' aria-hidden='true'><img src='{_astronaut_data_uri()}' alt=''></td>{header}</tr></thead>"
-        f"<tbody>{rows}</tbody></table></div>"
+        f"<thead><tr><td class='mascot' aria-hidden='true'></td>{header}</tr></thead>"
+        f"<tbody>{rows}</tbody></table></div></div>"
     )
 
 
