@@ -635,7 +635,7 @@ def _render_launch(data: pd.DataFrame) -> None:
         "</style>",
         unsafe_allow_html=True,
     )
-    with st.container(width=1100):
+    with st.container(width=960):
         image_column, mission_column = st.columns([5, 2], gap="medium")
         with image_column:
             with st.container(key="planet_shopping_hero_image"):
