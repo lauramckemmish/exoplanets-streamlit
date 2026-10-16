@@ -1063,8 +1063,8 @@ _TRANSFER_TABLE_STYLE = (
     "<style>"
     ".transfer-table-wrap { overflow-x: auto; padding: 0.9rem 1rem 0.5rem; border-radius: 0.5rem;"
     " margin-bottom: 0.75rem; background: linear-gradient(170deg, #030a14 0%, #06122a 100%); border: 1px solid rgba(47, 184, 255, 0.35); }"
-    ".transfer-table { width: 100%; min-width: 640px; table-layout: fixed; border-collapse: separate; border-spacing: 0 0.6rem; color: #e8f1ff; }"
-    ".transfer-table col.setting { width: 10.5rem; }"
+    ".transfer-table { width: 100%; min-width: 560px; table-layout: fixed; border-collapse: separate; border-spacing: 0 0.6rem; color: #e8f1ff; }"
+    ".transfer-table col.setting { width: 8.5rem; }"
     ".transfer-table caption { position: absolute; left: -9999px; }"
     ".transfer-table th { padding: 0.2rem 0.8rem 0.5rem; text-align: left; font-size: 0.85rem; font-weight: 700;"
     " letter-spacing: 0.08em; text-transform: uppercase; color: #3fc3ff; }"
@@ -1126,7 +1126,7 @@ def _render_data_science() -> None:
     st.subheader("💡 Data Science")
     curriculum_tags([("SC5-DA2-01.L2", "◐")], key="planet_shopping_data_science")
     st.write("So why did we call this a shopping expedition?")
-    with st.container(width=960):
+    with st.container(width=680):
         st.markdown(_transfer_table_html(), unsafe_allow_html=True)
         st.caption("Image: Astronaut shopping [illustration]. @catalyststuff, Magnific (magnific.com).")
     st.write(
