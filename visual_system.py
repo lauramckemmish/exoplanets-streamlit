@@ -460,6 +460,8 @@ def apply_typography(scope_key: str) -> None:
             {scope} [class*="st-key-facilitator_live_"] {{ gap: 0.1rem; }}
             {scope} [class*="st-key-facilitator_live_"] [data-testid="stMarkdownContainer"] {{ margin-bottom: 0; }}
             {scope} [class*="st-key-facilitator_live_"] p {{ margin-bottom: 0; }}
+            /* The curriculum summary box sat only about 1px clear of its last line at the larger text size. */
+            {scope} .st-key-curriculum_summary {{ padding-bottom: 1.5rem; }}
             /* Table cells follow the same font (weight is left to the table's own styling). */
             {scope} td, {scope} th {{ font-family: {heading_font}, {fallback}; }}
             /* Learner-facing text: nothing smaller than body size. */
