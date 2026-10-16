@@ -3,7 +3,9 @@
 See ``planet_shopping.md`` for the established pedagogical design.
 """
 
+import base64
 from datetime import date
+from functools import lru_cache
 from html import escape
 from pathlib import Path
 import random
@@ -36,6 +38,7 @@ ASSETS_DIR = Path(__file__).resolve().parent.parent / "assets"
 WELCOME_HOOK_IMAGE_PATH = ASSETS_DIR / "planet-shopping-welcome-hook.png"
 SOLAR_SYSTEM_IMAGE_PATH = ASSETS_DIR / "solar-system-nasa.jpeg"
 TRANSFER_IMAGE_PATH = ASSETS_DIR / "planet-shopping-transfer.png"
+ASTRONAUT_IMAGE_PATH = ASSETS_DIR / "astronaut-shopping-transparent.png"
 
 STAGE_LABELS = [
     "Launch",
@@ -1078,6 +1081,9 @@ _TRANSFER_TABLE_STYLE = (
     " line-height: 1.4rem; text-align: center; border: 1.5px solid currentColor; border-radius: 50%; }"
     ".transfer-table th:last-child { color: #FFDC00; }"
     ".transfer-table thead td { padding: 0; background: none; border: 0; }"
+    ".transfer-table thead th { vertical-align: bottom; }"
+    ".transfer-table thead td.mascot { vertical-align: bottom; padding: 0 0.6rem 0.25rem 0.2rem; }"
+    ".transfer-table thead td.mascot img { display: block; height: 6.5rem; width: auto; max-width: 100%; margin: 0; }"
     ".transfer-table thead td::before { content: none; }"
     ".transfer-table td, .transfer-table tbody th { position: relative; padding: 0.9rem 0.8rem; vertical-align: middle;"
     " background: rgba(47, 184, 255, 0.06); border-top: 1px solid rgba(47, 184, 255, 0.5);"
@@ -1092,6 +1098,12 @@ _TRANSFER_TABLE_STYLE = (
     ".transfer-table td:last-child::before { color: #FFDC00; text-shadow: 0 0 6px rgba(255, 220, 0, 0.6); }"
     "</style>"
 )
+
+
+@lru_cache(maxsize=1)
+def _astronaut_data_uri() -> str:
+    """The shopping astronaut (background removed) as an inline image, loaded once."""
+    return "data:image/png;base64," + base64.b64encode(ASTRONAUT_IMAGE_PATH.read_bytes()).decode("ascii")
 
 
 def _transfer_table_html() -> str:
@@ -1109,7 +1121,8 @@ def _transfer_table_html() -> str:
         + "<div class='transfer-table-wrap'><table class='transfer-table'>"
         "<caption>The same steps in exoplanet search, online shopping, medicine, careers and sport</caption>"
         "<colgroup><col class='setting'><col><col><col><col></colgroup>"
-        f"<thead><tr><td aria-hidden='true'></td>{header}</tr></thead><tbody>{rows}</tbody></table></div>"
+        f"<thead><tr><td class='mascot' aria-hidden='true'><img src='{_astronaut_data_uri()}' alt=''></td>{header}</tr></thead>"
+        f"<tbody>{rows}</tbody></table></div>"
     )
 
 
@@ -1119,6 +1132,7 @@ def _render_data_science() -> None:
     st.write("So why did we call this a shopping expedition?")
     with st.container(width=960):
         st.markdown(_transfer_table_html(), unsafe_allow_html=True)
+        st.caption("Image: Astronaut shopping [illustration]. @catalyststuff, Magnific (magnific.com).")
     st.write(
         "You started with thousands of possibilities.\n\n"
         "You chose what mattered.\n\n"
