@@ -454,6 +454,8 @@ def apply_typography(scope_key: str) -> None:
                 font-weight: {body_weight};
             }}
             {scope} p strong, {scope} li strong, {scope} p b, {scope} li b {{ font-weight: {strong_weight}; }}
+            /* Table cells follow the same font (weight is left to the table's own styling). */
+            {scope} td, {scope} th {{ font-family: {heading_font}, {fallback}; }}
             /* Learner-facing text: nothing smaller than body size. */
             {scope} [data-testid="stCaptionContainer"],
             {scope} [data-testid="stCaptionContainer"] p,
