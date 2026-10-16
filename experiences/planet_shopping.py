@@ -1069,7 +1069,8 @@ _TRANSFER_TABLE_STYLE = (
     "<style>"
     ".transfer-table-wrap { overflow-x: auto; padding: 0.9rem 1rem 0.5rem; border-radius: 0.5rem;"
     " margin-bottom: 0.75rem; background: linear-gradient(170deg, #030a14 0%, #06122a 100%); border: 1px solid rgba(47, 184, 255, 0.35); }"
-    ".transfer-table { width: 100%; min-width: 640px; border-collapse: separate; border-spacing: 0 0.6rem; color: #e8f1ff; }"
+    ".transfer-table { width: 100%; min-width: 640px; table-layout: fixed; border-collapse: separate; border-spacing: 0 0.6rem; color: #e8f1ff; }"
+    ".transfer-table col.setting { width: 9rem; }"
     ".transfer-table caption { position: absolute; left: -9999px; }"
     ".transfer-table th { padding: 0.2rem 0.8rem 0.5rem; text-align: left; font-size: 0.85rem; font-weight: 700;"
     " letter-spacing: 0.08em; text-transform: uppercase; color: #3fc3ff; }"
@@ -1082,7 +1083,7 @@ _TRANSFER_TABLE_STYLE = (
     " background: rgba(47, 184, 255, 0.06); border-top: 1px solid rgba(47, 184, 255, 0.5);"
     " border-bottom: 1px solid rgba(47, 184, 255, 0.5); font-size: 1rem; line-height: 1.3; }"
     ".transfer-table tbody th { border-left: 1px solid rgba(47, 184, 255, 0.5); border-radius: 0.5rem 0 0 0.5rem;"
-    " font-size: 1rem; letter-spacing: 0.06em; text-transform: uppercase; color: #3fc3ff; text-shadow: 0 0 8px rgba(47, 184, 255, 0.45); }"
+    " font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase; color: #3fc3ff; text-shadow: 0 0 8px rgba(47, 184, 255, 0.45); overflow-wrap: anywhere; }"
     ".transfer-table td:last-child { border-right: 1px solid rgba(255, 220, 0, 0.6); border-radius: 0 0.5rem 0.5rem 0;"
     " color: #FFDC00; font-weight: 600; text-shadow: 0 0 8px rgba(255, 220, 0, 0.4); background: rgba(255, 220, 0, 0.07);"
     " border-top-color: rgba(255, 220, 0, 0.6); border-bottom-color: rgba(255, 220, 0, 0.6); }"
@@ -1107,6 +1108,7 @@ def _transfer_table_html() -> str:
         _TRANSFER_TABLE_STYLE
         + "<div class='transfer-table-wrap'><table class='transfer-table'>"
         "<caption>The same steps in exoplanet search, online shopping, medicine, careers and sport</caption>"
+        "<colgroup><col class='setting'><col><col><col><col></colgroup>"
         f"<thead><tr><td aria-hidden='true'></td>{header}</tr></thead><tbody>{rows}</tbody></table></div>"
     )
 
