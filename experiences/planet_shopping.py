@@ -1068,7 +1068,7 @@ _TRANSFER_ROWS = (
 _TRANSFER_TABLE_STYLE = (
     "<style>"
     ".transfer-table-wrap { overflow-x: auto; padding: 0.9rem 1rem 0.5rem; border-radius: 0.5rem;"
-    " background: linear-gradient(170deg, #030a14 0%, #06122a 100%); border: 1px solid rgba(47, 184, 255, 0.35); }"
+    " margin-bottom: 0.75rem; background: linear-gradient(170deg, #030a14 0%, #06122a 100%); border: 1px solid rgba(47, 184, 255, 0.35); }"
     ".transfer-table { width: 100%; min-width: 640px; border-collapse: separate; border-spacing: 0 0.6rem; color: #e8f1ff; }"
     ".transfer-table caption { position: absolute; left: -9999px; }"
     ".transfer-table th { padding: 0.2rem 0.8rem 0.5rem; text-align: left; font-size: 0.85rem; font-weight: 700;"
@@ -1076,6 +1076,8 @@ _TRANSFER_TABLE_STYLE = (
     ".transfer-table th .step-number { display: inline-block; min-width: 1.5rem; height: 1.5rem; margin-right: 0.45rem;"
     " line-height: 1.4rem; text-align: center; border: 1.5px solid currentColor; border-radius: 50%; }"
     ".transfer-table th:last-child { color: #ffb13b; }"
+    ".transfer-table thead td { padding: 0; background: none; border: 0; }"
+    ".transfer-table thead td::before { content: none; }"
     ".transfer-table td, .transfer-table tbody th { position: relative; padding: 0.9rem 0.8rem; vertical-align: middle;"
     " background: rgba(47, 184, 255, 0.06); border-top: 1px solid rgba(47, 184, 255, 0.5);"
     " border-bottom: 1px solid rgba(47, 184, 255, 0.5); font-size: 1rem; line-height: 1.3; }"
