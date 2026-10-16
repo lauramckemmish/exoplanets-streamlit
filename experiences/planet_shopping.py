@@ -1139,7 +1139,7 @@ def _render_destination(data: pd.DataFrame) -> None:
         return
     _initialise_destination_control(st.session_state, names)
     st.markdown("#### Which planet would you choose?")
-    st.write("Check the evidence — including what we still don't know — then choose the one you want.")
+    st.write("Check the evidence, including what we still don't know, then choose the one you want.")
     if len(names) > _DESTINATION_LIST_LIMIT:
         st.info(
             f"There are {len(names):,} possible destinations, which is too many to look through one by one. "

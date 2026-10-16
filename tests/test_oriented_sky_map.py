@@ -324,7 +324,7 @@ class SkyMapTests(unittest.TestCase):
     def test_planet_shopping_requires_a_deliberate_transition_before_showing_the_map(self):
         shopping_source = Path("experiences/planet_shopping.py").read_text()
 
-        prompt_index = shopping_source.index("Check the evidence — including what we still don't know")
+        prompt_index = shopping_source.index("Check the evidence, including what we still don't know")
         list_call_index = shopping_source.index("_render_destination_list(candidates)", prompt_index)
         profile_index = shopping_source.index("_render_planet_profile(planet_name, planet, centred=False)")
         choose_index = shopping_source.index('"Choose this planet"')
