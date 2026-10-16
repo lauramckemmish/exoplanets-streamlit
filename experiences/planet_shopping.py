@@ -4,6 +4,7 @@ See ``planet_shopping.md`` for the established pedagogical design.
 """
 
 from datetime import date
+from html import escape
 from pathlib import Path
 import random
 
@@ -1049,16 +1050,71 @@ def _render_destination(data: pd.DataFrame) -> None:
     completion_gate(selected)
 
 
+_TRANSFER_STEPS = ("Many options", "Use criteria / filter", "Compare what remains", "Choose best match")
+_TRANSFER_ROWS = (
+    ("Exoplanets", "Many planets", "Filter candidate worlds", "Compare shortlisted planets", "Choose best match"),
+    ("Online shopping", "Many products", "Filter by needs", "Compare results", "Choose best option"),
+    ("Medicine", "Many treatments", "Use evidence and patient needs", "Compare benefits and risks", "Choose best treatment"),
+    ("Careers", "Many possible paths", "Use what matters to you", "Compare matches", "Choose best fit"),
+    (
+        "Sport & performance",
+        "Many players or strategies",
+        "Use criteria (skills / roles / goals)",
+        "Compare performance",
+        "Choose best lineup",
+    ),
+)
+
+_TRANSFER_TABLE_STYLE = (
+    "<style>"
+    ".transfer-table-wrap { overflow-x: auto; padding: 0.9rem 1rem 0.5rem; border-radius: 0.5rem;"
+    " background: linear-gradient(170deg, #030a14 0%, #06122a 100%); border: 1px solid rgba(47, 184, 255, 0.35); }"
+    ".transfer-table { width: 100%; min-width: 640px; border-collapse: separate; border-spacing: 0 0.6rem; color: #e8f1ff; }"
+    ".transfer-table caption { position: absolute; left: -9999px; }"
+    ".transfer-table th { padding: 0.2rem 0.8rem 0.5rem; text-align: left; font-size: 0.85rem; font-weight: 700;"
+    " letter-spacing: 0.08em; text-transform: uppercase; color: #3fc3ff; }"
+    ".transfer-table th .step-number { display: inline-block; min-width: 1.5rem; height: 1.5rem; margin-right: 0.45rem;"
+    " line-height: 1.4rem; text-align: center; border: 1.5px solid currentColor; border-radius: 50%; }"
+    ".transfer-table th:last-child { color: #ffb13b; }"
+    ".transfer-table td, .transfer-table tbody th { position: relative; padding: 0.9rem 0.8rem; vertical-align: middle;"
+    " background: rgba(47, 184, 255, 0.06); border-top: 1px solid rgba(47, 184, 255, 0.5);"
+    " border-bottom: 1px solid rgba(47, 184, 255, 0.5); font-size: 1rem; line-height: 1.3; }"
+    ".transfer-table tbody th { border-left: 1px solid rgba(47, 184, 255, 0.5); border-radius: 0.5rem 0 0 0.5rem;"
+    " font-size: 1rem; letter-spacing: 0.06em; text-transform: uppercase; color: #3fc3ff; text-shadow: 0 0 8px rgba(47, 184, 255, 0.45); }"
+    ".transfer-table td:last-child { border-right: 1px solid rgba(255, 177, 59, 0.6); border-radius: 0 0.5rem 0.5rem 0;"
+    " color: #ffb13b; font-weight: 600; text-shadow: 0 0 8px rgba(255, 177, 59, 0.4); background: rgba(255, 177, 59, 0.07);"
+    " border-top-color: rgba(255, 177, 59, 0.6); border-bottom-color: rgba(255, 177, 59, 0.6); }"
+    ".transfer-table td + td::before { content: '\\2192'; position: absolute; left: -0.62rem; top: 50%;"
+    " transform: translateY(-50%); color: #3fc3ff; font-size: 1.1rem; text-shadow: 0 0 6px rgba(47, 184, 255, 0.6); }"
+    ".transfer-table td:last-child::before { color: #ffb13b; text-shadow: 0 0 6px rgba(255, 177, 59, 0.6); }"
+    "</style>"
+)
+
+
+def _transfer_table_html() -> str:
+    """The same process in five settings, as a real table (replaces the old AI-generated graphic)."""
+    header = "".join(
+        f"<th scope='col'><span class='step-number' aria-hidden='true'>{number}</span>{escape(step)}</th>"
+        for number, step in enumerate(_TRANSFER_STEPS, start=1)
+    )
+    rows = "".join(
+        f"<tr><th scope='row'>{escape(setting)}</th>" + "".join(f"<td>{escape(cell)}</td>" for cell in cells) + "</tr>"
+        for setting, *cells in _TRANSFER_ROWS
+    )
+    return (
+        _TRANSFER_TABLE_STYLE
+        + "<div class='transfer-table-wrap'><table class='transfer-table'>"
+        "<caption>The same steps in exoplanet search, online shopping, medicine, careers and sport</caption>"
+        f"<thead><tr><td aria-hidden='true'></td>{header}</tr></thead><tbody>{rows}</tbody></table></div>"
+    )
+
+
 def _render_data_science() -> None:
     st.subheader("💡 Data Science")
     curriculum_tags([("SC5-DA2-01.L2", "◐")], key="planet_shopping_data_science")
     st.write("So why did we call this a shopping expedition?")
-    with st.container(width=720):
-        role_image(
-            TRANSFER_IMAGE_PATH,
-            role="support",
-            key="planet_shopping_transfer",
-        )
+    with st.container(width=960):
+        st.markdown(_transfer_table_html(), unsafe_allow_html=True)
     st.write(
         "You started with thousands of possibilities.\n\n"
         "You chose what mattered.\n\n"
