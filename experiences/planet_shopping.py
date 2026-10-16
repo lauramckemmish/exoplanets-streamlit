@@ -678,6 +678,11 @@ def _render_launch(data: pd.DataFrame) -> None:
                 role="context",
                 key="planet_shopping_solar_system",
             )
+            st.caption(
+                "An artist's concept of our solar system. The planets, moons, asteroids, and other objects are "
+                "not to scale. Image: Our Solar System: An artist's concept [digital image]. NASA/JPL-Caltech, "
+                "2018, NASA Science (science.nasa.gov)."
+            )
         st.write("Suppose none of those planets works either.")
         st.write("The Sun is one star. Other stars can have planets too. Those planets are **exoplanets**.")
 
