@@ -512,3 +512,28 @@ class DestinationLongShortlistFallbackTests(unittest.TestCase):
         self.assertFalse(at.exception)
         self.assertTrue(any(s.label == "Sort by" for s in at.selectbox))
         self.assertFalse(any(s.label == "Choose a planet to preview" for s in at.selectbox))
+
+
+class DestinationOrderCaptionTests(unittest.TestCase):
+    def test_unknown_detection_ignores_names_and_counts_only_missing_values(self):
+        from experiences.planet_shopping import _has_unknown_values
+
+        with_unknown = pd.DataFrame({"pl_name": ["a", "b"], "sy_snum": [1, None]})
+        without_unknown = pd.DataFrame({"pl_name": ["a", "b", None], "sy_snum": [1, 2, None]})
+
+        self.assertTrue(_has_unknown_values(with_unknown, "sy_snum"))
+        self.assertFalse(_has_unknown_values(without_unknown, "sy_snum"))
+
+    def test_caption_names_the_direction_and_says_when_there_are_no_unknowns(self):
+        from experiences.planet_shopping import _destination_order_caption
+
+        self.assertEqual(
+            _destination_order_caption(
+                "Number of stars in the system", descending=False, has_unknowns=False, unknowns_first=False
+            ),
+            "Number of stars in the system listed low to high. No unknown values for this criterion.",
+        )
+        self.assertEqual(
+            _destination_order_caption("Temperature", descending=True, has_unknowns=True, unknowns_first=True),
+            "Temperature listed high to low. Planets with an unknown value are listed first.",
+        )

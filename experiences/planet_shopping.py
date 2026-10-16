@@ -81,6 +81,13 @@ _SKY_MAP_REVEAL_KEY = "planet_shopping_sky_map_revealed"
 _DESTINATION_SORT_KEY = "planet_shopping_destination_sort"
 _DESTINATION_ORDER_KEY = "planet_shopping_destination_order"
 _DESTINATION_ORDER_OPTIONS = ("Low to high", "High to low")
+_DESTINATION_SORT_SUBJECTS = {
+    "Temperature": "Temperature",
+    "Distance": "Distance",
+    "Size": "Size",
+    "Stars in the system": "Number of stars in the system",
+    "Year length": "Year length",
+}
 _DESTINATION_UNKNOWN_KEY = "planet_shopping_destination_unknown_position"
 _DESTINATION_UNKNOWN_OPTIONS = ("Show first", "Show last")
 _DESTINATION_LIST_LIMIT = 150  # Above this the list is too long to browse; learners narrow their filters first.
@@ -429,6 +436,23 @@ def _initialise_combine_control(
 def _candidate_names(candidates: pd.DataFrame) -> list[str]:
     """Return every named real catalogue planet in deterministic order."""
     return sorted(candidates.dropna(subset=["pl_name"]).drop_duplicates("pl_name")["pl_name"].astype(str).tolist())
+
+
+def _has_unknown_values(candidates: pd.DataFrame, column: str) -> bool:
+    """True when at least one listed planet has no recorded value for ``column``."""
+    named = candidates.dropna(subset=["pl_name"]).drop_duplicates("pl_name")
+    return bool(pd.to_numeric(named[column], errors="coerce").isna().any())
+
+
+def _destination_order_caption(
+    subject: str, *, descending: bool, has_unknowns: bool, unknowns_first: bool
+) -> str:
+    """Say how the list is ordered and where (or whether) unknown values appear."""
+    direction = "high to low" if descending else "low to high"
+    if not has_unknowns:
+        return f"{subject} listed {direction}. No unknown values for this criterion."
+    position = "first" if unknowns_first else "last"
+    return f"{subject} listed {direction}. Planets with an unknown value are listed {position}."
 
 
 def _sort_destination_candidates(
@@ -937,6 +961,7 @@ def _render_destination_list(candidates: pd.DataFrame) -> None:
         sort_label = st.selectbox("Sort by", list(_DESTINATION_SORT_OPTIONS), key=_DESTINATION_SORT_KEY)
     sort_column = _DESTINATION_SORT_OPTIONS[sort_label]
     by_name = sort_column == "pl_name"
+    has_unknowns = not by_name and _has_unknown_values(candidates, sort_column)
     with order_choice:
         order = st.radio(
             "Order",
@@ -950,18 +975,22 @@ def _render_destination_list(candidates: pd.DataFrame) -> None:
             "Unknown values",
             _DESTINATION_UNKNOWN_OPTIONS,
             horizontal=True,
-            disabled=by_name,
+            disabled=not has_unknowns,
             key=_DESTINATION_UNKNOWN_KEY,
         )
     descending = order == _DESTINATION_ORDER_OPTIONS[1] and not by_name
-    unknowns_first = unknown_position == _DESTINATION_UNKNOWN_OPTIONS[0] and not by_name
+    unknowns_first = unknown_position == _DESTINATION_UNKNOWN_OPTIONS[0] and has_unknowns
     ordered = _sort_destination_candidates(
         candidates, sort_column, descending=descending, unknowns_first=unknowns_first
     )
     if not by_name:
         st.caption(
-            f"{'Highest' if descending else 'Lowest'} {sort_label.lower()} first. "
-            f"Planets with an unknown value are listed {'first' if unknowns_first else 'last'}."
+            _destination_order_caption(
+                _DESTINATION_SORT_SUBJECTS[sort_label],
+                descending=descending,
+                has_unknowns=has_unknowns,
+                unknowns_first=unknowns_first,
+            )
         )
         known_mask = pd.to_numeric(ordered[sort_column], errors="coerce").notna()
         has_both_groups = bool(known_mask.any() and (~known_mask).any())
