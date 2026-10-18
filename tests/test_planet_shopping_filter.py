@@ -112,7 +112,7 @@ class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
         self.assertEqual(_temperature_profile(373.15)[1], "Hotter than a summer day on Earth.")
         self.assertEqual(_temperature_profile(773.15)[1], "Very hot.")
         self.assertEqual(_temperature_profile(1272.15)[1], "Extremely hot.")
-        self.assertEqual(_temperature_profile(1274.15)[1], "Over 1,000 °C — extraordinarily hot.")
+        self.assertEqual(_temperature_profile(1274.15)[1], "Over 1,000 °C. Extraordinarily hot.")
 
     def test_profile_missing_value_is_explicitly_unknown(self):
         value, interpretation = _planet_display_value(None, _temperature_profile)

@@ -318,7 +318,7 @@ class SkyMapTests(unittest.TestCase):
             shopping_source,
         )
         self.assertNotIn("Most of these planets are not visible to the naked eye.", shopping_source)
-        self.assertIn("**The green dots are detected exoplanets — not stars.**", shopping_source)
+        self.assertIn("**The green dots are detected exoplanets, not stars.**", shopping_source)
         self.assertIn("The map shows where **known** exoplanets appear on our sky", shopping_source)
 
     def test_planet_shopping_requires_a_deliberate_transition_before_showing_the_map(self):
