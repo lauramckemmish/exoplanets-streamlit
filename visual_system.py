@@ -454,6 +454,16 @@ def apply_typography(scope_key: str) -> None:
                 font-weight: {body_weight};
             }}
             {scope} p strong, {scope} li strong, {scope} p b, {scope} li b {{ font-weight: {strong_weight}; }}
+            /* Facilitator live cues: Streamlit pulls each markdown block up by 1rem to cancel its last paragraph's
+               margin, but the shared cue style shrinks that margin, so the shaded box ended short of its text.
+               Remove the margin and the pull-up together so the box encloses all of the text. */
+            {scope} [class*="st-key-facilitator_live_"] {{ gap: 0.1rem; }}
+            {scope} [class*="st-key-facilitator_live_"] [data-testid="stMarkdownContainer"] {{ margin-bottom: 0; }}
+            {scope} [class*="st-key-facilitator_live_"] p {{ margin-bottom: 0; }}
+            /* The curriculum summary box sat only about 1px clear of its last line at the larger text size. */
+            {scope} .st-key-curriculum_summary {{ padding-bottom: 1.5rem; }}
+            /* Table cells follow the same font (weight is left to the table's own styling). */
+            {scope} td, {scope} th {{ font-family: {heading_font}, {fallback}; }}
             /* Learner-facing text: nothing smaller than body size. */
             {scope} [data-testid="stCaptionContainer"],
             {scope} [data-testid="stCaptionContainer"] p,
