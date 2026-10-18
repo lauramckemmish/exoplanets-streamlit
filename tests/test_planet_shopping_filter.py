@@ -414,3 +414,30 @@ class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class DisplayNameTests(unittest.TestCase):
+    def test_abbreviated_constellation_names_are_shown_in_full_without_changing_other_data(self):
+        from experiences.planet_shopping import _with_display_names
+
+        data = pd.DataFrame(
+            {
+                "pl_name": ["24 Sex b", "24 Sex c", "Kepler-22 b", "124 Sex b"],
+                "hostname": ["24 Sex", "24 Sex", "Kepler-22", "124 Sex"],
+                "pl_eqt": [471.0, 377.0, 262.0, 300.0],
+            }
+        )
+
+        shown = _with_display_names(data)
+
+        self.assertEqual(shown["pl_name"].tolist(), ["24 Sextantis b", "24 Sextantis c", "Kepler-22 b", "124 Sex b"])
+        self.assertEqual(shown["hostname"].tolist(), ["24 Sextantis", "24 Sextantis", "Kepler-22", "124 Sex"])
+        self.assertEqual(shown["pl_eqt"].tolist(), data["pl_eqt"].tolist())
+        self.assertEqual(data["pl_name"].tolist()[0], "24 Sex b")  # the original frame is not modified
+
+    def test_data_without_aliased_stars_is_returned_unchanged(self):
+        from experiences.planet_shopping import _with_display_names
+
+        data = pd.DataFrame({"pl_name": ["Kepler-22 b"], "hostname": ["Kepler-22"]})
+
+        self.assertIs(_with_display_names(data), data)

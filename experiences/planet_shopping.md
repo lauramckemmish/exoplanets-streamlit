@@ -267,6 +267,10 @@ Do not couple this experience to Tatooine session state.
 - `pl_eqt` is estimated equilibrium temperature in Kelvin; convert appropriately
   for learner-facing Celsius.
 - Missing values remain unknown.
+- Display names: NASA abbreviates the constellation Sextans as "Sex" (for example
+  "24 Sex b"). Planet Shopping shows these host stars by their full names (for
+  example "24 Sextantis b"). Only the displayed name changes; the records and
+  counts are untouched.
 - Do not globally change shared filtering semantics merely to implement this
   experience.
 
