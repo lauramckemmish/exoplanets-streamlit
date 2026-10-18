@@ -401,7 +401,7 @@ class SkyMapTests(unittest.TestCase):
         confirmation_index = shopping_source.index('st.success(f"Destination chosen: {destination_name}")')
         claim_boundary_call_index = shopping_source.index("hard_reveal(", confirmation_index)
         claim_boundary_prompt_index = shopping_source.index(
-            "**You’ve chosen a promising candidate. Are we done?**", claim_boundary_call_index
+            "**You’ve chosen a promising candidate. Have we found our new home?**", claim_boundary_call_index
         )
         claim_boundary_key_index = shopping_source.index(
             "_HABITABILITY_BOUNDARY_REVEAL_KEY", claim_boundary_call_index
