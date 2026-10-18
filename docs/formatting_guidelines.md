@@ -17,7 +17,8 @@ to Planet Shopping only; other experiences not yet changed).
 
 ## 1. Typography
 
-**Status:** ADOPTED in Planet Shopping · ROLLOUT PENDING for other experiences  
+**Status:** ADOPTED in Planet Shopping · ROLLOUT PENDING for other experiences
+
 **Scope:** shared mechanism (`apply_typography()` in `visual_system.py`), opted into per experience
 
 ### Rules
@@ -73,7 +74,8 @@ all experiences, a short pointer to this section should be added to that file.
 
 ## 2. Emoji and icons
 
-**Status:** ADOPTED in Planet Shopping · ROLLOUT PENDING for other experiences  
+**Status:** ADOPTED in Planet Shopping · ROLLOUT PENDING for other experiences
+
 **Scope:** local to each experience. Planet Shopping implements it with `_render_icon_marker()` in `experiences/planet_shopping.py`; this is not yet a shared helper.
 
 ### Rules
@@ -106,7 +108,8 @@ The sidebar (experience list and its icons) belongs to shared navigation and is 
 
 ## 3. Spacing between sections
 
-**Status:** ADOPTED in Planet Shopping (Meet a Planet, Temperature, Combine, Choose Your Destination, Data Science) · ROLLOUT PENDING for other experiences  
+**Status:** ADOPTED in Planet Shopping (Meet a Planet, Temperature, Combine, Choose Your Destination, Data Science) · ROLLOUT PENDING for other experiences
+
 **Scope:** shared mechanism (`apply_section_spacing()` in `visual_system.py`), opted into per experience and per stage
 
 ### Rules
