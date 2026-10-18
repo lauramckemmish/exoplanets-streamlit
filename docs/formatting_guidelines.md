@@ -146,6 +146,40 @@ if stage not in (0, 2):  # Launch and Distance keep their tighter flow.
 
 ---
 
+## 4. Sliders
+
+**Status:** ADOPTED in Planet Shopping (all stages with sliders) · ROLLOUT PENDING for other experiences
+
+**Scope:** shared mechanism (`apply_slider_style()` in `visual_system.py`), opted into per experience
+
+### Rules
+
+Sliders should look like the important, clickable controls they are. The increases are deliberately **subtle but noticeable**:
+
+| Part | Streamlit default | Now |
+| --- | --- | --- |
+| Track (the line) | 4px | **7px**, with fully rounded ends |
+| Handle (the circle) | 12px | **19px** |
+| Value shown above the handle | 16px (1rem) | **17.6px (1.1rem)** |
+
+The block above each slider has a little extra space (12px) so the larger value stays clear of the slider's own label.
+
+### Why
+
+At the default size the handle is small and easy to miss, especially on a projector or a touch screen, and the slider reads as a thin decorative line. A thicker track and bigger handle make it clear that this is the thing to move, and a larger value makes the number the learner is choosing easy to read.
+
+### Notes
+
+- All values live in `SLIDER_TOKENS` in `visual_system.py`; change them there, not per experience.
+- Not changed: the colour. Streamlit shows the slider value in the primary colour (UNSW yellow), which has low contrast on a white background. This is a known issue for a later accessibility pass, since the style guide asks for 4.5:1 contrast on ordinary text.
+- The min and max numbers under the slider keep their size.
+
+### How to apply to another experience
+
+Call `apply_slider_style("<experience>_sliders")` once near the top of the experience's render function. The styles apply only while that marker is on the page, so other experiences are unchanged.
+
+---
+
 ## 5. Em dashes
 
 **Status:** ADOPTED in Planet Shopping · ROLLOUT PENDING for other experiences

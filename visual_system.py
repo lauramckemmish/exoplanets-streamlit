@@ -520,3 +520,43 @@ def apply_section_spacing(scope_key: str) -> None:
             """,
             unsafe_allow_html=True,
         )
+
+
+SLIDER_TOKENS = {
+    "track_height": "7px",  # Streamlit default: 4px
+    "thumb_size": "19px",  # Streamlit default: 12px
+    "value_size": "1.1rem",  # Streamlit default: 1rem
+    "value_lift": "-30px",  # Moves the value above the larger thumb (default: -22px)
+    "group_height": "40px",  # Leaves room for the larger thumb and value (default: 40px)
+    "group_top_space": "12px",  # Keeps the larger value label clear of the slider's own label
+}
+
+
+def apply_slider_style(scope_key: str) -> None:
+    """Make sliders easier to see and grab, while ``scope_key`` is on the page.
+
+    Opt-in per experience, like ``apply_typography``. The changes are deliberately modest:
+    a thicker track, a larger handle and a larger value label.
+    """
+
+    t = SLIDER_TOKENS
+    slider = f'[data-testid="stMain"]:has(.st-key-{scope_key}) [data-testid="stSlider"]'
+    with st.container(key=scope_key):
+        st.markdown(
+            f"""
+            <style>
+            {slider} [role="group"] {{ height: {t['group_height']}; margin-top: {t['group_top_space']}; }}
+            {slider} [role="group"] > div > div:first-child {{
+                height: {t['track_height']};
+                border-radius: calc({t['track_height']} / 2);
+            }}
+            {slider} [role="group"] > div > div:has(input[type="range"]) {{
+                width: {t['thumb_size']};
+                height: {t['thumb_size']};
+            }}
+            {slider} [data-testid="stSliderThumbValue"] {{ top: {t['value_lift']}; }}
+            {slider} [data-testid="stSliderThumbValue"] p {{ font-size: {t['value_size']}; }}
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
