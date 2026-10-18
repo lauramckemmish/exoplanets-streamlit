@@ -743,30 +743,47 @@ def _planet_visual_style(planet: pd.Series) -> tuple[int, str, str]:
 def _render_planet_profile(planet_name: str, planet: pd.Series) -> None:
     """Render the compact evidence profile shared by browsing and destination choice."""
     planet_size, planet_colour, colour_description = _planet_visual_style(planet)
-    portrait, details = st.columns([1, 2])
-    with portrait:
-        with st.container(border=True):
-            st.markdown("#### Planet portrait")
-            st.markdown(f"**{planet_name}**")
-            st.markdown(
-                f"<div style='height: 170px; display: grid; place-items: center;'>"
-                f"<div role='img' aria-label='Symbolic planet portrait' title='{colour_description}; not to scale' "
-                f"style='width: {planet_size}px; height: {planet_size}px; border-radius: 50%; "
-                f"background: radial-gradient(circle at 32% 28%, #fff9, {planet_colour} 45%, #1e2a44); "
-                f"box-shadow: 0 0 22px {planet_colour}88;'></div></div>",
-                unsafe_allow_html=True,
-            )
-            st.caption("Symbolic data portrait. Colour and size are not to scale.")
-    with details:
-        st.markdown("#### Planet profile")
-        top_left, top_right = st.columns(2)
-        with top_left:
-            _render_planet_property("🌡️", "Temperature", planet["pl_eqt"], _temperature_profile)
-            _render_planet_property("🚀", "Distance", planet["sy_dist"], _distance_profile)
-            _render_planet_property("🌍", "Size", planet["pl_rade"], _size_profile)
-        with top_right:
-            _render_planet_property("☀️", "Stars in the system", planet["sy_snum"], _stars_profile)
-            _render_planet_property("📅", "Year length", planet["pl_orbper"], _year_profile)
+    st.markdown(
+        "<style>"
+        # Fixed-size block: two equal columns (portrait box + profile), 478px each with a 16px gap, as the
+        # portrait box was in the original layout on a wide monitor. It only shrinks ("squishes") once the
+        # content area is narrower than the block.
+        ".st-key-planet_shopping_profile { --profile-width: min(972px, 100%);"
+        " width: var(--profile-width); margin-left: auto; margin-right: auto; }"
+        # With the default 300px sidebar open, the block's midpoint sits 100px right of the window centre
+        # (sidebar 300px + 80px page padding = 380px). The space either side is whatever is left: as the
+        # window narrows it shrinks, down to zero on the left or right, rather than resizing the block.
+        ' [data-testid="stApp"]:has([data-testid="stSidebar"][aria-expanded="true"]) .st-key-planet_shopping_profile {'
+        " margin-left: clamp(0px, calc(50vw - 280px - var(--profile-width) / 2), calc(100% - var(--profile-width)));"
+        " margin-right: 0; }"
+        "</style>",
+        unsafe_allow_html=True,
+    )
+    with st.container(key="planet_shopping_profile"):
+        portrait, details = st.columns(2)
+        with portrait:
+            with st.container(border=True):
+                st.markdown("#### Planet portrait")
+                st.markdown(f"**{planet_name}**")
+                st.markdown(
+                    f"<div style='height: 170px; display: grid; place-items: center;'>"
+                    f"<div role='img' aria-label='Symbolic planet portrait' title='{colour_description}; not to scale' "
+                    f"style='width: {planet_size}px; height: {planet_size}px; border-radius: 50%; "
+                    f"background: radial-gradient(circle at 32% 28%, #fff9, {planet_colour} 45%, #1e2a44); "
+                    f"box-shadow: 0 0 22px {planet_colour}88;'></div></div>",
+                    unsafe_allow_html=True,
+                )
+                st.caption("Symbolic data portrait. Colour and size are not to scale.")
+        with details:
+            st.markdown("#### Planet profile")
+            top_left, top_right = st.columns(2)
+            with top_left:
+                _render_planet_property("🌡️", "Temperature", planet["pl_eqt"], _temperature_profile)
+                _render_planet_property("🚀", "Distance", planet["sy_dist"], _distance_profile)
+                _render_planet_property("🌍", "Size", planet["pl_rade"], _size_profile)
+            with top_right:
+                _render_planet_property("☀️", "Stars in the system", planet["sy_snum"], _stars_profile)
+                _render_planet_property("📅", "Year length", planet["pl_orbper"], _year_profile)
 
 
 def _render_meet_your_planet(data: pd.DataFrame) -> None:
