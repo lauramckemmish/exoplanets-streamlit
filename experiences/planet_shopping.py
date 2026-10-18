@@ -37,7 +37,6 @@ SUBTITLE = "Use real exoplanet data to find your perfect planet."
 ASSETS_DIR = Path(__file__).resolve().parent.parent / "assets"
 WELCOME_HOOK_IMAGE_PATH = ASSETS_DIR / "planet-shopping-welcome-hook.png"
 SOLAR_SYSTEM_IMAGE_PATH = ASSETS_DIR / "solar-system-nasa.jpeg"
-TRANSFER_IMAGE_PATH = ASSETS_DIR / "planet-shopping-transfer.png"
 ASTRONAUT_IMAGE_PATH = ASSETS_DIR / "astronaut-shopping-transparent.png"
 
 STAGE_LABELS = [
