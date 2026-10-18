@@ -514,15 +514,12 @@ def _render_temperature(data: pd.DataFrame) -> None:
         "Temperature is a deliberate whole-room reasoning anchor. Unknown temperature is not the same as unsuitable. "
         "Equilibrium temperature is an estimated model quantity, not a direct measurement of surface climate.",
     )
-    st.write("Choose an acceptable temperature range for your planet.")
-
     temperature_range_c = st.slider(
-        "Estimated equilibrium temperature range (°C)",
+        "Choose an acceptable temperature (°C) range for your planet.",
         min_value=-200,
         max_value=2_000,
         value=_TEMPERATURE_DEFAULT_RANGE_C,
         step=10,
-        label_visibility="collapsed",
         key=_TEMPERATURE_CONTROL_KEY,
     )
     temperature_range_c = (int(temperature_range_c[0]), int(temperature_range_c[1]))
