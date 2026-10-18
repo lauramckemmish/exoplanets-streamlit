@@ -66,8 +66,8 @@ _TEMPERATURE_DEFAULT_RANGE_C = (1_000, 2_000)
 _UNKNOWN_TEMPERATURE_CONTROL_KEY = "planet_shopping_unknown_temperature_control"
 _UNKNOWN_TEMPERATURE_DECISION_KEY = "planet_shopping_unknown_temperature_decision"
 _UNKNOWN_TEMPERATURE_OPTIONS = (
-    "Take the risk — keep unknowns as possibilities",
-    "Play it safe — set unknowns aside",
+    "Take the risk: keep unknowns as possibilities",
+    "Play it safe: set unknowns aside",
 )
 _COMBINE_DISTANCE_CONTROL_KEY = "planet_shopping_combine_distance_control_ly"
 _COMBINE_TEMPERATURE_CONTROL_KEY = "planet_shopping_combine_temperature_control_c"
@@ -225,7 +225,7 @@ def _temperature_profile(value) -> tuple[str, str]:
     elif celsius <= 1_000:
         interpretation = "Extremely hot."
     else:
-        interpretation = "Over 1,000 °C — extraordinarily hot."
+        interpretation = "Over 1,000 °C. Extraordinarily hot."
     return f"{celsius:.0f} °C", interpretation
 
 
@@ -696,7 +696,7 @@ def _render_planet_profile(planet_name: str, planet: pd.Series) -> None:
                     f"box-shadow: 0 0 22px {planet_colour}88;'></div></div>",
                     unsafe_allow_html=True,
                 )
-                st.caption("Symbolic data portrait — colour and size are not to scale.")
+                st.caption("Symbolic data portrait. Colour and size are not to scale.")
         with details:
             st.markdown("#### Planet profile")
             top_left, top_right = st.columns(2)
@@ -779,7 +779,7 @@ def _render_distance(data: pd.DataFrame) -> None:
 
     distance_population = _known_distance_population(data)
     st.caption(
-        "A light-year is a **distance** — and it is enormous. At passenger-plane speed, "
+        "A light-year is a **distance**, and it is enormous. At passenger-plane speed, "
         "travelling just **1 light-year would take about 1.2 million years.**"
     )
     _initialise_distance_control(st.session_state)
@@ -927,7 +927,7 @@ def _render_destination(data: pd.DataFrame) -> None:
         "it does not prove habitability. Unexpected real-data cases can be acknowledged or explored; an immediate expert "
         "explanation is not required.",
     )
-    st.write("You’ve narrowed the catalogue — but that may still be a lot of planets.")
+    st.write("You’ve narrowed the catalogue, but that may still be a lot of planets.")
 
     combine_distance = int(st.session_state.get(_COMBINE_DISTANCE_CONTROL_KEY, st.session_state.get(_APPLIED_DISTANCE_KEY, _DISTANCE_DEFAULT_VALUE)))
     combine_temperature = st.session_state.get(_COMBINE_TEMPERATURE_CONTROL_KEY, st.session_state.get(_APPLIED_TEMPERATURE_KEY, (0, 30)))
@@ -1032,12 +1032,12 @@ def _render_destination(data: pd.DataFrame) -> None:
             "**You’ve chosen a promising candidate. Are we done?**",
             _HABITABILITY_BOUNDARY_REVEAL_KEY,
             reveal_label="Check the claim",
-            revealed_message="**Not quite. You found a promising candidate — not proof of habitability.**",
+            revealed_message="**Not quite. You found a promising candidate, not proof of habitability.**",
             explanation=(
                 "Distance and estimated temperature helped you narrow the search. They do **not** tell us "
                 "whether the planet is actually habitable. We would need much more evidence about the planet "
                 "and its atmosphere.\n\n"
-                "Your filters answered **Which planets meet the criteria we chose?** — not "
+                "Your filters answered **Which planets meet the criteria we chose?** They did not answer "
                 "**Which planets are habitable?**"
             ),
         ):
@@ -1065,8 +1065,8 @@ def _render_destination(data: pd.DataFrame) -> None:
                         )
                     with interpretation_column:
                         st.info(
-                            "**The green dots are detected exoplanets — not stars.**  \n"
-                            "The map shows where **known** exoplanets appear on our sky — not where all planets really are."
+                            "**The green dots are detected exoplanets, not stars.**  \n"
+                            "The map shows where **known** exoplanets appear on our sky, not where all planets really are."
                         )
                         st.markdown(
                             "**Notice anything unusual about where the green dots are?**  \n"
@@ -1079,7 +1079,7 @@ def _render_destination(data: pd.DataFrame) -> None:
                                 "measuring the brightness of more than 100,000 stars in that concentrated patch."
                             )
                             st.write(
-                                "So the clumps and gaps in this map partly reflect **where we looked and how we looked** — "
+                                "So the clumps and gaps in this map partly reflect **where we looked and how we looked**, "
                                 "not just where planets exist."
                             )
             st.markdown(
@@ -1117,11 +1117,11 @@ def _render_destination(data: pd.DataFrame) -> None:
                     "of sky around Cygnus and Lyra to learn about exoplanet populations, so its major catalogue jumps and "
                     "the visible sky clump are meaningful scientific context rather than random plotting artefacts.\n\n"
                     "**Kepler → TESS → Roman: changing scientific questions**  \n"
-                    "- **Kepler — How common are different kinds of planets?** It went deep on one patch of sky to build a "
+                    "- **Kepler: How common are different kinds of planets?** It went deep on one patch of sky to build a "
                     "population census.\n"
-                    "- **TESS — Where are nearby planetary systems suitable for detailed follow-up?** It surveys much more "
+                    "- **TESS: Where are nearby planetary systems suitable for detailed follow-up?** It surveys much more "
                     "of the sky, especially bright nearby stars.\n"
-                    "- **Roman — What parts of the planetary population remain poorly sampled?** It extends the statistical "
+                    "- **Roman: What parts of the planetary population remain poorly sampled?** It extends the statistical "
                     "census into different regions and planetary parameter space.\n\n"
                     "**Where the science goes next**  \n"
                     "This activity is largely about finding and counting planets, then reasoning from basic planetary "
