@@ -811,10 +811,10 @@ def _render_combine(data: pd.DataFrame) -> None:
     # A prediction is optional input: it never gates the reveal or Continue.
     st.markdown(
         "<style>"
-        # Larger typed number and placeholder; the box grows with the text.
-        f".st-key-{_COMBINE_GUESS_KEY} [data-baseweb='input'] {{ min-height: 3.4rem; }}"
-        f".st-key-{_COMBINE_GUESS_KEY} input {{ font-size: 1.5rem; }}"
-        f".st-key-{_COMBINE_GUESS_KEY} input::placeholder {{ font-size: 1.5rem; }}"
+        # The typed number and placeholder match the label above in size and font (Tomorrow is the activity's font
+        # where it is loaded; otherwise the normal font is used), a touch smaller so it sits comfortably in the box.
+        f".st-key-{_COMBINE_GUESS_KEY} input {{ font-family: 'Tomorrow', 'Source Sans', sans-serif; font-size: 0.95rem; }}"
+        f".st-key-{_COMBINE_GUESS_KEY} input::placeholder {{ font-family: 'Tomorrow', 'Source Sans', sans-serif; font-size: 0.95rem; }}"
         "</style>",
         unsafe_allow_html=True,
     )
