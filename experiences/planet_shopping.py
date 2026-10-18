@@ -773,7 +773,7 @@ def _render_meet_your_planet(data: pd.DataFrame) -> None:
         return
 
     catalogue_revealed = hard_reveal(
-        "**So how many planets like this do we actually know about?**",
+        "**So how many exoplanets do we actually know about?**",
         _CATALOGUE_REVEAL_KEY,
         reveal_label="Show the catalogue",
     )
