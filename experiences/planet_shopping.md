@@ -86,7 +86,7 @@ and after the reveal. This is a minimum browsing experience, not a cap.
 After learners have browsed three distinct planets, use the existing catalogue
 hard reveal and growth display here:
 
-- ask how many planets like this we actually know about;
+- ask how many exoplanets we actually know about;
 - reveal the current catalogue size and growth over time;
 - note briefly that not every property is known for every planet;
 - motivate systematic filtering.
