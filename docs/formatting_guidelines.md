@@ -143,3 +143,35 @@ if stage not in (0, 2):  # Launch and Distance keep their tighter flow.
 ### Relationship to existing guidance
 
 `curious_online_style.md` asks for one main cognitive job per screen and warns against competing tasks; clearer separation between sections supports that. It does not specify spacing values, so this entry adds to it rather than overriding it.
+
+---
+
+## 5. Em dashes
+
+**Status:** ADOPTED in Planet Shopping · ROLLOUT PENDING for other experiences
+
+**Scope:** local to each experience's wording (no shared code)
+
+### Rules
+
+1. **Avoid em dashes (—) in learner-facing and facilitator text.** Restructure the sentence instead:
+   - **Full stop** when the dash joins two complete thoughts: *"Over 1,000 °C. Extraordinarily hot."*
+   - **Comma** for a contrast or an added clause: *"A light-year is a distance, and it is enormous."* and *"You found a promising candidate, not proof of habitability."*
+   - **Commas around the phrase** when a dash pair wraps an aside: *"Check the evidence, including what we still don't know, then choose the one you want."*
+   - **Colon** when a dash separates a label from what it names: *"Take the risk: keep unknowns as possibilities"* and *"Kepler: How common are different kinds of planets?"*
+2. **Keep an em dash only when it earns its place**, that is, when no comma, full stop or colon conveys the same information as clearly (for example, a break in speech or a sharp interruption that matters to the meaning). Expect these to be rare.
+3. **Do not swap one habit for another.** Replacing every dash with a semicolon or a long run of commas produces the same templated feel. Prefer shorter sentences.
+4. **Check the meaning survives.** A contrast like "not proof of habitability" should still read as a contrast after the dash is gone. Where a comma would blur it, use two sentences ("They did not answer…").
+
+### Why
+
+Em dashes used to splice clauses are one of the most recognisable markers of generated text. Plain punctuation reads as more natural, and shorter sentences are easier for learners to follow.
+
+### Exceptions in Planet Shopping
+
+- The curriculum label **"NSW curriculum — Stage 5 Data Science 2"** is a fixed heading shared with other experiences (and their tests). It is left as is until a shared decision is made.
+- Text inside shared helpers and other experiences is out of scope for Planet Shopping work.
+
+### How to check
+
+Search the experience's source for `—`. Every remaining one should either be a deliberate exception above or have a reason noted here.
