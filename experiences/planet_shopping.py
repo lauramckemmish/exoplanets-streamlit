@@ -809,6 +809,15 @@ def _render_combine(data: pd.DataFrame) -> None:
         _render_overlap_visual(len(distance_matches), len(temperature_matches))
     predict_prompt("How many planets do you think are in both groups?")
     # A prediction is optional input: it never gates the reveal or Continue.
+    st.markdown(
+        "<style>"
+        # Larger typed number and placeholder; the box grows with the text.
+        f".st-key-{_COMBINE_GUESS_KEY} [data-baseweb='input'] {{ min-height: 3.4rem; }}"
+        f".st-key-{_COMBINE_GUESS_KEY} input {{ font-size: 1.5rem; }}"
+        f".st-key-{_COMBINE_GUESS_KEY} input::placeholder {{ font-size: 1.5rem; }}"
+        "</style>",
+        unsafe_allow_html=True,
+    )
     st.number_input(
         "Your guess: how many planets are in both groups?",
         min_value=0,
