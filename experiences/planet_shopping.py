@@ -36,7 +36,7 @@ from ui_helpers import (
 TITLE = "Planet Shopping Outside Our Solar System"
 SUBTITLE = "Use real exoplanet data to find your perfect planet."
 ASSETS_DIR = Path(__file__).resolve().parent.parent / "assets"
-WELCOME_HOOK_IMAGE_PATH = ASSETS_DIR / "planet-shopping-welcome-hook.png"
+WELCOME_HOOK_IMAGE_PATH = ASSETS_DIR / "wall-e-looking-up-at-the-stars.jpg"
 SOLAR_SYSTEM_IMAGE_PATH = ASSETS_DIR / "solar-system-nasa.jpeg"
 ASTRONAUT_IMAGE_PATH = ASSETS_DIR / "astronaut-shopping-transparent.png"
 
@@ -652,11 +652,84 @@ def _render_temperature(data: pd.DataFrame) -> None:
 
 def _render_launch(data: pd.DataFrame) -> None:
     st.subheader("Launch")
+    st.markdown(
+        "<style>"
+        # The overlay text sits in the image's top-left corner. Streamlit cannot layer elements, so the
+        # image's wrapper is positioned and the overlay's element container is placed over it.
+        ".st-key-planet_shopping_hero_image { position: relative; }"
+        '.st-key-planet_shopping_hero_image [data-testid="stElementContainer"]:has(.hero-overlay) {'
+        " position: absolute; top: 1.1rem; left: 1.4rem; width: 52%; z-index: 2; }"
+        ".hero-overlay { color: #fff; text-shadow: 0 1px 6px rgba(20, 8, 40, 0.75), 0 0 2px rgba(20, 8, 40, 0.6); }"
+        ".st-key-planet_shopping_hero_image .hero-overlay .hero-overlay__title { margin: 0; color: #FF635D; font-weight: 700; line-height: 1.1;"
+        " font-size: clamp(1.4rem, 3.2vw, 2.4rem); text-transform: uppercase; }"
+        ".st-key-planet_shopping_hero_image .hero-overlay .hero-overlay__text { margin: 0.45rem 0 0; font-size: clamp(1rem, 1.7vw, 1.35rem); line-height: 1.3; }"
+        # Mission briefing panel: deep space navy-black with yellow title and glowing yellow step numbers; same corner
+        # radius as the image. The row stretches its two
+        # columns to the same height, and the panel fills its column, so it is exactly as tall as the image.
+        '[data-testid="stHorizontalBlock"]:has(.st-key-planet_shopping_mission_box) { align-items: stretch; }'
+        '[data-testid="stColumn"]:has(.st-key-planet_shopping_mission_box) > [data-testid="stVerticalBlock"] { height: 100%; }'
+        '[data-testid="stColumn"]:has(.st-key-planet_shopping_mission_box) [data-testid="stLayoutWrapper"] { height: 100%; }'
+        ".st-key-planet_shopping_mission_box { position: relative; overflow: hidden; height: 100%; min-height: 20rem;"
+        " border-radius: 0.5rem; background: linear-gradient(165deg, #0a1020 0%, #0e172e 55%, #121a33 100%);"
+        " border: 1px solid rgba(255, 220, 0, 0.28); padding: 1.4rem 1.4rem 1.1rem; color: #fff; }"
+        ".st-key-planet_shopping_mission_box > div, .st-key-planet_shopping_mission_box [data-testid='stElementContainer'],"
+        " .st-key-planet_shopping_mission_box [data-testid='stMarkdown'] { height: 100%; }"
+        ".mission { display: flex; flex-direction: column; height: 100%; }"
+        # Below 1100px the side-by-side layout gets cramped (the sidebar takes 300px of it), so stack the two.
+        "@media (max-width: 1100px) {"
+        ' [data-testid="stHorizontalBlock"]:has(.st-key-planet_shopping_mission_box) { flex-direction: column; }'
+        ' [data-testid="stHorizontalBlock"]:has(.st-key-planet_shopping_mission_box) > [data-testid="stColumn"] {'
+        " width: 100% !important; flex: 1 1 100% !important; min-width: 100% !important; }"
+        ' [data-testid="stColumn"]:has(.st-key-planet_shopping_mission_box) > [data-testid="stVerticalBlock"],'
+        ' [data-testid="stColumn"]:has(.st-key-planet_shopping_mission_box) [data-testid="stLayoutWrapper"] { height: auto; }'
+        " .st-key-planet_shopping_mission_box { height: auto; min-height: 0; }"
+        "}"
+        ".st-key-planet_shopping_mission_box .mission__title { margin: 0.2rem 0 0.6rem; padding: 0 0 0.7rem;"
+        " color: #FFDC00; font-size: 1.5rem; font-weight: 700; letter-spacing: 0.14em; line-height: 1.2;"
+        " border-bottom: 1px solid rgba(255, 220, 0, 0.45); }"
+        ".mission__steps { list-style: none; counter-reset: step; margin: 0; padding: 0; flex: 1;"
+        " display: flex; flex-direction: column; justify-content: space-evenly; }"
+        ".mission__steps li { counter-increment: step; display: flex; align-items: center; gap: 0.9rem;"
+        " padding: 0.3rem 0; color: #fff; font-size: 1.3rem; line-height: 1.25; }"
+        ".mission__steps li + li { border-top: 1px solid rgba(255, 255, 255, 0.16); }"
+        ".mission__steps li::before { content: counter(step, decimal-leading-zero); flex: 0 0 auto;"
+        " color: #FFDC00; text-shadow: 0 0 10px rgba(255, 220, 0, 0.55); font-size: 2.2rem; font-weight: 700;"
+        " line-height: 1; min-width: 2.8rem; }"
+        "</style>",
+        unsafe_allow_html=True,
+    )
     with st.container(width=960):
-        role_image(
-            WELCOME_HOOK_IMAGE_PATH,
-            role="hero",
-            key="planet_shopping_welcome_hook",
+        image_column, mission_column = st.columns([5, 2], gap="medium")
+        with image_column:
+            with st.container(key="planet_shopping_hero_image"):
+                role_image(
+                    WELCOME_HOOK_IMAGE_PATH,
+                    role="hero",
+                    key="planet_shopping_welcome_hook",
+                )
+                st.markdown(
+                    "<div class='hero-overlay'>"
+                    "<p class='hero-overlay__title'>Earth is unavailable</p>"
+                    "<p class='hero-overlay__text'>But the universe is full of possibilities.</p>"
+                    "</div>",
+                    unsafe_allow_html=True,
+                )
+        with mission_column:
+            with st.container(key="planet_shopping_mission_box"):
+                st.markdown(
+                    "<div class='mission'>"
+                    "<h4 class='mission__title'>YOUR<br>MISSION</h4>"
+                    "<ol class='mission__steps'>"
+                    "<li>Explore the data</li>"
+                    "<li>Set your criteria</li>"
+                    "<li>Filter the options</li>"
+                    "<li>Find the best world for our new home</li>"
+                    "</ol></div>",
+                    unsafe_allow_html=True,
+                )
+        st.caption(
+            "Image: WALL-E promotional still [digital image]. Pixar Animation Studios, 2008, "
+            "Disney+ (disneyplus.com). © Walt Disney Pictures."
         )
 
     with st.container(width="content"):
@@ -667,6 +740,10 @@ def _render_launch(data: pd.DataFrame) -> None:
                 SOLAR_SYSTEM_IMAGE_PATH,
                 role="context",
                 key="planet_shopping_solar_system",
+            )
+            st.caption(
+                "Image: Our Solar System: An artist's concept [digital image]. NASA/JPL-Caltech, "
+                "2018, NASA Science (science.nasa.gov)."
             )
         st.write("Suppose none of those planets works either.")
         st.write("The Sun is one star. Other stars can have planets too. Those planets are **exoplanets**.")
