@@ -3,7 +3,9 @@
 See ``planet_shopping.md`` for the established pedagogical design.
 """
 
+import base64
 from datetime import date
+from functools import lru_cache
 from html import escape
 from pathlib import Path
 import random
@@ -36,7 +38,7 @@ SUBTITLE = "Use real exoplanet data to find your perfect planet."
 ASSETS_DIR = Path(__file__).resolve().parent.parent / "assets"
 WELCOME_HOOK_IMAGE_PATH = ASSETS_DIR / "wall-e-looking-up-at-the-stars.jpg"
 SOLAR_SYSTEM_IMAGE_PATH = ASSETS_DIR / "solar-system-nasa.jpeg"
-TRANSFER_IMAGE_PATH = ASSETS_DIR / "planet-shopping-transfer.png"
+ASTRONAUT_IMAGE_PATH = ASSETS_DIR / "astronaut-shopping-transparent.png"
 
 STAGE_LABELS = [
     "Launch",
@@ -1233,16 +1235,119 @@ def _render_destination(data: pd.DataFrame) -> None:
     completion_gate(selected)
 
 
+_TRANSFER_STEPS = ("Many options", "Use criteria / filter", "Compare what remains", "Choose best match")
+_TRANSFER_ROWS = (
+    ("Exoplanets", "Many planets", "Filter candidate worlds", "Compare shortlisted planets", "Choose best match"),
+    ("Online shopping", "Many products", "Filter by needs", "Compare results", "Choose best option"),
+)
+
+_TRANSFER_TABLE_STYLE = (
+    "<style>"
+    ".transfer-table-wrap { overflow-x: auto; padding: 1.06rem 1.18rem 0.59rem; border-radius: 0.59rem;"
+    " margin-bottom: 0.89rem; background: linear-gradient(170deg, #030a14 0%, #06122a 100%); border: 1px solid rgba(47, 184, 255, 0.35); }"
+    ".transfer-table { width: 100%; min-width: 660px; table-layout: fixed; border-collapse: separate; border-spacing: 0 0.71rem; color: #e8f1ff; }"
+    ".transfer-table col.setting { width: 10.03rem; }"
+    ".transfer-table caption { position: absolute; left: -9999px; }"
+    ".transfer-table th { padding: 0.24rem 0.94rem 0.59rem; text-align: left; font-size: 1rem; font-weight: 700;"
+    " letter-spacing: 0.08em; text-transform: uppercase; color: #3fc3ff; }"
+    ".transfer-table th .step-number { display: inline-block; min-width: 1.77rem; height: 1.77rem; margin-right: 0.53rem;"
+    " line-height: 1.65rem; text-align: center; border: 1.5px solid currentColor; border-radius: 50%; }"
+    ".transfer-table th:last-child { color: #FFDC00; }"
+    ".transfer-table thead td { padding: 0; background: none; border: 0; }"
+    ".transfer-table thead th { vertical-align: bottom; }"
+    # The astronaut stands on the EXOPLANETS cell: it lives in the header's empty top-left cell, and its wheels rest
+    # on the cell's top outline (the header cell's bottom edge sits right on that outline).
+    ".transfer-table thead td.mascot { position: relative; height: 8.97rem; padding: 0; }"
+    ".transfer-astronaut { position: absolute; left: 0.83rem; bottom: -2px; height: 9.2rem; width: auto;"
+    " z-index: 2; pointer-events: none; }"
+    ".transfer-table thead td::before { content: none; }"
+    ".transfer-table td, .transfer-table tbody th { position: relative; padding: 1.06rem 0.94rem; vertical-align: middle;"
+    " background: rgba(47, 184, 255, 0.06); border-top: 1px solid rgba(47, 184, 255, 0.5);"
+    " border-bottom: 1px solid rgba(47, 184, 255, 0.5); font-size: 1.18rem; line-height: 1.3; }"
+    ".transfer-table tbody th { border-left: 1px solid rgba(47, 184, 255, 0.5); border-radius: 0.59rem 0 0 0.59rem;"
+    " font-size: 1.06rem; letter-spacing: 0.05em; text-transform: uppercase; color: #3fc3ff; text-shadow: 0 0 8px rgba(47, 184, 255, 0.45); overflow-wrap: break-word; }"
+    ".transfer-table td:last-child { border-right: 1px solid rgba(255, 220, 0, 0.6); border-radius: 0 0.59rem 0.59rem 0;"
+    " color: #FFDC00; font-weight: 600; text-shadow: 0 0 8px rgba(255, 220, 0, 0.4); background: rgba(255, 220, 0, 0.07);"
+    " border-top-color: rgba(255, 220, 0, 0.6); border-bottom-color: rgba(255, 220, 0, 0.6); }"
+    ".transfer-table td + td::before { content: '\\2192'; position: absolute; left: -0.73rem; top: 50%;"
+    " transform: translateY(-50%); color: #3fc3ff; font-size: 1.3rem; text-shadow: 0 0 6px rgba(47, 184, 255, 0.6); }"
+    ".transfer-table td:last-child::before { color: #FFDC00; text-shadow: 0 0 6px rgba(255, 220, 0, 0.6); }"
+    "</style>"
+)
+
+
+_TRANSFER_EXAMPLES = ("Medicine", "Careers", "Sport")
+_TRANSFER_EXAMPLES_KEY = "planet_shopping_transfer_examples_response"
+# Light circles with dark labels and a thick outline.
+_TRANSFER_EXAMPLES_STYLE = (
+    "<style>"
+    ".transfer-examples { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem; margin: 0.5rem 0 1rem;"
+    " padding: 0; list-style: none; }"
+    ".transfer-examples li { display: flex; align-items: center; justify-content: center; box-sizing: border-box;"
+    " width: 10.5rem; height: 10.5rem; margin: 0; padding: 0.5rem; border-radius: 50%; text-align: center;"
+    " border: 8px solid #1c4e9a; background: #f2f6fb; color: #06122a;"
+    " font-family: 'Atkinson Hyperlegible', 'Source Sans', sans-serif;"
+    # !important: the page's general list-item text size and weight would otherwise win.
+    " font-size: 1.7rem !important; font-weight: 700 !important; }"
+    "</style>"
+)
+
+
+def _transfer_examples_html() -> str:
+    """Other areas where the same steps apply, as large circles."""
+    items = "".join(f"<li>{escape(name)}</li>" for name in _TRANSFER_EXAMPLES)
+    return _TRANSFER_EXAMPLES_STYLE + f"<ul class='transfer-examples' role='list'>{items}</ul>"
+
+
+@lru_cache(maxsize=1)
+def _astronaut_data_uri() -> str:
+    """The shopping astronaut (background removed) as an inline image, loaded once."""
+    return "data:image/png;base64," + base64.b64encode(ASTRONAUT_IMAGE_PATH.read_bytes()).decode("ascii")
+
+
+def _transfer_table_html() -> str:
+    """The same process in exoplanet search and online shopping, as a real table (replaces the old AI-generated graphic)."""
+    header = "".join(
+        f"<th scope='col'><span class='step-number' aria-hidden='true'>{number}</span>{escape(step)}</th>"
+        for number, step in enumerate(_TRANSFER_STEPS, start=1)
+    )
+    rows = "".join(
+        f"<tr><th scope='row'>{escape(setting)}</th>" + "".join(f"<td>{escape(cell)}</td>" for cell in cells) + "</tr>"
+        for setting, *cells in _TRANSFER_ROWS
+    )
+    return (
+        _TRANSFER_TABLE_STYLE
+        + "<div class='transfer-table-wrap'><table class='transfer-table'>"
+        "<caption>The same steps in exoplanet search and online shopping</caption>"
+        "<colgroup><col class='setting'><col><col><col><col></colgroup>"
+        f"<thead><tr><td class='mascot' aria-hidden='true'>"
+        f"<img class='transfer-astronaut' src='{_astronaut_data_uri()}' alt=''></td>{header}</tr></thead>"
+        f"<tbody>{rows}</tbody></table></div>"
+    )
+
+
 def _render_data_science() -> None:
     st.subheader("Data Science")
     curriculum_tags([("SC5-DA2-01.L2", "◐")], key="planet_shopping_data_science")
     st.write("So why did we call this a shopping expedition?")
-    with st.container(width=720):
-        role_image(
-            TRANSFER_IMAGE_PATH,
-            role="support",
-            key="planet_shopping_transfer",
-        )
+    with st.container(width=800):
+        st.markdown(_transfer_table_html(), unsafe_allow_html=True)
+        st.caption("Image: Astronaut shopping [illustration]. @catalyststuff, Magnific (magnific.com).")
+    st.markdown("#### Where else could we use this?")
+    with st.container(width=800):
+        st.markdown(_transfer_examples_html(), unsafe_allow_html=True)
+    st.write("Think of an area you are interested in. How could you use this approach to make a decision there?")
+    # Optional, like the typed guess: it never gates the page, and what the learner typed is kept for the session.
+    st.text_area(
+        "Think of an area you are interested in. How could you use this approach to make a decision there?",
+        key=_TRANSFER_EXAMPLES_KEY,
+        height=100,
+        placeholder="I could use this approach to answer …",
+        label_visibility="collapsed",
+        persist_state="session",
+    )
+    # Extra space (on top of the normal gap) so the recap reads as its own block, matching the section spacing.
+    st.markdown("<div style='height: 0.75rem'></div>", unsafe_allow_html=True)
     st.write(
         "You started with thousands of possibilities.\n\n"
         "You chose what mattered.\n\n"

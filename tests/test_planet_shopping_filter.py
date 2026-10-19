@@ -441,3 +441,29 @@ class DisplayNameTests(unittest.TestCase):
         data = pd.DataFrame({"pl_name": ["Kepler-22 b"], "hostname": ["Kepler-22"]})
 
         self.assertIs(_with_display_names(data), data)
+
+
+class DataScienceTransferExamplesTests(unittest.TestCase):
+    def test_other_examples_are_three_circles_in_a_list(self):
+        from experiences.planet_shopping import _transfer_examples_html
+
+        html = _transfer_examples_html()
+
+        self.assertEqual(html.count("<li>"), 3)
+        for name in ("Medicine", "Careers", "Sport"):
+            self.assertIn(f"<li>{name}</li>", html)
+
+    def test_page_prompts_for_other_examples_with_an_optional_text_box(self):
+        from streamlit.testing.v1 import AppTest
+
+        def page():
+            from experiences.planet_shopping import _render_data_science
+
+            _render_data_science()
+
+        app = AppTest.from_function(page).run()
+
+        self.assertFalse(app.exception)
+        self.assertIn("#### Where else could we use this?", [m.value for m in app.markdown])
+        self.assertEqual(len(app.text_area), 1)
+        self.assertEqual(app.text_area[0].value, "")  # optional: nothing is required to carry on
