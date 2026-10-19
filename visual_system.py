@@ -521,3 +521,32 @@ def apply_typography(scope_key: str) -> None:
             """,
             unsafe_allow_html=True,
         )
+
+
+SPACING_TOKENS = {
+    # Added on top of the normal gap between elements.
+    "section_space": "1.75rem",
+}
+
+
+def apply_section_spacing(scope_key: str) -> None:
+    """Add a clear break before section headings and REVEAL blocks, while ``scope_key`` is on the page.
+
+    Opt-in per stage, like ``apply_typography``. Only headings that sit directly in the page flow
+    are affected, so headings inside columns or bordered boxes (for example the planet portrait and
+    profile) keep their alignment.
+    """
+
+    space = SPACING_TOKENS["section_space"]
+    scope = f'[data-testid="stMain"]:has(.st-key-{scope_key})'
+    flow = f'{scope} [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"]'
+    with st.container(key=scope_key):
+        st.markdown(
+            f"""
+            <style>
+            {flow} > [data-testid="stElementContainer"]:has(h4) {{ margin-top: {space}; }}
+            {flow} > [data-testid="stLayoutWrapper"]:has(> [class*="st-key-hard_reveal_"] .interaction-marker) {{ margin-top: {space}; }}
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )

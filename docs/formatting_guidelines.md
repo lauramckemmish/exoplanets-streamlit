@@ -108,6 +108,46 @@ The sidebar (experience list and its icons) belongs to shared navigation and is 
 
 ---
 
+## 3. Spacing between sections
+
+**Status:** ADOPTED in Planet Shopping (Meet a Planet, Temperature, Combine, Choose Your Destination, Data Science) · ROLLOUT PENDING for other experiences
+
+**Scope:** shared mechanism (`apply_section_spacing()` in `visual_system.py`), opted into per experience and per stage
+
+### Rules
+
+1. **Add a visible space before every section heading and before every REVEAL block.** The standard amount is **28px (1.75rem)** on top of the normal gap between elements. The value is `section_space` in `SPACING_TOKENS`.
+2. **Use space, not only text size, to separate sections.** Differences in heading size help show hierarchy, but on their own they do not give the page enough separation. A small-to-medium space is also needed so each section reads as its own block.
+3. **Only page-level headings get the space.** Headings inside columns or bordered boxes (for example "Planet portrait" and "Planet profile") are not spaced, so their alignment is preserved.
+4. **The stage title itself is not spaced**, since it follows the tabs directly.
+5. **Short, tightly connected stages can opt out.** In Planet Shopping, Launch and Distance keep their tighter flow.
+
+### Why
+
+Generated pages often separate sections by changing text size alone: a bigger heading, then a block of body text, then another bigger heading, with the same small gap throughout. That leaves pages looking dense and overwhelming, and it is one of the ways such pages read as templated. A consistent, noticeable space before each section makes the structure clearer and the page calmer.
+
+### What counts as a "section"
+
+- A heading written as a Markdown `####` (for example "Your choices" or "Each criterion on its own").
+- A REVEAL block, meaning a hard reveal that shows the **REVEAL** label above its prompt. A reveal that is only a button (for example the Combine "Show the combined result" button, which belongs to the Predict prompt above it) has no label and is not spaced.
+
+### How to apply to another experience
+
+Call `apply_section_spacing("<experience>_section_spacing")` once per stage, **after** the active stage is known (after the stage tabs are rendered), and skip it on stages that should stay tight. It places a marker container, and the styles apply only while that marker is on the page. Experiences that have not opted in are unchanged.
+
+In Planet Shopping this is in `render()`:
+
+```python
+if stage not in (0, 2):  # Launch and Distance keep their tighter flow.
+    apply_section_spacing("planet_shopping_section_spacing")
+```
+
+### Relationship to existing guidance
+
+`curious_online_style.md` asks for one main cognitive job per screen and warns against competing tasks; clearer separation between sections supports that. It does not specify spacing values, so this entry adds to it rather than overriding it.
+
+---
+
 ## 5. Em dashes
 
 **Status:** ADOPTED in Planet Shopping · ROLLOUT PENDING for other experiences
