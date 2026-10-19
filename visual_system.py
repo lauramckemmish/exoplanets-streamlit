@@ -411,13 +411,27 @@ def apply_visual_system() -> None:
 TYPOGRAPHY_TOKENS = {
     "heading_font": "'Tomorrow'",
     "heading_weight": "700",
+    # Body text is Atkinson Hyperlegible. "Tomorrow Digits" is Tomorrow limited to the digits 0-9 (see
+    # _DIGIT_FONT_CSS), listed first so numbers keep the Tomorrow look while all other characters fall through.
+    "body_font": "'Tomorrow Digits', 'Atkinson Hyperlegible'",
     "body_font_fallback": "'Source Sans', 'Source Sans Pro', sans-serif",
     "body_weight": "400",
-    "body_strong_weight": "600",
+    "body_strong_weight": "700",
     "learner_min_size": "1rem",
     "facilitator_min_size": "0.875rem",
 }
-_HEADING_FONT_URL = "https://fonts.googleapis.com/css2?family=Tomorrow:wght@400;600;700&display=swap"
+_HEADING_FONT_URL = (
+    "https://fonts.googleapis.com/css2?family=Tomorrow:wght@400;700"
+    "&family=Atkinson+Hyperlegible:wght@400;700&display=swap"
+)
+# Tomorrow restricted to digits, so numbers in body text keep the Tomorrow look. If these files ever move,
+# digits quietly fall back to Atkinson Hyperlegible and nothing breaks.
+_DIGIT_FONT_CSS = """
+@font-face { font-family: 'Tomorrow Digits'; font-weight: 400; font-display: swap; unicode-range: U+0030-0039;
+    src: url(https://fonts.gstatic.com/s/tomorrow/v19/WBLmrETNbFtZCeGqgRXSe2DiLsip.woff2) format('woff2'); }
+@font-face { font-family: 'Tomorrow Digits'; font-weight: 700; font-display: swap; unicode-range: U+0030-0039;
+    src: url(https://fonts.gstatic.com/s/tomorrow/v19/WBLhrETNbFtZCeGqgR1pXnXPDMWDikd5.woff2) format('woff2'); }
+"""
 
 
 def apply_typography(scope_key: str) -> None:
@@ -429,6 +443,7 @@ def apply_typography(scope_key: str) -> None:
     """
 
     heading_font = TYPOGRAPHY_TOKENS["heading_font"]
+    body_font = TYPOGRAPHY_TOKENS["body_font"]
     fallback = TYPOGRAPHY_TOKENS["body_font_fallback"]
     weight = TYPOGRAPHY_TOKENS["heading_weight"]
     body_weight = TYPOGRAPHY_TOKENS["body_weight"]
@@ -441,16 +456,17 @@ def apply_typography(scope_key: str) -> None:
             f"""
             <style>
             @import url('{_HEADING_FONT_URL}');
+            {_DIGIT_FONT_CSS}
             {scope} h1, {scope} h2, {scope} h3, {scope} h4 {{
                 font-family: {heading_font}, {fallback};
                 font-weight: {weight};
             }}
             {scope} h1 *, {scope} h2 *, {scope} h3 *, {scope} h4 * {{ font-weight: {weight}; }}
-            /* Body text: same family as headings. Targeted, so icon fonts are untouched. */
+            /* Body text: Atkinson Hyperlegible, with Tomorrow digits. Targeted, so icon fonts are untouched. */
             {scope} p, {scope} li, {scope} summary, {scope} label,
             {scope} [data-testid="stCaptionContainer"],
             {scope} [data-testid="stMetricValue"], {scope} [data-testid="stMetricLabel"] {{
-                font-family: {heading_font}, {fallback};
+                font-family: {body_font}, {fallback};
                 font-weight: {body_weight};
             }}
             {scope} p strong, {scope} li strong, {scope} p b, {scope} li b {{ font-weight: {strong_weight}; }}
@@ -463,7 +479,7 @@ def apply_typography(scope_key: str) -> None:
             /* The curriculum summary box sat only about 1px clear of its last line at the larger text size. */
             {scope} .st-key-curriculum_summary {{ padding-bottom: 1.5rem; }}
             /* Table cells follow the same font (weight is left to the table's own styling). */
-            {scope} td, {scope} th {{ font-family: {heading_font}, {fallback}; }}
+            {scope} td, {scope} th {{ font-family: {body_font}, {fallback}; }}
             /* Learner-facing text: nothing smaller than body size. */
             {scope} [data-testid="stCaptionContainer"],
             {scope} [data-testid="stCaptionContainer"] p,
