@@ -975,13 +975,13 @@ def _render_combine(data: pd.DataFrame) -> None:
     # A prediction is optional input: it never gates the reveal or Continue.
     from visual_system import TYPOGRAPHY_TOKENS
 
-    _GUESS_FONT = f"{TYPOGRAPHY_TOKENS['body_font']}, {TYPOGRAPHY_TOKENS['body_font_fallback']}"
+    _GUESS_FONT = f"{TYPOGRAPHY_TOKENS['number_font']}, {TYPOGRAPHY_TOKENS['body_font_fallback']}"
     st.markdown(
         "<style>"
-        # The typed number and placeholder match the label above in size and font (the activity's body font, with
+        # The typed number and placeholder match the label above in size and font (the activity's number font,
         # Tomorrow digits), a touch smaller so it sits comfortably in the box.
-        f".st-key-{_COMBINE_GUESS_KEY} input {{ font-family: {_GUESS_FONT}; font-size: 0.95rem; }}"
-        f".st-key-{_COMBINE_GUESS_KEY} input::placeholder {{ font-family: {_GUESS_FONT}; font-size: 0.95rem; }}"
+        f".st-key-{_COMBINE_GUESS_KEY} input {{ font-family: {_GUESS_FONT}; font-size: 1rem; }}"
+        f".st-key-{_COMBINE_GUESS_KEY} input::placeholder {{ font-family: {_GUESS_FONT}; font-size: 1rem; }}"
         "</style>",
         unsafe_allow_html=True,
     )
