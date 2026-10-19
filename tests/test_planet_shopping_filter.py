@@ -416,6 +416,128 @@ if __name__ == "__main__":
     unittest.main()
 
 
+class DestinationSortTests(unittest.TestCase):
+    def test_sort_puts_lowest_first_and_unknown_last_without_treating_unknown_as_zero(self):
+        from experiences.planet_shopping import _sort_destination_candidates
+
+        candidates = pd.DataFrame(
+            {
+                "pl_name": ["Warm", "Unknown one", "Cold", "Hot", "Unknown two", "Cold"],
+                "pl_eqt": [300.0, None, 100.0, 900.0, float("nan"), 100.0],
+            }
+        )
+
+        ordered = _sort_destination_candidates(candidates, "pl_eqt")
+
+        self.assertEqual(ordered["pl_name"].tolist(), ["Cold", "Warm", "Hot", "Unknown one", "Unknown two"])
+
+    def test_sort_by_name_is_alphabetical_and_lists_each_planet_once(self):
+        from experiences.planet_shopping import _sort_destination_candidates
+
+        candidates = pd.DataFrame({"pl_name": ["b", "a", "b", None], "pl_eqt": [1, 2, 3, 4]})
+
+        self.assertEqual(_sort_destination_candidates(candidates, "pl_name")["pl_name"].tolist(), ["a", "b"])
+
+    def test_high_to_low_reverses_known_values_but_keeps_unknown_last(self):
+        from experiences.planet_shopping import _sort_destination_candidates
+
+        candidates = pd.DataFrame(
+            {
+                "pl_name": ["Warm", "Unknown", "Cold", "Hot"],
+                "pl_eqt": [300.0, None, 100.0, 900.0],
+            }
+        )
+
+        ordered = _sort_destination_candidates(candidates, "pl_eqt", descending=True)
+
+        self.assertEqual(ordered["pl_name"].tolist(), ["Hot", "Warm", "Cold", "Unknown"])
+
+    def test_unknowns_can_be_placed_first_in_either_direction_without_being_sorted_as_a_value(self):
+        from experiences.planet_shopping import _sort_destination_candidates
+
+        candidates = pd.DataFrame(
+            {
+                "pl_name": ["Warm", "Unknown b", "Cold", "Unknown a", "Hot"],
+                "pl_eqt": [300.0, None, 100.0, None, 900.0],
+            }
+        )
+
+        low_to_high = _sort_destination_candidates(candidates, "pl_eqt", unknowns_first=True)
+        high_to_low = _sort_destination_candidates(candidates, "pl_eqt", descending=True, unknowns_first=True)
+
+        self.assertEqual(low_to_high["pl_name"].tolist(), ["Unknown a", "Unknown b", "Cold", "Warm", "Hot"])
+        self.assertEqual(high_to_low["pl_name"].tolist(), ["Unknown a", "Unknown b", "Hot", "Warm", "Cold"])
+
+
+class DestinationLongShortlistFallbackTests(unittest.TestCase):
+    def _run(self, limit):
+        from streamlit.testing.v1 import AppTest
+
+        def app():
+            import streamlit as st
+            import data
+            from experiences import planet_shopping as ps
+
+            ps._DESTINATION_LIST_LIMIT = st.session_state.get("limit", 12)
+            if "init" not in st.session_state:
+                st.session_state["init"] = True
+                st.session_state[ps._COMBINE_DISTANCE_CONTROL_KEY] = 2000
+                st.session_state[ps._COMBINE_TEMPERATURE_CONTROL_KEY] = (-200, 2000)
+                st.session_state[ps._COMBINE_UNKNOWN_CONTROL_KEY] = ps._UNKNOWN_TEMPERATURE_OPTIONS[0]
+            ps._render_destination(data.prepare(data.load_sample()))
+
+        at = AppTest.from_function(app, default_timeout=60)
+        at.session_state["limit"] = limit
+        return at.run()
+
+    def test_too_many_planets_still_lets_the_learner_preview_and_choose_one(self):
+        at = self._run(limit=1)
+
+        self.assertFalse(at.exception)
+        self.assertTrue(any("too many to look through one by one" in i.value for i in at.info))
+        self.assertTrue(any("Preview exoplanets one by one" in m.value for m in at.markdown))
+        preview = [s for s in at.selectbox if s.label == "Choose a planet to preview"]
+        self.assertEqual(len(preview), 1)
+
+        preview[0].select(preview[0].options[0]).run()
+        choose = [b for b in at.button if b.label == "Choose this planet"]
+        self.assertEqual(len(choose), 1)
+        choose[0].click().run()
+
+        self.assertTrue(any("Destination chosen" in s.value for s in at.success))
+
+    def test_a_manageable_shortlist_shows_the_sortable_list_and_no_preview_dropdown(self):
+        at = self._run(limit=10_000)
+
+        self.assertFalse(at.exception)
+        self.assertTrue(any(s.label == "Sort by" for s in at.selectbox))
+        self.assertFalse(any(s.label == "Choose a planet to preview" for s in at.selectbox))
+
+
+class DestinationOrderCaptionTests(unittest.TestCase):
+    def test_unknown_detection_ignores_names_and_counts_only_missing_values(self):
+        from experiences.planet_shopping import _has_unknown_values
+
+        with_unknown = pd.DataFrame({"pl_name": ["a", "b"], "sy_snum": [1, None]})
+        without_unknown = pd.DataFrame({"pl_name": ["a", "b", None], "sy_snum": [1, 2, None]})
+
+        self.assertTrue(_has_unknown_values(with_unknown, "sy_snum"))
+        self.assertFalse(_has_unknown_values(without_unknown, "sy_snum"))
+
+    def test_caption_names_the_direction_and_says_when_there_are_no_unknowns(self):
+        from experiences.planet_shopping import _destination_order_caption
+
+        self.assertEqual(
+            _destination_order_caption(
+                "Number of stars in the system", descending=False, has_unknowns=False, unknowns_first=False
+            ),
+            "Number of stars in the system listed low to high. No unknowns for this criterion.",
+        )
+        self.assertEqual(
+            _destination_order_caption("Temperature", descending=True, has_unknowns=True, unknowns_first=True),
+            "Temperature listed high to low. Planets with an unknown value are listed first.",
+        )
+
 class DisplayNameTests(unittest.TestCase):
     def test_abbreviated_constellation_names_are_shown_in_full_without_changing_other_data(self):
         from experiences.planet_shopping import _with_display_names

@@ -324,11 +324,11 @@ class SkyMapTests(unittest.TestCase):
     def test_planet_shopping_requires_a_deliberate_transition_before_showing_the_map(self):
         shopping_source = Path("experiences/planet_shopping.py").read_text()
 
-        profile_index = shopping_source.index("_render_planet_profile(inspected_name, inspected_destination)")
-        selection_guard_index = shopping_source.index("if inspected_name is not None:")
-        prompt_index = shopping_source.index("Still want this one? Check the evidence")
-        choose_index = shopping_source.index('st.button("Choose this planet", type="primary")')
-        commit_index = shopping_source.index("_record_destination_selection(st.session_state, inspected_name)")
+        prompt_index = shopping_source.index("Check the evidence, including what we still don't know")
+        list_call_index = shopping_source.index("_render_destination_list(candidates)", prompt_index)
+        profile_index = shopping_source.index("_render_planet_profile(planet_name, planet, centred=False)")
+        choose_index = shopping_source.index('"Choose this planet"')
+        commit_index = shopping_source.index("on_click=_record_destination_selection", choose_index)
         confirmation_index = shopping_source.index('st.success(f"Destination chosen: {destination_name}")')
         claim_boundary_index = shopping_source.index(
             "_HABITABILITY_BOUNDARY_REVEAL_KEY", confirmation_index
@@ -351,10 +351,10 @@ class SkyMapTests(unittest.TestCase):
         noticing_index = shopping_source.index("**Notice anything unusual", clarification_index)
         soft_reveal_index = shopping_source.index('with soft_reveal("Why are they so unevenly spread across the sky?"):', noticing_index)
 
-        self.assertLess(selection_guard_index, profile_index)
-        self.assertLess(profile_index, prompt_index)
-        self.assertLess(prompt_index, choose_index)
+        self.assertLess(prompt_index, list_call_index)
+        self.assertLess(profile_index, choose_index)
         self.assertLess(choose_index, commit_index)
+        self.assertLess(list_call_index, confirmation_index)
         self.assertLess(commit_index, confirmation_index)
         self.assertLess(confirmation_index, claim_boundary_index)
         self.assertLess(claim_boundary_index, sky_map_prompt_index)

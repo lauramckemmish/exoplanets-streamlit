@@ -81,6 +81,29 @@ _DESTINATION_CONTROL_KEY = "planet_shopping_destination_control"
 _APPLIED_DESTINATION_KEY = "planet_shopping_applied_destination"
 _HABITABILITY_BOUNDARY_REVEAL_KEY = "planet_shopping_habitability_boundary_revealed"
 _SKY_MAP_REVEAL_KEY = "planet_shopping_sky_map_revealed"
+_DESTINATION_SORT_KEY = "planet_shopping_destination_sort"
+_DESTINATION_ORDER_KEY = "planet_shopping_destination_order"
+_DESTINATION_ORDER_OPTIONS = ("Low to high", "High to low")
+_DESTINATION_SORT_SUBJECTS = {
+    "Temperature": "Temperature",
+    "Distance": "Distance",
+    "Size": "Size",
+    "Stars in the system": "Number of stars in the system",
+    "Year length": "Year length",
+}
+_DESTINATION_UNKNOWN_KEY = "planet_shopping_destination_unknown_position"
+_DESTINATION_UNKNOWN_OPTIONS = ("Show first", "Show last")
+# Above this the list is too long to browse, and heavy for a whole class on one server; learners narrow first.
+_DESTINATION_LIST_LIMIT = 12
+_DESTINATION_LIST_HEIGHT = 640
+_DESTINATION_SORT_OPTIONS = {
+    "Name (A–Z)": "pl_name",
+    "Temperature": "pl_eqt",
+    "Distance": "sy_dist",
+    "Size": "pl_rade",
+    "Stars in the system": "sy_snum",
+    "Year length": "pl_orbper",
+}
 _DESTINATION_USE_SIZE_KEY = "planet_shopping_destination_use_size"
 _DESTINATION_SIZE_CONTROL_KEY = "planet_shopping_destination_size_control"
 _DESTINATION_USE_STARS_KEY = "planet_shopping_destination_use_stars"
@@ -443,6 +466,44 @@ def _candidate_names(candidates: pd.DataFrame) -> list[str]:
     return sorted(candidates.dropna(subset=["pl_name"]).drop_duplicates("pl_name")["pl_name"].astype(str).tolist())
 
 
+def _has_unknown_values(candidates: pd.DataFrame, column: str) -> bool:
+    """True when at least one listed planet has no recorded value for ``column``."""
+    named = candidates.dropna(subset=["pl_name"]).drop_duplicates("pl_name")
+    return bool(pd.to_numeric(named[column], errors="coerce").isna().any())
+
+
+def _destination_order_caption(
+    subject: str, *, descending: bool, has_unknowns: bool, unknowns_first: bool
+) -> str:
+    """Say how the list is ordered and where (or whether) unknown values appear."""
+    direction = "high to low" if descending else "low to high"
+    if not has_unknowns:
+        return f"{subject} listed {direction}. No unknowns for this criterion."
+    position = "first" if unknowns_first else "last"
+    return f"{subject} listed {direction}. Planets with an unknown value are listed {position}."
+
+
+def _sort_destination_candidates(
+    candidates: pd.DataFrame, column: str, *, descending: bool = False, unknowns_first: bool = False
+) -> pd.DataFrame:
+    """List each named planet once, ordered by one field.
+
+    Planets with an unknown value form their own group, placed first or last as the learner
+    chooses. Unknown is never sorted as if it were a low or high value (or zero). Ties are
+    broken by name so the order is stable.
+    """
+    named = candidates.dropna(subset=["pl_name"]).drop_duplicates("pl_name").copy()
+    named["_name"] = named["pl_name"].astype(str)
+    if column == "pl_name":
+        return named.sort_values("_name").drop(columns="_name")
+    named["_value"] = pd.to_numeric(named[column], errors="coerce")
+    return named.sort_values(
+        ["_value", "_name"],
+        ascending=[not descending, True],
+        na_position="first" if unknowns_first else "last",
+    ).drop(columns=["_name", "_value"])
+
+
 def _apply_optional_filter(
     data: pd.DataFrame, field: str, predicate, keep_unknowns: bool
 ) -> pd.DataFrame:
@@ -763,26 +824,30 @@ def _planet_visual_style(planet: pd.Series) -> tuple[int, str, str]:
     return diameter, "#B570C9", "Middle-range colour"
 
 
-def _render_planet_profile(planet_name: str, planet: pd.Series) -> None:
-    """Render the compact evidence profile shared by browsing and destination choice."""
+def _render_planet_profile(planet_name: str, planet: pd.Series, *, centred: bool = True) -> None:
+    """Render the compact evidence profile shared by browsing and destination choice.
+
+    ``centred=False`` drops the page-level centring so the profile can sit inside a list or box.
+    """
     planet_size, planet_colour, colour_description = _planet_visual_style(planet)
-    st.markdown(
-        "<style>"
-        # Fixed-size block: two equal columns (portrait box + profile), 478px each with a 16px gap, as the
-        # portrait box was in the original layout on a wide monitor. It only shrinks ("squishes") once the
-        # content area is narrower than the block.
-        ".st-key-planet_shopping_profile { --profile-width: min(972px, 100%);"
-        " width: var(--profile-width); margin-left: auto; margin-right: auto; }"
-        # With the default 300px sidebar open, the block's midpoint sits 100px right of the window centre
-        # (sidebar 300px + 80px page padding = 380px). The space either side is whatever is left: as the
-        # window narrows it shrinks, down to zero on the left or right, rather than resizing the block.
-        ' [data-testid="stApp"]:has([data-testid="stSidebar"][aria-expanded="true"]) .st-key-planet_shopping_profile {'
-        " margin-left: clamp(0px, calc(50vw - 280px - var(--profile-width) / 2), calc(100% - var(--profile-width)));"
-        " margin-right: 0; }"
-        "</style>",
-        unsafe_allow_html=True,
-    )
-    with st.container(key="planet_shopping_profile"):
+    if centred:
+        st.markdown(
+            "<style>"
+            # Fixed-size block: two equal columns (portrait box + profile), 478px each with a 16px gap, as the
+            # portrait box was in the original layout on a wide monitor. It only shrinks ("squishes") once the
+            # content area is narrower than the block.
+            ".st-key-planet_shopping_profile { --profile-width: min(972px, 100%);"
+            " width: var(--profile-width); margin-left: auto; margin-right: auto; }"
+            # With the default 300px sidebar open, the block's midpoint sits 100px right of the window centre
+            # (sidebar 300px + 80px page padding = 380px). The space either side is whatever is left: as the
+            # window narrows it shrinks, down to zero on the left or right, rather than resizing the block.
+            ' [data-testid="stApp"]:has([data-testid="stSidebar"][aria-expanded="true"]) .st-key-planet_shopping_profile {'
+            " margin-left: clamp(0px, calc(50vw - 280px - var(--profile-width) / 2), calc(100% - var(--profile-width)));"
+            " margin-right: 0; }"
+            "</style>",
+            unsafe_allow_html=True,
+        )
+    with st.container(key="planet_shopping_profile") if centred else st.container():
         portrait, details = st.columns(2)
         with portrait:
             with st.container(border=True):
@@ -1017,6 +1082,95 @@ def _render_combine(data: pd.DataFrame) -> None:
         )
 
 
+def _render_destination_list(candidates: pd.DataFrame) -> None:
+    """Show every possible destination in a sortable scrolling list, each with a choose button."""
+    sort_choice, order_choice, unknown_choice = st.columns([3, 2, 2])
+    with sort_choice:
+        sort_label = st.selectbox("Sort by", list(_DESTINATION_SORT_OPTIONS), key=_DESTINATION_SORT_KEY)
+    sort_column = _DESTINATION_SORT_OPTIONS[sort_label]
+    by_name = sort_column == "pl_name"
+    has_unknowns = not by_name and _has_unknown_values(candidates, sort_column)
+    with order_choice:
+        order = st.radio(
+            "Order",
+            _DESTINATION_ORDER_OPTIONS,
+            horizontal=True,
+            disabled=by_name,
+            key=_DESTINATION_ORDER_KEY,
+        )
+    with unknown_choice:
+        unknown_position = st.radio(
+            "Unknown values",
+            _DESTINATION_UNKNOWN_OPTIONS,
+            horizontal=True,
+            disabled=not has_unknowns,
+            key=_DESTINATION_UNKNOWN_KEY,
+        )
+    descending = order == _DESTINATION_ORDER_OPTIONS[1] and not by_name
+    unknowns_first = unknown_position == _DESTINATION_UNKNOWN_OPTIONS[0] and has_unknowns
+    ordered = _sort_destination_candidates(
+        candidates, sort_column, descending=descending, unknowns_first=unknowns_first
+    )
+    if not by_name:
+        st.caption(
+            _destination_order_caption(
+                _DESTINATION_SORT_SUBJECTS[sort_label],
+                descending=descending,
+                has_unknowns=has_unknowns,
+                unknowns_first=unknowns_first,
+            )
+        )
+        known_mask = pd.to_numeric(ordered[sort_column], errors="coerce").notna()
+        has_both_groups = bool(known_mask.any() and (~known_mask).any())
+    else:
+        has_both_groups = False
+    chosen_name = st.session_state.get(_APPLIED_DESTINATION_KEY)
+    current_group = None
+    with st.container(height=_DESTINATION_LIST_HEIGHT, border=True, key="planet_shopping_destination_list"):
+        for _, planet in ordered.iterrows():
+            planet_name = str(planet["pl_name"])
+            if has_both_groups:
+                is_known = pd.notna(pd.to_numeric(pd.Series([planet[sort_column]]), errors="coerce").iloc[0])
+                if is_known != current_group:
+                    current_group = is_known
+                    if is_known:
+                        st.markdown(f"**Known {sort_label.lower()}**")
+                    else:
+                        st.markdown(f"**Unknown {sort_label.lower()}**")
+                        st.caption("We don't have a measurement for these planets yet.")
+            _render_planet_profile(planet_name, planet, centred=False)
+            if planet_name == chosen_name:
+                st.success("Your destination")
+            else:
+                st.button(
+                    "Choose this planet",
+                    type="primary",
+                    key=f"planet_shopping_choose_{planet_name}",
+                    on_click=_record_destination_selection,
+                    args=(st.session_state, planet_name),
+                )
+            st.divider()
+
+
+def _render_destination_preview(candidates: pd.DataFrame, names: list[str]) -> None:
+    """Fallback for a long shortlist: preview one planet at a time and still choose one."""
+    st.markdown("**Preview exoplanets one by one:**")
+    previous = _initialise_destination_control(st.session_state, names)
+    index = names.index(previous) if previous in names else None
+    inspected_name = st.selectbox(
+        "Choose a planet to preview",
+        names,
+        index=index,
+        key=_DESTINATION_CONTROL_KEY,
+    )
+    if inspected_name is not None:
+        inspected_destination = candidates.loc[candidates["pl_name"].astype(str) == inspected_name].iloc[0]
+        _render_planet_profile(inspected_name, inspected_destination)
+        st.write("Still want this one? Or narrow your choices above to compare more planets at once.")
+        if st.button("Choose this planet", type="primary"):
+            _record_destination_selection(st.session_state, inspected_name)
+
+
 def _render_destination(data: pd.DataFrame) -> None:
     st.subheader("Choose Your Destination")
     curriculum_tags(
@@ -1111,20 +1265,17 @@ def _render_destination(data: pd.DataFrame) -> None:
         st.warning("The remaining records do not have planet names to inspect. Try loosening a filter.")
         completion_gate(False)
         return
-    previous = _initialise_destination_control(st.session_state, names)
-    index = names.index(previous) if previous in names else None
-    inspected_name = st.selectbox(
-        "Which planet would you choose?",
-        names,
-        index=index,
-        key=_DESTINATION_CONTROL_KEY,
-    )
-    if inspected_name is not None:
-        inspected_destination = candidates.loc[candidates["pl_name"].astype(str) == inspected_name].iloc[0]
-        _render_planet_profile(inspected_name, inspected_destination)
-        st.write("Still want this one? Check the evidence — including what we still don't know.")
-        if st.button("Choose this planet", type="primary"):
-            _record_destination_selection(st.session_state, inspected_name)
+    _initialise_destination_control(st.session_state, names)
+    st.markdown("#### Which planet would you choose?")
+    st.write("Check the evidence, including what we still don't know, then choose the one you want.")
+    if len(names) > _DESTINATION_LIST_LIMIT:
+        st.info(
+            f"There are {len(names):,} possible destinations, which is too many to look through one by one. "
+            "Narrow your choices above until the list feels more manageable."
+        )
+        _render_destination_preview(candidates, names)
+    else:
+        _render_destination_list(candidates)
 
     destination_name = st.session_state.get(_APPLIED_DESTINATION_KEY)
     selected = destination_name in names
