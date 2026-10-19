@@ -1278,15 +1278,15 @@ _TRANSFER_TABLE_STYLE = (
 
 _TRANSFER_EXAMPLES = ("Medicine", "Careers", "Sport")
 _TRANSFER_EXAMPLES_KEY = "planet_shopping_transfer_examples_response"
-# White circles with black labels and a thick outline in the same blue as the table above.
+# White circles with black labels and a thick outline in the dark blue of the table above.
 _TRANSFER_EXAMPLES_STYLE = (
     "<style>"
     ".transfer-examples { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem; margin: 0.5rem 0 1rem;"
     " padding: 0; list-style: none; }"
     ".transfer-examples li { display: flex; align-items: center; justify-content: center; box-sizing: border-box;"
     " width: 10.5rem; height: 10.5rem; margin: 0; padding: 0.5rem; border-radius: 50%; text-align: center;"
-    " background: #ffffff; border: 8px solid #2fb8ff; color: #000000; font-size: 1.3rem; font-weight: 700;"
-    " letter-spacing: 0.06em; text-transform: uppercase; }"
+    " background: #ffffff; border: 8px solid #06122a; color: #000000; font-family: 'Atkinson Hyperlegible', 'Source Sans', sans-serif;"
+    " font-size: 1.7rem; font-weight: 700; }"
     "</style>"
 )
 
