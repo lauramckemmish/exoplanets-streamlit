@@ -412,13 +412,16 @@ TYPOGRAPHY_TOKENS = {
     "heading_font": "'Tomorrow'",
     "heading_weight": "700",
     # Body text is Atkinson Hyperlegible. "Tomorrow Digits" is Tomorrow limited to the digits 0-9 (see
-    # _DIGIT_FONT_CSS), listed first so numbers keep the Tomorrow look while all other characters fall through.
-    "body_font": "'Tomorrow Digits', 'Atkinson Hyperlegible'",
+    # _DIGIT_FONT_CSS), listed first so stand-alone numbers (slider values, metrics, table cells) keep the
+    # Tomorrow look while all other characters fall through. Numbers inside sentences stay in the body font.
+    "body_font": "'Atkinson Hyperlegible'",
+    "number_font": "'Tomorrow Digits', 'Atkinson Hyperlegible'",
     "body_font_fallback": "'Source Sans', 'Source Sans Pro', sans-serif",
     "body_weight": "400",
     "body_strong_weight": "700",
-    "learner_min_size": "1rem",
-    "facilitator_min_size": "0.875rem",
+    # Atkinson Hyperlegible looks smaller than Tomorrow at the same size, so every size is 1px larger than before.
+    "learner_min_size": "1.0625rem",
+    "facilitator_min_size": "0.9375rem",
 }
 _HEADING_FONT_URL = (
     "https://fonts.googleapis.com/css2?family=Tomorrow:wght@400;700"
@@ -444,6 +447,7 @@ def apply_typography(scope_key: str) -> None:
 
     heading_font = TYPOGRAPHY_TOKENS["heading_font"]
     body_font = TYPOGRAPHY_TOKENS["body_font"]
+    number_font = TYPOGRAPHY_TOKENS["number_font"]
     fallback = TYPOGRAPHY_TOKENS["body_font_fallback"]
     weight = TYPOGRAPHY_TOKENS["heading_weight"]
     body_weight = TYPOGRAPHY_TOKENS["body_weight"]
@@ -479,7 +483,15 @@ def apply_typography(scope_key: str) -> None:
             /* The curriculum summary box sat only about 1px clear of its last line at the larger text size. */
             {scope} .st-key-curriculum_summary {{ padding-bottom: 1.5rem; }}
             /* Table cells follow the same font (weight is left to the table's own styling). */
-            {scope} td, {scope} th {{ font-family: {body_font}, {fallback}; }}
+            {scope} td, {scope} th {{ font-family: {number_font}, {fallback}; }}
+            /* Stand-alone numbers (not part of a sentence) use Tomorrow digits. */
+            {scope} [data-testid="stMetricValue"], {scope} [data-testid="stMetricValue"] *,
+            {scope} [data-testid="stSliderThumbValue"], {scope} [data-testid="stSliderThumbValue"] p,
+            {scope} [data-testid="stSliderTickBarMin"], {scope} [data-testid="stSliderTickBarMax"] {{ font-family: {number_font}, {fallback}; }}
+            /* Plain Markdown paragraphs and list items are body text at the learner size. */
+            {scope} [data-testid="stMarkdownContainer"] > p,
+            {scope} [data-testid="stMarkdownContainer"] > ul li,
+            {scope} [data-testid="stMarkdownContainer"] > ol li {{ font-size: {learner}; }}
             /* Learner-facing text: nothing smaller than body size. */
             {scope} [data-testid="stCaptionContainer"],
             {scope} [data-testid="stCaptionContainer"] p,
