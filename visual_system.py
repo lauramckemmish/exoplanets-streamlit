@@ -492,6 +492,8 @@ def apply_typography(scope_key: str) -> None:
             {scope} [data-testid="stMarkdownContainer"] > p,
             {scope} [data-testid="stMarkdownContainer"] > ul li,
             {scope} [data-testid="stMarkdownContainer"] > ol li {{ font-size: {learner}; }}
+            /* st.metric renders its value through a Markdown container too; keep the big metric size. */
+            {scope} [data-testid="stMetricValue"] [data-testid="stMarkdownContainer"] > p {{ font-size: inherit; }}
             /* Learner-facing text: nothing smaller than body size. */
             {scope} [data-testid="stCaptionContainer"],
             {scope} [data-testid="stCaptionContainer"] p,
