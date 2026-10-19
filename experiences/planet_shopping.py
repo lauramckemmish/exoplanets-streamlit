@@ -1286,7 +1286,8 @@ _TRANSFER_EXAMPLES_STYLE = (
     ".transfer-examples li { display: flex; align-items: center; justify-content: center; box-sizing: border-box;"
     " width: 10.5rem; height: 10.5rem; margin: 0; padding: 0.5rem; border-radius: 50%; text-align: center;"
     " background: #ffffff; border: 8px solid #06122a; color: #000000; font-family: 'Atkinson Hyperlegible', 'Source Sans', sans-serif;"
-    " font-size: 1.7rem; font-weight: 700; }"
+    # !important: the page's general list-item text size and weight would otherwise win.
+    " font-size: 1.7rem !important; font-weight: 700 !important; }"
     "</style>"
 )
 
