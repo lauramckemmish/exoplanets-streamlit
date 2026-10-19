@@ -1285,14 +1285,10 @@ _TRANSFER_EXAMPLES_STYLE = (
     " padding: 0; list-style: none; }"
     ".transfer-examples li { display: flex; align-items: center; justify-content: center; box-sizing: border-box;"
     " width: 10.5rem; height: 10.5rem; margin: 0; padding: 0.5rem; border-radius: 50%; text-align: center;"
-    " border: 8px solid #2fb8ff; background: #e3f4ff; color: #06122a;"
+    " border: 8px solid #1c4e9a; background: #f2f6fb; color: #06122a;"
     " font-family: 'Atkinson Hyperlegible', 'Source Sans', sans-serif;"
     # !important: the page's general list-item text size and weight would otherwise win.
     " font-size: 1.7rem !important; font-weight: 700 !important; }"
-    # Colour options to try: each circle has a different light fill with dark text.
-    ".transfer-examples li:nth-child(1) { background: #e3f4ff; border-color: #2fb8ff; color: #06122a; }"
-    ".transfer-examples li:nth-child(2) { background: #fff8d8; border-color: #d3aa00; color: #3b2f00; }"
-    ".transfer-examples li:nth-child(3) { background: #f2f6fb; border-color: #1c4e9a; color: #06122a; }"
     "</style>"
 )
 
