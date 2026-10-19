@@ -1346,6 +1346,8 @@ def _render_data_science() -> None:
         label_visibility="collapsed",
         persist_state="session",
     )
+    # Extra space (on top of the normal gap) so the recap reads as its own block, matching the section spacing.
+    st.markdown("<div style='height: 0.75rem'></div>", unsafe_allow_html=True)
     st.write(
         "You started with thousands of possibilities.\n\n"
         "You chose what mattered.\n\n"
