@@ -971,12 +971,15 @@ def _render_combine(data: pd.DataFrame) -> None:
         _render_overlap_visual(len(distance_matches), len(temperature_matches))
     predict_prompt("How many planets do you think are in both groups?")
     # A prediction is optional input: it never gates the reveal or Continue.
+    from visual_system import TYPOGRAPHY_TOKENS
+
+    _GUESS_FONT = f"{TYPOGRAPHY_TOKENS['body_font']}, {TYPOGRAPHY_TOKENS['body_font_fallback']}"
     st.markdown(
         "<style>"
-        # The typed number and placeholder match the label above in size and font (Tomorrow is the activity's font
-        # where it is loaded; otherwise the normal font is used), a touch smaller so it sits comfortably in the box.
-        f".st-key-{_COMBINE_GUESS_KEY} input {{ font-family: 'Tomorrow', 'Source Sans', sans-serif; font-size: 0.95rem; }}"
-        f".st-key-{_COMBINE_GUESS_KEY} input::placeholder {{ font-family: 'Tomorrow', 'Source Sans', sans-serif; font-size: 0.95rem; }}"
+        # The typed number and placeholder match the label above in size and font (the activity's body font, with
+        # Tomorrow digits), a touch smaller so it sits comfortably in the box.
+        f".st-key-{_COMBINE_GUESS_KEY} input {{ font-family: {_GUESS_FONT}; font-size: 0.95rem; }}"
+        f".st-key-{_COMBINE_GUESS_KEY} input::placeholder {{ font-family: {_GUESS_FONT}; font-size: 0.95rem; }}"
         "</style>",
         unsafe_allow_html=True,
     )
