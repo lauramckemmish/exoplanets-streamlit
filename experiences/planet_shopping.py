@@ -1276,6 +1276,28 @@ _TRANSFER_TABLE_STYLE = (
 )
 
 
+_TRANSFER_EXAMPLES = ("Medicine", "Careers", "Sport")
+_TRANSFER_EXAMPLES_KEY = "planet_shopping_transfer_examples_response"
+# Same dark, techy look as the table above: cyan outlines, with the same glow on the labels.
+_TRANSFER_EXAMPLES_STYLE = (
+    "<style>"
+    ".transfer-examples { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem; margin: 0.5rem 0 1rem;"
+    " padding: 0; list-style: none; }"
+    ".transfer-examples li { display: flex; align-items: center; justify-content: center; box-sizing: border-box;"
+    " width: 10.5rem; height: 10.5rem; margin: 0; padding: 0.5rem; border-radius: 50%; text-align: center;"
+    " background: linear-gradient(170deg, #030a14 0%, #06122a 100%); border: 1.5px solid rgba(47, 184, 255, 0.6);"
+    " box-shadow: 0 0 14px rgba(47, 184, 255, 0.25); color: #3fc3ff; font-size: 1.3rem; font-weight: 700;"
+    " letter-spacing: 0.06em; text-transform: uppercase; text-shadow: 0 0 8px rgba(47, 184, 255, 0.45); }"
+    "</style>"
+)
+
+
+def _transfer_examples_html() -> str:
+    """Other areas where the same steps apply, as large circles."""
+    items = "".join(f"<li>{escape(name)}</li>" for name in _TRANSFER_EXAMPLES)
+    return _TRANSFER_EXAMPLES_STYLE + f"<ul class='transfer-examples' role='list'>{items}</ul>"
+
+
 @lru_cache(maxsize=1)
 def _astronaut_data_uri() -> str:
     """The shopping astronaut (background removed) as an inline image, loaded once."""
@@ -1310,6 +1332,19 @@ def _render_data_science() -> None:
     with st.container(width=800):
         st.markdown(_transfer_table_html(), unsafe_allow_html=True)
         st.caption("Image: Astronaut shopping [illustration]. @catalyststuff, Magnific (magnific.com).")
+    st.markdown("#### Can you think of other examples we could apply this approach to?")
+    with st.container(width=800):
+        st.markdown(_transfer_examples_html(), unsafe_allow_html=True)
+    st.write("Describe how a similar approach can be used to make decisions in an area you are interested in.")
+    # Optional, like the typed guess: it never gates the page, and what the learner typed is kept for the session.
+    st.text_area(
+        "Describe how a similar approach can be used to make decisions in an area you are interested in.",
+        key=_TRANSFER_EXAMPLES_KEY,
+        height=100,
+        placeholder="I could use this approach in…",
+        label_visibility="collapsed",
+        persist_state="session",
+    )
     st.write(
         "You started with thousands of possibilities.\n\n"
         "You chose what mattered.\n\n"
