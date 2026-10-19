@@ -1278,14 +1278,15 @@ _TRANSFER_TABLE_STYLE = (
 
 _TRANSFER_EXAMPLES = ("Medicine", "Careers", "Sport")
 _TRANSFER_EXAMPLES_KEY = "planet_shopping_transfer_examples_response"
-# White circles with black labels and a thick outline in the dark blue of the table above.
+# Navy circles (the table's colours) with light blue labels and a thick light blue outline.
 _TRANSFER_EXAMPLES_STYLE = (
     "<style>"
     ".transfer-examples { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem; margin: 0.5rem 0 1rem;"
     " padding: 0; list-style: none; }"
     ".transfer-examples li { display: flex; align-items: center; justify-content: center; box-sizing: border-box;"
     " width: 10.5rem; height: 10.5rem; margin: 0; padding: 0.5rem; border-radius: 50%; text-align: center;"
-    " background: #ffffff; border: 8px solid #06122a; color: #000000; font-family: 'Atkinson Hyperlegible', 'Source Sans', sans-serif;"
+    " background: linear-gradient(170deg, #030a14 0%, #06122a 100%); border: 8px solid #2fb8ff; color: #3fc3ff;"
+    " box-shadow: 0 0 14px rgba(47, 184, 255, 0.25); text-shadow: 0 0 8px rgba(47, 184, 255, 0.45); font-family: 'Atkinson Hyperlegible', 'Source Sans', sans-serif;"
     # !important: the page's general list-item text size and weight would otherwise win.
     " font-size: 1.7rem !important; font-weight: 700 !important; }"
     "</style>"
