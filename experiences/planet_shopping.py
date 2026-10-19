@@ -93,7 +93,8 @@ _DESTINATION_SORT_SUBJECTS = {
 }
 _DESTINATION_UNKNOWN_KEY = "planet_shopping_destination_unknown_position"
 _DESTINATION_UNKNOWN_OPTIONS = ("Show first", "Show last")
-_DESTINATION_LIST_LIMIT = 150  # Above this the list is too long to browse; learners narrow their filters first.
+# Above this the list is too long to browse, and heavy for a whole class on one server; learners narrow first.
+_DESTINATION_LIST_LIMIT = 12
 _DESTINATION_LIST_HEIGHT = 640
 _DESTINATION_SORT_OPTIONS = {
     "Name (A–Z)": "pl_name",

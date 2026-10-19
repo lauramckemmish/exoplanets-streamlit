@@ -478,7 +478,7 @@ class DestinationLongShortlistFallbackTests(unittest.TestCase):
             import data
             from experiences import planet_shopping as ps
 
-            ps._DESTINATION_LIST_LIMIT = st.session_state.get("limit", 150)
+            ps._DESTINATION_LIST_LIMIT = st.session_state.get("limit", 12)
             if "init" not in st.session_state:
                 st.session_state["init"] = True
                 st.session_state[ps._COMBINE_DISTANCE_CONTROL_KEY] = 2000
