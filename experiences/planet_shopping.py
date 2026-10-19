@@ -1426,6 +1426,29 @@ _TRANSFER_TABLE_STYLE = (
 )
 
 
+_TRANSFER_EXAMPLES = ("Medicine", "Careers", "Sport")
+_TRANSFER_EXAMPLES_KEY = "planet_shopping_transfer_examples_response"
+# Light circles with dark labels and a thick outline.
+_TRANSFER_EXAMPLES_STYLE = (
+    "<style>"
+    ".transfer-examples { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem; margin: 0.5rem 0 1rem;"
+    " padding: 0; list-style: none; }"
+    ".transfer-examples li { display: flex; align-items: center; justify-content: center; box-sizing: border-box;"
+    " width: 10.5rem; height: 10.5rem; margin: 0; padding: 0.5rem; border-radius: 50%; text-align: center;"
+    " border: 8px solid #1c4e9a; background: #f2f6fb; color: #06122a;"
+    " font-family: 'Atkinson Hyperlegible', 'Source Sans', sans-serif;"
+    # !important: the page's general list-item text size and weight would otherwise win.
+    " font-size: 1.7rem !important; font-weight: 700 !important; }"
+    "</style>"
+)
+
+
+def _transfer_examples_html() -> str:
+    """Other areas where the same steps apply, as large circles."""
+    items = "".join(f"<li>{escape(name)}</li>" for name in _TRANSFER_EXAMPLES)
+    return _TRANSFER_EXAMPLES_STYLE + f"<ul class='transfer-examples' role='list'>{items}</ul>"
+
+
 @lru_cache(maxsize=1)
 def _astronaut_data_uri() -> str:
     """The shopping astronaut (background removed) as an inline image, loaded once."""
@@ -1460,6 +1483,21 @@ def _render_data_science() -> None:
     with st.container(width=800):
         st.markdown(_transfer_table_html(), unsafe_allow_html=True)
         st.caption("Image: Astronaut shopping [illustration]. @catalyststuff, Magnific (magnific.com).")
+    st.markdown("#### Where else could we use this?")
+    with st.container(width=800):
+        st.markdown(_transfer_examples_html(), unsafe_allow_html=True)
+    st.write("Think of an area you are interested in. How could you use this approach to make a decision there?")
+    # Optional, like the typed guess: it never gates the page, and what the learner typed is kept for the session.
+    st.text_area(
+        "Think of an area you are interested in. How could you use this approach to make a decision there?",
+        key=_TRANSFER_EXAMPLES_KEY,
+        height=100,
+        placeholder="I could use this approach to answer …",
+        label_visibility="collapsed",
+        persist_state="session",
+    )
+    # Extra space (on top of the normal gap) so the recap reads as its own block, matching the section spacing.
+    st.markdown("<div style='height: 0.75rem'></div>", unsafe_allow_html=True)
     st.write(
         "You started with thousands of possibilities.\n\n"
         "You chose what mattered.\n\n"
