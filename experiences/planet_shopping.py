@@ -94,6 +94,30 @@ _CATALOGUE_BROWSING_MINIMUM = 3
 _TEMPERATURE_UNKNOWN_REVEAL_KEY = "planet_shopping_temperature_unknown_revealed"
 
 
+# NASA's archive abbreviates the constellation Sextans as "Sex" (as in "24 Sex b"). That reads badly for a school
+# audience, so these host stars are shown by their full IAU genitive name instead ("24 Sextantis b").
+_DISPLAY_NAME_ALIASES = {"24 Sex": "24 Sextantis"}
+
+
+def _with_display_names(data: pd.DataFrame) -> pd.DataFrame:
+    """Return ``data`` with abbreviated host-star names replaced for display; the catalogue is otherwise unchanged."""
+    host = data["hostname"].astype(str) if "hostname" in data else None
+    names = data["pl_name"].astype(str)
+    result = None
+    for short, full in _DISPLAY_NAME_ALIASES.items():
+        matches = names.str.startswith(short + " ") | (names == short)
+        if host is not None:
+            matches = matches | (host == short)
+        if not matches.any():
+            continue
+        if result is None:
+            result = data.copy()
+        result.loc[matches, "pl_name"] = names[matches].str.replace(f"^{short}", full, regex=True)
+        if "hostname" in result:
+            result.loc[host == short, "hostname"] = full
+    return data if result is None else result
+
+
 def _catalogue_counts(data: pd.DataFrame, current_year: int | None = None) -> dict[str, int]:
     """Count unique catalogue records available at three recent points in time."""
     current_year = current_year or date.today().year
@@ -1179,6 +1203,7 @@ def render(data: pd.DataFrame, terminal_action) -> None:
     if _STAGE_KEY not in st.session_state:
         st.session_state[_STAGE_KEY] = 0
 
+    data = _with_display_names(data)
     stage = max(0, min(int(st.session_state[_STAGE_KEY]), len(STAGE_LABELS) - 1))
     apply_typography("planet_shopping_typography")
     apply_slider_style("planet_shopping_sliders")
