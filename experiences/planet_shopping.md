@@ -236,10 +236,11 @@ characterisation and broader habitability questions.
 ### 7. Data Science — What did you just do?
 
 Open with “So why did we call this a shopping expedition?”, then keep the
-existing transfer graphic as the main object. Under it, ask “Can you think of
-other examples we could apply this approach to?” with Medicine, Careers and
-Sport shown as large circles, then invite the learner to describe how a similar
-approach could support decisions in an area they care about. The text box is
+existing transfer graphic as the main object. Under it, ask “Where else could we use this?” with Medicine, Careers and
+Sport shown as large circles, then ask the learner to think of an area they are
+interested in and how they could use this approach to make a decision there.
+“This approach” is deliberately left unnamed: learners apply what they learnt
+in the workshop (narrowing many options by filtering, comparing and choosing). The text box is
 optional, never gates the page and is kept for the session. Briefly reconstruct the learner's
 actions: start with possibilities, choose what matters, filter, deal with what
 is unknown, combine choices and use evidence to choose. Finish with the concise

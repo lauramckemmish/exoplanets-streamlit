@@ -464,6 +464,6 @@ class DataScienceTransferExamplesTests(unittest.TestCase):
         app = AppTest.from_function(page).run()
 
         self.assertFalse(app.exception)
-        self.assertIn("#### Can you think of other examples we could apply this approach to?", [m.value for m in app.markdown])
+        self.assertIn("#### Where else could we use this?", [m.value for m in app.markdown])
         self.assertEqual(len(app.text_area), 1)
         self.assertEqual(app.text_area[0].value, "")  # optional: nothing is required to carry on

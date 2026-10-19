@@ -1333,16 +1333,16 @@ def _render_data_science() -> None:
     with st.container(width=800):
         st.markdown(_transfer_table_html(), unsafe_allow_html=True)
         st.caption("Image: Astronaut shopping [illustration]. @catalyststuff, Magnific (magnific.com).")
-    st.markdown("#### Can you think of other examples we could apply this approach to?")
+    st.markdown("#### Where else could we use this?")
     with st.container(width=800):
         st.markdown(_transfer_examples_html(), unsafe_allow_html=True)
-    st.write("Describe how a similar approach can be used to make decisions in an area you are interested in.")
+    st.write("Think of an area you are interested in. How could you use this approach to make a decision there?")
     # Optional, like the typed guess: it never gates the page, and what the learner typed is kept for the session.
     st.text_area(
-        "Describe how a similar approach can be used to make decisions in an area you are interested in.",
+        "Think of an area you are interested in. How could you use this approach to make a decision there?",
         key=_TRANSFER_EXAMPLES_KEY,
         height=100,
-        placeholder="I could use this approach in…",
+        placeholder="I could use this approach to answer …",
         label_visibility="collapsed",
         persist_state="session",
     )
