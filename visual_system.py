@@ -406,3 +406,118 @@ def apply_visual_system() -> None:
         """,
         unsafe_allow_html=True,
     )
+
+
+TYPOGRAPHY_TOKENS = {
+    "heading_font": "'Tomorrow'",
+    "heading_weight": "700",
+    # Body text is Atkinson Hyperlegible. "Tomorrow Digits" is Tomorrow limited to the digits 0-9 (see
+    # _DIGIT_FONT_CSS), listed first so stand-alone numbers (slider values, metrics, table cells) keep the
+    # Tomorrow look while all other characters fall through. Numbers inside sentences stay in the body font.
+    "body_font": "'Atkinson Hyperlegible'",
+    "number_font": "'Tomorrow Digits', 'Atkinson Hyperlegible'",
+    "body_font_fallback": "'Source Sans', 'Source Sans Pro', sans-serif",
+    "body_weight": "400",
+    "body_strong_weight": "700",
+    # Atkinson Hyperlegible looks smaller than Tomorrow at the same size, so every size is 1px larger than before.
+    "learner_min_size": "1.0625rem",
+    "facilitator_min_size": "0.9375rem",
+}
+_HEADING_FONT_URL = (
+    "https://fonts.googleapis.com/css2?family=Tomorrow:wght@400;700"
+    "&family=Atkinson+Hyperlegible:wght@400;700&display=swap"
+)
+# Tomorrow restricted to digits, so numbers in body text keep the Tomorrow look. If these files ever move,
+# digits quietly fall back to Atkinson Hyperlegible and nothing breaks.
+_DIGIT_FONT_CSS = """
+@font-face { font-family: 'Tomorrow Digits'; font-weight: 400; font-display: swap; unicode-range: U+0030-0039;
+    src: url(https://fonts.gstatic.com/s/tomorrow/v19/WBLmrETNbFtZCeGqgRXSe2DiLsip.woff2) format('woff2'); }
+@font-face { font-family: 'Tomorrow Digits'; font-weight: 700; font-display: swap; unicode-range: U+0030-0039;
+    src: url(https://fonts.gstatic.com/s/tomorrow/v19/WBLhrETNbFtZCeGqgR1pXnXPDMWDikd5.woff2) format('woff2'); }
+"""
+
+
+def apply_typography(scope_key: str) -> None:
+    """Apply bold headings and minimum text sizes only while ``scope_key`` is on the page.
+
+    Typography is opt-in per experience. The experience renders this marker
+    container once; the styles apply to the main content area only while the
+    marker exists, so other experiences keep their current appearance.
+    """
+
+    heading_font = TYPOGRAPHY_TOKENS["heading_font"]
+    body_font = TYPOGRAPHY_TOKENS["body_font"]
+    number_font = TYPOGRAPHY_TOKENS["number_font"]
+    fallback = TYPOGRAPHY_TOKENS["body_font_fallback"]
+    weight = TYPOGRAPHY_TOKENS["heading_weight"]
+    body_weight = TYPOGRAPHY_TOKENS["body_weight"]
+    strong_weight = TYPOGRAPHY_TOKENS["body_strong_weight"]
+    learner = TYPOGRAPHY_TOKENS["learner_min_size"]
+    facilitator = TYPOGRAPHY_TOKENS["facilitator_min_size"]
+    scope = f'[data-testid="stMain"]:has(.st-key-{scope_key})'
+    with st.container(key=scope_key):
+        st.markdown(
+            f"""
+            <style>
+            @import url('{_HEADING_FONT_URL}');
+            {_DIGIT_FONT_CSS}
+            {scope} h1, {scope} h2, {scope} h3, {scope} h4 {{
+                font-family: {heading_font}, {fallback};
+                font-weight: {weight};
+            }}
+            {scope} h1 *, {scope} h2 *, {scope} h3 *, {scope} h4 * {{ font-weight: {weight}; }}
+            /* Body text: Atkinson Hyperlegible, with Tomorrow digits. Targeted, so icon fonts are untouched. */
+            {scope} p, {scope} li, {scope} summary, {scope} label,
+            {scope} [data-testid="stCaptionContainer"],
+            {scope} [data-testid="stMetricValue"], {scope} [data-testid="stMetricLabel"] {{
+                font-family: {body_font}, {fallback};
+                font-weight: {body_weight};
+            }}
+            {scope} p strong, {scope} li strong, {scope} p b, {scope} li b {{ font-weight: {strong_weight}; }}
+            /* Facilitator live cues: Streamlit pulls each markdown block up by 1rem to cancel its last paragraph's
+               margin, but the shared cue style shrinks that margin, so the shaded box ended short of its text.
+               Remove the margin and the pull-up together so the box encloses all of the text. */
+            {scope} [class*="st-key-facilitator_live_"] {{ gap: 0.1rem; }}
+            {scope} [class*="st-key-facilitator_live_"] [data-testid="stMarkdownContainer"] {{ margin-bottom: 0; }}
+            {scope} [class*="st-key-facilitator_live_"] p {{ margin-bottom: 0; }}
+            /* The curriculum summary box sat only about 1px clear of its last line at the larger text size. */
+            {scope} .st-key-curriculum_summary {{ padding-bottom: 1.5rem; }}
+            /* Table cells follow the same font (weight is left to the table's own styling). */
+            {scope} td, {scope} th {{ font-family: {number_font}, {fallback}; }}
+            /* Stand-alone numbers (not part of a sentence) use Tomorrow digits. */
+            {scope} [data-testid="stMetricValue"], {scope} [data-testid="stMetricValue"] *,
+            {scope} [data-testid="stSliderThumbValue"], {scope} [data-testid="stSliderThumbValue"] p,
+            {scope} [data-testid="stSliderTickBarMin"], {scope} [data-testid="stSliderTickBarMax"] {{ font-family: {number_font}, {fallback}; }}
+            /* Plain Markdown paragraphs and list items are body text at the learner size. */
+            {scope} [data-testid="stMarkdownContainer"] > p,
+            {scope} [data-testid="stMarkdownContainer"] > ul li,
+            {scope} [data-testid="stMarkdownContainer"] > ol li {{ font-size: {learner}; }}
+            /* st.metric renders its value through a Markdown container too; keep the big metric size. */
+            {scope} [data-testid="stMetricValue"] [data-testid="stMarkdownContainer"] > p {{ font-size: inherit; }}
+            /* Learner-facing text: nothing smaller than body size. */
+            {scope} [data-testid="stCaptionContainer"],
+            {scope} [data-testid="stCaptionContainer"] p,
+            {scope} [data-testid="stTabs"] [role="tab"] p,
+            {scope} [data-testid="stWidgetLabel"] p,
+            {scope} [data-testid="stButton"] button p,
+            {scope} [data-testid="stSlider"] p,
+            {scope} [data-testid="stRadio"] p,
+            {scope} [data-testid="stCheckbox"] p,
+            {scope} [data-testid="stMetricLabel"] p,
+            {scope} [data-testid="stSliderTickBarMin"],
+            {scope} [data-testid="stSliderTickBarMax"],
+            {scope} [data-testid="stExpander"] summary p,
+            {scope} [class*="st-key-hard_reveal_"] .interaction-marker,
+            {scope} [class*="_prompt"] .cognitive-prompt__label {{ font-size: {learner}; }}
+            /* Facilitator-only text: smaller is allowed, but not tiny. */
+            {scope} .facilitator-live__label,
+            {scope} .curriculum-summary__outcome,
+            {scope} .curriculum-summary__note,
+            {scope} .curriculum-summary__body,
+            {scope} .curriculum-summary p,
+            {scope} .curriculum-tags {{ font-size: {facilitator}; }}
+            {scope} .curriculum-summary__outcome span {{ font-size: 1em; }}
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )

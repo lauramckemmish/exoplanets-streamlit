@@ -112,7 +112,7 @@ class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
         self.assertEqual(_temperature_profile(373.15)[1], "Hotter than a summer day on Earth.")
         self.assertEqual(_temperature_profile(773.15)[1], "Very hot.")
         self.assertEqual(_temperature_profile(1272.15)[1], "Extremely hot.")
-        self.assertEqual(_temperature_profile(1274.15)[1], "Over 1,000 °C — extraordinarily hot.")
+        self.assertEqual(_temperature_profile(1274.15)[1], "Over 1,000 °C. Extraordinarily hot.")
 
     def test_profile_missing_value_is_explicitly_unknown(self):
         value, interpretation = _planet_display_value(None, _temperature_profile)
@@ -159,7 +159,8 @@ class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
     def test_temperature_policy_cards_are_complete_native_button_surfaces(self):
         source = Path("experiences/planet_shopping.py").read_text()
 
-        self.assertIn('button_label = f"{icon} **{title}**\\n{consequence}"', source)
+        self.assertIn('button_label = f"**{title}**\\n{consequence}"', source)
+        self.assertNotIn('button_label = f"{icon}', source)  # emoji is a margin marker, not inline text
         self.assertIn('button_label += "\\n✓ Selected"', source)
         self.assertIn("use_container_width=True", source)
         self.assertIn('background: #fff8d8;', source)
