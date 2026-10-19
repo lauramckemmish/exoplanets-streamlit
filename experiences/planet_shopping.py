@@ -1278,16 +1278,15 @@ _TRANSFER_TABLE_STYLE = (
 
 _TRANSFER_EXAMPLES = ("Medicine", "Careers", "Sport")
 _TRANSFER_EXAMPLES_KEY = "planet_shopping_transfer_examples_response"
-# Same dark, techy look as the table above: cyan outlines, with the same glow on the labels.
+# White circles with black labels and a thick outline in the same blue as the table above.
 _TRANSFER_EXAMPLES_STYLE = (
     "<style>"
     ".transfer-examples { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem; margin: 0.5rem 0 1rem;"
     " padding: 0; list-style: none; }"
     ".transfer-examples li { display: flex; align-items: center; justify-content: center; box-sizing: border-box;"
     " width: 10.5rem; height: 10.5rem; margin: 0; padding: 0.5rem; border-radius: 50%; text-align: center;"
-    " background: linear-gradient(170deg, #030a14 0%, #06122a 100%); border: 1.5px solid rgba(47, 184, 255, 0.6);"
-    " box-shadow: 0 0 14px rgba(47, 184, 255, 0.25); color: #3fc3ff; font-size: 1.3rem; font-weight: 700;"
-    " letter-spacing: 0.06em; text-transform: uppercase; text-shadow: 0 0 8px rgba(47, 184, 255, 0.45); }"
+    " background: #ffffff; border: 8px solid #2fb8ff; color: #000000; font-size: 1.3rem; font-weight: 700;"
+    " letter-spacing: 0.06em; text-transform: uppercase; }"
     "</style>"
 )
 
