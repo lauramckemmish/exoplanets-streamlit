@@ -26,7 +26,8 @@ to Planet Shopping only; other experiences not yet changed).
 | Element | Rule |
 | --- | --- |
 | Headings (`st.header`, `st.subheader`, title, raw `h1`–`h4`) | **Tomorrow, bold (700)**. A free Google font with a wide, squared, futuristic look. The original aim was to echo the bold headings on the European Space Agency home page. |
-| Body text | **Tomorrow Regular (400)**, so headings and body share one family. Bold text inside body copy (`**…**`) is semi-bold (600). Icon fonts are not touched. |
+| Body text | **Atkinson Hyperlegible Regular (400)**, a typeface designed by the Braille Institute for low-vision readers. Bold text inside body copy (`**…**`) is Bold (700). Icon fonts are not touched. |
+| Numbers (digits 0 to 9, anywhere in body text, table cells, slider values and metrics) | **Tomorrow**, so numbers keep the same look as the headings. Implemented as a `Tomorrow Digits` font limited to the digit characters, so no markup is needed. |
 | Learner-facing text (captions, tab labels, widget and slider labels, slider values, radio and checkbox options, button text, metric labels, expander titles, prompt/reveal labels) | **Minimum 16px (1rem)**, the same as body text. |
 | Facilitator-only text (curriculum summary and tags, live-cue labels) | **Minimum 14px (0.875rem)**. Previously as small as about 11px. |
 
@@ -43,12 +44,13 @@ to Planet Shopping only; other experiences not yet changed).
 ### Notes and decisions
 
 - Fonts tried: Titillium Web (Light 300, then Regular 400) and Tomorrow. Light was too thin at 16px. Tomorrow was chosen for its sci-fi character.
-- Tomorrow is wide and squared, so lines wrap sooner than in Source Sans on narrow windows. Check long facilitator notes and narrow screens when rolling out.
-- The weight is `body_weight` in `TYPOGRAPHY_TOKENS`; the family is `heading_font`.
+- Team feedback: Tomorrow is not a good choice for continuous reading (wide, squared letters, similar shapes). It is now kept for headings and digits only, and Atkinson Hyperlegible is used for all other text.
+- Letters in Atkinson Hyperlegible are narrower than Tomorrow, so lines wrap later than before. Check the layout when rolling out.
+- The weight is `body_weight` in `TYPOGRAPHY_TOKENS`; the families are `heading_font` and `body_font`.
 - ESA's own heading typeface (*Notes ESA*) is proprietary to ESA and is not used.
   Tomorrow is a free font and is not a copy of ESA's typeface.
-- The font is loaded from Google Fonts (`@import` in `apply_typography`).
-  If a school network blocks it, text falls back to Source Sans (headings still bold), so nothing breaks. If this is a concern, the font file could be
+- The fonts are loaded from Google Fonts (`@import` in `apply_typography`). The digit font points directly at two Tomorrow files on `fonts.gstatic.com`; if those files move, digits fall back to Atkinson Hyperlegible.
+  If a school network blocks Google Fonts, text falls back to Source Sans (headings still bold), so nothing breaks. If this is a concern, the font file could be
   self-hosted later.
 - Not covered: text drawn inside Plotly charts and inside inline SVG/HTML
   graphics (for example the overlap diagram). Those sizes are set in the chart or
