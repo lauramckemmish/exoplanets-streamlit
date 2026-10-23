@@ -252,10 +252,13 @@ introducing another topic.
 
 A research page added after the Data Science screen. Learners use NASA's own
 resources to investigate the planet they chose, working through three sections.
-Each section opens only when the learner clicks **Continue →**, and **Continue →**
-appears only after every text box in the current section has something written in
-it. The answers are kept for the session. The page needs a chosen destination: if
-there is none, it sends the learner back to Choose Your Destination.
+Each section opens only when the learner clicks **Continue →**, which appears in
+the bottom-right footer (where **Back to experiences** normally sits) once every
+text box in the current section has something written in it. The footer shows
+nothing until then, and **Back to experiences** returns after the last section.
+The page scrolls to each new section. The answers are kept for the session. The
+page needs a chosen destination: if there is none, it sends the learner back to
+Choose Your Destination.
 
 Section 1, “Find out more about your planet”, shows the chosen planet's profile,
 then **Instructions** (search for the NASA Exoplanet Catalog, scroll down and
@@ -266,7 +269,13 @@ future ships; which telescope first observed it and how; how its system compares
 with the Solar System and where the planet sits; and whether it is in the
 habitable zone, and what that is. The instructions deliberately name the sites
 without linking to them, so learners find the resources themselves like
-researchers. Sections 2 and 3 are still to be written.
+researchers.
+
+Section 2, “Can you use better filters?”, has no instructions and asks learners to
+reflect on their own filters, each with a text box: which filter mattered most and
+why; whether they found a good candidate and what limitations the filters had;
+and what other criteria could be filtered by to find a new home, including what
+else a planet needs to be habitable. Section 3 is still to be written.
 
 ## State that must persist
 

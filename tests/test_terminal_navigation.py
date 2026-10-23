@@ -38,7 +38,15 @@ def test_every_staged_experience_supplies_the_shared_terminal_pattern():
         assert len(calls) == 1, path
         assert isinstance(_keyword_value(calls[0], "terminal_action"), ast.Name)
         label = _keyword_value(calls[0], "terminal_label")
-        assert isinstance(label, ast.Constant) and label.value == "Back to experiences"
+        if path == "experiences/planet_shopping.py":
+            # The Report stage shows Continue in this slot until its last section is complete, so the label is a
+            # variable that defaults to "Back to experiences" and is only changed there.
+            assert isinstance(label, ast.Name)
+            source = (ROOT / path).read_text()
+            assert 'terminal_label = "Back to experiences"' in source
+            assert '"Back to experiences"' in source.split("def _render_report(")[1].split("\n\n\n")[0]
+        else:
+            assert isinstance(label, ast.Constant) and label.value == "Back to experiences"
 
 
 def test_app_supplies_the_existing_landing_route_as_each_terminal_callback():

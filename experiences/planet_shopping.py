@@ -5,13 +5,15 @@ See ``planet_shopping.md`` for the established pedagogical design.
 
 import base64
 from datetime import date
-from functools import lru_cache
+from functools import lru_cache, partial
 from html import escape
+import json
 from pathlib import Path
 import random
 
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
 
 from data import PARSEC_TO_LIGHT_YEARS
 from visual_system import apply_section_spacing, apply_slider_style, apply_typography
@@ -1533,6 +1535,7 @@ def _render_data_science() -> None:
         )
 
 _REPORT_SECTIONS_KEY = "planet_shopping_report_sections_shown"
+_REPORT_SCROLL_KEY = "planet_shopping_report_scroll_to_section"
 _REPORT_SECTION_COUNT = 3
 _REPORT_DESTINATION_STAGE = STAGE_LABELS.index("Choose Your Destination")
 # Section 1: each entry is (key, lead-in text, follow-up questions). Every entry gets its own text box.
@@ -1610,14 +1613,72 @@ def _render_report_planet_section(data: pd.DataFrame, planet_name: str) -> bool:
     return _report_question_boxes(1, _REPORT_PLANET_QUESTIONS)
 
 
-def _render_report_next_section(section: int) -> bool:
+# Section 2 mirrors section 1's layout, with no instructions: it asks learners to reflect on their own filters.
+_REPORT_FILTER_QUESTIONS = (
+    ("most_important", "Think back to the filters you used. Which one was the most important to you, and why?", ()),
+    (
+        "good_candidate",
+        "Now that you know more about your exoplanet, do you think you found a good candidate? Why or why not?",
+        ("What limitations did the filters have?",),
+    ),
+    (
+        "other_criteria",
+        "What other criteria could we filter by if we wanted to find a new home?",
+        ("What else is important for an exoplanet to be habitable?",),
+    ),
+)
+_REPORT_FILTERS_HEADING = "Can you use better filters?"
+_REPORT_PLANET_HEADING = "Find out more about your planet"
+
+
+def _render_report_filters_section(data: pd.DataFrame, planet_name: str) -> bool:
+    """Section 2: reflect on the filters. True when every question has an answer."""
+    st.markdown(f"#### {_REPORT_FILTERS_HEADING}")
+    st.markdown("##### Questions")
+    return _report_question_boxes(2, _REPORT_FILTER_QUESTIONS)
+
+
+def _render_report_next_section(data: pd.DataFrame, planet_name: str) -> bool:
     """Placeholder until the next batch of questions is written."""
-    st.markdown(f"#### Section {section}")
+    st.markdown("#### Section 3")
     st.caption("This section has not been written yet.")
     return True
 
 
-def _render_report(data: pd.DataFrame) -> None:
+_REPORT_SECTIONS = (
+    (_REPORT_PLANET_HEADING, _render_report_planet_section),
+    (_REPORT_FILTERS_HEADING, _render_report_filters_section),
+    ("Section 3", _render_report_next_section),
+)
+
+
+def _scroll_to_heading(heading: str) -> None:
+    """Bring a newly opened section's heading to the top of the page."""
+    components.html(
+        f"""
+        <script>
+            const wanted = {json.dumps(heading)};
+            const doc = window.parent.document;
+            const target = [...doc.querySelectorAll('h4')].find((h) => h.textContent.trim() === wanted);
+            if (target) setTimeout(() => target.scrollIntoView({{behavior: 'instant', block: 'start'}}), 100);
+        </script>
+        """,
+        height=0,
+    )
+
+
+def _open_next_report_section(shown: int) -> None:
+    st.session_state[_REPORT_SECTIONS_KEY] = shown + 1
+    st.session_state[_REPORT_SCROLL_KEY] = True
+
+
+def _render_report(data: pd.DataFrame, terminal_action=None):
+    """Render the Report stage and return the footer button as (action, label).
+
+    The footer button is Continue while a later section is waiting, and the experience's own
+    closing action (if any) once the last section is complete. It is withheld while the current
+    section still has an empty text box.
+    """
     st.subheader("Report")
     planet_name = st.session_state.get(_APPLIED_DESTINATION_KEY)
     if planet_name is None or not data["pl_name"].astype(str).eq(planet_name).any():
@@ -1629,23 +1690,20 @@ def _render_report(data: pd.DataFrame) -> None:
             on_click=select_tab_step,
             args=(_TAB_KEY, STAGE_LABELS, _STAGE_KEY, _SCROLL_KEY, _REPORT_DESTINATION_STAGE),
         )
-        return
+        return None, None
 
-    # Each section opens only after the one before it has been written up; learners move on with Continue.
+    # Each section opens only after the one before it has been written up.
     shown = max(1, min(int(st.session_state.get(_REPORT_SECTIONS_KEY, 1)), _REPORT_SECTION_COUNT))
     complete = False
-    for section in range(1, shown + 1):
-        if section == 1:
-            complete = _render_report_planet_section(data, planet_name)
-        else:
-            complete = _render_report_next_section(section)
-    if complete and shown < _REPORT_SECTION_COUNT:
-        st.button(
-            "Continue →",
-            type="primary",
-            key="planet_shopping_report_continue",
-            on_click=lambda: st.session_state.__setitem__(_REPORT_SECTIONS_KEY, shown + 1),
-        )
+    for _, render_section in _REPORT_SECTIONS[:shown]:
+        complete = render_section(data, planet_name)
+    if st.session_state.pop(_REPORT_SCROLL_KEY, False):
+        _scroll_to_heading(_REPORT_SECTIONS[shown - 1][0])
+    if not complete:
+        return None, None
+    if shown < _REPORT_SECTION_COUNT:
+        return partial(_open_next_report_section, shown), "Continue →"
+    return terminal_action, "Back to experiences"
 
 
 def render(data: pd.DataFrame, terminal_action) -> None:
@@ -1668,6 +1726,7 @@ def render(data: pd.DataFrame, terminal_action) -> None:
         apply_section_spacing("planet_shopping_section_spacing")
     scroll_to_top_if_requested(_SCROLL_KEY)
 
+    terminal_label = "Back to experiences"
     if stage == 0 and facilitator_notes_enabled():
         _render_facilitator_orientation()
 
@@ -1686,7 +1745,7 @@ def render(data: pd.DataFrame, terminal_action) -> None:
     elif stage == 6:
         _render_data_science()
     else:
-        _render_report(data)
+        terminal_action, terminal_label = _render_report(data, terminal_action)
 
     step_buttons(
         STAGE_LABELS,
@@ -1696,5 +1755,5 @@ def render(data: pd.DataFrame, terminal_action) -> None:
         stage,
         "planet_shopping",
         terminal_action=terminal_action,
-        terminal_label="Back to experiences",
+        terminal_label=terminal_label,
     )

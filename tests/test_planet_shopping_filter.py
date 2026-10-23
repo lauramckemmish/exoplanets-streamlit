@@ -603,11 +603,16 @@ class ReportPageTests(unittest.TestCase):
             frame = data.prepare(data.load_sample())
             if st.session_state.get("destination") and ps._APPLIED_DESTINATION_KEY not in st.session_state:
                 st.session_state[ps._APPLIED_DESTINATION_KEY] = frame["pl_name"].iloc[0]
-            ps._render_report(frame)
+            st.session_state[ps._STAGE_KEY] = len(ps.STAGE_LABELS) - 1
+            ps.render(frame, lambda: None)
 
         at = AppTest.from_function(page, default_timeout=60)
         at.session_state["destination"] = destination
         return at.run()
+
+    @staticmethod
+    def _footer(at):
+        return [b.label for b in at.button if b.label in ("Continue →", "Back to experiences")]
 
     def test_stage_list_ends_with_report(self):
         self.assertEqual(STAGE_LABELS[-1], "Report")
@@ -618,29 +623,30 @@ class ReportPageTests(unittest.TestCase):
         self.assertFalse(at.exception)
         self.assertEqual(len(at.text_area), 0)
         self.assertTrue(any(b.label == "Go to Choose Your Destination" for b in at.button))
+        self.assertEqual(self._footer(at), [])
 
-    def test_first_section_has_six_boxes_and_continue_only_after_every_box_is_written(self):
+    def test_first_section_has_six_boxes_and_footer_continue_only_after_every_box_is_written(self):
         at = self._app()
 
         self.assertFalse(at.exception)
         self.assertIn("#### Find out more about your planet", [m.value for m in at.markdown])
         self.assertEqual(len(at.text_area), 6)
-        self.assertFalse(any(b.label == "Continue →" for b in at.button))
+        self.assertEqual(self._footer(at), [])  # nothing in the footer while a box is empty
 
         for box in at.text_area[:5]:
             box.input("Some notes")
         at.run()
-        self.assertFalse(any(b.label == "Continue →" for b in at.button))
+        self.assertEqual(self._footer(at), [])
 
         at.text_area[5].input("   ")  # blank space does not count as writing something
         at.run()
-        self.assertFalse(any(b.label == "Continue →" for b in at.button))
+        self.assertEqual(self._footer(at), [])
 
         at.text_area[5].input("In the zone")
         at.run()
-        self.assertTrue(any(b.label == "Continue →" for b in at.button))
+        self.assertEqual(self._footer(at), ["Continue →"])
 
-    def test_continue_opens_the_next_section(self):
+    def test_continue_opens_the_filter_questions_then_the_last_section_then_back_to_experiences(self):
         at = self._app()
         for box in at.text_area:
             box.input("Some notes")
@@ -649,5 +655,15 @@ class ReportPageTests(unittest.TestCase):
         next(b for b in at.button if b.label == "Continue →").click().run()
 
         self.assertFalse(at.exception)
-        self.assertIn("#### Section 2", [m.value for m in at.markdown])
-        self.assertEqual(len(at.text_area), 6)  # section 1 stays on the page with its answers
+        self.assertIn("#### Can you use better filters?", [m.value for m in at.markdown])
+        self.assertEqual(len(at.text_area), 9)  # section 1 stays on the page with its answers
+        self.assertEqual(self._footer(at), [])  # the new section is not written up yet
+        for box in at.text_area[6:]:
+            box.input("More notes")
+        at.run()
+        self.assertEqual(self._footer(at), ["Continue →"])
+
+        next(b for b in at.button if b.label == "Continue →").click().run()
+
+        self.assertIn("#### Section 3", [m.value for m in at.markdown])
+        self.assertEqual(self._footer(at), ["Back to experiences"])
