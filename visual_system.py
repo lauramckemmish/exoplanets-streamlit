@@ -422,6 +422,10 @@ TYPOGRAPHY_TOKENS = {
     # Atkinson Hyperlegible looks smaller than Tomorrow at the same size, so every size is 1px larger than before.
     "learner_min_size": "1.0625rem",
     "facilitator_min_size": "0.9375rem",
+    # Stage tabs: tighter than the shared default so a long stage list (Planet Shopping has eight) stays on one
+    # line in a smaller laptop browser. The tab strip still wraps on very narrow windows.
+    "tab_padding_x": "0.2rem",
+    "tab_gap": "0",
 }
 _HEADING_FONT_URL = (
     "https://fonts.googleapis.com/css2?family=Tomorrow:wght@400;700"
@@ -454,6 +458,8 @@ def apply_typography(scope_key: str) -> None:
     strong_weight = TYPOGRAPHY_TOKENS["body_strong_weight"]
     learner = TYPOGRAPHY_TOKENS["learner_min_size"]
     facilitator = TYPOGRAPHY_TOKENS["facilitator_min_size"]
+    tab_padding = TYPOGRAPHY_TOKENS["tab_padding_x"]
+    tab_gap = TYPOGRAPHY_TOKENS["tab_gap"]
     scope = f'[data-testid="stMain"]:has(.st-key-{scope_key})'
     with st.container(key=scope_key):
         st.markdown(
@@ -474,6 +480,11 @@ def apply_typography(scope_key: str) -> None:
                 font-weight: {body_weight};
             }}
             {scope} p strong, {scope} li strong, {scope} p b, {scope} li b {{ font-weight: {strong_weight}; }}
+            /* Stage tabs: less space around and between the labels so every stage fits on one line. */
+            {scope} [data-testid="stTabs"] [role="tablist"] {{ gap: {tab_gap}; }}
+            {scope} [data-testid="stTabs"] [role="tab"] {{ padding-left: {tab_padding}; padding-right: {tab_padding}; }}
+            {scope} [data-testid="stTabs"] [role="tab"][aria-selected="true"],
+            {scope} [data-testid="stTabs"] [role="tab"][data-selected="true"] {{ padding-left: max(0px, calc({tab_padding} - 3px)); }}
             /* Facilitator live cues: Streamlit pulls each markdown block up by 1rem to cancel its last paragraph's
                margin, but the shared cue style shrinks that margin, so the shaded box ended short of its text.
                Remove the margin and the pull-up together so the box encloses all of the text. */

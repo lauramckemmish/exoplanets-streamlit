@@ -29,6 +29,7 @@ to Planet Shopping only; other experiences not yet changed).
 | Body text | **Atkinson Hyperlegible Regular (400)**, a typeface designed by the Braille Institute for low-vision readers. Bold text inside body copy (`**…**`) is Bold (700). Icon fonts are not touched. |
 | Stand-alone numbers (slider values and their min/max, metric values, table cells, the typed guess) | **Tomorrow**, so they keep the same look as the headings. Implemented as a `Tomorrow Digits` font limited to the digit characters, so no markup is needed. Numbers inside a sentence stay in Atkinson Hyperlegible. |
 | Learner-facing text (body paragraphs and lists, captions, tab labels, widget and slider labels, slider values, radio and checkbox options, button text, metric labels, expander titles, prompt/reveal labels) | **17px (1.0625rem)**. Atkinson Hyperlegible looks smaller than Tomorrow at the same size, so this is 1px above the Streamlit default of 16px. |
+| Stage tabs (the row of stage names under the title) | Less padding and no gap between labels (`tab_padding_x` 0.2rem, `tab_gap` 0 in `TYPOGRAPHY_TOKENS`), so a long list such as Planet Shopping's eight stages stays on **one line** at about 1280px wide with the sidebar open. On narrower windows the tabs still wrap to a second line rather than being hidden. |
 | Facilitator-only text (curriculum summary and tags, live-cue labels) | **Minimum 15px (0.9375rem)**. Previously as small as about 11px. |
 
 ### Why
