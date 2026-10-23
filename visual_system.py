@@ -423,14 +423,15 @@ TYPOGRAPHY_TOKENS = {
     "learner_min_size": "1.0625rem",
     "facilitator_min_size": "0.9375rem",
     # Stage tabs. The spacing adapts to the room the tab strip has: the tight minimum when it only just fits, growing
-    # to the shared default (0.55rem padding, 0.25rem gap) when there is room, never beyond it. The widths are for
-    # Planet Shopping's eight tabs at 17px Atkinson Hyperlegible: the strip is 787px wide when the minimum spacing
-    # exactly fits and 906px when the shared default does. Below the first width the tabs still wrap.
+    # to the shared default (0.55rem padding, 0.25rem gap) when there is room, never beyond it. Planet Shopping's
+    # eight tabs at 17px Atkinson Hyperlegible measure 787px with the minimum spacing and 906px with the shared
+    # default; the widths below add about 13px of slack so rounding never pushes the last tab onto a new line.
+    # Below the first width the tabs still wrap.
     "tab_padding_min_px": 3.2,  # 0.2rem
     "tab_padding_max_px": 8.8,  # 0.55rem
     "tab_gap_max_px": 4,  # 0.25rem
-    "tab_tight_width_px": 787,
-    "tab_roomy_width_px": 906,
+    "tab_tight_width_px": 800,
+    "tab_roomy_width_px": 920,
 }
 _HEADING_FONT_URL = (
     "https://fonts.googleapis.com/css2?family=Tomorrow:wght@400;700"
