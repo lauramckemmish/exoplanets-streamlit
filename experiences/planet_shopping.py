@@ -1579,7 +1579,9 @@ def _report_question_boxes(section: int, questions) -> bool:
     complete = True
     for number, (question, lead_in, follow_ups) in enumerate(questions, start=1):
         st.markdown(f"**{number}.** {lead_in}")
-        if follow_ups:
+        if len(follow_ups) == 1:
+            st.markdown(follow_ups[0])
+        elif follow_ups:
             st.markdown("\n".join(f"- {text}" for text in follow_ups))
         answer = st.text_area(
             f"Your answer to question {number}",
