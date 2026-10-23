@@ -461,11 +461,11 @@ def apply_typography(scope_key: str) -> None:
             <style>
             @import url('{_HEADING_FONT_URL}');
             {_DIGIT_FONT_CSS}
-            {scope} h1, {scope} h2, {scope} h3, {scope} h4 {{
+            {scope} h1, {scope} h2, {scope} h3, {scope} h4, {scope} h5 {{
                 font-family: {heading_font}, {fallback};
                 font-weight: {weight};
             }}
-            {scope} h1 *, {scope} h2 *, {scope} h3 *, {scope} h4 * {{ font-weight: {weight}; }}
+            {scope} h1 *, {scope} h2 *, {scope} h3 *, {scope} h4 *, {scope} h5 * {{ font-weight: {weight}; }}
             /* Body text: Atkinson Hyperlegible, with Tomorrow digits. Targeted, so icon fonts are untouched. */
             {scope} p, {scope} li, {scope} summary, {scope} label,
             {scope} [data-testid="stCaptionContainer"],

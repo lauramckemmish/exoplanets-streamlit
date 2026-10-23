@@ -178,12 +178,12 @@ class PlanetShoppingTemperatureFilterTests(unittest.TestCase):
         self.assertIn('**Your shortlist: {len(candidates):,} planets**', source)
         self.assertNotIn("You've narrowed thousands of planets", source)
 
-    def test_stage_shell_matches_established_seven_screen_sequence(self):
+    def test_stage_shell_matches_the_screen_sequence(self):
         self.assertEqual(
             STAGE_LABELS,
             [
                 "Launch", "Meet a Planet", "Distance", "Temperature", "Combine",
-                "Choose Your Destination", "Data Science",
+                "Choose Your Destination", "Data Science", "Report",
             ],
         )
 
@@ -589,3 +589,65 @@ class DataScienceTransferExamplesTests(unittest.TestCase):
         self.assertIn("#### Where else could we use this?", [m.value for m in app.markdown])
         self.assertEqual(len(app.text_area), 1)
         self.assertEqual(app.text_area[0].value, "")  # optional: nothing is required to carry on
+
+
+class ReportPageTests(unittest.TestCase):
+    def _app(self, destination=True):
+        from streamlit.testing.v1 import AppTest
+
+        def page():
+            import streamlit as st
+            import data
+            from experiences import planet_shopping as ps
+
+            frame = data.prepare(data.load_sample())
+            if st.session_state.get("destination") and ps._APPLIED_DESTINATION_KEY not in st.session_state:
+                st.session_state[ps._APPLIED_DESTINATION_KEY] = frame["pl_name"].iloc[0]
+            ps._render_report(frame)
+
+        at = AppTest.from_function(page, default_timeout=60)
+        at.session_state["destination"] = destination
+        return at.run()
+
+    def test_stage_list_ends_with_report(self):
+        self.assertEqual(STAGE_LABELS[-1], "Report")
+
+    def test_without_a_chosen_planet_the_report_sends_the_learner_back(self):
+        at = self._app(destination=False)
+
+        self.assertFalse(at.exception)
+        self.assertEqual(len(at.text_area), 0)
+        self.assertTrue(any(b.label == "Go to Choose Your Destination" for b in at.button))
+
+    def test_first_section_has_six_boxes_and_continue_only_after_every_box_is_written(self):
+        at = self._app()
+
+        self.assertFalse(at.exception)
+        self.assertIn("#### Find out more about your planet", [m.value for m in at.markdown])
+        self.assertEqual(len(at.text_area), 6)
+        self.assertFalse(any(b.label == "Continue →" for b in at.button))
+
+        for box in at.text_area[:5]:
+            box.input("Some notes")
+        at.run()
+        self.assertFalse(any(b.label == "Continue →" for b in at.button))
+
+        at.text_area[5].input("   ")  # blank space does not count as writing something
+        at.run()
+        self.assertFalse(any(b.label == "Continue →" for b in at.button))
+
+        at.text_area[5].input("In the zone")
+        at.run()
+        self.assertTrue(any(b.label == "Continue →" for b in at.button))
+
+    def test_continue_opens_the_next_section(self):
+        at = self._app()
+        for box in at.text_area:
+            box.input("Some notes")
+        at.run()
+
+        next(b for b in at.button if b.label == "Continue →").click().run()
+
+        self.assertFalse(at.exception)
+        self.assertIn("#### Section 2", [m.value for m in at.markdown])
+        self.assertEqual(len(at.text_area), 6)  # section 1 stays on the page with its answers

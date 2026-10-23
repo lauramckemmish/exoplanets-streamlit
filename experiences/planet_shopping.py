@@ -27,6 +27,7 @@ from ui_helpers import (
     hard_reveal,
     role_image,
     scroll_to_top_if_requested,
+    select_tab_step,
     soft_reveal,
     step_buttons,
     step_tabs,
@@ -48,6 +49,7 @@ STAGE_LABELS = [
     "Combine",
     "Choose Your Destination",
     "Data Science",
+    "Report",
 ]
 
 # These keys belong only to this experience. Do not reuse the mission or
@@ -1530,9 +1532,122 @@ def _render_data_science() -> None:
             "and used evidence to choose."
         )
 
+_REPORT_SECTIONS_KEY = "planet_shopping_report_sections_shown"
+_REPORT_SECTION_COUNT = 3
+_REPORT_DESTINATION_STAGE = STAGE_LABELS.index("Choose Your Destination")
+# Section 1: each entry is (key, lead-in text, follow-up questions). Every entry gets its own text box.
+_REPORT_PLANET_QUESTIONS = (
+    ("composition", "What is the exoplanet composed of?", ()),
+    (
+        "star",
+        "Click **LEARN MORE+** and answer these questions about the star:",
+        (
+            "What type of star does the exoplanet orbit?",
+            "Is this the same type of star as our Sun?",
+            "Is the star it orbits bigger or smaller than our Sun, and by how much?",
+            "What colour is the star?",
+        ),
+    ),
+    (
+        "travel",
+        "How long would it take to travel to the exoplanet with our current technology?",
+        ("Imagine future space-faring technology. How long would it take to get there with faster ships?",),
+    ),
+    ("telescope", "Which telescope first observed this exoplanet, and what method did it use?", ()),
+    (
+        "system",
+        "Select **Close** to go back. In the view panel on the right, select **System**.",
+        (
+            "How does this solar system compare to our Solar System?",
+            "Where does your chosen exoplanet sit in this system?",
+        ),
+    ),
+    (
+        "habitable_zone",
+        "Is the exoplanet in the habitable zone?",
+        ("What is the habitable zone?",),
+    ),
+)
+
+
+def _report_answer_key(section: int, question: str) -> str:
+    return f"planet_shopping_report_{section}_{question}"
+
+
+def _report_question_boxes(section: int, questions) -> bool:
+    """Show each question with its text box. True once every box has something written in it."""
+    complete = True
+    for number, (question, lead_in, follow_ups) in enumerate(questions, start=1):
+        st.markdown(f"**{number}.** {lead_in}")
+        if follow_ups:
+            st.markdown("\n".join(f"- {text}" for text in follow_ups))
+        answer = st.text_area(
+            f"Your answer to question {number}",
+            key=_report_answer_key(section, question),
+            height=100,
+            placeholder="Write what you found…",
+            label_visibility="collapsed",
+            persist_state="session",
+        )
+        complete = complete and bool(answer.strip())
+    return complete
+
+
+def _render_report_planet_section(data: pd.DataFrame, planet_name: str) -> bool:
+    """Section 1: research the chosen exoplanet in NASA's own resources. True when it is complete."""
+    st.markdown("#### Find out more about your planet")
+    planet = data.loc[data["pl_name"].astype(str) == planet_name].iloc[0]
+    _render_planet_profile(planet_name, planet)
+    st.markdown("##### Instructions")
+    st.markdown(
+        "1. Search for the NASA Exoplanet Catalog.\n"
+        "2. Scroll down and search for your exoplanet by name.\n"
+        "3. View your exoplanet, then answer the questions below."
+    )
+    st.markdown("##### Questions")
+    return _report_question_boxes(1, _REPORT_PLANET_QUESTIONS)
+
+
+def _render_report_next_section(section: int) -> bool:
+    """Placeholder until the next batch of questions is written."""
+    st.markdown(f"#### Section {section}")
+    st.caption("This section has not been written yet.")
+    return True
+
+
+def _render_report(data: pd.DataFrame) -> None:
+    st.subheader("Report")
+    planet_name = st.session_state.get(_APPLIED_DESTINATION_KEY)
+    if planet_name is None or not data["pl_name"].astype(str).eq(planet_name).any():
+        st.write("The report starts with the planet you chose. Choose your destination first.")
+        st.button(
+            "Go to Choose Your Destination",
+            type="primary",
+            key="planet_shopping_report_go_to_destination",
+            on_click=select_tab_step,
+            args=(_TAB_KEY, STAGE_LABELS, _STAGE_KEY, _SCROLL_KEY, _REPORT_DESTINATION_STAGE),
+        )
+        return
+
+    # Each section opens only after the one before it has been written up; learners move on with Continue.
+    shown = max(1, min(int(st.session_state.get(_REPORT_SECTIONS_KEY, 1)), _REPORT_SECTION_COUNT))
+    complete = False
+    for section in range(1, shown + 1):
+        if section == 1:
+            complete = _render_report_planet_section(data, planet_name)
+        else:
+            complete = _render_report_next_section(section)
+    if complete and shown < _REPORT_SECTION_COUNT:
+        st.button(
+            "Continue →",
+            type="primary",
+            key="planet_shopping_report_continue",
+            on_click=lambda: st.session_state.__setitem__(_REPORT_SECTIONS_KEY, shown + 1),
+        )
+
 
 def render(data: pd.DataFrame, terminal_action) -> None:
-    """Render the seven-stage workshop using the shared prepared dataset."""
+    """Render the eight-stage workshop using the shared prepared dataset."""
     if _STAGE_KEY not in st.session_state:
         st.session_state[_STAGE_KEY] = 0
 
@@ -1566,8 +1681,10 @@ def render(data: pd.DataFrame, terminal_action) -> None:
         _render_combine(data)
     elif stage == 5:
         _render_destination(data)
-    else:
+    elif stage == 6:
         _render_data_science()
+    else:
+        _render_report(data)
 
     step_buttons(
         STAGE_LABELS,

@@ -248,6 +248,26 @@ recognition that data science is using data to narrow possibilities and make a
 decision. Leave room for the facilitator's human connection rather than
 introducing another topic.
 
+### 8. Report — Find out more about your planet
+
+A research page added after the Data Science screen. Learners use NASA's own
+resources to investigate the planet they chose, working through three sections.
+Each section opens only when the learner clicks **Continue →**, and **Continue →**
+appears only after every text box in the current section has something written in
+it. The answers are kept for the session. The page needs a chosen destination: if
+there is none, it sends the learner back to Choose Your Destination.
+
+Section 1, “Find out more about your planet”, shows the chosen planet's profile,
+then **Instructions** (search for the NASA Exoplanet Catalog, scroll down and
+search for your exoplanet by name, view it and answer the questions) and
+**Questions**, each with its own text box: what the planet is made of; the star
+(type, compared with the Sun, size, colour); travel time now and with faster
+future ships; which telescope first observed it and how; how its system compares
+with the Solar System and where the planet sits; and whether it is in the
+habitable zone, and what that is. The instructions deliberately name the sites
+without linking to them, so learners find the resources themselves like
+researchers. Sections 2 and 3 are still to be written.
+
 ## State that must persist
 
 Planet Shopping owns its own session state.
@@ -288,7 +308,7 @@ responsive layout and reuse of shared components.
 
 Codex should not independently:
 
-- add or remove learning screens from the seven-screen sequence;
+- add or remove learning screens from the eight-screen sequence (the Report screen was added at the project owner's request);
 - add new core filtering variables;
 - reorder the reasoning sequence;
 - reinterpret missing values;
