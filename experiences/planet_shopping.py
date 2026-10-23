@@ -16,6 +16,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 from data import PARSEC_TO_LIGHT_YEARS
+from report_pdf import build_report_pdf
 from visual_system import apply_section_spacing, apply_slider_style, apply_typography
 from charts import sky_map
 from ui_helpers import (
@@ -1638,17 +1639,83 @@ def _render_report_filters_section(data: pd.DataFrame, planet_name: str) -> bool
     return _report_question_boxes(2, _REPORT_FILTER_QUESTIONS)
 
 
-def _render_report_next_section(data: pd.DataFrame, planet_name: str) -> bool:
-    """Placeholder until the next batch of questions is written."""
-    st.markdown("#### Section 3")
-    st.caption("This section has not been written yet.")
-    return True
+_REPORT_BACKYARD_HEADING = "Can you see your exoplanet's star from your backyard?"
+_REPORT_BACKYARD_QUESTIONS = (
+    (
+        "overhead",
+        "Between what times will you be able to see your exoplanet's star overhead?",
+        ("Alternatively, what time of year will the star be clearly visible in the early evening?",),
+    ),
+    (
+        "reference_points",
+        "What bright objects or constellations could you use as reference points to locate your exoplanet's star "
+        "in the sky?",
+        ("For example, is the star near the Milky Way, or near any bright stars?",),
+    ),
+)
+_REPORT_PDF_TITLE = "Planet Shopping report"
+
+
+def _report_pdf(data: pd.DataFrame, planet_name: str) -> bytes:
+    """The learner's answers from every Report section, with their planet and its key facts."""
+    planet = data.loc[data["pl_name"].astype(str) == planet_name].iloc[0]
+    facts = []
+    for label, column, formatter in (
+        ("Temperature", "pl_eqt", _temperature_profile),
+        ("Distance", "sy_dist", _distance_profile),
+        ("Size", "pl_rade", _size_profile),
+        ("Stars in the system", "sy_snum", _stars_profile),
+        ("Year length", "pl_orbper", _year_profile),
+    ):
+        display_value, interpretation = _planet_display_value(planet[column], formatter)
+        facts.append((label, f"{display_value}. {interpretation}"))
+    sections = [
+        (
+            heading,
+            [
+                (number, lead_in, follow_ups, st.session_state.get(_report_answer_key(section, question), ""))
+                for number, (question, lead_in, follow_ups) in enumerate(questions, start=1)
+            ],
+        )
+        for section, (heading, _, questions) in enumerate(_REPORT_SECTION_QUESTIONS, start=1)
+    ]
+    return build_report_pdf(_REPORT_PDF_TITLE, planet_name, facts, sections)
+
+
+def _render_report_backyard_section(data: pd.DataFrame, planet_name: str) -> bool:
+    """Section 3: can you see the star from home? True when every question has an answer."""
+    st.markdown(f"#### {_REPORT_BACKYARD_HEADING}")
+    st.markdown("##### Instructions")
+    st.markdown(
+        "1. Go to stellarium-web.org.\n"
+        "2. Set the location to where you live. An approximate location is fine.\n"
+        "3. Search for your exoplanet, then answer the questions below."
+    )
+    st.markdown("##### Questions")
+    complete = _report_question_boxes(3, _REPORT_BACKYARD_QUESTIONS)
+    if complete:
+        st.markdown("#### Download your answers as a PDF")
+        st.write("Your PDF includes your planet, its key facts and all of your answers.")
+        st.download_button(
+            "Download PDF",
+            data=_report_pdf(data, planet_name),
+            file_name="planet-shopping-report.pdf",
+            mime="application/pdf",
+            type="primary",
+            key="planet_shopping_report_download",
+        )
+    return complete
 
 
 _REPORT_SECTIONS = (
     (_REPORT_PLANET_HEADING, _render_report_planet_section),
     (_REPORT_FILTERS_HEADING, _render_report_filters_section),
-    ("Section 3", _render_report_next_section),
+    (_REPORT_BACKYARD_HEADING, _render_report_backyard_section),
+)
+_REPORT_SECTION_QUESTIONS = (
+    (_REPORT_PLANET_HEADING, 1, _REPORT_PLANET_QUESTIONS),
+    (_REPORT_FILTERS_HEADING, 2, _REPORT_FILTER_QUESTIONS),
+    (_REPORT_BACKYARD_HEADING, 3, _REPORT_BACKYARD_QUESTIONS),
 )
 
 

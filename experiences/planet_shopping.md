@@ -275,7 +275,17 @@ Section 2, “Can you use better filters?”, has no instructions and asks learn
 reflect on their own filters, each with a text box: which filter mattered most and
 why; whether they found a good candidate and what limitations the filters had;
 and what other criteria could be filtered by to find a new home, including what
-else a planet needs to be habitable. Section 3 is still to be written.
+else a planet needs to be habitable.
+
+Section 3, “Can you see your exoplanet's star from your backyard?”, has
+instructions (go to stellarium-web.org, set the location to where you live, an
+approximate location is fine, and search for your exoplanet) and two text boxes:
+between what times the star is overhead, or what time of year it is clearly
+visible in the early evening; and which bright objects or constellations could
+be used as reference points to find it. Once both are answered, a final
+**Download your answers as a PDF** heading and button appear. The PDF holds the
+chosen planet's name and key facts and every answer from all three sections.
+Like the earlier instructions, the site is named rather than linked.
 
 ## State that must persist
 

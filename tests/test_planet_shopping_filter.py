@@ -665,5 +665,30 @@ class ReportPageTests(unittest.TestCase):
 
         next(b for b in at.button if b.label == "Continue →").click().run()
 
-        self.assertIn("#### Section 3", [m.value for m in at.markdown])
+        self.assertIn("#### Can you see your exoplanet's star from your backyard?", [m.value for m in at.markdown])
+        self.assertEqual(len(at.text_area), 11)
+        self.assertEqual(self._footer(at), [])
+        self.assertNotIn("#### Download your answers as a PDF", [m.value for m in at.markdown])  # not until answered
+
+        for box in at.text_area[9:]:
+            box.input("Last notes")
+        at.run()
+
         self.assertEqual(self._footer(at), ["Back to experiences"])
+        self.assertIn("#### Download your answers as a PDF", [m.value for m in at.markdown])
+        self.assertEqual(len(at.get("download_button")), 1)
+
+
+class ReportPdfTests(unittest.TestCase):
+    def test_pdf_is_built_with_unusual_characters_and_blank_answers(self):
+        from report_pdf import build_report_pdf
+
+        pdf = build_report_pdf(
+            "Planet Shopping report",
+            "Kepler-22 b",
+            [("Temperature", "20 °C. Comfortable.")],
+            [("Section", [(1, "Question with **bold** text", ("A follow-up",), "Answer with 🚀 and “quotes” é"), (2, "Blank", (), "  ")])],
+        )
+
+        self.assertTrue(pdf.startswith(b"%PDF-"))
+        self.assertGreater(len(pdf), 1_000)
