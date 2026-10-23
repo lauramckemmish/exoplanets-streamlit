@@ -422,10 +422,15 @@ TYPOGRAPHY_TOKENS = {
     # Atkinson Hyperlegible looks smaller than Tomorrow at the same size, so every size is 1px larger than before.
     "learner_min_size": "1.0625rem",
     "facilitator_min_size": "0.9375rem",
-    # Stage tabs: tighter than the shared default so a long stage list (Planet Shopping has eight) stays on one
-    # line in a smaller laptop browser. The tab strip still wraps on very narrow windows.
-    "tab_padding_x": "0.2rem",
-    "tab_gap": "0",
+    # Stage tabs. The spacing adapts to the room the tab strip has: the tight minimum when it only just fits, growing
+    # to the shared default (0.55rem padding, 0.25rem gap) when there is room, never beyond it. The widths are for
+    # Planet Shopping's eight tabs at 17px Atkinson Hyperlegible: the strip is 787px wide when the minimum spacing
+    # exactly fits and 906px when the shared default does. Below the first width the tabs still wrap.
+    "tab_padding_min_px": 3.2,  # 0.2rem
+    "tab_padding_max_px": 8.8,  # 0.55rem
+    "tab_gap_max_px": 4,  # 0.25rem
+    "tab_tight_width_px": 787,
+    "tab_roomy_width_px": 906,
 }
 _HEADING_FONT_URL = (
     "https://fonts.googleapis.com/css2?family=Tomorrow:wght@400;700"
@@ -458,8 +463,14 @@ def apply_typography(scope_key: str) -> None:
     strong_weight = TYPOGRAPHY_TOKENS["body_strong_weight"]
     learner = TYPOGRAPHY_TOKENS["learner_min_size"]
     facilitator = TYPOGRAPHY_TOKENS["facilitator_min_size"]
-    tab_padding = TYPOGRAPHY_TOKENS["tab_padding_x"]
-    tab_gap = TYPOGRAPHY_TOKENS["tab_gap"]
+    tab_pad_min = TYPOGRAPHY_TOKENS["tab_padding_min_px"]
+    tab_pad_max = TYPOGRAPHY_TOKENS["tab_padding_max_px"]
+    tab_gap_max = TYPOGRAPHY_TOKENS["tab_gap_max_px"]
+    tab_tight = TYPOGRAPHY_TOKENS["tab_tight_width_px"]
+    tab_span = TYPOGRAPHY_TOKENS["tab_roomy_width_px"] - tab_tight
+    # Spacing grows in step with the strip's width (100cqw, the tab block's own width) between the two widths above.
+    tab_pad_rate = (tab_pad_max - tab_pad_min) / tab_span
+    tab_gap_rate = tab_gap_max / tab_span
     scope = f'[data-testid="stMain"]:has(.st-key-{scope_key})'
     with st.container(key=scope_key):
         st.markdown(
@@ -480,11 +491,19 @@ def apply_typography(scope_key: str) -> None:
                 font-weight: {body_weight};
             }}
             {scope} p strong, {scope} li strong, {scope} p b, {scope} li b {{ font-weight: {strong_weight}; }}
-            /* Stage tabs: less space around and between the labels so every stage fits on one line. */
-            {scope} [data-testid="stTabs"] [role="tablist"] {{ gap: {tab_gap}; }}
-            {scope} [data-testid="stTabs"] [role="tab"] {{ padding-left: {tab_padding}; padding-right: {tab_padding}; }}
+            /* Stage tabs: spacing adapts to the room available so every stage fits on one line when it can.
+               The minimum applies where container units are unsupported or the strip is narrow. */
+            {scope} [data-testid="stTabs"] {{ container-type: inline-size; }}
+            {scope} [data-testid="stTabs"] [role="tablist"] {{ --tab-pad: {tab_pad_min}px; --tab-gap: 0px; gap: var(--tab-gap); }}
+            @supports (width: 1cqw) {{
+                {scope} [data-testid="stTabs"] [role="tablist"] {{
+                    --tab-pad: clamp({tab_pad_min}px, calc({tab_pad_min}px + (100cqw - {tab_tight}px) * {tab_pad_rate:.5f}), {tab_pad_max}px);
+                    --tab-gap: clamp(0px, calc((100cqw - {tab_tight}px) * {tab_gap_rate:.5f}), {tab_gap_max}px);
+                }}
+            }}
+            {scope} [data-testid="stTabs"] [role="tab"] {{ padding-left: var(--tab-pad); padding-right: var(--tab-pad); }}
             {scope} [data-testid="stTabs"] [role="tab"][aria-selected="true"],
-            {scope} [data-testid="stTabs"] [role="tab"][data-selected="true"] {{ padding-left: max(0px, calc({tab_padding} - 3px)); }}
+            {scope} [data-testid="stTabs"] [role="tab"][data-selected="true"] {{ padding-left: max(0px, calc(var(--tab-pad) - 3px)); }}
             /* Facilitator live cues: Streamlit pulls each markdown block up by 1rem to cancel its last paragraph's
                margin, but the shared cue style shrinks that margin, so the shaded box ended short of its text.
                Remove the margin and the pull-up together so the box encloses all of the text. */
