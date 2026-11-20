@@ -5,15 +5,18 @@ See ``planet_shopping.md`` for the established pedagogical design.
 
 import base64
 from datetime import date
-from functools import lru_cache
+from functools import lru_cache, partial
 from html import escape
+import json
 from pathlib import Path
 import random
 
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
 
 from data import PARSEC_TO_LIGHT_YEARS
+from report_pdf import build_report_pdf
 from visual_system import apply_section_spacing, apply_slider_style, apply_typography
 from charts import sky_map
 from ui_helpers import (
@@ -27,6 +30,7 @@ from ui_helpers import (
     hard_reveal,
     role_image,
     scroll_to_top_if_requested,
+    select_tab_step,
     soft_reveal,
     step_buttons,
     step_tabs,
@@ -48,6 +52,7 @@ STAGE_LABELS = [
     "Combine",
     "Choose Your Destination",
     "Data Science",
+    "Report",
 ]
 
 # These keys belong only to this experience. Do not reuse the mission or
@@ -1530,9 +1535,246 @@ def _render_data_science() -> None:
             "and used evidence to choose."
         )
 
+_REPORT_SECTIONS_KEY = "planet_shopping_report_sections_shown"
+_REPORT_SCROLL_KEY = "planet_shopping_report_scroll_to_section"
+_REPORT_SECTION_COUNT = 3
+_REPORT_DESTINATION_STAGE = STAGE_LABELS.index("Choose Your Destination")
+# Section 1: each entry is (key, lead-in text, follow-up questions). Every entry gets its own text box.
+_REPORT_PLANET_QUESTIONS = (
+    ("composition", "What is the exoplanet composed of?", ()),
+    (
+        "star",
+        "Click **LEARN MORE+** and answer these questions about the star:",
+        (
+            "What type of star does the exoplanet orbit?",
+            "Is this the same type of star as our Sun?",
+            "Is the star it orbits bigger or smaller than our Sun, and by how much?",
+            "What colour is the star?",
+        ),
+    ),
+    (
+        "travel",
+        "How long would it take to travel to the exoplanet with our current technology?",
+        ("Imagine future space-faring technology. How long would it take to get there with faster ships?",),
+    ),
+    ("telescope", "Which telescope first observed this exoplanet, and what method did it use?", ()),
+    (
+        "system",
+        "Select **Close** to go back. In the view panel on the right, select **System**.",
+        (
+            "How does this solar system compare to our Solar System?",
+            "Where does your chosen exoplanet sit in this system?",
+        ),
+    ),
+    (
+        "habitable_zone",
+        "Is the exoplanet in the habitable zone?",
+        ("What is the habitable zone?",),
+    ),
+)
+
+
+def _report_answer_key(section: int, question: str) -> str:
+    return f"planet_shopping_report_{section}_{question}"
+
+
+def _report_question_boxes(section: int, questions) -> bool:
+    """Show each question with its text box. True once every box has something written in it."""
+    complete = True
+    for number, (question, lead_in, follow_ups) in enumerate(questions, start=1):
+        st.markdown(f"**{number}.** {lead_in}")
+        if len(follow_ups) == 1:
+            st.markdown(follow_ups[0])
+        elif follow_ups:
+            st.markdown("\n".join(f"- {text}" for text in follow_ups))
+        answer = st.text_area(
+            f"Your answer to question {number}",
+            key=_report_answer_key(section, question),
+            height=100,
+            placeholder="Write what you found…",
+            label_visibility="collapsed",
+            persist_state="session",
+        )
+        complete = complete and bool(answer.strip())
+    return complete
+
+
+def _render_report_planet_section(data: pd.DataFrame, planet_name: str) -> bool:
+    """Section 1: research the chosen exoplanet in NASA's own resources. True when it is complete."""
+    st.markdown("#### Find out more about your planet")
+    planet = data.loc[data["pl_name"].astype(str) == planet_name].iloc[0]
+    _render_planet_profile(planet_name, planet)
+    st.markdown("##### Instructions")
+    st.markdown(
+        "1. Search for the NASA Exoplanet Catalog.\n"
+        "2. Scroll down and search for your exoplanet by name.\n"
+        "3. View your exoplanet, then answer the questions below."
+    )
+    st.markdown("##### Questions")
+    return _report_question_boxes(1, _REPORT_PLANET_QUESTIONS)
+
+
+# Section 2 mirrors section 1's layout, with no instructions: it asks learners to reflect on their own filters.
+_REPORT_FILTER_QUESTIONS = (
+    ("most_important", "Think back to the filters you used. Which one was the most important to you, and why?", ()),
+    (
+        "good_candidate",
+        "Now that you know more about your exoplanet, do you think you found a good candidate? Why or why not?",
+        ("What limitations did the filters have?",),
+    ),
+    (
+        "other_criteria",
+        "What other criteria could we filter by if we wanted to find a new home?",
+        ("What else is important for an exoplanet to be habitable?",),
+    ),
+)
+_REPORT_FILTERS_HEADING = "Can you use better filters?"
+_REPORT_PLANET_HEADING = "Find out more about your planet"
+
+
+def _render_report_filters_section(data: pd.DataFrame, planet_name: str) -> bool:
+    """Section 2: reflect on the filters. True when every question has an answer."""
+    st.markdown(f"#### {_REPORT_FILTERS_HEADING}")
+    st.markdown("##### Questions")
+    return _report_question_boxes(2, _REPORT_FILTER_QUESTIONS)
+
+
+_REPORT_BACKYARD_HEADING = "Can you see your exoplanet's star from your backyard?"
+_REPORT_BACKYARD_QUESTIONS = (
+    (
+        "overhead",
+        "Between what times will you be able to see your exoplanet's star overhead?",
+        ("Alternatively, what time of year will the star be clearly visible in the early evening?",),
+    ),
+    (
+        "reference_points",
+        "What bright objects or constellations could you use as reference points to locate your exoplanet's star "
+        "in the sky?",
+        ("For example, is the star near the Milky Way, or near any bright stars?",),
+    ),
+)
+_REPORT_PDF_TITLE = "Planet Shopping report"
+
+
+def _report_pdf(data: pd.DataFrame, planet_name: str) -> bytes:
+    """The learner's answers from every Report section, with their planet and its key facts."""
+    planet = data.loc[data["pl_name"].astype(str) == planet_name].iloc[0]
+    facts = []
+    for label, column, formatter in (
+        ("Temperature", "pl_eqt", _temperature_profile),
+        ("Distance", "sy_dist", _distance_profile),
+        ("Size", "pl_rade", _size_profile),
+        ("Stars in the system", "sy_snum", _stars_profile),
+        ("Year length", "pl_orbper", _year_profile),
+    ):
+        display_value, interpretation = _planet_display_value(planet[column], formatter)
+        facts.append((label, f"{display_value}. {interpretation}"))
+    sections = [
+        (
+            heading,
+            [
+                (number, lead_in, follow_ups, st.session_state.get(_report_answer_key(section, question), ""))
+                for number, (question, lead_in, follow_ups) in enumerate(questions, start=1)
+            ],
+        )
+        for section, (heading, _, questions) in enumerate(_REPORT_SECTION_QUESTIONS, start=1)
+    ]
+    return build_report_pdf(_REPORT_PDF_TITLE, planet_name, facts, sections)
+
+
+def _render_report_backyard_section(data: pd.DataFrame, planet_name: str) -> bool:
+    """Section 3: can you see the star from home? True when every question has an answer."""
+    st.markdown(f"#### {_REPORT_BACKYARD_HEADING}")
+    st.markdown("##### Instructions")
+    st.markdown(
+        "1. Go to stellarium-web.org.\n"
+        "2. Set the location to where you live. An approximate location is fine.\n"
+        "3. Search for your exoplanet, then answer the questions below."
+    )
+    st.markdown("##### Questions")
+    complete = _report_question_boxes(3, _REPORT_BACKYARD_QUESTIONS)
+    if complete:
+        st.markdown("#### Download your answers as a PDF")
+        st.write("Your PDF includes your planet, its key facts and all of your answers.")
+        st.download_button(
+            "Download PDF",
+            data=_report_pdf(data, planet_name),
+            file_name="planet-shopping-report.pdf",
+            mime="application/pdf",
+            type="primary",
+            key="planet_shopping_report_download",
+        )
+    return complete
+
+
+_REPORT_SECTIONS = (
+    (_REPORT_PLANET_HEADING, _render_report_planet_section),
+    (_REPORT_FILTERS_HEADING, _render_report_filters_section),
+    (_REPORT_BACKYARD_HEADING, _render_report_backyard_section),
+)
+_REPORT_SECTION_QUESTIONS = (
+    (_REPORT_PLANET_HEADING, 1, _REPORT_PLANET_QUESTIONS),
+    (_REPORT_FILTERS_HEADING, 2, _REPORT_FILTER_QUESTIONS),
+    (_REPORT_BACKYARD_HEADING, 3, _REPORT_BACKYARD_QUESTIONS),
+)
+
+
+def _scroll_to_heading(heading: str) -> None:
+    """Bring a newly opened section's heading to the top of the page."""
+    components.html(
+        f"""
+        <script>
+            const wanted = {json.dumps(heading)};
+            const doc = window.parent.document;
+            const target = [...doc.querySelectorAll('h4')].find((h) => h.textContent.trim() === wanted);
+            if (target) setTimeout(() => target.scrollIntoView({{behavior: 'instant', block: 'start'}}), 100);
+        </script>
+        """,
+        height=0,
+    )
+
+
+def _open_next_report_section(shown: int) -> None:
+    st.session_state[_REPORT_SECTIONS_KEY] = shown + 1
+    st.session_state[_REPORT_SCROLL_KEY] = True
+
+
+def _render_report(data: pd.DataFrame, terminal_action=None):
+    """Render the Report stage and return the footer button as (action, label).
+
+    The footer button is Continue while a later section is waiting, and the experience's own
+    closing action (if any) once the last section is complete. It is withheld while the current
+    section still has an empty text box.
+    """
+    st.subheader("Report")
+    planet_name = st.session_state.get(_APPLIED_DESTINATION_KEY)
+    if planet_name is None or not data["pl_name"].astype(str).eq(planet_name).any():
+        st.write("The report starts with the planet you chose. Choose your destination first.")
+        st.button(
+            "Go to Choose Your Destination",
+            type="primary",
+            key="planet_shopping_report_go_to_destination",
+            on_click=select_tab_step,
+            args=(_TAB_KEY, STAGE_LABELS, _STAGE_KEY, _SCROLL_KEY, _REPORT_DESTINATION_STAGE),
+        )
+        return None, None
+
+    # Each section opens only after the one before it has been written up.
+    shown = max(1, min(int(st.session_state.get(_REPORT_SECTIONS_KEY, 1)), _REPORT_SECTION_COUNT))
+    complete = False
+    for _, render_section in _REPORT_SECTIONS[:shown]:
+        complete = render_section(data, planet_name)
+    if st.session_state.pop(_REPORT_SCROLL_KEY, False):
+        _scroll_to_heading(_REPORT_SECTIONS[shown - 1][0])
+    if not complete:
+        return None, None
+    if shown < _REPORT_SECTION_COUNT:
+        return partial(_open_next_report_section, shown), "Continue →"
+    return terminal_action, "Back to experiences"
+
 
 def render(data: pd.DataFrame, terminal_action) -> None:
-    """Render the seven-stage workshop using the shared prepared dataset."""
+    """Render the eight-stage workshop using the shared prepared dataset."""
     if _STAGE_KEY not in st.session_state:
         st.session_state[_STAGE_KEY] = 0
 
@@ -1551,6 +1793,7 @@ def render(data: pd.DataFrame, terminal_action) -> None:
         apply_section_spacing("planet_shopping_section_spacing")
     scroll_to_top_if_requested(_SCROLL_KEY)
 
+    terminal_label = "Back to experiences"
     if stage == 0 and facilitator_notes_enabled():
         _render_facilitator_orientation()
 
@@ -1566,8 +1809,10 @@ def render(data: pd.DataFrame, terminal_action) -> None:
         _render_combine(data)
     elif stage == 5:
         _render_destination(data)
-    else:
+    elif stage == 6:
         _render_data_science()
+    else:
+        terminal_action, terminal_label = _render_report(data, terminal_action)
 
     step_buttons(
         STAGE_LABELS,
@@ -1577,5 +1822,5 @@ def render(data: pd.DataFrame, terminal_action) -> None:
         stage,
         "planet_shopping",
         terminal_action=terminal_action,
-        terminal_label="Back to experiences",
+        terminal_label=terminal_label,
     )

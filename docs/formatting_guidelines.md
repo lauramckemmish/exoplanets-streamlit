@@ -25,10 +25,11 @@ to Planet Shopping only; other experiences not yet changed).
 
 | Element | Rule |
 | --- | --- |
-| Headings (`st.header`, `st.subheader`, title, raw `h1`–`h4`) | **Tomorrow, bold (700)**. A free Google font with a wide, squared, futuristic look. The original aim was to echo the bold headings on the European Space Agency home page. |
+| Headings (`st.header`, `st.subheader`, title, raw `h1`–`h5`) | **Tomorrow, bold (700)**. A free Google font with a wide, squared, futuristic look. The original aim was to echo the bold headings on the European Space Agency home page. |
 | Body text | **Atkinson Hyperlegible Regular (400)**, a typeface designed by the Braille Institute for low-vision readers. Bold text inside body copy (`**…**`) is Bold (700). Icon fonts are not touched. |
 | Stand-alone numbers (slider values and their min/max, metric values, table cells, the typed guess) | **Tomorrow**, so they keep the same look as the headings. Implemented as a `Tomorrow Digits` font limited to the digit characters, so no markup is needed. Numbers inside a sentence stay in Atkinson Hyperlegible. |
 | Learner-facing text (body paragraphs and lists, captions, tab labels, widget and slider labels, slider values, radio and checkbox options, button text, metric labels, expander titles, prompt/reveal labels) | **17px (1.0625rem)**. Atkinson Hyperlegible looks smaller than Tomorrow at the same size, so this is 1px above the Streamlit default of 16px. |
+| Stage tabs (the row of stage names under the title) | The padding and gap between labels **adapt to the width of the page**. They stay at a tight minimum (0.2rem padding, no gap) when the strip only just fits, and grow smoothly up to the shared default (0.55rem padding, 0.25rem gap) when there is room, never beyond it. At about 1280px with the sidebar open, Planet Shopping's eight stages fit on one line. On narrower windows the tabs still wrap to a second line rather than being hidden. Values and the two widths they are tuned to are in `TYPOGRAPHY_TOKENS`; re-measure them if the tab text or number of stages changes. |
 | Facilitator-only text (curriculum summary and tags, live-cue labels) | **Minimum 15px (0.9375rem)**. Previously as small as about 11px. |
 
 ### Why

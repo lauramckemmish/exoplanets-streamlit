@@ -248,6 +248,45 @@ recognition that data science is using data to narrow possibilities and make a
 decision. Leave room for the facilitator's human connection rather than
 introducing another topic.
 
+### 8. Report — Find out more about your planet
+
+A research page added after the Data Science screen. Learners use NASA's own
+resources to investigate the planet they chose, working through three sections.
+Each section opens only when the learner clicks **Continue →**, which appears in
+the bottom-right footer (where **Back to experiences** normally sits) once every
+text box in the current section has something written in it. The footer shows
+nothing until then, and **Back to experiences** returns after the last section.
+The page scrolls to each new section. The answers are kept for the session. The
+page needs a chosen destination: if there is none, it sends the learner back to
+Choose Your Destination.
+
+Section 1, “Find out more about your planet”, shows the chosen planet's profile,
+then **Instructions** (search for the NASA Exoplanet Catalog, scroll down and
+search for your exoplanet by name, view it and answer the questions) and
+**Questions**, each with its own text box: what the planet is made of; the star
+(type, compared with the Sun, size, colour); travel time now and with faster
+future ships; which telescope first observed it and how; how its system compares
+with the Solar System and where the planet sits; and whether it is in the
+habitable zone, and what that is. The instructions deliberately name the sites
+without linking to them, so learners find the resources themselves like
+researchers.
+
+Section 2, “Can you use better filters?”, has no instructions and asks learners to
+reflect on their own filters, each with a text box: which filter mattered most and
+why; whether they found a good candidate and what limitations the filters had;
+and what other criteria could be filtered by to find a new home, including what
+else a planet needs to be habitable.
+
+Section 3, “Can you see your exoplanet's star from your backyard?”, has
+instructions (go to stellarium-web.org, set the location to where you live, an
+approximate location is fine, and search for your exoplanet) and two text boxes:
+between what times the star is overhead, or what time of year it is clearly
+visible in the early evening; and which bright objects or constellations could
+be used as reference points to find it. Once both are answered, a final
+**Download your answers as a PDF** heading and button appear. The PDF holds the
+chosen planet's name and key facts and every answer from all three sections.
+Like the earlier instructions, the site is named rather than linked.
+
 ## State that must persist
 
 Planet Shopping owns its own session state.
@@ -288,7 +327,7 @@ responsive layout and reuse of shared components.
 
 Codex should not independently:
 
-- add or remove learning screens from the seven-screen sequence;
+- add or remove learning screens from the eight-screen sequence (the Report screen was added at the project owner's request);
 - add new core filtering variables;
 - reorder the reasoning sequence;
 - reinterpret missing values;
